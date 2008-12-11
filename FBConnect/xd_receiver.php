@@ -30,7 +30,7 @@ This is a cross domain (XD) receiver page. It needs to be placed on your domain 
 -->
 
 <?php
-  echo '<script src="http://static.ak.' . $base_url . '/js/api_lib/v0.4/XdCommReceiver.debug.js" type="text/javascript"></script>';
+  echo '<script src="http://static.ak.' . $base_fb_url . '/js/api_lib/v0.4/XdCommReceiver.debug.js" type="text/javascript"></script>';
 ?>
 </body>
 </html>
