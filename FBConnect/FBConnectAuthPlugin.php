@@ -31,7 +31,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	}
 
 	function updateUser( &$user ) {
-		$realName = FBConnectClient::get_fields($fb_uid, array('name'));
+		$realName = FBConnectClient::get_fields($user->getName(), array('name'));
 		if ($realName != "" && $realName != $user->getRealName()) {
 			$user->setRealName($realName);
 			$user->saveSettings();
