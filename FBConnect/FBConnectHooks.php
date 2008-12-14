@@ -4,16 +4,20 @@
  *  Class containing all the hooks used in this extension
  */
 class FBConnectHooks {
-	// Set the global variable $wgAuth to our custom authentification plugin
+	/**
+	 * Set the global variable $wgAuth to our custom authentification plugin
+	 */
 	static function onAuthPluginSetup (&$auth) {
 		$auth = new StubObject('wgAuth', 'FBConnectAuthPlugin');
 		return true;
 	}
 	
-	// If the user isn't logged in, try to auto-authenticate via Facebook Connect
+	/**
+	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect
+	 */
 	static function onUserLoadFromSession($user, &$result) {
 		global $wgAuth;
-		//FBConnectClient
+		
 		$fb_uid = FBConnectClient::getClient()->get_loggedin_user();	
 		if (!isset($fb_uid) || $fb_uid == 0) {
 			// No connection with facebook, so use local sessions only
@@ -21,34 +25,39 @@ class FBConnectHooks {
 		}
 		if( $user->isLoggedIn() ) {
 			// Already logged in; don't worry about the global session
+			// TODO: check against the user's facebook ID, and log them out if they don't match
 			return true;
 		}
 		
 		// Username is the user's facebook ID
 		$userName = "$fb_uid";
 		
-		// Why doesn't this work? Is the facebook client not fully initialized yet?
-		// $real_name = facebook_get_fields($fb_uid, array('name'));
+		// Only create a new user if we can see the user's real name from facebook
+		$real_name = FBConnectClient::get_fields($fb_uid, array('name'));
+		
 		
 		$localId = User::idFromName( $userName );
 		
 		// If the user does not exist locally, attempt to create it
 		if ( !$localId ) {
+			/* 
 			// Denied by configuration?
 			if ( !$wgAuth->autoCreate() ) {
 				wfDebug( __METHOD__.": denied by configuration\n" );
 				// Can't create new user, give up now
 				return true;
-			}	
+			}
+			/**/	
 			
 			/* Skip this check for now, until we hammer down the other problems
-			// Is the user blocked?
 			$anon = new User;
+			// Is the user blocked?
 			if ( !$anon->isAllowedToCreateAccount() ) {
 				wfDebug( __METHOD__.": denied by configuration. \$user->isAllowedToCreateAccount() returned false.\n" );
 				// Can't create new user, give up now
 				return true;
-			} */
+			}
+			/**/
 
 			// Checks passed, create the user
 			//wfDebug( __METHOD__.": creating new user\n" );
@@ -56,7 +65,8 @@ class FBConnectHooks {
 			$user->addToDatabase();
 
 			$wgAuth->initUser( $user, true );
-			//$wgAuth->updateUser( $user );	// Called by $wgAuth->initUser(). Should it not be?
+			// $wgAuth->updateUser() is called by $wgAuth->initUser(). Should it be called here instead?
+			// $wgAuth->updateUser( $user );
 
 			// Update user count
 			$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
@@ -68,6 +78,9 @@ class FBConnectHooks {
 		} else {
 			$user->setID( $localId );
 			$user->loadFromId();
+			if ($user->getRealName() == '') {
+				$wgAuth->updateUser( $user );
+			}
 		}
 		
 		// Auth OK.
@@ -78,7 +91,9 @@ class FBConnectHooks {
 		return true;
 	}
 
-	// Modify the user's persinal toolbar (in the upper right)
+	/**
+	 * Modify the user's persinal toolbar (in the upper right)
+	 */
 	static function onPersonalUrls(&$personal_urls, &$title) {
 		global $wgUser, $wgLang, $wgOut, $wgFBConnectOnly, $wgFBConnectLogoUrl;
 		wfLoadExtensionMessages('FBConnect');
@@ -105,13 +120,14 @@ class FBConnectHooks {
 			if ($wgUser->getRealName() == "") {
 				$wgAuth->updateUser($wgUser);
 			}
-			*/
+			/**/
 			if ($wgUser->getRealName() == "") {
 				$personal_urls['userpage']['text'] .= ' (change "Real Name" in preferences) ';
 			} else {
 				$personal_urls['userpage']['text'] = $wgUser->getRealName();
 			}
 			unset($personal_urls['logout']);
+			/**/
 			$thisurl = $title->getPrefixedURL();
 			$personal_urls['fblogout'] = array('text' => wfMsg('fbconnectlogout'),
 			                                   'href' => Skin::makeSpecialUrl('Userlogout', $title->isSpecial('Preferences') ?
@@ -128,9 +144,12 @@ class FBConnectHooks {
 
 		return true;
 	}
-
-	// We seriously need to use a better hook... But which one allows injecting javascript src's into the page's body???
-	// The dynamic source code loading [newElement("source") ...] technique didn't work for me.
+	
+	/**
+	 * We seriously need to use a better hook... But which one allows injecting javascript src's into the page's body?
+	 * The dynamic source code loading [newElement("source") ...] technique didn't work for me.
+	 *
+	 */
 	static function onParserAfterTidy(&$parser, &$text) {
 		static $wgOnce = false;
 		//if (!isset($wgOnce) || !$wgOnce) {
@@ -141,15 +160,22 @@ class FBConnectHooks {
 		return true;
 	}
 	
-	// Is there any hook for this task?
+	/**
+	 * Is there any hook for this task?
+	 *
+	 * Perhaps one of the skin hooks: SkinAfterBottomScripts, SkinAfterContent or SkinBuildSidebar...
+	 *
+	 */
 	static function onSomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
 		$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
 		//$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js" type="text/javascript"></script>';
-		//<script src="/w/extensions/FBConnect/fbconnect.js"></script>
+		//$text .= '<script src="/w/extensions/FBConnect/fbconnect.js"></script>';
 		return true;
 	}
 
-	// Injects some CSS and Javascript into the <head> of the page
+	/**
+	 * Injects some CSS and Javascript into the <head> of the page
+	 */
 	static function onBeforePageDisplay(&$out, &$sk) {
 		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath;
 		$thisurl = $wgTitle->getPrefixedURL();
@@ -161,6 +187,7 @@ class FBConnectHooks {
 			}
 		</style>';
 		
+		// Setup some variables and pseudo window.onload functions for Facebook Connect
 		$script = "";
 		$js_vars = array(
 			'api_key' => FBConnectClient::get_api_key(),
@@ -174,6 +201,7 @@ class FBConnectHooks {
 				$script .= "var " . $name . " = '" . $value . "';\n";
 			}
 		}
+		// Onload functions from fbconnect.js (actually called in the <body> by addOnloadHook())
 		foreach( array( 'facebook_onload_addFBConnectButtons', 'facebook_init', 'facebook_onload' ) as $hook ) {
 			$script .= "addOnloadHook($hook);\n";
 		}
