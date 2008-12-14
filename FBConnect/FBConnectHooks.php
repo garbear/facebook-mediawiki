@@ -17,33 +17,27 @@ class FBConnectHooks {
 	 */
 	static function onUserLoadFromSession($user, &$result) {
 		global $wgAuth;
-		
+
 		$fb_uid = FBConnectClient::getClient()->get_loggedin_user();	
 		if (!isset($fb_uid) || $fb_uid == 0) {
-			// No connection with facebook, so use local sessions only
+			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
 			return true;
 		}
-		if( $user->isLoggedIn() ) {
-			// Already logged in; don't worry about the global session
-			// TODO: check against the user's facebook ID, and log them out if they don't match
-			return true;
-		}
-		
+
 		// Username is the user's facebook ID
 		$userName = "$fb_uid";
-		
-		// Only create a new user if we can see the user's real name from facebook
-		$real_name = FBConnectClient::get_fields($fb_uid, array('name'));
-		
-		
+		if( $user->isLoggedIn() && $user->getName() == $userName ) {
+			return true;
+		}
+
 		$localId = User::idFromName( $userName );
-		
+
 		// If the user does not exist locally, attempt to create it
 		if ( !$localId ) {
-			/* 
-			// Denied by configuration?
+			/*
+			// Are we denied by the configuration of FBConnectAuthPlugin?
 			if ( !$wgAuth->autoCreate() ) {
-				wfDebug( __METHOD__.": denied by configuration\n" );
+				wfDebug( __METHOD__.": denied by the configuration of FBConnectAuthPlugin\n" );
 				// Can't create new user, give up now
 				return true;
 			}
@@ -65,8 +59,8 @@ class FBConnectHooks {
 			$user->addToDatabase();
 
 			$wgAuth->initUser( $user, true );
-			// $wgAuth->updateUser() is called by $wgAuth->initUser(). Should it be called here instead?
-			// $wgAuth->updateUser( $user );
+			// updateUser() is called by $wgAuth->initUser(). Should it be called here instead?
+			//$wgAuth->updateUser( $user );
 
 			// Update user count
 			$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
@@ -74,7 +68,8 @@ class FBConnectHooks {
 
 			// Notify hooks (e.g. Newuserlog)
 			wfRunHooks( 'AuthPluginAutoCreate', array( $user ) );
-			//$user->addNewUserLogEntryAutoCreate();	// Which MediaWiki versions can we call this function in?
+			// Which MediaWiki versions can we call this function in?
+			//$user->addNewUserLogEntryAutoCreate();
 		} else {
 			$user->setID( $localId );
 			$user->loadFromId();

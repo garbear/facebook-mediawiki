@@ -26,6 +26,7 @@ function facebook_logout() {
         FB.Connect.logoutAndRedirect(logout_url);
         //FB.Connect.logoutAndRedirect(window.location.href);
     });
+    setTimeout("window.location = '" + logout_url + "';", 1750);
 }
 
 /*
