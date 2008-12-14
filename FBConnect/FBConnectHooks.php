@@ -92,10 +92,34 @@ class FBConnectHooks {
 	}
 
 	/**
+	 * Modify the preferences form. At the moment, we simply turn the user name
+	 * into a link to the user's facebook profile.
+	 * 
+	 */
+	public static function onRenderPreferencesForm($form, $output) {
+		global $wgUser;
+		$fb_uid = $wgUser->getName();
+		// If the user name is not a valid facebook ID (i.e. not a bunch of numbers) then we're done here
+		// TODO: I need a function that actually tests this
+		if ($fb_uid == "Admin") {
+			return true;
+		}
+		$html = $output->getHTML();
+		$i = strpos( $html, $fb_uid );
+		if ($i !== FALSE) {
+			// Replace the old output with the new output
+			$output->clearHTML();
+			$output->addHTML( substr($html, 0, $i) . preg_replace("($fb_uid)",
+			    "<a href='http://www.facebook.com/profile.php?id=$fb_uid'>$fb_uid</a>", substr($html, $i, -1), 1 ) );
+		}
+		return true;
+	}
+
+	/**
 	 * Modify the user's persinal toolbar (in the upper right)
 	 */
 	static function onPersonalUrls(&$personal_urls, &$title) {
-		global $wgUser, $wgLang, $wgOut, $wgFBConnectOnly, $wgFBConnectLogoUrl;
+		global $wgUser, $wgLang, $wgOut, $wgFBConnectOnly;
 		wfLoadExtensionMessages('FBConnect');
 		$sk = $wgUser->getSkin();
 		

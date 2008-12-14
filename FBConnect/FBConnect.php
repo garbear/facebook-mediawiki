@@ -41,6 +41,7 @@ $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 $wgHooks['AuthPluginSetup'][] =			'FBConnectHooks::onAuthPluginSetup';
 $wgHooks['UserLoadFromSession'][] =		'FBConnectHooks::onUserLoadFromSession';
+$wgHooks['RenderPreferencesForm'][]=	'FBConnectHooks::onRenderPreferencesForm';
 $wgHooks['PersonalUrls'][]=				'FBConnectHooks::onPersonalUrls';
 $wgHooks['BeforePageDisplay'][] =		'FBConnectHooks::onBeforePageDisplay';
 $wgHooks['ParserAfterTidy'][] =			'FBConnectHooks::onParserAfterTidy';
