@@ -1,3 +1,76 @@
+/*
+ * Initializes the Facebook Connect JavaScript libraries.
+ * Make sure that the variable api_key is set!
+ */
+function facebook_init() {
+    FB.init(api_key, "/w/extensions/FBConnect/xd_receiver.php");
+}
+
+/*
+ * Logs the user into Facebook. Upon login, the page is probably refreshed.
+ */
+function facebook_login(){
+    FB_RequireFeatures(["Connect"], function() {
+        FB.Connect.requireSession(function() {
+            facebook_onlogin_ready();
+        })
+    });
+}
+
+/*
+ * Logs the user out of Facebook. When this is accomplished, the user is redirected to
+ * the Wiki's logout page to keep things syncronized.
+ */
+function facebook_logout() {
+    FB_RequireFeatures(["Connect"], function() {
+        FB.Connect.logoutAndRedirect(logout_url);
+        //FB.Connect.logoutAndRedirect(window.location.href);
+    });
+}
+
+/*
+ * Because the PersonalUrls hook only accepts plain text...
+ */
+function facebook_onload_addFBConnectButtons() {
+    if (document.getElementById("pt-fbconnect")) {
+        // Either use a FBXML button, or render an html button
+        document.getElementById("pt-fbconnect").innerHTML = '<a href="#" onclick="facebook_login(); return false;">' +
+            '<img id="fb_login_image" src="http://static.ak.fbcdn.net/images/fbconnect/login-buttons/connect_light_medium_long.gif" ' + 
+            'alt="Connect with Facebook"/></a>';
+        //document.getElementById("pt-fbconnect").innerHTML = '<fb:login-button length="long" onlogin="facebook_onlogin_ready();"></fb:login-button>';
+    }
+    if (document.getElementById("pt-fblogout")) {
+        // Either use a FBXML button, render an html button, or a combination of both
+        document.getElementById("pt-fblogout").innerHTML = '<a href="#" onclick="facebook_logout();">' + 
+            '<img id="fb_logout_image" src="http://static.ak.fbcdn.net/images/fbconnect/logout-buttons/logout_small.gif" ' + 
+            'alt="Logout of Facebook"/></a>';
+        //document.getElementById("pt-fblogout").innerHTML = '<fb:login-button autologoutlink="true"></fb:login-button>';
+        //document.getElementById("pt-fblogout").innerHTML = '<span onclick="setTimeout(\'facebook_logout_function()\', 2000)"><fb:login-button autologoutlink="true" size="small"></fb:login-button></span>';
+    }
+}
+
+/*
+ * Not used. This was provided as an example by the Facebook Dev Wiki. This function alerts the user
+ * that the session is ready, and then displays a message box containing the user's friends' IDs.
+ */
+function facebook_alertfunction() {
+    FB_RequireFeatures(["XFBML"], function()
+    {
+        facebook_init();
+        FB.Facebook.get_sessionState().waitUntilReady(function()
+        {
+            window.alert("Session is ready");
+            // If you want to make Facebook API calls from JavaScript do something like
+            FB.Facebook.apiClient.friends_get(null, function(result, ex)
+            {
+                //Do something with result
+                window.alert("Friends list: " + result);
+            });
+        });
+    });
+}
+
+
 
 /*
  * The facebook_onload statement is printed out in the PHP. If the user's logged in
@@ -12,15 +85,14 @@
  *                                      is logged in, based on their cookies
  *
  */
-function facebook_onload(already_logged_into_facebook) {
+function facebook_onload() {
   // user state is either: has a session, or does not.
   // if the state has changed, detect that and reload.
   FB.ensureInit(function() {
       FB.Facebook.get_sessionState().waitUntilReady(function(session) {
           var is_now_logged_into_facebook = session ? true : false;
 
-          // if the new state is the same as the old (i.e., nothing changed)
-          // then do nothing
+          // if the new state is the same as the old (i.e., nothing changed) then do nothing
           if (is_now_logged_into_facebook == already_logged_into_facebook) {
             return;
           }
@@ -51,6 +123,8 @@ function facebook_onlogin_ready() {
  * This is the easiest but not the only way to pick up changes.
  * If you have a small amount of Facebook-specific content on a large page,
  * then you could change it in Javascript without refresh.
+ *
+ * This function was modified from The Run Around's original function to not load index.php.
  */
 function refresh_page() {
   window.location.reload(true);
@@ -58,7 +132,9 @@ function refresh_page() {
 
 /*
  * Prompts the user to grant a permission to the application.
- */
+ *
+ * This function is not currently used in FBConnect.
+ *
 function facebook_prompt_permission(permission) {
   FB.ensureInit(function() {
     FB.Connect.showPermissionDialog(permission);
@@ -70,7 +146,8 @@ function facebook_prompt_permission(permission) {
  * onclick handler of a "Publish" button, or in the onload event after
  * the user submits a form with info that should be published.
  *
- */
+ * This function is not currently used in FBConnect.
+ *
 function facebook_publish_feed_story(form_bundle_id, template_data) {
   // Load the feed form
   FB.ensureInit(function() {
@@ -88,7 +165,9 @@ function facebook_publish_feed_story(form_bundle_id, template_data) {
  *
  * This function detects whether the user is logged into facebook but just
  * not connected, and shows the checkbox if that's true.
- */
+ *
+ * This function is not currently used in FBConnect.
+ *
 function facebook_show_feed_checkbox() {
   FB.ensureInit(function() {
       FB.Connect.get_status().waitUntilReady(function(status) {
@@ -103,3 +182,4 @@ function facebook_show_feed_checkbox() {
         });
     });
 }
+/**/

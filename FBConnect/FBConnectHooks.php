@@ -143,15 +143,15 @@ class FBConnectHooks {
 	
 	// Is there any hook for this task?
 	static function onSomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
-		$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js" type="text/javascript"></script>
-		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
-		<script src="/w/extensions/FBConnect/fbconnect.js"></script>';
+		$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
+		//$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js" type="text/javascript"></script>';
+		//<script src="/w/extensions/FBConnect/fbconnect.js"></script>
 		return true;
 	}
 
-	// Injects some CSS and Javascript into the <head> and <body> of the page
+	// Injects some CSS and Javascript into the <head> of the page
 	static function onBeforePageDisplay(&$out, &$sk) {
-		global $wgTitle, $wgFBConnectLogoUrl;
+		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath;
 		$thisurl = $wgTitle->getPrefixedURL();
 		
 		// Add a pretty Facebook logo in front of the userpage's link
@@ -161,73 +161,28 @@ class FBConnectHooks {
 			}
 		</style>';
 		
-		// Define javascript functions to be executing in the <body> of the page
-		// Array format: array( 'functionName' => '{ //do something; }' )
-		$functions = array(
-		'addFBConnectButtons' =>
-			'{
-				if (document.getElementById("pt-fbconnect")) {
-				'/* Either use a FBXML button (in use), or render an html button */.'
-					//document.getElementById("pt-fbconnect").innerHTML = \'<a href="#" onclick="FB.Connect.requireSession(' .
-						'function(){facebook_onlogin_ready();}); return false;" ><img id="fb_login_image" ' .
-						'src="http://static.ak.fbcdn.net/images/fbconnect/login-buttons/connect_light_medium_long.gif" ' .
-						'alt="Connect"/></a>\';
-					document.getElementById("pt-fbconnect").innerHTML = \'<fb:login-button length="long" ' .
-						'onlogin="facebook_onlogin_ready();"></fb:login-button>\';
-				}
-				if (document.getElementById("pt-fblogout")) {
-				'/* Either use a FBXML button, render an html button, or a combination of both (in use, "necessary" for MediaWiki user logouts */.'
-					//document.getElementById("pt-fblogout").innerHTML = \'<a href="#" onclick="facebook_logout_function();" >' .
-						'<img id="fb_logout_image" src="http://static.ak.fbcdn.net/images/fbconnect/logout-buttons/logout_small.gif" ' .
-						'alt="logout of facebook"/></a>\';
-					//document.getElementById("pt-fblogout").innerHTML = \'<fb:login-button autologoutlink="true"></fb:login-button>\';
-					document.getElementById("pt-fblogout").innerHTML = \'<span onclick="setTimeout(\\\'facebook_logout_function()\\\', 2000)">' .
-						'<fb:login-button autologoutlink="true" size="small"></fb:login-button></span>\';
-				}
-			}',
-		'FB_init' =>
-			'{
-				FB.init("' . FBConnectClient::get_api_key() . '", "/w/extensions/FBConnect/xd_receiver.php");
-			}',
-		'alertfunction' => 
-			'{
-				FB_RequireFeatures(["XFBML"], function()
-				{
-					FB_init();
-					FB.Facebook.get_sessionState().waitUntilReady(function()
-					{
-						//window.alert("Session is ready");
-						// If you want to make Facebook API calls from JavaScript do something like
-						FB.Facebook.apiClient.friends_get(null, function(result, ex)
-						{
-							//Do something with result
-							window.alert("Friends list: " + result);
-						});
-					});
-				});
-			}',
-		'facebook_logout_function' =>
-			'{
-				window.location = "' . Skin::makeSpecialUrl('Userlogout', $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}") . '";
-			}',
-		'facebook_onload_function' =>
-			'{
-				window.onload = function() { facebook_onload(' . (FBConnectClient::getClient()->get_loggedin_user() ? "true" : "false") . '); };
-			}');
-		// Include all of $functions in the page's javascript
-		#foreach( $functions as $fName => $fBody ) {
-		// Only include the functions listed here into the page's javascript
-		foreach( array( 'addFBConnectButtons', 'FB_init', 'facebook_onload_function' ) as $fName ) {
-			$fBody = $functions[$fName]; // If we are using foreach($functions as $fName => $fBody), then remove this line
-			$script[0][] = "\n\t\t\tfunction $fName()\n\t\t\t$fBody";
-			$script[1][] = "\n\t\t\taddOnloadHook($fName);";
+		$script = "";
+		$js_vars = array(
+			'api_key' => FBConnectClient::get_api_key(),
+			'already_logged_into_facebook' => FBConnectClient::getClient()->get_loggedin_user() ? "true" : "false",
+			'logout_url' => Skin::makeSpecialUrl('Userlogout', $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}")
+		);
+		foreach( $js_vars as $name => $value ) {
+			if( $value == "true" || $value == "false" ) {
+				$script .= "var " . $name . " = " . $value . ";\n";
+			} else {
+				$script .= "var " . $name . " = '" . $value . "';\n";
+			}
 		}
-		$script = implode(array( implode($script[0]), implode($script[1]) ));
+		foreach( array( 'facebook_onload_addFBConnectButtons', 'facebook_init', 'facebook_onload' ) as $hook ) {
+			$script .= "addOnloadHook($hook);\n";
+		}
 		
 		// Styles and Scripts have been built, so add them to the page
 		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
 			$out->addScript($style . "\n\t\t");
 		}
+		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>");
 		$out->addInlineScript($script);
 		return true;
 	}
