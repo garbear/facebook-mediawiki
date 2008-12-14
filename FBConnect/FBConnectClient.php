@@ -11,13 +11,22 @@ if (file_exists($dir . 'config.php')) {
 }
 
 class FBConnectClient {
-	//private static $facebook = null;
 	/*
 	 * Get the facebook client object for easy access.
 	 */
 	public static function getClient() {
 		static $facebook = null;
-		//if (!isset($facebook) || $facebook === null) {
+		static $is_config_setup = false;
+		if (!$is_config_setup) {
+			if (self::get_api_key() && self::get_api_key() != 'YOUR_API_KEY' &&
+			        self::get_api_secret() && self::get_api_secret() != 'YOUR_API_SECRET' &&
+			        self::get_callback_url() != null) {
+				$is_config_setup = true;
+			} else {
+				echo "Error: please update the api_key in your configuration.<br>\n";
+				return null;
+			}
+		}
 		if ($facebook === null) {
 			$facebook = new Facebook(self::get_api_key(), self::get_api_secret());
 			if (!$facebook) {
@@ -27,13 +36,9 @@ class FBConnectClient {
 		return $facebook;
 	}
 
-	### Facebook Connect core functions (copied almost verbosely from The Run Around's lib/core.php and prettified)
-
 	// Make sure our environment variables were set corrently
 	public static function is_config_setup() {
-		return (get_api_key() && get_api_key() != 'YOUR_API_KEY' &&
-				get_api_secret() && get_api_secret() != 'YOUR_API_SECRET' &&
-				get_callback_url() != null);
+		return getClient() != null;
 	}
 
 	// Whether the site is "connected" or not
@@ -71,37 +76,11 @@ class FBConnectClient {
 
 	public static function get_callback_url() {
 		global $callback_url;
-		return $callback_url;
+		return isset($callback_url) ? $callback_url : null;
 	}
 
-	/*
-	 * Extract the domain from a relatively-well-formed URL
-	 */
-	public static function get_domain($url) {
-		$info = parse_url($url);
-		if (isset($info['host'])) {
-			return $info['host'];
-		}
-		return $info['path'];
-	}
 
-	public static function no_magic_quotes($val) {
-		if (get_magic_quotes_gpc()) {
-			return stripslashes($val);
-		} else {
-			return $val;
-		}
-	}
-
-	public static function parse_http_args($http_params, $keys) {
-		$result = array();
-		foreach ($keys as $key) {
-			$result[$key] = self::no_magic_quotes($http_params[$key]);
-		}
-		return $result;
-	}
-
-	### Facebook Client functions (several useful functions from The Run Around's lib/fbconnect.php)
+	### Facebook Client functions (two useful functions from The Run Around's lib/fbconnect.php)
 
 
 	/*
@@ -117,10 +96,9 @@ class FBConnectClient {
 				return null;
 			}
 			return reset($infos);
-
-			} catch (Exception $e) {
-				error_log("Failure in the api when requesting " . join(",", $fields) .
-						  " on uid " . $fb_uid . " : ". $e->getMessage());
+		} catch (Exception $e) {
+			error_log("Failure in the api when requesting " . join(",", $fields) .
+			          " on uid " . $fb_uid . " : ". $e->getMessage());
 			return null;
 		}
 	}
