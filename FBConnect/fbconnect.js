@@ -21,12 +21,17 @@ function facebook_login(){
  * Logs the user out of Facebook. When this is accomplished, the user is redirected to
  * the Wiki's logout page to keep things syncronized.
  */
+var ctime;
 function facebook_logout() {
+    ctime = setTimeout("alert('Timeout waiting for FB.Connect.logoutAndRedirect(). The error returned was: " +
+                       "\\\"FB.UI is undefined\\\" (connect.js.pkg.php, line 502).\\n\\n" +
+                       "You will be logged out of this wiki, but we cannot log you out of Facebook at this time.');" +
+                       "window.location = '" + logout_url + "';", 3000);
     FB_RequireFeatures(["Connect"], function() {
+        clearTimeout(ctime);
+        //logout_url = window.location.href;
         FB.Connect.logoutAndRedirect(logout_url);
-        //FB.Connect.logoutAndRedirect(window.location.href);
     });
-    setTimeout("window.location = '" + logout_url + "';", 1750);
 }
 
 /*
@@ -42,7 +47,7 @@ function facebook_onload_addFBConnectButtons() {
     }
     if (document.getElementById("pt-fblogout")) {
         // Either use a FBXML button, render an html button, or a combination of both
-        document.getElementById("pt-fblogout").innerHTML = '<a href="#" onclick="facebook_logout();">' + 
+        document.getElementById("pt-fblogout").innerHTML = '<a href="#" onclick="facebook_logout(); return false;">' + 
             '<img id="fb_logout_image" src="http://static.ak.fbcdn.net/images/fbconnect/logout-buttons/logout_small.gif" ' + 
             'alt="Logout of Facebook"/></a>';
         //document.getElementById("pt-fblogout").innerHTML = '<fb:login-button autologoutlink="true"></fb:login-button>';
