@@ -3,7 +3,9 @@
  * Make sure that the variable api_key is set!
  */
 function facebook_init() {
-    FB.init(api_key, "/w/extensions/FBConnect/xd_receiver.php");
+    FB_RequireFeatures(["XFBML"], function() {
+        FB.init(api_key, "/w/extensions/FBConnect/xd_receiver.php");
+    }
 }
 
 /*
@@ -25,8 +27,8 @@ var ctime;
 function facebook_logout() {
     ctime = setTimeout("alert('Timeout waiting for FB.Connect.logoutAndRedirect(). The error returned was: " +
                        "\\\"FB.UI is undefined\\\" (connect.js.pkg.php, line 502).\\n\\n" +
-                       "You will be logged out of this wiki, but we cannot log you out of Facebook at this time.');" +
-                       "window.location = '" + logout_url + "';", 3000);
+                       "We cannot log you out of Facebook at this time. Please visit Facebook.com and logout directly.');", 3000);
+                       //"window.location = '" + logout_url + "';", 3000);
     FB_RequireFeatures(["Connect"], function() {
         clearTimeout(ctime);
         //logout_url = window.location.href;
