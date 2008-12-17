@@ -5,7 +5,7 @@
 function facebook_init() {
     FB_RequireFeatures(["XFBML"], function() {
         FB.init(api_key, "/w/extensions/FBConnect/xd_receiver.php");
-    }
+    });
 }
 
 /*
