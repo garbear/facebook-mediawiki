@@ -4,7 +4,7 @@ if( !defined( 'MEDIAWIKI' ) ) {
 	exit( 1 );
 }
 
-require_once("AuthPlugin.php");
+require_once("$IP/includes/AuthPlugin.php");
 
 class FBConnectAuthPlugin extends AuthPlugin {
 	/**
@@ -15,7 +15,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 		// security paranoid says to check the data, e.g. in an LDAP plugin you could do an LDAP verify here, just to be safe
 		return true; // or return false if the username is invalid
 	}
-	
+
 	/**
 	 * Whether the given username and password authenticate as a valid login.
 	 */
@@ -51,7 +51,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	public function autoCreate() {
 		return false;
 	}
-	
+
 	/**
 	 * Users cannot change their passwords, because passwords are not used.
 	 */
