@@ -1,13 +1,42 @@
 <?php
+/**
+ * Copyright © 2008 Garrett Bruin <http://www.mediawiki.org/wiki/User:Gbruin>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /**
- *  Class containing all the hooks used in this extension
+ * Not a valid entry point, skip unless MEDIAWIKI is defined.
+ */
+if ( !defined( 'MEDIAWIKI' ) ) {
+	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
+}
+
+
+/**
+ * Class FBConnectHooks
+ * 
+ * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
+ * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a function with the same
+ * name as the hook that initiates it, place it inside this class and let
+ * setup() do its magic.
  */
 class FBConnectHooks {
 	/**
 	 * Set the global variable $wgAuth to our custom authentification plugin
 	 */
-	static function onAuthPluginSetup (&$auth) {
+	static function AuthPluginSetup(&$auth) {
 		$auth = new StubObject('wgAuth', 'FBConnectAuthPlugin');
 		return true;
 	}
@@ -15,10 +44,10 @@ class FBConnectHooks {
 	/**
 	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect
 	 */
-	static function onUserLoadFromSession($user, &$result) {
+	static function UserLoadFromSession($user, &$result) {
 		global $wgAuth;
 
-		$fb_uid = FBConnectClient::getClient()->get_loggedin_user();	
+		$fb_uid = FBConnect::getClient()->get_loggedin_user();	
 		if (!isset($fb_uid) || $fb_uid == 0) {
 			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
 			return true;
@@ -91,7 +120,7 @@ class FBConnectHooks {
 	 * into a link to the user's facebook profile.
 	 * 
 	 */
-	public static function onRenderPreferencesForm($form, $output) {
+	public static function RenderPreferencesForm($form, $output) {
 		global $wgUser;
 		$fb_uid = $wgUser->getName();
 		// If the user name is not a valid facebook ID (i.e. not a bunch of numbers) then we're done here
@@ -113,7 +142,7 @@ class FBConnectHooks {
 	/**
 	 * Modify the user's persinal toolbar (in the upper right)
 	 */
-	static function onPersonalUrls(&$personal_urls, &$title) {
+	static function PersonalUrls(&$personal_urls, &$title) {
 		global $wgUser, $wgLang, $wgOut, $wgFBConnectOnly;
 		wfLoadExtensionMessages('FBConnect');
 		$sk = $wgUser->getSkin();
@@ -169,12 +198,12 @@ class FBConnectHooks {
 	 * The dynamic source code loading [newElement("source") ...] technique didn't work for me.
 	 *
 	 */
-	static function onParserAfterTidy(&$parser, &$text) {
+	static function ParserAfterTidy(&$parser, &$text) {
 		static $wgOnce = false;
 		//if (!isset($wgOnce) || !$wgOnce) {
 		if (!$wgOnce) {
 			$wgOnce = true;
-			self::onSomeHookThatAllowsOneTimeRenderingToFooter($text);
+			self::SomeHookThatAllowsOneTimeRenderingToFooter($text);
 		}
 		return true;
 	}
@@ -183,9 +212,9 @@ class FBConnectHooks {
 	 * Is there any hook for this task?
 	 *
 	 * Perhaps one of the skin hooks: SkinAfterBottomScripts, SkinAfterContent or SkinBuildSidebar...
-	 *
+	 * Found one: SiteNoticeAfter
 	 */
-	static function onSomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
+	static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
 		$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
 		//$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js" type="text/javascript"></script>';
 		//$text .= '<script src="/w/extensions/FBConnect/fbconnect.js"></script>';
@@ -195,7 +224,7 @@ class FBConnectHooks {
 	/**
 	 * Injects some CSS and Javascript into the <head> of the page
 	 */
-	static function onBeforePageDisplay(&$out, &$sk) {
+	static function BeforePageDisplay(&$out, &$sk) {
 		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath;
 		$thisurl = $wgTitle->getPrefixedURL();
 		
@@ -209,8 +238,8 @@ class FBConnectHooks {
 		// Setup some variables and pseudo window.onload functions for Facebook Connect
 		$script = "";
 		$js_vars = array(
-			'api_key' => FBConnectClient::get_api_key(),
-			'already_logged_into_facebook' => FBConnectClient::getClient()->get_loggedin_user() ? "true" : "false",
+			'api_key' => FBConnect::get_api_key(),
+			'already_logged_into_facebook' => FBConnect::getClient()->get_loggedin_user() ? "true" : "false",
 			'logout_url' => Skin::makeSpecialUrl('Userlogout', $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}")
 		);
 		foreach( $js_vars as $name => $value ) {
@@ -231,6 +260,12 @@ class FBConnectHooks {
 		}
 		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>");
 		$out->addInlineScript($script);
+		return true;
+	}
+	
+	// if (defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) { // as of MediaWiki 1.12
+	static function ParserFirstCallInit(&$parser) {
+		$parser->setHook( 'sample', 'FBConnect::parserHook' );
 		return true;
 	}
 }

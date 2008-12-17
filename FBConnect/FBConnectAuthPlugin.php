@@ -1,11 +1,45 @@
 <?php
+/**
+ * Copyright © 2008 Garrett Bruin <http://www.mediawiki.org/wiki/User:Gbruin>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-if( !defined( 'MEDIAWIKI' ) ) {
-	exit( 1 );
+
+/**
+ * Not a valid entry point, skip unless MEDIAWIKI is defined.
+ */
+if ( !defined( 'MEDIAWIKI' ) ) {
+	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+/**
+ * Class AuthPlugin must be defined before we can extend it!
+ */
+//require_once("AuthPlugin.php");
 require_once("$IP/includes/AuthPlugin.php");
+ 
 
+/**
+ * Class FBConnectAuthPlugin extends AuthPlugin
+ * 
+ * Custom implementation of user authentification as it pertains to
+ * Facebook Connect. This plugin bypasses the typical username-password
+ * system currently in place in MediaWiki. Authentification takes place
+ * against the cookies set by Facebook; if the user is signed into
+ * Facebook Connect and has authorized the application, then they will
+ * by logged into MediaWiki by their Facebook ID.
+ */
 class FBConnectAuthPlugin extends AuthPlugin {
 	/**
 	 * Returns whether $username is a valid username.
@@ -15,7 +49,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 		// security paranoid says to check the data, e.g. in an LDAP plugin you could do an LDAP verify here, just to be safe
 		return true; // or return false if the username is invalid
 	}
-
+	
 	/**
 	 * Whether the given username and password authenticate as a valid login.
 	 */
@@ -51,7 +85,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	public function autoCreate() {
 		return false;
 	}
-
+	
 	/**
 	 * Users cannot change their passwords, because passwords are not used.
 	 */
