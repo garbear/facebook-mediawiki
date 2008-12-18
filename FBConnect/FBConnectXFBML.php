@@ -119,12 +119,3 @@ class FBConnectXFBML {
 		return array_merge( $validTags, $wikiTags, $jsTags );
 	}
 }
-	
-
-
-
-
-
-
-
-

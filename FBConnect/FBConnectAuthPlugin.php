@@ -26,9 +26,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  * Class AuthPlugin must be defined before we can extend it!
  */
-//require_once("AuthPlugin.php");
 require_once("$IP/includes/AuthPlugin.php");
- 
+
 
 /**
  * Class FBConnectAuthPlugin extends AuthPlugin
