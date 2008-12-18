@@ -75,8 +75,9 @@ $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
+$wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 
-$wgExtensionFunctions[] =					'FBConnect::setup';
+$wgExtensionFunctions[] = 'FBConnect::setup';
 
 
 
@@ -131,14 +132,6 @@ class FBConnect {
 			               'ParserAfterTidy', 'BeforePageDisplay');
 		}
 		return $hooks;
-	}
-	
-	/**
-	 * Set by ParserFirstCallInit hook. This should go in its own
-	 * class FBConnectParserHooks or FBConnectXFBML.
-	 */
-	public static function parserHook($input, $args, &$parser ) {
-		return htmlspecialchars( $input );
 	}
 	
 	/*

@@ -263,9 +263,11 @@ class FBConnectHooks {
 		return true;
 	}
 	
-	// if (defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) { // as of MediaWiki 1.12
 	static function ParserFirstCallInit(&$parser) {
-		$parser->setHook( 'sample', 'FBConnect::parserHook' );
+		$pHooks = FBConnectXFBML::availableTags();
+		foreach( $pHooks as $tag ) {
+			$parser->setHook( $tag, 'FBConnectXFBML::parserHook' );
+		}
 		return true;
 	}
 }
