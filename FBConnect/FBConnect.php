@@ -70,66 +70,76 @@ require_once $dir . 'facebook-client/facebook.php';
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
-//$wgSpecialPages['Connect'] = 'SpecialConnect'; # Let MediaWiki know about your new special page.
+// Let MediaWiki know about your new special page... because we have one...
+// $wgSpecialPages['Connect'] = 'SpecialConnect';
 
 $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 
 $wgExtensionFunctions[] =					'FBConnect::setup';
 
-		
 
 
 /**
  * Class FBConnect
  * 
- * This class contains all the hooks used in this extension. It does shit.
+ * This class initializes the extension, and contains the core non-hook,
+ * non-authentification code.
  */
 class FBConnect {
-	private static $fbconnect;
-	
 	/**
-	 * setup
+	 * Initializes and configures the extension.
 	 */
 	public static function setup() {
 		global $wgHooks, $wgXhtmlNamespaces;
+		
+		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
-		$hooks = FBConnect::enumHooks();
+		
+		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
+		$hooks = FBConnect::enumMethods('FBConnectHooks');
 		foreach( $hooks as $hookName ) {
 			$wgHooks["$hookName"][] = "FBConnectHooks::$hookName";
 		}
+		
+		// ParserFirstCallInit was introduced in modern (1.12+) MW versions to
+		// avoid unstubbing $wgParser on setHook() too early, as per r35980
 		if (!defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) {
 			global $wgParser;
-			FBConnectHooks::ParserFirstCallInit($wgParser);
-		}
-		if (!isset($fbconnect)) {
-			self::$fbconnect = new FBConnect;
+			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
 		return true;
 	}
 	
-	private static function parserHook($input, $args, &$parser ) {
+	/**
+	 * Returns an array with the names of all public static functions
+	 * in the specified class.
+	 */
+	public static function enumMethods($className) {
+		$hooks = array();
+		try {
+			$class = new ReflectionClass($className);
+			foreach( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
+				if ($method->isStatic()) {
+					$hooks[] = $method->getName();
+				}
+			}
+		} catch (Exception $e) {
+			// If PHP's version doesn't support the Reflection API
+			$hooks = array('AuthPluginSetup', 'UserLoadFromSession',
+			               'RenderPreferencesForm', 'PersonalUrls',
+			               'ParserAfterTidy', 'BeforePageDisplay');
+		}
+		return $hooks;
+	}
+	
+	/**
+	 * Set by ParserFirstCallInit hook. This should go in its own
+	 * class FBConnectParserHooks or FBConnectXFBML.
+	 */
+	public static function parserHook($input, $args, &$parser ) {
 		return htmlspecialchars( $input );
 	}
-	
-	private function __construct() {
-		// Can't instantiate this object
-	}
-	
-	public static function enumHooks() {
-		$hooks = array('AuthPluginSetup',
-		               'UserLoadFromSession',
-		               'RenderPreferencesForm',
-		               'PersonalUrls',
-		               'ParserAfterTidy',
-		               'SomeHookThatAllowsOneTimeRenderingToFooter',
-		               'BeforePageDisplay');
-		if (defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) {
-			$hooks[] = 'ParserFirstCallInit';
-		}
-		return $hooks; 
-	}
-	
 	
 	/*
 	 * Get the facebook client object for easy access.
@@ -239,39 +249,3 @@ class FBConnect {
 	}
 	
 }
-
-
-/*
-$wgHooks['AuthPluginSetup'][] =					'FBConnectHooks::AuthPluginSetup';
-$wgHooks['UserLoadFromSession'][] =				'FBConnectHooks::UserLoadFromSession';
-$wgHooks['RenderPreferencesForm'][]=			'FBConnectHooks::RenderPreferencesForm';
-$wgHooks['PersonalUrls'][]=						'FBConnectHooks::PersonalUrls';
-$wgHooks['BeforePageDisplay'][] =				'FBConnectHooks::BeforePageDisplay';
-$wgHooks['ParserAfterTidy'][] =					'FBConnectHooks::ParserAfterTidy';
-if ( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
-	$wgHooks['ParserFirstCallInit'][] =			'FBConnectHooks::ParserFirstCallInit';
-} else { // Otherwise do things the old fashioned way
-	$wgExtensionFunctions[] =					'FBConnectHooks::setupHooks';
-}
-*/
-
-/*
-//Avoid unstubbing $wgParser on setHook() too early on modern (1.12+) MW versions, as per r35980
-
-// http://forum.developers.facebook.com/viewtopic.php?id=25568
-
-function ParserFirstCallInit(&$parser) {
-	global $wgParser;
-	($parser == null ? $wgParser : $parser)->setHook( 'sample', 'efSampleRender' );
-	return true;
-}
-
-function efSampleRender( $input, $args, &$parser ) {
-	// Nothing exciting here, just escape the user-provided
-	// input and throw it back out again
-	return htmlspecialchars( $input );
-}
-*/
-
-
-
