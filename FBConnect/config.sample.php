@@ -20,7 +20,17 @@ $callback_url     = 'http://www.example.com/callback/w/';
  *
  * Set the callback URL in your developer app to match the one you chose above.
  * This is important so that the Javascript cross-domain library works correctly.
- *
+ * 
+ * To use Facebook Connect you will first need to get a Facebook API Key:
+ *    1.  Visit the Facebook application creation page:
+ *        http://www.facebook.com/developers/createapp.php
+ *    2.  Enter a descriptive name for your blog in the Application Name field.
+ *        This will be seen by users when they sign up for your site.
+ *    3.  Accept the Facebook Terms of Service.
+ *    4.  Upload icon and logo images. The icon appears in News Feed stories and the
+ *        logo appears in the Connect dialog when the user connects with your application.
+ *    5.  Click Submit.
+ *    6.  Copy the displayed API key and application secret into this config file. 
  */
 $api_key         = 'YOUR_API_KEY';
 $api_secret      = 'YOUR_SECRET';
