@@ -42,12 +42,13 @@ class FBConnectXFBML {
 		switch ($tag) {
 			case '':
 				return ''; // Error: We shouldn't be here!
-			// To implement a custom XFBML tag handler, simple case it here like so  
+			// To implement a custom XFBML tag handler, simply case it here like so  
 			case 'fb:name':
 			default:
 				$attrs = "";
 				foreach( $args as $name => $value ) {
-					// TODO: !!!VERY IMPORTANT FOR SECURITY!!! strip all double-quotes from $value
+					// @TODO: !!!VERY IMPORTANT!!! strip all double-quotes from $value
+					//                             and other security checks, as necessary
 					$attrs .= " $name=\"$value\"";
 				}
 				return '<' . $tag . $attrs . '>' . $parser->recursiveTagParse($text) . "</$tag>";
@@ -56,7 +57,7 @@ class FBConnectXFBML {
 	
 	/**
 	 * Helper function for parserHook. Originally, all tags were directed to
-	 * this function, but I had no way of knowing whick tag provoked the function.
+	 * that function, but I had no way of knowing whick tag provoked the function.
 	 */
 	static function createParserHook($tag) {
 		$args = '$text,$args,&$parser';
