@@ -29,8 +29,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * 
  * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
  * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a function with the same
- * name as the hook that initiates it, place it inside this class and let
- * FBConnect::setup() do its magic.
+ * name as the hook that provokes it, place it inside this class and let
+ * FBConnect::setup() do its magic. Helper functions should be private, because
+ * only public static methods with an initial capital letter are added as hooks.
  */
 class FBConnectHooks {
 	/**

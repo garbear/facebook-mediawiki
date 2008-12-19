@@ -122,6 +122,7 @@ class FBConnect {
 			$class = new ReflectionClass($className);
 			foreach( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
 				if ($method->isStatic()) {
+					// @TODO: Make this true: only initial capital letters are added as hooks
 					$hooks[] = $method->getName();
 				}
 			}
