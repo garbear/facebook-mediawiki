@@ -65,22 +65,22 @@ class FBConnectHooks {
 		);
 		foreach( $js_vars as $name => $value ) {
 			if( $value == "true" || $value == "false" ) {
-				$script .= "var " . $name . " = " . $value . ";\n";
+				$script .= "\t\tvar " . $name . " = " . $value . ";\n";
 			} else {
-				$script .= "var " . $name . " = '" . $value . "';\n";
+				$script .= "\t\tvar " . $name . " = '" . $value . "';\n";
 			}
 		}
 		// Onload functions from fbconnect.js (actually called in the <body> by addOnloadHook())
 		foreach( array( 'facebook_onload_addFBConnectButtons', 'facebook_init', 'facebook_onload' ) as $hook ) {
-			$script .= "addOnloadHook($hook);\n";
+			$script .= "\t\taddOnloadHook($hook);\n";
 		}
 		
 		// Styles and Scripts have been built, so add them to the page
 		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
-			$out->addScript($style . "\n\t\t");
+			$out->addScript($style);
 		}
-		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>");
 		$out->addInlineScript($script);
+		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>\n");
 		return true;
 	}
 	
@@ -155,21 +155,19 @@ class FBConnectHooks {
 				$wgAuth->updateUser($wgUser);
 			}
 			/**/
-			if ($wgUser->getRealName() == "") {
-				$personal_urls['userpage']['text'] .= ' (change "Real Name" in preferences) ';
-			} else {
+			if ($wgUser->getRealName() != "") {
 				$personal_urls['userpage']['text'] = $wgUser->getRealName();
 			}
 			unset($personal_urls['logout']);
 			/**/
 			$thisurl = $title->getPrefixedURL();
 			$personal_urls['fblogout'] = array('text' => wfMsg('fbconnectlogout'),
-			                                   'href' => Skin::makeSpecialUrl('Userlogout', $title->isSpecial('Preferences') ?
-			                                             '' : "returnto={$thisurl}"),
+			                                   'href' => Skin::makeSpecialUrl('Userlogout', $title->isSpecial('Preferences')
+			                                             ? '' : "returnto={$thisurl}"),
 			                                   'active' => false);
-			$personal_urls['fblink'] = array('text' => wfMsg('fbconnectlink'),
-			                                 'href' => 'http://www.facebook.com/profile.php?id=' . $wgUser->getName(),
-			                                 'active' => false);
+			$personal_urls['fblink'] =   array('text' => wfMsg('fbconnectlink'),
+			                                   'href' => 'http://www.facebook.com/profile.php?id=' . $wgUser->getName(),
+			                                   'active' => false);
 		}
 		
 		// Unset user talk page links
