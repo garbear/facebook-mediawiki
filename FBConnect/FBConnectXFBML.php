@@ -117,6 +117,17 @@ class FBConnectXFBML {
 		                   'fb:userLink',
 		                   'fb:video');
 		// Oh well, include them anyway
-		return array_merge( $validTags, $wikiTags, $jsTags );
+		$tags = array_merge( $validTags, $wikiTags, $jsTags );
+		
+		// Code that we could possibly use to reject unwanted tags from Special:Version
+		/*
+		$p = new Parser();
+		foreach( $tags as $i => $tag ) {
+			if (parserHook('', '', $p, $tag) == '') {
+				unset($tags[$i]);
+			}
+		}
+		/**/
+		return $tags;
 	}
 }
