@@ -26,6 +26,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  * Class AuthPlugin must be defined before we can extend it!
  */
+if (!isset($IP))
+	$IP = defined('MW_INSTALL_PATH') ? MW_INSTALL_PATH : dirname( __FILE__ ) . "/../..";
 require_once("$IP/includes/AuthPlugin.php");
 
 

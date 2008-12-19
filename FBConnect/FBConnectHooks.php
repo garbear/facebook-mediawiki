@@ -79,8 +79,8 @@ class FBConnectHooks {
 		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
 			$out->addScript($style);
 		}
-		$out->addInlineScript($script);
 		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>\n");
+		$out->addInlineScript($script);
 		return true;
 	}
 	
