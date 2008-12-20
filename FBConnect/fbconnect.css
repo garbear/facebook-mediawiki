@@ -10,7 +10,7 @@
   font-weight: bold;
   line-height: 13px;
   whitespace: nowrap;
-  padding: 4px 7px 3px 62px;
+  padding: 4px 8px 3px 62px;
 }
  
 #WzTtDiV img {
@@ -29,8 +29,7 @@
   border-bottom-width: 0;
   color: #333333;
   margin-top: -1px;
-  padding-top: 4px;
-  padding-left: 62px;
+  padding: 4px 5px 0 62px;
 }
  
 #WzTtDiV .tooltip-line2 {
@@ -41,6 +40,5 @@
   color: #999999;
   line-height: 23px;
   whitespace: nowrap;
-  padding-bottom: 2px;
-  padding-left: 62px;
+  padding: 0 5px 2px 62px;
 }
