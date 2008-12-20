@@ -44,7 +44,7 @@ var config = new Object();
 
 
 //===================  GLOBAL TOOLTIP CONFIGURATION  =========================//
-var tt_Debug	= true		// false or true - recommended: false once you release your page to the public
+var tt_Debug	= false		// false or true - recommended: false once you release your page to the public
 var tt_Enabled	= true		// Allows to (temporarily) suppress tooltips, e.g. by providing the user with a button that sets this global variable to false
 var TagsToTip	= true		// false or true - if true, HTML elements to be converted to tooltips via TagToTip() are automatically hidden;
 							// if false, you should hide those HTML elements yourself
