@@ -1,10 +1,43 @@
 /*
+ * Transverses the DOM tree, adding useful tooltips to all Facebook Connected users.
+ */
+function facebook_add_user_tooltips() {
+	var a = getElementsByClassName(document, "a", "mw-userlink");
+	for (var i = 0; i < a.length; i++) {
+		id = /\d\d+/.exec(a[i].href);
+		if (id) {
+			a[i].className += " mw-fbconnectuser";
+			a[i].onmouseover = function() {
+				var fb_uid = /\d\d+/.exec(this.href);
+				// this.title is set to "" by wz_tooltip. This was not by design, but for now it
+				// looks pretty cool and showcases the ability to exclude the second line of user info
+				Tip(facebook_make_info_box(fb_uid, "Facebook Connect User", this.title,
+				        'http://static.ak.connect.facebook.com/pics/q_silhouette.gif'));
+			};
+			a[i].onmouseout = function() {
+				UnTip();
+			};
+		}
+	}
+
+}
+
+/*
+ * Returns the HTML for the Connected user tooltips. Pretty simple HTML, just three divs
+ * and an image (is <fb:profile-pic> possible here?). The layout is stored in fbconnect.css.
+ */
+function facebook_make_info_box(name, line1, line2, imgsrc) {
+	return "<div class=\'tooltip-name\'>" + name + "</div><div class=\'tooltip-line1\'>" + line1 +
+	       "</div><div class=\'tooltip-line2\'>" + line2 + "</div><img src=\'" + imgsrc + "\'>";
+}
+
+/*
  * Initializes the Facebook Connect JavaScript libraries.
  * Make sure that the variable api_key is set!
  */
 function facebook_init() {
     FB_RequireFeatures(["XFBML"], function() {
-        FB.init(api_key, "/w/extensions/FBConnect/xd_receiver.php");
+        FB.init(fbAPIKey, "/w/extensions/FBConnect/xd_receiver.php");
     });
 }
 
@@ -28,16 +61,18 @@ function facebook_logout() {
     ctime = setTimeout("alert('Timeout waiting for FB.Connect.logoutAndRedirect(). The error returned was: " +
                        "\\\"FB.UI is undefined\\\" (connect.js.pkg.php, line 502).\\n\\n" +
                        "We cannot log you out of Facebook at this time. Please visit Facebook.com and logout directly.');", 3000);
-                       //"window.location = '" + logout_url + "';", 3000);
+                       //"window.location = '" + fbLogoutURL + "';", 3000);
     FB_RequireFeatures(["Connect"], function() {
         clearTimeout(ctime);
-        //logout_url = window.location.href;
-        FB.Connect.logoutAndRedirect(logout_url);
+        //fbLogoutURL = window.location.href;
+        FB.Connect.logoutAndRedirect(fbLogoutURL);
     });
 }
 
 /*
  * Because the PersonalUrls hook only accepts plain text...
+ * 
+ * @TODO: This can all be done with cascading style sheets! Modify this to only add "onclick" 
  */
 function facebook_onload_addFBConnectButtons() {
     if (document.getElementById("pt-fbconnect")) {
@@ -101,7 +136,7 @@ function facebook_onload() {
           var is_now_logged_into_facebook = session ? true : false;
 
           // if the new state is the same as the old (i.e., nothing changed) then do nothing
-          if (is_now_logged_into_facebook == already_logged_into_facebook) {
+          if (is_now_logged_into_facebook == fbLoggedIn) {
             return;
           }
 
@@ -191,3 +226,9 @@ function facebook_show_feed_checkbox() {
     });
 }
 /**/
+
+
+addOnloadHook(facebook_onload_addFBConnectButtons);
+addOnloadHook(facebook_add_user_tooltips);
+addOnloadHook(facebook_init);
+addOnloadHook(facebook_onload);

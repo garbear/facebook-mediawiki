@@ -1,0 +1,46 @@
+/* Styles for the Facebook Connect user info tooltips */
+
+#WzTtDiV .tooltip-name {
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+  font-size: 11px;
+  border: 1px solid #3B5998;
+  border-bottom-color: #CCCCCC;
+  color: #3B5998;
+  background-color: #D8DFEA;
+  font-weight: bold;
+  line-height: 13px;
+  whitespace: nowrap;
+  padding: 4px 7px 3px 62px;
+}
+ 
+#WzTtDiV img {
+  float: left;
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 50px;
+}
+ 
+#WzTtDiV .tooltip-line1 {
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+  font-size: 11px;
+  border: 1px solid #3B5998;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  color: #333333;
+  margin-top: -1px;
+  padding-top: 4px;
+  padding-left: 62px;
+}
+ 
+#WzTtDiV .tooltip-line2 {
+  font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+  font-size: 11px;
+  border: 1px solid #3B5998;
+  border-top-width: 0;
+  color: #999999;
+  line-height: 23px;
+  whitespace: nowrap;
+  padding-bottom: 2px;
+  padding-left: 62px;
+}

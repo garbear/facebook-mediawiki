@@ -43,44 +43,46 @@ class FBConnectHooks {
 	}
 	
 	/**
+	 * Adds several Facebook Connect variables to the page:
+	 * 
+	 * fbAPIKey			The application's API key (see $fbAPIKey in config.php)
+	 * fbLoggedIn		Whether the PHP client reports the user being Connected
+	 * fbLogoutURL		The URL to be redirected to on a disconnect
+	 */
+	static function MakeGlobalVariablesScript(&$vars, &$user) {
+		global $wgTitle;
+		$thisurl = $wgTitle->getPrefixedURL();
+		$vars['fbAPIKey'] = FBConnect::get_api_key();
+		$vars['fbLoggedIn'] = FBConnect::getClient()->get_loggedin_user() ? true : false;
+		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
+		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
+		return true;
+	}
+	
+	/**
 	 * Injects some CSS and Javascript into the <head> of the page
 	 */
 	static function BeforePageDisplay(&$out, &$sk) {
-		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType;
-		$thisurl = $wgTitle->getPrefixedURL();
+		global $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType;
 		
 		// Add a pretty Facebook logo in front of the userpage's link
-		$style = '<style type="text/css">
+		$style = "<style type=\"text/css\">
+			@import url(\"$wgScriptPath/extensions/FBConnect/fbconnect.css\");
+			.mw-fbconnectuser {
+				background: url($wgFBConnectLogoUrl) top right no-repeat;
+				padding-right: 17px;
+			}
 			li#pt-userpage {
-				background: url(' . $wgFBConnectLogoUrl . ') top left no-repeat;
+				background: url($wgFBConnectLogoUrl) top left no-repeat;
 			}
-		</style>';
-		
-		// Setup some variables and pseudo window.onload functions for Facebook Connect
-		$script = "";
-		$js_vars = array(
-			'api_key' => FBConnect::get_api_key(),
-			'already_logged_into_facebook' => FBConnect::getClient()->get_loggedin_user() ? "true" : "false",
-			'logout_url' => Skin::makeSpecialUrl('Userlogout', $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}")
-		);
-		foreach( $js_vars as $name => $value ) {
-			if( $value == "true" || $value == "false" ) {
-				$script .= "\t\tvar " . $name . " = " . $value . ";\n";
-			} else {
-				$script .= "\t\tvar " . $name . " = '" . $value . "';\n";
-			}
-		}
-		// Onload functions from fbconnect.js (actually called in the <body> by addOnloadHook())
-		foreach( array( 'facebook_onload_addFBConnectButtons', 'facebook_init', 'facebook_onload' ) as $hook ) {
-			$script .= "\t\taddOnloadHook($hook);\n";
-		}
+		</style>";
 		
 		// Styles and Scripts have been built, so add them to the page
 		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
 			$out->addScript($style);
 		}
-		$out->addScript("<script type='$wgJsMimeType' src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>\n");
-		$out->addInlineScript($script);
+		$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgScriptPath/extensions/FBConnect/wz_tooltip/wz_tooltip.js\"></script>\n");
+		$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgScriptPath/extensions/FBConnect/fbconnect.js\"></script>\n");
 		return true;
 	}
 	
@@ -105,10 +107,10 @@ class FBConnectHooks {
 	 * Perhaps one of the skin hooks: SkinAfterBottomScripts, SkinAfterContent or SkinBuildSidebar...
 	 * Found one: SiteNoticeAfter
 	 */
-	static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
-		$text .= '<script type='$wgJsMimeType' src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
-		//$text .= '<script type='$wgJsMimeType' src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js"></script>';
-		//$text .= '<script type='$wgJsMimeType' src="/w/extensions/FBConnect/fbconnect.js"></script>';
+	private static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
+		global $wgScriptPath, $wgJsMimeType;
+		$text .= "<script type=\"$wgJsMimeType\" src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\"></script>";
+		//$text .= "<script type=\"$wgJsMimeType\" src=\"/w/extensions/FBConnect/fbconnect.js\"></script>";
 		return true;
 	}
 
@@ -194,10 +196,13 @@ class FBConnectHooks {
 		$i = strpos( $html, $fb_uid );
 		if ($i !== FALSE) {
 			// Replace the old output with the new output
+			$html =  substr($html, 0, $i) . preg_replace("($fb_uid)",
+			    "<a href=\"http://www.facebook.com/profile.php?id=$fb_uid\" " +
+			    "class=\"mw-userlink\">$fb_uid</a>", substr($html, $i, -1), 1 );
 			$output->clearHTML();
-			$output->addHTML( substr($html, 0, $i) . preg_replace("($fb_uid)",
-			    "<a href='http://www.facebook.com/profile.php?id=$fb_uid'>$fb_uid</a>", substr($html, $i, -1), 1 ) );
+			$output->addHTML($html);
 		}
+		else {echo 'hi';}
 		return true;
 	}
 
