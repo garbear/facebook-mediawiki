@@ -4,11 +4,13 @@
 function facebook_add_user_tooltips() {
 	var a = getElementsByClassName(document, "a", "mw-userlink");
 	for (var i = 0; i < a.length; i++) {
-		id = /\d\d+/.exec(a[i].href);
+		// Look for a Facebook user ID 
+		id = /User:(\d{6,19})$/.exec(a[i].href) || /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(a[i].href);
 		if (id) {
 			a[i].className += " mw-fbconnectuser";
 			a[i].onmouseover = function() {
-				var fb_uid = /\d\d+/.exec(this.href);
+				var fb_uid = /User:(\d{6,19})$/.exec(this.href)[1] ||
+				             /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(this.href)[1];
 				// this.title is set to "" by wz_tooltip. This was not by design, but for now it
 				// looks pretty cool and showcases the ability to exclude the second line of user info
 				Tip(facebook_make_info_box(fb_uid, "Facebook Connect User", this.title,

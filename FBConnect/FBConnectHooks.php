@@ -48,6 +48,10 @@ class FBConnectHooks {
 	 * fbAPIKey			The application's API key (see $fbAPIKey in config.php)
 	 * fbLoggedIn		Whether the PHP client reports the user being Connected
 	 * fbLogoutURL		The URL to be redirected to on a disconnect
+	 * 
+	 * This hook was added in MediaWiki version 1.14. See:
+	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
+	 * @TODO: Additional coding will be needed to make this hook backwards-compatible 
 	 */
 	static function MakeGlobalVariablesScript(&$vars, &$user) {
 		global $wgTitle;
@@ -196,13 +200,12 @@ class FBConnectHooks {
 		$i = strpos( $html, $fb_uid );
 		if ($i !== FALSE) {
 			// Replace the old output with the new output
-			$html =  substr($html, 0, $i) . preg_replace("($fb_uid)",
-			    "<a href=\"http://www.facebook.com/profile.php?id=$fb_uid\" " +
-			    "class=\"mw-userlink\">$fb_uid</a>", substr($html, $i, -1), 1 );
+			$html =  substr($html, 0, $i) . preg_replace("/$fb_uid/",
+			    "<a href=\"http://www.facebook.com/profile.php?id=$fb_uid\">$fb_uid</a>",
+			    substr($html, $i), 1 );
 			$output->clearHTML();
 			$output->addHTML($html);
 		}
-		else {echo 'hi';}
 		return true;
 	}
 
