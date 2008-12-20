@@ -46,7 +46,7 @@ class FBConnectHooks {
 	 * Injects some CSS and Javascript into the <head> of the page
 	 */
 	static function BeforePageDisplay(&$out, &$sk) {
-		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath;
+		global $wgTitle, $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType;
 		$thisurl = $wgTitle->getPrefixedURL();
 		
 		// Add a pretty Facebook logo in front of the userpage's link
@@ -79,7 +79,7 @@ class FBConnectHooks {
 		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
 			$out->addScript($style);
 		}
-		$out->addScript("<script src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>\n");
+		$out->addScript("<script type='$wgJsMimeType' src='$wgScriptPath/extensions/FBConnect/fbconnect.js'></script>\n");
 		$out->addInlineScript($script);
 		return true;
 	}
@@ -106,9 +106,9 @@ class FBConnectHooks {
 	 * Found one: SiteNoticeAfter
 	 */
 	static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
-		$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
-		//$text .= '<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js" type="text/javascript"></script>';
-		//$text .= '<script src="/w/extensions/FBConnect/fbconnect.js"></script>';
+		$text .= '<script type='$wgJsMimeType' src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
+		//$text .= '<script type='$wgJsMimeType' src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/XdCommReceiver.js"></script>';
+		//$text .= '<script type='$wgJsMimeType' src="/w/extensions/FBConnect/fbconnect.js"></script>';
 		return true;
 	}
 
