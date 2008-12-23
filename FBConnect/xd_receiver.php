@@ -18,7 +18,7 @@ header('Pragma:');
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-    <title>cross domain receiver page</title>
+    <title>Cross Domain Receiver Page</title>
 </head>
 <body>
 
@@ -26,11 +26,11 @@ header('Pragma:');
 This is a cross domain (XD) receiver page. It needs to be placed on your domain so that the Javascript
   library can communicate within the iframe permission model. Put it here:
 
-  http://www.example.com/xd_receiver.php
+  http://www.example.com/path_to_extensions/FBConnect/xd_receiver.php
 -->
 
 <?php
-  echo '<script src="http://static.ak.' . $base_fb_url .
+  echo '<script src="http://static.ak.' . (isset($fbBaseURL) ? $fbBaseURL : "connect.facebook.com" ) .
        '/js/api_lib/v0.4/XdCommReceiver.debug.js" type="text/javascript"></script>';
 ?>
 </body>

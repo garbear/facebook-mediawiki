@@ -39,7 +39,7 @@ function facebook_make_info_box(name, line1, line2, imgsrc) {
  */
 function facebook_init() {
     FB_RequireFeatures(["XFBML"], function() {
-        FB.init(fbAPIKey, "/w/extensions/FBConnect/xd_receiver.php");
+        FB.init(fbApiKey, "/w/extensions/FBConnect/xd_receiver.php");
     });
 }
 

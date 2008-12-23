@@ -176,18 +176,18 @@ class FBConnect {
 	}
 
 	public static function get_api_key() {
-		global $api_key;
-		return $api_key;
+		global $fbApiKey;
+		return $fbApiKey;
 	}
 
 	public static function get_api_secret() {
-		global $api_secret;
-		return $api_secret;
+		global $fbApiSecret;
+		return $fbApiSecret;
 	}
 
 	public static function get_base_fb_url() {
-		global $base_fb_url;
-		return $base_fb_url;
+		global $fbBaseURL;
+		return $fbBaseURL;
 	}
 
 	public static function get_static_root() {
@@ -195,13 +195,13 @@ class FBConnect {
 	}
 
 	public static function get_feed_bundle_id() {
-		global $feed_bundle_id;
-		return $feed_bundle_id;
+		global $fbFeedBundleId;
+		return $fbFeedBundleId;
 	}
 
 	public static function get_callback_url() {
-		global $callback_url;
-		return isset($callback_url) ? $callback_url : null;
+		global $fbCallbackURL;
+		return $fbCallbackURL;
 	}
 
 

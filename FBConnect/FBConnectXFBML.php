@@ -93,7 +93,7 @@ class FBConnectXFBML {
 			return array( );
 		}
 		
-		// These are DEFINITELY valid tags (sarcasm intended -- see function doc comment)
+		// These are DEFINITELY valid tags (sarcasm intended -- see method doc comment)
 		$validTags = array('fb:container',
 		                   'fb:eventLink',
 		                   'fb:groupLink',

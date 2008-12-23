@@ -58,7 +58,7 @@ class FBConnectHooks {
 	static function MakeGlobalVariablesScript(&$vars) {
 		global $wgTitle;
 		$thisurl = $wgTitle->getPrefixedURL();
-		$vars['fbAPIKey'] = FBConnect::get_api_key();
+		$vars['fbApiKey'] = FBConnect::get_api_key();
 		$vars['fbLoggedIn'] = FBConnect::getClient()->get_loggedin_user() ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
@@ -69,7 +69,7 @@ class FBConnectHooks {
 	 * Injects some CSS and Javascript into the <head> of the page
 	 */
 	static function BeforePageDisplay(&$out, &$sk) {
-		global $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType, $wgVersion;
+		global $fbLogo, $wgScriptPath, $wgJsMimeType, $wgVersion;
 		
 		// Run MakeGlobalVariablesScript for backwards compatability. The MakeGlobalVariablesScript
 		// hook was added to MediaWiki 1.14 in revision 38397:
@@ -94,24 +94,24 @@ class FBConnectHooks {
 			}
 		}
 		
-		// Add a pretty Facebook logo in front of the userpage's link
+		// Add a pretty Facebook logo in front of the userpage's link if $fbLogo is set
 		$style = "<style type=\"text/css\">
-			@import url(\"$wgScriptPath/extensions/FBConnect/fbconnect.css\");
+			@import url(\"$wgScriptPath/extensions/FBConnect/fbconnect.css\");" . ($fbLogo ? "
 			.mw-fbconnectuser {
-				background: url($wgFBConnectLogoUrl) top right no-repeat;
+				background: url($fbLogo) top right no-repeat;
 				padding-right: 17px;
 			}
 			li#pt-userpage {
-				background: url($wgFBConnectLogoUrl) top left no-repeat;
-			}
+				background: url($fbLogo) top left no-repeat;
+			}" : "") . "
 		</style>";
 		
 		// Styles and Scripts have been built, so add them to the page
-		if (isset($wgFBConnectLogoUrl) && $wgFBConnectLogoUrl) {
-			$out->addScript($style);
-		}
-		$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgScriptPath/extensions/FBConnect/wz_tooltip/wz_tooltip.js\"></script>\n");
-		$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgScriptPath/extensions/FBConnect/fbconnect.js\"></script>\n");
+		$out->addScript($style);
+		$out->addScript("<script type=\"$wgJsMimeType\" " .
+		                "src=\"$wgScriptPath/extensions/FBConnect/wz_tooltip/wz_tooltip.js\"></script>\n");
+		$out->addScript("<script type=\"$wgJsMimeType\" " . 
+		                "src=\"$wgScriptPath/extensions/FBConnect/fbconnect.js\"></script>\n");
 		return true;
 	}
 	
@@ -121,10 +121,10 @@ class FBConnectHooks {
 	 *
 	 */
 	static function ParserAfterTidy(&$parser, &$text) {
-		static $wgOnce = false;
+		static $once = false;
 		//if (!isset($wgOnce) || !$wgOnce) {
-		if (!$wgOnce) {
-			$wgOnce = true;
+		if (!$once) {
+			$once = true;
 			self::SomeHookThatAllowsOneTimeRenderingToFooter($text);
 		}
 		return true;
@@ -137,9 +137,8 @@ class FBConnectHooks {
 	 * Found one: SiteNoticeAfter
 	 */
 	private static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
-		global $wgScriptPath, $wgJsMimeType;
-		$text .= "<script type=\"$wgJsMimeType\" src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\"></script>";
-		//$text .= "<script type=\"$wgJsMimeType\" src=\"/w/extensions/FBConnect/fbconnect.js\"></script>";
+		$text .= "<script type=\"text/javascript\" " .
+			"src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\"></script>";
 		return true;
 	}
 
@@ -160,7 +159,7 @@ class FBConnectHooks {
 	 * Modify the user's persinal toolbar (in the upper right)
 	 */
 	static function PersonalUrls(&$personal_urls, &$title) {
-		global $wgUser, $wgLang, $wgOut, $wgFBConnectOnly;
+		global $wgUser, $wgLang, $wgOut, $fbConnectOnly;
 		wfLoadExtensionMessages('FBConnect');
 		$sk = $wgUser->getSkin();
 		
@@ -172,7 +171,7 @@ class FBConnectHooks {
 			                                    #'href' => $sk->makeSpecialUrl( 'Userlogin', $returnto ),
 			                                    'href' => $sk->makeSpecialUrl( 'Connect', $returnto ),
 			                                    'active' => $title->isSpecial( 'Userlogin' ) );
-			if ($wgFBConnectOnly) {
+			if ($fbConnectOnly) {
 				# remove other personal toolbar links
 				foreach (array('login', 'anonlogin') as $k) {
 					if (array_key_exists($k, $personal_urls)) {
@@ -240,7 +239,7 @@ class FBConnectHooks {
 	static function UserLoadFromSession($user, &$result) {
 		global $wgAuth;
 
-		$fb_uid = FBConnect::getClient()->get_loggedin_user();	
+		$fb_uid = FBConnect::getClient()->get_loggedin_user();
 		if (!isset($fb_uid) || $fb_uid == 0) {
 			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
 			return true;

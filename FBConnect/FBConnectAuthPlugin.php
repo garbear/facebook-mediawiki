@@ -55,8 +55,8 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * Whether the given username and password authenticate as a valid login.
 	 */
 	public function authenticate( $username, $password = '') {
-		global $wgFBConnectOnly;
-		if ($wgFBConnectOnly) {
+		global $fbConnectOnly;
+		if ($fbConnectOnly) {
 			// Only let people login if they are first connected through Facebook Connect
 			return $username == FBConnectClient::getClient()->get_loggedin_user();
 		} else {
@@ -108,8 +108,8 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * password fields.
 	 */
 	public function strict() {
-		global $wgFBConnectOnly;
-		//return $wgFBConnectOnly;
+		global $fbConnectOnly;
+		//return $fbConnectOnly;
 		return false;
 	}
 
