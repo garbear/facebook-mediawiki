@@ -63,8 +63,9 @@ function facebook_logout() {
     ctime = setTimeout("alert('Timeout waiting for FB.Connect.logoutAndRedirect(). The error returned was: " +
                        "\\\"FB.UI is undefined\\\" (connect.js.pkg.php, line 502).\\n\\n" +
                        "We cannot log you out of Facebook at this time. Please visit Facebook.com and logout directly.');", 3000);
-                       //"window.location = '" + fbLogoutURL + "';", 3000);
+    // Which one should I use?
     FB_RequireFeatures(["Connect"], function() {
+    //FB.ensureInit(function() {
         clearTimeout(ctime);
         //fbLogoutURL = window.location.href;
         FB.Connect.logoutAndRedirect(fbLogoutURL);

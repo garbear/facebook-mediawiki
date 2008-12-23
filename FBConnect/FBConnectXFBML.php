@@ -111,7 +111,8 @@ class FBConnectXFBML {
 		// Is it valid? What's going on in this JavaScript file?
 		$wikiTags =  array('fb:connect-form');
 		// I found these in the JavaScript package connect.js.pkg.php, but the wiki
-		// makes no mention of them. Are they valid?
+		// makes no mention of them. Are they valid? This article might have more info:
+		// http://wiki.developers.facebook.com/index.php/JS_API_N_FB.XFBML
 		$jsTags =    array('fb:add-section-button',
 		                   'fb:share-button',
 		                   'fb:userLink',

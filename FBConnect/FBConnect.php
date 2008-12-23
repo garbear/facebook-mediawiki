@@ -152,7 +152,8 @@ class FBConnect {
 			}
 		}
 		if ($facebook === null) {
-			$facebook = new Facebook(self::get_api_key(), self::get_api_secret());
+			$facebook = new Facebook(self::get_api_key(), self::get_api_secret(),
+			                         false, self::get_base_fb_url());
 			if (!$facebook) {
 				error_log('Could not create facebook client.');
 			}
