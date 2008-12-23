@@ -51,9 +51,11 @@ class FBConnectHooks {
 	 * 
 	 * This hook was added in MediaWiki version 1.14. See:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
-	 * @TODO: Additional coding will be needed to make this hook backwards-compatible 
+	 * If we are not at revision 38397 or later, this function is called from BeforePageDisplay
+	 * to retain backward compatability.
 	 */
-	static function MakeGlobalVariablesScript(&$vars, &$user) {
+	//static function MakeGlobalVariablesScript(&$vars, &$user) {
+	static function MakeGlobalVariablesScript(&$vars) {
 		global $wgTitle;
 		$thisurl = $wgTitle->getPrefixedURL();
 		$vars['fbAPIKey'] = FBConnect::get_api_key();
@@ -67,7 +69,30 @@ class FBConnectHooks {
 	 * Injects some CSS and Javascript into the <head> of the page
 	 */
 	static function BeforePageDisplay(&$out, &$sk) {
-		global $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType;
+		global $wgFBConnectLogoUrl, $wgScriptPath, $wgJsMimeType, $wgVersion;
+		
+		// Run MakeGlobalVariablesScript for backwards compatability. The MakeGlobalVariablesScript
+		// hook was added to MediaWiki 1.14 in revision 38397:
+		// http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
+		if (version_compare($wgVersion, '1.14', '<')) {
+			global $IP;
+			$svn = SpecialVersion::getSvnRevision($IP);
+			// if !$svn, then we must be using 1.13.x (as opposed to 1.14alpha+)
+			if (!$svn || $svn < 38397)
+			{
+				$script = "";
+				$vars = array();
+				wfRunHooks('MakeGlobalVariablesScript', array(&$vars));
+				foreach( $vars as $name => $value ) {
+					if( $value === true || $value === false ) {
+						$script .= "\t\tvar " . $name . " = " . ($value ? "true" : "false") . ";\n";
+					} else {
+						$script .= "\t\tvar " . $name . " = \"" . $value . "\";\n";
+					}
+	    		}
+				$out->addInlineScript($script);
+			}
+		}
 		
 		// Add a pretty Facebook logo in front of the userpage's link
 		$style = "<style type=\"text/css\">
