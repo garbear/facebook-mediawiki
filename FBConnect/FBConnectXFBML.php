@@ -42,18 +42,26 @@ class FBConnectXFBML {
 		switch ($tag) {
 			case '':
 				return ''; // Error: We shouldn't be here!
+				
 			// To implement a custom XFBML tag handler, simply case it here like so  
-			case 'fb:name':
+			case 'fb:login-button':
+			case 'fb:prompt-permission':
+				// Disable these tags by returning an empty string
+				return '';
+			
+			// The default action is to string all event handlers and allow the tag
 			default:
 				$attrs = "";
 				foreach( $args as $name => $value ) {
-					// @TODO: !!!VERY IMPORTANT!!! strip all double-quotes from $value
-					//                             and other security checks, as necessary
-					$attrs .= " $name=\"$value\"";
+					// Disable all event handlers (e.g. onClick, onligin)
+					if (substr( $name, 0, 2 ) != "on")
+						$attrs .= " $name=\"" . htmlspecialchars($value) . '"';
 				}
-				return '<' . $tag . $attrs . '>' . $parser->recursiveTagParse($text) . "</$tag>";
+				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse($text) . "</$tag>";
 		}
 	}
+	
+	
 	
 	/**
 	 * Helper function for parserHook. Originally, all tags were directed to
@@ -122,9 +130,9 @@ class FBConnectXFBML {
 		
 		// Code that we could possibly use to reject unwanted tags from Special:Version
 		/*
-		$p = new Parser();
+		global $wgParser;
 		foreach( $tags as $i => $tag ) {
-			if (parserHook('', '', $p, $tag) == '') {
+			if (self::parserHook('', array(), $wgParser, $tag) == '') {
 				unset($tags[$i]);
 			}
 		}

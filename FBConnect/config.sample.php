@@ -17,7 +17,7 @@
  *    4.  Upload icon and logo images. The icon appears in News Feed stories and the
  *        logo appears in the Connect dialog when the user connects with your application.
  *    5.  Click Submit.
- *    6.  Copy the displayed API key and application secret into this config file. 
+ *    6.  Copy the displayed API key and application secret into this config file.
  */
 $fbApiKey         = 'YOUR_API_KEY';
 $fbApiSecret      = 'YOUR_SECRET';
@@ -52,14 +52,15 @@ $fbFeedBundleId  = 99999999;
 // The Facebook icon. You can copy this to your server if you want, or set to false to disable.
 $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
-// Allow non-Connected user accounts to login
+// Allow non-Connected user accounts to login (false may work but is untested)
 $fbAllowOldAccounts = true;
 
-// Disable new account creation. Accounts can only be created by a successful Connection.
-$fbConnectOnly = true;
+// Disable new account creation (accounts can only be created by a successful Connection)
+// Currently, this feature is locked to true. Look for dual-signin and account merging in the future
+const $fbConnectOnly = true;
 
 // Allow the use of XFBML in wiki text
-$fbUseMarkup = false;
+$fbUseMarkup = true;
 
 
 ### GLOBAL CONFIGURATION VARIABLES ###
