@@ -77,8 +77,7 @@ $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 
-$wgExtensionFunctions[] = 'FBConnect::setup';
-
+$wgExtensionFunctions[] = 'FBConnect::init';
 
 
 /**
@@ -91,19 +90,28 @@ class FBConnect {
 	/**
 	 * Initializes and configures the extension.
 	 */
-	public static function setup() {
-		global $wgHooks, $wgXhtmlNamespaces;
+	public static function init() {
+		$fbc = new FBConnect();
+		$fbc->setup();
+	}
+	
+	private function __construct() {
+		global $wgXhtmlNamespaces;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
+	}
+	
+	function setup() {
+		global $wgHooks;
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
-		$hooks = FBConnect::enumMethods('FBConnectHooks');
+		$hooks = $this->enumMethods('FBConnectHooks');
 		foreach( $hooks as $hookName ) {
 			$wgHooks["$hookName"][] = "FBConnectHooks::$hookName";
 		}
 		
-		// ParserFirstCallInit was introduced in modern (1.12+) MW versions to
+		// ParserFirstCallInit was introduced in modern (1.12+) MW versions so as to
 		// avoid unstubbing $wgParser on setHook() too early, as per r35980
 		if (!defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) {
 			global $wgParser;
@@ -134,6 +142,8 @@ class FBConnect {
 		}
 		return $hooks;
 	}
+	
+	
 	
 	/*
 	 * Get the facebook client object for easy access.
