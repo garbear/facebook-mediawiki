@@ -54,28 +54,25 @@ class FBConnectHooks {
 	 * If we are not at revision 38397 or later, this function is called from BeforePageDisplay
 	 * to retain backward compatability.
 	 */
-	//static function MakeGlobalVariablesScript(&$vars, &$user) {
-	static function MakeGlobalVariablesScript(&$vars) {
+	static function MakeGlobalVariablesScript( &$vars ) {
 		global $wgTitle;
 		$thisurl = $wgTitle->getPrefixedURL();
 		$vars['fbApiKey'] = FBConnect::get_api_key();
 		$vars['fbLoggedIn'] = FBConnect::getClient()->get_loggedin_user() ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
+		$vars['fbNames'] = FBConnect::getPersons();
 		return true;
 	}
 	
 	/**
-	 * Injects some CSS and Javascript into the <head> of the page
+	 * Hack: run MakeGlobalVariablesScript for backwards compatability.
+	 * The MakeGlobalVariablesScript hook was added to MediaWiki 1.14 in revision 38397:
+	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
 	 */
-	static function BeforePageDisplay(&$out, &$sk) {
-		global $fbLogo, $wgScriptPath, $wgJsMimeType, $wgVersion;
-		
-		// Run MakeGlobalVariablesScript for backwards compatability. The MakeGlobalVariablesScript
-		// hook was added to MediaWiki 1.14 in revision 38397:
-		// http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
+	private static function MGVS_hack( &$script ) {
+		global $wgVersion, $IP;
 		if (version_compare($wgVersion, '1.14', '<')) {
-			global $IP;
 			$svn = SpecialVersion::getSvnRevision($IP);
 			// if !$svn, then we must be using 1.13.x (as opposed to 1.14alpha+)
 			if (!$svn || $svn < 38397)
@@ -84,17 +81,28 @@ class FBConnectHooks {
 				$vars = array();
 				wfRunHooks('MakeGlobalVariablesScript', array(&$vars));
 				foreach( $vars as $name => $value ) {
-					if( $value === true || $value === false ) {
-						$script .= "\t\tvar " . $name . " = " . ($value ? "true" : "false") . ";\n";
-					} else {
-						$script .= "\t\tvar " . $name . " = \"" . $value . "\";\n";
-					}
+					$script .= "\t\tvar $name = " . json_encode($value) . ";\n";
 	    		}
-				$out->addInlineScript($script);
+	    		return true;
 			}
 		}
+		return false;
+	}
+	
+	/**
+	 * Injects some important CSS and Javascript into the <head> of the page
+	 */
+	static function BeforePageDisplay(&$out, &$sk) {
+		global $fbLogo, $wgScriptPath, $wgJsMimeType;
 		
-		// Add a pretty Facebook logo in front of the userpage's link if $fbLogo is set
+		// Parse page output for Facebook IDs
+		$html = $out->getHTML();
+		preg_match_all('/User:(\d{6,19})["\'&]/', $html, $ids);
+		foreach( $ids[1] as $id ) {
+			FBConnect::addPersonById(intval( $id ));
+		}
+		
+		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = "<style type=\"text/css\">
 			@import url(\"$wgScriptPath/extensions/FBConnect/fbconnect.css\");" . ($fbLogo ? "
 			.mw-fbconnectuser {
@@ -107,11 +115,17 @@ class FBConnectHooks {
 		</style>";
 		
 		// Styles and Scripts have been built, so add them to the page
-		$out->addScript($style);
+		if (self::MGVS_hack( $mgvs_script ))
+			$out->addInlineScript( $mgvs_script );
+		// Enables DHTML tooltips
 		$out->addScript("<script type=\"$wgJsMimeType\" " .
 		                "src=\"$wgScriptPath/extensions/FBConnect/wz_tooltip/wz_tooltip.js\"></script>\n");
+		// Facebook Connect JavaScript code
 		$out->addScript("<script type=\"$wgJsMimeType\" " . 
 		                "src=\"$wgScriptPath/extensions/FBConnect/fbconnect.js\"></script>\n");
+		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
+		$out->addScript($style);
+		
 		return true;
 	}
 	
@@ -165,7 +179,8 @@ class FBConnectHooks {
 				}
 			}
 		} else {
-			/* User's real name is not set at account creation. Why not? And why doesn't this workaround seem to work?
+			/*
+			// User's real name is not set at account creation. Why not? And why doesn't this workaround seem to work?
 			if ($wgUser->getRealName() == "") {
 				$wgAuth->updateUser($wgUser);
 			}
@@ -199,21 +214,20 @@ class FBConnectHooks {
 	 */
 	public static function RenderPreferencesForm($form, $output) {
 		global $wgUser;
-		$fb_uid = $wgUser->getName();
-		// If the user name is not a valid facebook ID (i.e. not a bunch of numbers) then we're done here
-		// TODO: I need a function that actually tests this
-		if ($fb_uid == "Admin") {
-			return true;
-		}
-		$html = $output->getHTML();
-		$i = strpos( $html, $fb_uid );
-		if ($i !== FALSE) {
-			// Replace the old output with the new output
-			$html =  substr($html, 0, $i) . preg_replace("/$fb_uid/",
-			    "<a href=\"http://www.facebook.com/profile.php?id=$fb_uid\">$fb_uid</a>",
-			    substr($html, $i), 1 );
-			$output->clearHTML();
-			$output->addHTML($html);
+		$name = $wgUser->getName();
+
+		// If the user name is a valid Facebook ID, link to the Facebook profile
+		if (FBConnect::isIdValid( $name )) {
+			$html = $output->getHTML();
+			$i = strpos( $html, $name );
+			if ($i !== FALSE) {
+				// Replace the old output with the new output
+				$html =  substr($html, 0, $i) . preg_replace("/$name/",
+				    "<a href=\"http://www.facebook.com/profile.php?id=$name\" " .
+					"class='mw-userlink mw-fbconnectuser'>$name</a>", substr($html, $i), 1 );
+				$output->clearHTML();
+				$output->addHTML($html);
+			}
 		}
 		return true;
 	}

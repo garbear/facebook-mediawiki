@@ -72,13 +72,15 @@ $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 // Let MediaWiki know about your new special page... because we have one...
 // $wgSpecialPages['Connect'] = 'SpecialConnect';
+// $wgSpecialPages['RegisterNewsFeed'] = 'SpecialRegisterNewsFeed';
+
 
 $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 
 $wgExtensionFunctions[] = 'FBConnect::init';
-
+ 
 
 /**
  * Class FBConnect
@@ -87,23 +89,22 @@ $wgExtensionFunctions[] = 'FBConnect::init';
  * non-authentification code.
  */
 class FBConnect {
+	private static $connect;
+	
+	private $ids = array();
+	
 	/**
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		$fbc = new FBConnect();
-		$fbc->setup();
+		self::$connect = new FBConnect();
 	}
 	
 	private function __construct() {
-		global $wgXhtmlNamespaces;
+		global $wgXhtmlNamespaces, $wgHooks;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
-	}
-	
-	function setup() {
-		global $wgHooks;
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = $this->enumMethods('FBConnectHooks');
@@ -117,14 +118,13 @@ class FBConnect {
 			global $wgParser;
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
-		return true;
 	}
 	
 	/**
 	 * Returns an array with the names of all public static functions
 	 * in the specified class.
 	 */
-	public static function enumMethods($className) {
+	function enumMethods($className) {
 		$hooks = array();
 		try {
 			$class = new ReflectionClass($className);
@@ -143,7 +143,40 @@ class FBConnect {
 		return $hooks;
 	}
 	
+	/**
+	 * Checks to see if the string is a valid (64-bit) Facebook ID.
+	 */
+	public static function isIdValid( $id ) {
+		if (!is_numeric( $id ))
+			$id = intval( $id );
+		return 0 < $id && $id < hexdec("FFFFFFFFFFFFFFFF");
+	}
 	
+	/*
+	 * Does something
+	 */
+	public static function addPersonById( $id ) {
+		if (self::isIdValid( $id ) && !in_array( $id, self::$connect->ids )) {
+			self::$connect->ids[] = $id;
+		}
+	}
+	
+	public static function getPersons() {
+		$session_key = md5(self::getClient()->api_client->session_key);
+		session_id($session_key);
+		session_start();
+		
+		// Default generic picture
+		$default_pic = 'http://static.ak.connect.facebook.com/pics/q_silhouette.gif';
+		$user_details = self::getClient()->api_client->users_getInfo(self::$connect->ids, array('last_name', 'first_name', 'pic', 'pic_big', 'pic_small', 'pic_square'));
+		foreach ( $user_details as $user ) {
+			$fbuid = "fb" . $user['uid'];
+			$users->$fbuid->name = $user['first_name'] . ' ' . $user['last_name'];
+			$users->$fbuid->pic = $user['pic_square'];
+		}
+		
+		return $users;
+	}
 	
 	/*
 	 * Get the facebook client object for easy access.
