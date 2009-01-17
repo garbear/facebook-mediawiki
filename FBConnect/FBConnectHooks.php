@@ -116,29 +116,14 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * We seriously need to use a better hook... But which one allows injecting javascript src's into the page's body?
-	 * The dynamic source code loading [newElement("source") ...] technique didn't work for me.
-	 *
+	 * This script is necessary for Facebook Connect because it refers the browser to the
+	 * Facebook JavaScript Feature Loader file. This script should be referenced in the
+	 * BODY not in the HEAD, as low as possible before FB.init() is called.
 	 */
-	static function ParserAfterTidy(&$parser, &$text) {
-		static $once = false;
-		//if (!isset($wgOnce) || !$wgOnce) {
-		if (!$once) {
-			$once = true;
-			self::SomeHookThatAllowsOneTimeRenderingToFooter($text);
-		}
-		return true;
-	}
-	
-	/**
-	 * Is there any hook for this task?
-	 *
-	 * Perhaps one of the skin hooks: SkinAfterBottomScripts, SkinAfterContent or SkinBuildSidebar...
-	 * Found one: SiteNoticeAfter
-	 */
-	private static function SomeHookThatAllowsOneTimeRenderingToFooter(&$text) {
-		$text .= "<script type=\"text/javascript\" " .
-			"src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\"></script>";
+	static function SkinAfterBottomScripts($skin, &$text) {
+		$text = "\n\t\t<script type=\"text/javascript\" " .
+			"src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\">" .
+			"</script>$text";
 		return true;
 	}
 
