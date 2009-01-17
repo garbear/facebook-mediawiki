@@ -57,7 +57,7 @@ $fbAllowOldAccounts = true;
 
 // Disable new account creation (accounts can only be created by a successful Connection)
 // Currently, this feature is locked to true. Look for dual-signin and account merging in the future
-const $fbConnectOnly = true;
+$fbConnectOnly = true;
 
 // Allow the use of XFBML in wiki text
 $fbUseMarkup = true;
