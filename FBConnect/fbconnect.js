@@ -6,12 +6,11 @@ function facebook_add_user_tooltips() {
 	//.concat(getElementsByClassName(document, "a", "new mw-userlink"));
 	for (var i = 0; i < a.length; i++) {
 		// Look for a Facebook user ID 
-		id = /User:(\d{6,19})$/.exec(a[i].href) || /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(a[i].href);
+		id = extract_id(a[i].href);
 		if (id) {
 			a[i].className += " mw-fbconnectuser";
 			a[i].onmouseover = function() {
-				var fb_uid = /User:(\d{6,19})$/.exec(this.href)[1] ||
-				             /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(this.href)[1];
+				var fb_uid = extract_id(this.href);
 				// this.title is set to "" by wz_tooltip. This was not by design, but for now it
 				// looks pretty cool and showcases the ability to exclude the second line of user info
 				Tip(facebook_make_info_box(fbNames["fb" + fb_uid].name, "Facebook Connect User",
@@ -22,7 +21,14 @@ function facebook_add_user_tooltips() {
 			};
 		}
 	}
+}
 
+function extract_id(string) {
+	if (/User:(\d{6,19})$/.exec(string))
+		return /User:(\d{6,19})$/.exec(string)[1];
+	if (/User:(\d{6,19})[^a-zA-Z0-9_]/.exec(string))
+		return /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(string)[1];
+	return 0;
 }
 
 /*

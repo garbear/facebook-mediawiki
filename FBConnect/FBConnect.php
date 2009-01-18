@@ -130,7 +130,6 @@ class FBConnect {
 			$class = new ReflectionClass($className);
 			foreach( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
 				if ($method->isStatic()) {
-					// @TODO: Make this true: only initial capital letters are added as hooks
 					$hooks[] = $method->getName();
 				}
 			}
@@ -162,12 +161,12 @@ class FBConnect {
 	}
 	
 	public static function getPersons() {
+		// Switch to http://wiki.developers.facebook.com/index.php/Users.getStandardInfo
 		$session_key = md5(self::getClient()->api_client->session_key);
 		session_id($session_key);
 		session_start();
 		
 		// Default generic picture
-		$default_pic = 'http://static.ak.connect.facebook.com/pics/q_silhouette.gif';
 		$user_details = self::getClient()->api_client->users_getInfo(self::$connect->ids, array('last_name', 'first_name', 'pic', 'pic_big', 'pic_small', 'pic_square'));
 		foreach ( $user_details as $user ) {
 			$fbuid = "fb" . $user['uid'];
