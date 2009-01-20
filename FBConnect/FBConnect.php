@@ -166,12 +166,13 @@ class FBConnect {
 		session_id($session_key);
 		session_start();
 		
-		// Default generic picture
 		$user_details = self::getClient()->api_client->users_getInfo(self::$connect->ids, array('last_name', 'first_name', 'pic', 'pic_big', 'pic_small', 'pic_square'));
 		foreach ( $user_details as $user ) {
 			$fbuid = "fb" . $user['uid'];
 			$users->$fbuid->name = $user['first_name'] . ' ' . $user['last_name'];
-			$users->$fbuid->pic = $user['pic_square'];
+			// If the user's picture is hidden, use a default generic picture
+			$users->$fbuid->pic = ($user['pic_square'] != "" ? $user['pic_square'] :
+			                       'http://static.ak.connect.facebook.com/pics/q_silhouette.gif');
 		}
 		
 		return $users;

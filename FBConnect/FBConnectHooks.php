@@ -130,6 +130,28 @@ class FBConnectHooks {
 	}
 	
 	/**
+	 * Adds Facebook info to the rows of Connected users in Special:ListUsers.
+	 */
+	static function SpecialListusersFormatRow( &$item, $row ) {
+		// Only add DHTML tooltips to Facebook Connect users
+		if (!FBConnect::isIdValid( $row->user_name )) {// || $row->edits == 0) {
+			return true;
+		}
+		
+		// Look to see if class="..." appears in the link
+		preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
+		if (count( $regs ) > 0) {
+			// If so, append " mw-userlink" to the end of the class list
+			$item = $regs[1] . "class=$regs[2]$regs[3] mw-userlink$regs[2]" . $regs[4];
+		} else {
+			// Otherwise, stick class="mw-userlink" into the link just before the '>'
+			preg_match( '/^([^>]*)(.*)/', $item, $regs );
+			$item = $regs[1] . ' class="mw-userlink"' . $regs[2];
+		}
+		return true;
+	}
+	
+	/**
 	 * This script is necessary for Facebook Connect because it refers the browser to the
 	 * Facebook JavaScript Feature Loader file. This script should be referenced in the
 	 * BODY not in the HEAD, as low as possible before FB.init() is called.
