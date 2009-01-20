@@ -34,7 +34,7 @@ $fbApiSecret      = 'YOUR_SECRET';
 $fbCallbackURL     = 'http://www.example.com/callback/w/';
 
 /*
- * This is the root of the facebook site you'll be hitting. In production,
+ * This is the root of the Facebook site you'll be hitting. In production,
  * this will be facebook.com
  */
 $fbBaseURL     = 'connect.facebook.com';
