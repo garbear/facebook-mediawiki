@@ -39,18 +39,22 @@ class FBConnectXFBML {
 	 * $tag argument with the $tag provided to createParserHook.
 	 */
 	static function parserHook($text, $args, &$parser, $tag = '' ) {
+		global $fbAllowFacebookImages;
 		switch ($tag) {
 			case '':
-				return ''; // Error: We shouldn't be here!
+				break; // Error: We shouldn't be here!
 				
 			// To implement a custom XFBML tag handler, simply case it here like so  
 			case 'fb:login-button':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
-				return '';
-			
-			// The default action is to string all event handlers and allow the tag
+				break;
+			case 'fb:photo':
+				if (!$fbAllowFacebookImages)
+					break;
+				// Careful - no break; if $fbAllowFacebookImages is true
 			default:
+				// The default action is to strip all event handlers and allow the tag
 				$attrs = "";
 				foreach( $args as $name => $value ) {
 					// Disable all event handlers (e.g. onClick, onligin)
@@ -59,6 +63,8 @@ class FBConnectXFBML {
 				}
 				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse($text) . "</$tag>";
 		}
+		// Strip the tag entirely
+		return '';
 	}
 	
 	

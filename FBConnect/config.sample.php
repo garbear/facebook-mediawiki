@@ -62,6 +62,11 @@ $fbConnectOnly = true;
 // Allow the use of XFBML in wiki text
 $fbUseMarkup = true;
 
+// If XFBML is enabled, then <fb:photo> maybe be used as a replacement for $wgAllowExternalImages
+// with the added benefit that all photos are screened against Facebook's Code of Conduct
+// <http://www.facebook.com/codeofconduct.php> and subject to dynamic privacy. To disable just
+// <fb:photo> tags, set this to false.
+$fbAllowFacebookImages = true;
 
 ### GLOBAL CONFIGURATION VARIABLES ###
 
