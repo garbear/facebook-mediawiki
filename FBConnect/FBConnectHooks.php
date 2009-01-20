@@ -30,7 +30,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
  * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a function with the same
  * name as the hook that provokes it, place it inside this class and let
- * FBConnect::setup() do its magic. Helper functions should be private, because
+ * FBConnect::init() do its magic. Helper functions should be private, because
  * only public static methods with an initial capital letter are added as hooks.
  */
 class FBConnectHooks {
@@ -55,13 +55,13 @@ class FBConnectHooks {
 	 * to retain backward compatability.
 	 */
 	static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgTitle;
+		global $wgTitle, $fbApiKey; 
 		$thisurl = $wgTitle->getPrefixedURL();
-		$vars['fbApiKey'] = FBConnect::get_api_key();
-		$vars['fbLoggedIn'] = FBConnect::getClient()->get_loggedin_user() ? true : false;
+		$vars['fbApiKey'] = $fbApiKey;
+		$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
-		$vars['fbNames'] = FBConnect::getPersons();
+		$vars['fbNames'] = FBConnect::$api->getPersons();
 		return true;
 	}
 	
@@ -99,7 +99,7 @@ class FBConnectHooks {
 		$html = $out->getHTML();
 		preg_match_all('/User:(\d{6,19})["\'&]/', $html, $ids);
 		foreach( $ids[1] as $id ) {
-			FBConnect::addPersonById(intval( $id ));
+			FBConnect::$api->addPersonById(intval( $id ));
 		}
 		
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
@@ -134,7 +134,7 @@ class FBConnectHooks {
 	 */
 	static function SpecialListusersFormatRow( &$item, $row ) {
 		// Only add DHTML tooltips to Facebook Connect users
-		if (!FBConnect::isIdValid( $row->user_name )) {// || $row->edits == 0) {
+		if (!FBConnect::$api->isIdValid( $row->user_name )) {// || $row->edits == 0) {
 			return true;
 		}
 		
@@ -239,7 +239,7 @@ class FBConnectHooks {
 		$name = $wgUser->getName();
 
 		// If the user name is a valid Facebook ID, link to the Facebook profile
-		if (FBConnect::isIdValid( $name )) {
+		if (FBConnect::$api->isIdValid( $name )) {
 			$html = $output->getHTML();
 			$i = strpos( $html, $name );
 			if ($i !== FALSE) {
@@ -259,8 +259,10 @@ class FBConnectHooks {
 	 */
 	static function UserLoadFromSession($user, &$result) {
 		global $wgAuth;
-
-		$fb_uid = FBConnect::getClient()->get_loggedin_user();
+		
+		FBConnect::onUserLoadFromSession();
+		$fb_uid = FBConnect::$api->user();
+		
 		if (!isset($fb_uid) || $fb_uid == 0) {
 			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
 			return true;

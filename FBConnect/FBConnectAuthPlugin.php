@@ -52,7 +52,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 		if (!$fbAllowOldAccounts) {
 			return true;
 		}
-		return FBConnect::isIdValid( $username );
+		return FBConnect::$api->isIdValid( $username );
 	}
 	
 	/**
@@ -60,7 +60,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 */
 	public function authenticate( $username, $password = '' ) {
 		// Only let people login if they are first connected through Facebook Connect
-		return $username == FBConnectClient::getClient()->get_loggedin_user();
+		return $username == FBConnect::$api->user();
 	}
 
 	/**
@@ -68,7 +68,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * for the user's real name.
 	 *
 	public function updateUser( &$user ) {
-		$realName = FBConnectClient::get_fields($user->getName(), array('name'));
+		$realName = FBConnect::$api->get_fields($user->getName(), array('name'));
 		$realName = $realName['name'];
 		if ($realName != "" && $realName != $user->getRealName()) {
 			$user->setRealName($realName);
