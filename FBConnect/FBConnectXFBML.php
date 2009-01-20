@@ -49,7 +49,9 @@ class FBConnectXFBML {
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
 				break;
+			case 'fb:profile-pic':
 			case 'fb:photo':
+			case 'fb:video':
 				if (!$fbAllowFacebookImages)
 					break;
 				// Careful - no break; if $fbAllowFacebookImages is true
@@ -134,15 +136,26 @@ class FBConnectXFBML {
 		// Oh well, include them anyway
 		$tags = array_merge( $validTags, $wikiTags, $jsTags );
 		
-		// Code that we could possibly use to reject unwanted tags from Special:Version
-		/*
-		global $wgParser;
+		// Reject discarded tags (that return an empty string) from Special:Version
+		$tempParser = new DummyParser();
 		foreach( $tags as $i => $tag ) {
-			if (self::parserHook('', array(), $wgParser, $tag) == '') {
+			if (self::parserHook('', array(), $tempParser, $tag) == '') {
 				unset($tags[$i]);
 			}
 		}
-		/**/
 		return $tags;
 	}
+}
+
+
+/**
+ * Class DummyParser
+ * 
+ * Allows FBConnectXML::availableTags() to pre-sanatize the list of tags reported to
+ * MediaWiki, excluding any tags that result in the tag breing replaced by an empty
+ * string. Sorry for the confusing summary here, its really late. =)
+ */
+class DummyParser {
+	// We don't pass any text in our testing, so this must return an empty string
+	function recursiveTagParse() { return ''; }
 }
