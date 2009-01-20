@@ -44,30 +44,29 @@ require_once("$IP/includes/AuthPlugin.php");
 class FBConnectAuthPlugin extends AuthPlugin {
 	/**
 	 * Returns whether $username is a valid username.
+	 * 
+	 * @return false if the username is invalid
 	 */
 	public function userExists( $username ) {
-		// Since the username will be passed from our external source, this will probably always be true. However, the
-		// security paranoid says to check the data, e.g. in an LDAP plugin you could do an LDAP verify here, just to be safe
-		return true; // or return false if the username is invalid
+		global $fbAllowOldAccounts;
+		if (!$fbAllowOldAccounts) {
+			return true;
+		}
+		return FBConnect::isIdValid( $username );
 	}
 	
 	/**
 	 * Whether the given username and password authenticate as a valid login.
 	 */
-	public function authenticate( $username, $password = '') {
-		global $fbConnectOnly;
-		if ($fbConnectOnly) {
-			// Only let people login if they are first connected through Facebook Connect
-			return $username == FBConnectClient::getClient()->get_loggedin_user();
-		} else {
-			return true;
-		}
+	public function authenticate( $username, $password = '' ) {
+		// Only let people login if they are first connected through Facebook Connect
+		return $username == FBConnectClient::getClient()->get_loggedin_user();
 	}
 
 	/**
 	 * When a user logs in, attempt to fill in preferences and such. Here, we query
 	 * for the user's real name.
-	 */
+	 *
 	public function updateUser( &$user ) {
 		$realName = FBConnectClient::get_fields($user->getName(), array('name'));
 		$realName = $realName['name'];
@@ -95,7 +94,8 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	}
 
     /**
-     * Check to see if external accounts can be created on Facebook. Returns false because they obviously can't be.
+     * Check to see if external accounts can be created on Facebook. Returns false
+     * because they obviously can't be.
      */
     public function canCreateAccounts() {
         return false;
@@ -108,9 +108,8 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * password fields.
 	 */
 	public function strict() {
-		global $fbConnectOnly;
-		//return $fbConnectOnly;
-		return false;
+		global $fbAllowOldAccounts;
+		return !$fbAllowOldAccounts;
 	}
 
 	/**
