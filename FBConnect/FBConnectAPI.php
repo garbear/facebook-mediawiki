@@ -83,12 +83,14 @@ class FBConnectAPI {
 	 * Get the facebook client object for easy access.
 	 */
 	public function getClient() {
+		global $fbApiKey, $fbApiSecret;
+		
 		static $facebook = null;
 		static $is_config_setup = false;
 		if (!$is_config_setup) {
-			if (self::get_api_key() && self::get_api_key() != 'YOUR_API_KEY' &&
-			        self::get_api_secret() && self::get_api_secret() != 'YOUR_API_SECRET' &&
-			        self::get_callback_url() != null) {
+			if (isset($fbApiKey) && $fbApiKey != 'YOUR_API_KEY' &&
+			    isset($fbApiSecret) && $fbApiSecret != 'YOUR_API_SECRET' &&
+			    $this->get_callback_url() != null) {
 				$is_config_setup = true;
 			} else {
 				echo "Error: please update the api_key in your configuration.<br>\n";
@@ -96,8 +98,7 @@ class FBConnectAPI {
 			}
 		}
 		if ($facebook === null) {
-			$facebook = new Facebook(self::get_api_key(), self::get_api_secret(),
-			                         false, self::get_base_fb_url());
+			$facebook = new Facebook($fbApiKey, $fbApiSecret, false, $this->get_base_fb_url());
 			if (!$facebook) {
 				error_log('Could not create facebook client.');
 			}
@@ -117,26 +118,16 @@ class FBConnectAPI {
 	
 	// Make sure our environment variables were set corrently
 	public function is_config_setup() {
-		return getClient() != null;
+		return $this->getClient() != null;
 	}
 
 	// Whether the site is "connected" or not
 	public function is_enabled() {
-		if (!self::is_config_setup()) {
+		if (!$this->is_config_setup()) {
 			return false;
 		}
 		// Change this if you want to turn off Facebook connect
 		return true;
-	}
-
-	public function get_api_key() {
-		global $fbApiKey;
-		return $fbApiKey;
-	}
-
-	public function get_api_secret() {
-		global $fbApiSecret;
-		return $fbApiSecret;
 	}
 
 	public function get_base_fb_url() {
@@ -145,7 +136,7 @@ class FBConnectAPI {
 	}
 
 	public function get_static_root() {
-		return 'http://static.ak.' . self::get_base_fb_url();
+		return 'http://static.ak.' . $this->get_base_fb_url();
 	}
 
 	public function get_feed_bundle_id() {
@@ -170,7 +161,7 @@ class FBConnectAPI {
 	 */
 	public function get_fields($fb_uid, $fields) {
 		try {
-			$infos = self::getClient()->api_client->users_getInfo($fb_uid, $fields);
+			$infos = $this->getClient()->api_client->users_getInfo($fb_uid, $fields);
 			if (empty($infos)) {
 				return null;
 			}
