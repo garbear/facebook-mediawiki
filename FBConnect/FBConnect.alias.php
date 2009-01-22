@@ -17,5 +17,5 @@ $aliases = array();
 
 /** English */
 $aliases['en'] = array(
-    'Connect'    => array( 'Connect' ),
+    'Connect'    => array( 'Connect', 'ConnectAccount' ),
 );
