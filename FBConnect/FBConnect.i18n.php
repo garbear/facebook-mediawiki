@@ -25,9 +25,5 @@ $messages['en'] = array(
 	'fbconnectconnect' => 'Connect this account to Facebook',
 	'fbconnectwelcome' => 'Welcome to {{SITENAME}}',
 	'fbconnectintro'   => 'Facebook Connnect is currently in test phase. For now, existing usernames will still work.',
-	'fbconnect-specialconnect' => 'Connect with Facebook',
-	'loginend'         => 'Or <strong>login</strong> with Facebook:
-
-
-<fb:login-button size="large" background="white" length="long"></fb:login-button>',
+	'fbconnect-specialconnect' => 'Connect with Facebook'
 );

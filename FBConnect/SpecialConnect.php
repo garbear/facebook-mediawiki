@@ -28,14 +28,24 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  *  Body class for the special page Special:Connect.
  */
 class SpecialConnect extends SpecialPage {
+	/**
+	 * Constructor: simply calls SpecialPage's constructor.
+	 */
 	function __construct() {
 		parent::__construct( 'Connect' );
 	}
 	
+	/**
+	 * Overrides getDescription() in SpecialPage. Looks in a different wiki message
+	 * for this extension's description.
+	 */
 	function getDescription() {
 		return wfMsg( 'fbconnect-specialconnect' );
 	}
 	
+	/**
+	 * Performs any necessary execution and outputs the resulting Special page.
+	 */
 	function execute( $par ) {
 		global $wgOut, $wgUser, $wgAuth;
 		
@@ -44,11 +54,13 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->disallowUserJs();  # just in case...
 		
 		// Display heading
-		$msg = $this->createHead();
-		$wgOut->addHTML( $msg );
+		$wgOut->addHTML( $this->createHeading() );
 		
+		// Display login form and Facebook Connect form
+		$wgOut->addHTML( '<table id="connectform"><tr><td class="left">' );
 		if( FBConnect::$api->isConnected() ) {
-			// Display "Logged in as {Facebook User}" & Facebook info
+			// If the user is Connected, display some info about them instead of a login form
+			$wgOut->addHTML( $this->createInfoForm() );
 		} else {
 			$template = $this->createLoginForm();
 			// Give authentication and captcha plugins a chance to modify the form
@@ -56,42 +68,53 @@ class SpecialConnect extends SpecialPage {
 			wfRunHooks( 'UserLoginForm', array( &$template ) );
 			$wgOut->addTemplate( $template );
 		}
-		
-		// Dispay <fb:login-button>
-	}
-	
-	function createHead() {
-		$msg = '
-<h2>Why Connect through Facebook?</h2>
-<table><tr>
-	<td style="vertical-align:top">
-		<h4>Simplicity</h4>
-		<ul>
-			<li><strong>One-click login.</strong> Forget remembering usernames and passwords</li>
-			<li><strong>Easily invite friends</strong> to view your linguistic work</li>
-			<li><strong>Special rights</strong> based on Facebook\'s dynamic privacy</li>
-		</ul>
-	</td><td style="vertical-align:top">
-		<h4>Features</h4>
-		<ul>
-			<li><strong>FBML:</strong> Utilize Facebook Markup Langauge</li>
-			<li>Proper rendering of FBML that others have written</li>
-		</ul>
-	</td><td style="vertical-align:top">
-		<h4>Communication</h4>
-		<ul>
-			<li><strong>Notifications.</strong> Recieve wiki notifications through facebook</li>
-			<li><strong>News Feed.</strong> Optionally share this wiki with your friends</li>
-			<li><strong>Privacy.</strong> No need to reveal your email adress, as emails are proxied through facebook</li>
-			<li><strong>Friends.</strong> See which of your friends are also using this wiki</li>
-		</ul>
-	</td>
-</tr></table><br/>';
-		return $msg;
+		$wgOut->addHTML( '</td><td class="right">' . $this->createConnectForm() . '</td></tr></table>');
 	}
 	
 	/**
-	 * Creates the template object and propogate it with parameters.
+	 * Creates a header outlining the benefits of using Facebook Connect.
+	 */
+	function createHeading() {
+		return '
+<h2>Why Connect through Facebook?</h2>
+<table>
+	<tr>
+		<td style="vertical-align:top">
+			<h4>Simplicity</h4>
+			<ul>
+				<li><strong>One-click login.</strong> Forget remembering usernames and passwords</li>
+				<li><strong>Easily invite friends</strong> to view your linguistic work</li>
+				<li><strong>Special rights</strong> based on Facebook\'s dynamic privacy</li>
+			</ul>
+		</td><td style="vertical-align:top">
+			<h4>Features</h4>
+			<ul>
+				<li><strong>FBML:</strong> Utilize Facebook Markup Langauge</li>
+				<li>Proper rendering of FBML that others have written</li>
+			</ul>
+		</td><td style="vertical-align:top">
+			<h4>Communication</h4>
+			<ul>
+				<li><strong>Notifications.</strong> Recieve wiki notifications through facebook</li>
+				<li><strong>News Feed.</strong> Optionally share this wiki with your friends</li>
+				<li><strong>Privacy.</strong> No need to reveal your email adress, as emails are proxied through facebook</li>
+				<li><strong>Friends.</strong> See which of your friends are also using this wiki</li>
+			</ul>
+		</td>
+	</tr>
+</table>';
+	}
+	
+	/**
+	 * If the user is already connected, then show some basic info about their Facebook
+	 * account (real name, profile picture, etc).
+	 */
+	function createInfoForm() {
+		return '';
+	}
+	
+	/**
+	 * Creates a Login Form template object and propogates it with parameters.
 	 */
 	function createLoginForm() {
 		global $wgUser, $wgEnableEmail, $wgEmailConfirmToEdit,
@@ -134,5 +157,13 @@ class SpecialConnect extends SpecialPage {
 		
 		// Spit out the form we just made
 		return $template;
+	}
+	
+	/**
+	 * Creates a button that allows users to merge their account with Facebook Connect.
+	 */
+	function createConnectForm() {
+		return 'Or <strong>login</strong> with Facebook:<br/><br/>' .
+		       '<fb:login-button size="large" background="white" length="long"></fb:login-button>';
 	}
 }
