@@ -105,11 +105,60 @@ class FBConnectHooks {
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = '<style type="text/css">
 			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
-			.specialconnect-intro {
+			
+			#specialconnect-intro {
 				font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
 				font-size: 14px;
 				color: #888;
+				margin: 16px 0;
 			}
+			
+			#specialconnect-table {
+				font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
+				color: #333;
+				text-align: left;
+				border: 0;
+				border-collapse: collapse;
+				margin: 0;
+			}
+			
+			#specialconnect-table th, #specialconnect-table td {
+				vertical-align: top;
+				padding: 0 10px 0 0;
+			}
+			#specialconnect-forms {
+				border: 0;
+				border-collapse: collapse;
+				margin: 35px 0 0 0;
+				width: 99%;
+			}
+			
+			#userloginForm, #userlogin {
+				float: right;
+			}
+			
+			#specialconnect-forms td.left {
+				width: 50%;
+				border-top: 0;
+				border-right: 1px;
+				border-bottom: 0;
+				border-left: 0;
+				border-color: #333;
+				border-style: solid;
+				border-collapse: collapse;
+				margin: 0;
+				padding: 1em 0 0 0;
+			}
+			
+			#specialconnect-forms td.right {
+				font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
+				color: #333;
+				width: 50%;
+				padding-left: 32px;
+				border-collapse: collapse;
+				
+			}
+			
 			.mw-fbconnectuser {
 				background: url(' . $fbLogo . ') top right no-repeat;
 				padding-right: 17px;

@@ -61,7 +61,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addWikiText( $this->createHeading() );
 		
 		// Display login form and Facebook Connect form
-		$wgOut->addHTML( '<table id="connectform"><tr><td class="left">' );
+		$wgOut->addHTML( '<table id="specialconnect-forms"><tr><td class="left">' );
 		if( FBConnect::$api->isConnected() ) {
 			// If the user is Connected, display some info about them instead of a login form
 			$wgOut->addHTML( $this->createInfoForm() );
@@ -82,17 +82,17 @@ class SpecialConnect extends SpecialPage {
 	 */
 	function createHeading() {
 		$heading = '
-			<div class="specialconnect-intro">' . wfMsg( 'fbconnect-intro' ) . '</div>
-			<table style="color:#333">
-				<tr style="text-align:left">
+			<div id="specialconnect-intro">' . wfMsg( 'fbconnect-intro' ) . '</div>
+			<table id="specialconnect-table">
+				<tr>
 					<th>' . wfMsg( 'fbconnect-conv' ) . '</th>
 					<th>' . wfMsg( 'fbconnect-fbml' ) . '</th>
 					<th>' . wfMsg( 'fbconnect-comm' ) . '</th>
 				</tr>
 				<tr>
-					<td valign="top">' . wfMsg( 'fbconnect-convdesc' ) . '</td>
-					<td valign="top">' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
-					<td valign="top">' . wfMsg( 'fbconnect-commdesc' ) . '</td>
+					<td>' . wfMsg( 'fbconnect-convdesc' ) . '</td>
+					<td>' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
+					<td>' . wfMsg( 'fbconnect-commdesc' ) . '</td>
 				</tr>
 			</table>';
 		return $heading;
