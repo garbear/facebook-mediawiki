@@ -163,7 +163,20 @@ class SpecialConnect extends SpecialPage {
 	 * Creates a button that allows users to merge their account with Facebook Connect.
 	 */
 	function createConnectForm() {
-		return 'Or <strong>login</strong> with Facebook:<br/><br/>' .
-		       '<fb:login-button size="large" background="white" length="long"></fb:login-button>';
+		global $wgUser;
+		
+		if( !$wgUser->isLoggedIn() ) {
+			$msg = 'Or <strong>login</strong> with Facebook:<br/><br/>' .
+		           '<fb:login-button size="large" background="white" length="long"></fb:login-button>';
+		} else if( !FBConnect::$api->isConnected() ) {
+			$msg = 'Merge your wiki account with your Facebook ID:<br/><br/>' .
+		           '<fb:login-button size="large" background="white" length="long"></fb:login-button><br/><br/>' .
+			       'Note: This can be undone by a sysop.';
+		} else {
+			$msg = 'Logout of Facebook<br/><br/>' .
+			       '<fb:login-button size="large" background="white"></fb:login-button><br/><br/>' .
+			       'This will also log you out of Facebook and all Connected sites, including this wiki.';
+		}
+		return $msg;
 	}
 }
