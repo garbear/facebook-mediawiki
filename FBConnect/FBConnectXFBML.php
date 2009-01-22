@@ -44,7 +44,7 @@ class FBConnectXFBML {
 			case '':
 				break; // Error: We shouldn't be here!
 				
-			// To implement a custom XFBML tag handler, simply case it here like so  
+			// To implement a custom XFBML tag handler, simply case it here like so
 			case 'fb:login-button':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
@@ -63,9 +63,9 @@ class FBConnectXFBML {
 					if (substr( $name, 0, 2 ) == "on")
 						continue;
 					// Otherwise, pass the attribute through htmlspecialchars unmodified
-					$attrs .= " $name=\"" . htmlspecialchars($value) . '"';
+					$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
 				}
-				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse($text) . "</$tag>";
+				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $text ) . "</$tag>";
 		}
 		// Strip the tag entirely
 		return '';
