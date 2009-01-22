@@ -90,7 +90,8 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * Users cannot change their passwords, because passwords are not used.
 	 */
 	public function allowPasswordChange() {
-		return false;
+		global $fbAllowOldAccounts;
+		return $fbAllowOldAccounts;
 	}
 
     /**
