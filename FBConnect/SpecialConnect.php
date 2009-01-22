@@ -29,10 +29,14 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class SpecialConnect extends SpecialPage {
 	/**
-	 * Constructor: simply calls SpecialPage's constructor.
+	 * Constructor
 	 */
 	function __construct() {
+		global $wgSpecialPageGroups;
+		// Initiate SpecialPage's constructor
 		parent::__construct( 'Connect' );
+		// Add this special page to the "login" group of special pages
+		$wgSpecialPageGroups['Connect'] = 'login';
 	}
 	
 	/**
@@ -40,7 +44,7 @@ class SpecialConnect extends SpecialPage {
 	 * for this extension's description.
 	 */
 	function getDescription() {
-		return wfMsg( 'fbconnect-specialconnect' );
+		return wfMsg( 'fbconnect-special' );
 	}
 	
 	/**
@@ -54,7 +58,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->disallowUserJs();  # just in case...
 		
 		// Display heading
-		$wgOut->addHTML( $this->createHeading() );
+		$wgOut->addWikiText( $this->createHeading() );
 		
 		// Display login form and Facebook Connect form
 		$wgOut->addHTML( '<table id="connectform"><tr><td class="left">' );
@@ -73,36 +77,25 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Creates a header outlining the benefits of using Facebook Connect.
+	 * 
+	 * @TODO: Move styles to a stylesheet.
 	 */
 	function createHeading() {
-		return '
-<h2>Why Connect through Facebook?</h2>
-<table>
-	<tr>
-		<td style="vertical-align:top">
-			<h4>Simplicity</h4>
-			<ul>
-				<li><strong>One-click login.</strong> Forget remembering usernames and passwords</li>
-				<li><strong>Easily invite friends</strong> to view your linguistic work</li>
-				<li><strong>Special rights</strong> based on Facebook\'s dynamic privacy</li>
-			</ul>
-		</td><td style="vertical-align:top">
-			<h4>Features</h4>
-			<ul>
-				<li><strong>FBML:</strong> Utilize Facebook Markup Langauge</li>
-				<li>Proper rendering of FBML that others have written</li>
-			</ul>
-		</td><td style="vertical-align:top">
-			<h4>Communication</h4>
-			<ul>
-				<li><strong>Notifications.</strong> Recieve wiki notifications through facebook</li>
-				<li><strong>News Feed.</strong> Optionally share this wiki with your friends</li>
-				<li><strong>Privacy.</strong> No need to reveal your email adress, as emails are proxied through facebook</li>
-				<li><strong>Friends.</strong> See which of your friends are also using this wiki</li>
-			</ul>
-		</td>
-	</tr>
-</table>';
+		$heading = '
+			<div class="specialconnect-intro">' . wfMsg( 'fbconnect-intro' ) . '</div>
+			<table style="color:#333">
+				<tr style="text-align:left">
+					<th>' . wfMsg( 'fbconnect-conv' ) . '</th>
+					<th>' . wfMsg( 'fbconnect-fbml' ) . '</th>
+					<th>' . wfMsg( 'fbconnect-comm' ) . '</th>
+				</tr>
+				<tr>
+					<td valign="top">' . wfMsg( 'fbconnect-convdesc' ) . '</td>
+					<td valign="top">' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
+					<td valign="top">' . wfMsg( 'fbconnect-commdesc' ) . '</td>
+				</tr>
+			</table>';
+		return $heading;
 	}
 	
 	/**

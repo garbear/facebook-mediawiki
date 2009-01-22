@@ -105,6 +105,11 @@ class FBConnectHooks {
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = '<style type="text/css">
 			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
+			.specialconnect-intro {
+				font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
+				font-size: 14px;
+				color: #888;
+			}
 			.mw-fbconnectuser {
 				background: url(' . $fbLogo . ') top right no-repeat;
 				padding-right: 17px;
@@ -195,14 +200,14 @@ class FBConnectHooks {
 				// Replace logout link with a button to disconnect from Facebook Connect
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
-					'text'   => wfMsg( 'fbconnectlogout' ),
+					'text'   => wfMsg( 'fbconnect-logout' ),
 					'href'   => '#',
 					'active' => false );
 				
 				// Add a convenient link back to facebook.com
 				// This helps enforce the idea that this wiki is "in front" of Facebook
 				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnectlink' ),
+					'text'   => wfMsg( 'fbconnect-link' ),
 					'href'   => 'http://www.facebook.com/profile.php?id=' . $wgUser->getName(),
 					'active' => false );
 				
@@ -210,7 +215,7 @@ class FBConnectHooks {
 				
 				// Link to a special page that connects the user's account with their Facebook ID
 				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnectconnect' ),
+					'text'   => wfMsg( 'fbconnect-connect' ),
 					'href'   => Skin::makeSpecialUrl( 'Connect', '' ),
 					'active' => false );
 			}
@@ -270,7 +275,7 @@ class FBConnectHooks {
 	static function UserLoadFromSession($user, &$result) {
 		global $wgAuth;
 		
-		FBConnect::onUserLoadFromSession();
+		//FBConnect::onUserLoadFromSession();
 		$fb_uid = FBConnect::$api->user();
 		
 		if (!isset($fb_uid) || $fb_uid == 0) {
