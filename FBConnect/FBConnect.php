@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  * @author Garrett Bruin
- * @author Other Contributors (if any - credit yourself!)
  * @copyright Copyright © 2008 Garrett Brown
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  * @addtogroup Extensions
@@ -23,7 +22,7 @@
  * 
  * FBConnect plugin. Integrates Facebook Connect into MediaWiki.
  * 
- * Facebook Connect single signon (SSO) experience and XFBML are currently available.
+ * Facebook Connect single sign on (SSO) experience and XFBML are currently available.
  * Please rename config.sample.php to config.php, follow the instructions inside and
  * customize variables as you like to set up your Facebook Connect extension.
  *
@@ -70,8 +69,8 @@ require_once $dir . 'facebook-client/facebook.php';
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
-// Let MediaWiki know about your new special page... because we have one...
-// $wgSpecialPages['Connect'] = 'SpecialConnect';
+// Let MediaWiki know about your special page
+$wgSpecialPages['Connect'] = 'SpecialConnect';
 // $wgSpecialPages['RegisterNewsFeed'] = 'SpecialRegisterNewsFeed';
 
 
@@ -79,6 +78,8 @@ $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
 $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
+$wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
+
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 

@@ -71,8 +71,7 @@ $fbAllowFacebookImages = true;
 ### GLOBAL CONFIGURATION VARIABLES ###
 
 // Remove link to user's talk page in the personal toolbar (upper right)
-// See http://www.mediawiki.org/wiki/Manual:$wgRemoveUserTalkLink
-$wgRemoveUserTalkLink = true;
+$fbRemoveUserTalkLink = true;
 
 // Don't show IP or its talk link in the personal header.
 // See http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader

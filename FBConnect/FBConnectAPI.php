@@ -69,6 +69,14 @@ class FBConnectAPI {
 		return 0 < $id && $id < hexdec("FFFFFFFFFFFFFFFF");
 	}
 	
+	/**
+	 * Returns true if the name of the global user $wgUser is a valid Facebook ID.
+	 */
+	public function isConnected() {
+		global $wgUser;
+		return $wgUser->isLoggedIn() && $this->isIdValid( $wgUser->getName() );
+	}
+	
 	/*
 	 * Get the Facebook client object for easy access.
 	 */
@@ -133,7 +141,7 @@ class FBConnectAPI {
 	 * Batches up user IDs so we can get their details with a single Platform query.
 	 */
 	public function addPersonById( $id ) {
-		if (self::isIdValid( $id ) && !in_array( $id, $this->ids )) {
+		if ($this->isIdValid( $id ) && !in_array( $id, $this->ids )) {
 			$this->ids[] = $id;
 		}
 	}
@@ -178,7 +186,7 @@ class FBConnectAPI {
 	 * Retrieves the proxied email address of a particular user.
 	 * See: http://wiki.developers.facebook.com/index.php/Proxied_Email
 	 * 
-	 * Untested!
+	 * @TODO: Test this function!
 	 */
 	public function getProxiedEmail( $ids ) {
 		return self::getClient()->api_client->users_getInfo($ids, 'proxied_email');
