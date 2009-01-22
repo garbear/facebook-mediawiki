@@ -171,7 +171,10 @@ class SpecialConnect extends SpecialPage {
 		} else if( !FBConnect::$api->isConnected() ) {
 			$msg = 'Merge your wiki account with your Facebook ID:<br/><br/>' .
 		           '<fb:login-button size="large" background="white" length="long"></fb:login-button><br/><br/>' .
-			       'Note: This can be undone by a sysop.';
+			       'Note: This can be undone by a sysop.<br/>' .
+			       'Note #2: This feature is unfinished. Eventually, it will require ' .
+			       '<a href="http://www.mediawiki.org/wiki/Extension:User_Merge_and_Delete">' .
+			       'Extension:User Merge and Delete</a>.';
 		} else {
 			$msg = 'Logout of Facebook<br/><br/>' .
 			       '<fb:login-button size="large" background="white"></fb:login-button><br/><br/>' .
