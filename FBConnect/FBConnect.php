@@ -84,7 +84,7 @@ $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
 $wgExtensionFunctions[] = 'FBConnect::init';
 
 
-FBConnect::$api = new FBConnectAPI();
+//FBConnect::$api = new FBConnectAPI();
 /**
  * Class FBConnect
  * 
@@ -116,12 +116,7 @@ class FBConnect {
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
 		
-		self::onUserLoadFromSession();
-	}
-	
-	public static function onUserLoadFromSession() {
-		if ( !isset($api) || $api === null )
-			$api = new FBConnectAPI();
+		self::$api = new FBConnectAPI();
 	}
 	
 	/**
