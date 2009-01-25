@@ -45,7 +45,7 @@ class FBConnectXFBML {
 				break; // Error: We shouldn't be here!
 				
 			// To implement a custom XFBML tag handler, simply case it here like so
-			case 'fb:login-button':
+			//case 'fb:login-button':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
 				break;
@@ -70,8 +70,6 @@ class FBConnectXFBML {
 		// Strip the tag entirely
 		return '';
 	}
-	
-	
 	
 	/**
 	 * Helper function for parserHook. Originally, all tags were directed to
