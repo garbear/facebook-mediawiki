@@ -37,6 +37,9 @@ class SpecialConnect extends SpecialPage {
 		parent::__construct( 'Connect' );
 		// Add this special page to the "login" group of special pages
 		$wgSpecialPageGroups['Connect'] = 'login';
+		
+		// Let the extension (specifically, FBConnectHooks::BeforePageDisplay()) know this page is being rendered
+		FBConnect::$special_connect = true;
 	}
 	
 	/**
@@ -44,35 +47,24 @@ class SpecialConnect extends SpecialPage {
 	 * for this extension's description.
 	 */
 	function getDescription() {
-		return wfMsg( 'fbconnect-special' );
+		return wfMsg( 'fbconnect-title' );
 	}
 	
 	/**
 	 * Performs any necessary execution and outputs the resulting Special page.
 	 */
 	function execute( $par ) {
-		global $wgOut, $wgUser, $wgAuth;
+		global $wgOut;
 		
 		wfLoadExtensionMessages( 'FBConnect' );
 		$this->setHeaders();
 		$wgOut->disallowUserJs();  # just in case...
 		
 		// Display heading
-		$wgOut->addWikiText( $this->createHeading() );
+		$this->drawHeading();
 		
-		// Display login form and Facebook Connect form
-		$wgOut->addHTML( '<table id="specialconnect-forms"><tr><td class="left">' );
-		if( FBConnect::$api->isConnected() ) {
-			// If the user is Connected, display some info about them instead of a login form
-			$wgOut->addHTML( $this->createInfoForm() );
-		} else {
-			$template = $this->createLoginForm();
-			// Give authentication and captcha plugins a chance to modify the form
-			$wgAuth->modifyUITemplate( $template );
-			wfRunHooks( 'UserLoginForm', array( &$template ) );
-			$wgOut->addTemplate( $template );
-		}
-		$wgOut->addHTML( '</td><td class="right">' . $this->createConnectForm() . '</td></tr></table>');
+		// Display forms
+		$this->drawForms();
 	}
 	
 	/**
@@ -80,30 +72,98 @@ class SpecialConnect extends SpecialPage {
 	 * 
 	 * @TODO: Move styles to a stylesheet.
 	 */
-	function createHeading() {
+	function drawHeading() {
+		global $wgOut;
 		$heading = '
-			<div id="specialconnect-intro">' . wfMsg( 'fbconnect-intro' ) . '</div>
-			<table id="specialconnect-table">
+			<div id="specialconnect_info">
+				' . wfMsg( 'fbconnect-intro' ) . '
+				<table>
+					<tr>
+						<th>' . wfMsg( 'fbconnect-conv' ) . '</th>
+						<th>' . wfMsg( 'fbconnect-fbml' ) . '</th>
+						<th>' . wfMsg( 'fbconnect-comm' ) . '</th>
+					</tr>
+					<tr>
+						<td>' . wfMsg( 'fbconnect-convdesc' ) . '</td>
+						<td>' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
+						<td>' . wfMsg( 'fbconnect-commdesc' ) . '</td>
+					</tr>
+				</table>
+			</div>';
+		$wgOut->addWikiText( $heading );
+	}
+	
+	function drawForms() {
+		global $wgOut, $wgAuth, $wgUser;
+		$wgOut->addHTML('
+			<table id="specialconnect_boxarea">
 				<tr>
-					<th>' . wfMsg( 'fbconnect-conv' ) . '</th>
-					<th>' . wfMsg( 'fbconnect-fbml' ) . '</th>
-					<th>' . wfMsg( 'fbconnect-comm' ) . '</th>
+					<td class="box_left">');
+						if( FBConnect::$api->isConnected() ) {
+							// If the user is Connected, display info about them instead of a login form
+							$content = '<b><fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name></b> ' .
+							           '(UCLA)<br/><a href="/wiki/User:2539590">my user page</a> | <a href="#" ' .
+							           'onclick="return popupFacebookInvite();">invite friends</a>';
+							$this->drawBox( 'fbconnect-welcome', '', $content );
+							$this->drawInfoForm();
+						} else {
+							$template = $this->createLoginForm();
+							// Give authentication and captcha plugins a chance to modify the form
+							$wgAuth->modifyUITemplate( $template );
+							wfRunHooks( 'UserLoginForm', array( &$template ));
+							$wgOut->addTemplate( $template );
+						}
+						$wgOut->addHTML('
+					</td>
+					<td class="box_right">');
+						// Display login form and Facebook Connect form
+						if( !$wgUser->isLoggedIn() ) {
+							$this->drawBox( 'fbconnect', 'fbconnect-loginbox' );
+						} else if( !FBConnect::$api->isConnected() ) {
+							$this->drawBox( 'fbconnect-merge', 'fbconnect-mergebox' );
+						} else {
+							$this->drawBox( 'fbconnect-logout', 'fbconnect-logoutbox' );
+						}
+						$wgOut->addHTML('
+					</td>
 				</tr>
-				<tr>
-					<td>' . wfMsg( 'fbconnect-convdesc' ) . '</td>
-					<td>' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
-					<td>' . wfMsg( 'fbconnect-commdesc' ) . '</td>
-				</tr>
-			</table>';
-		return $heading;
+			</table>');
 	}
 	
 	/**
 	 * If the user is already connected, then show some basic info about their Facebook
 	 * account (real name, profile picture, etc).
 	 */
-	function createInfoForm() {
-		return '';
+	function drawInfoForm() {
+	}
+	
+	function drawBox( $h1, $msg, $html = '' ) {
+		global $wgOut;
+		$wgOut->addHTML('
+			<div id="specialconnect_box">
+				<div>');
+					if( $html !== '' ) {
+						$wgOut->addHTML( '<fb:profile-pic uid="loggedinuser" size="small" ' .
+						                 'facebook-logo="true"></fb:profile-pic>' );
+					}
+					$wgOut->addHTML('
+				</div>
+				<h1>');
+					$wgOut->addWikiText( wfMsg( $h1 ));
+					$wgOut->addHTML('
+				</h1>
+				<div class="box_content">');
+					$button = '<fb:login-button size="large" background="white" length="long" autologoutlink="true">';
+					if( $msg !== '' ) {
+						$wgOut->addWikiText( wfMsg( $msg, $button ));
+					} else {
+						if( $html == '' )
+							$html = $button;
+						$wgOut->addHTML( '<p>' . $html . '</p>' );
+					}
+					$wgOut->addHTML('
+				</div>
+			</div>');
 	}
 	
 	/**
@@ -155,24 +215,6 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Creates a button that allows users to merge their account with Facebook Connect.
 	 */
-	function createConnectForm() {
-		global $wgUser;
-		
-		if( !$wgUser->isLoggedIn() ) {
-			$msg = 'Or <strong>login</strong> with Facebook:<br/><br/>' .
-		           '<fb:login-button size="large" background="white" length="long"></fb:login-button>';
-		} else if( !FBConnect::$api->isConnected() ) {
-			$msg = 'Merge your wiki account with your Facebook ID:<br/><br/>' .
-		           '<fb:login-button size="large" background="white" length="long"></fb:login-button><br/><br/>' .
-			       'Note: This can be undone by a sysop.<br/>' .
-			       'Note #2: This feature is unfinished. Eventually, it will require ' .
-			       '<a href="http://www.mediawiki.org/wiki/Extension:User_Merge_and_Delete">' .
-			       'Extension:User Merge and Delete</a>.';
-		} else {
-			$msg = 'Logout of Facebook<br/><br/>' .
-			       '<fb:login-button size="large" background="white"></fb:login-button><br/><br/>' .
-			       'This will also log you out of Facebook and all Connected sites, including this wiki.';
-		}
-		return $msg;
-	}
+	function drawConnectForm() {
+	}		
 }

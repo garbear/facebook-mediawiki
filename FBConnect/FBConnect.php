@@ -92,7 +92,10 @@ $wgExtensionFunctions[] = 'FBConnect::init';
  * non-authentification code.
  */
 class FBConnect {
+	// Instance of our Facebook API class
 	public static $api;
+	// Whether we are rendering the Special:Connect page
+	public static $special_connect;
 	
 	/**
 	 * Initializes and configures the extension.
@@ -116,6 +119,7 @@ class FBConnect {
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
 		
+		self::$special_connect = false;
 		self::$api = new FBConnectAPI();
 	}
 	
