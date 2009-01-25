@@ -183,8 +183,10 @@ class FBConnectAPI {
 	}
 
 	/**
-	 * Retrieves the proxied email address of a particular user.
+	 * Retrieves the proxied email address of a particular user. This function is untested.
 	 * See: http://wiki.developers.facebook.com/index.php/Proxied_Email
+	 * 
+	 * @Unused
 	 * 
 	 * @TODO: Test this function!
 	 */
@@ -195,6 +197,8 @@ class FBConnectAPI {
 	/**
 	 * Returns the "public" hash of the email address (i.e., the one Facebook
 	 * gives out via their API). The hash is of the form crc32($email)_md5($email).
+	 * 
+	 * @Unused
 	 */
 	public function hashEmail($email) {
 		if ($email == null)
