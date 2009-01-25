@@ -25,7 +25,7 @@ $messages['en'] = array(
 fb.'connect'  => 'Connect this account with Facebook',
 fb.'logout'   => 'Logout of Facebook',
 fb.'link'     => 'Back to facebook.com',
-fb.// Special:Connect
+// Special:Connect
 fb.'title'    => 'Connect account with Facebook',
 fb.'intro'    => 'This wiki is enabled with Facebook Connect, the next evolution of Facebook Platform. This means ' .
                  'that when you are Connected, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?' .
