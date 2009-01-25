@@ -37,9 +37,6 @@ class SpecialConnect extends SpecialPage {
 		parent::__construct( 'Connect' );
 		// Add this special page to the "login" group of special pages
 		$wgSpecialPageGroups['Connect'] = 'login';
-		
-		// Let the extension (specifically, FBConnectHooks::BeforePageDisplay()) know this page is being rendered
-		FBConnect::$special_connect = true;
 	}
 	
 	/**
@@ -55,15 +52,18 @@ class SpecialConnect extends SpecialPage {
 	 */
 	function execute( $par ) {
 		global $wgOut;
+		// Let the extension (specifically, FBConnectHooks::BeforePageDisplay()) know this page is being rendered
+		FBConnect::$special_connect = true;
 		
+		// Setup the page for rendering
 		wfLoadExtensionMessages( 'FBConnect' );
 		$this->setHeaders();
 		$wgOut->disallowUserJs();  # just in case...
 		
-		// Display heading
+		// Render the heading (general info and propoganda about Facebook Connect)
 		$this->drawHeading();
 		
-		// Display forms
+		// Render the Login and Connect/Merge forms
 		$this->drawForms();
 	}
 	
