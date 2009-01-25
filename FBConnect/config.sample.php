@@ -68,6 +68,10 @@ $fbUseMarkup = true;
 // <fb:photo> tags, set this to false.
 $fbAllowFacebookImages = true;
 
+// Groups
+$fbUserRightsFromGroup = false;
+
+
 ### GLOBAL CONFIGURATION VARIABLES ###
 
 // Remove link to user's talk page in the personal toolbar (upper right)
