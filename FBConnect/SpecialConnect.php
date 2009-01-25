@@ -110,7 +110,6 @@ class SpecialConnect extends SpecialPage {
 							           '(UCLA)<br/><a href="/wiki/User:2539590">my user page</a> | <a href="#" ' .
 							           'onclick="return popupFacebookInvite();">invite friends</a>';
 							$this->drawBox( 'fbconnect-welcome', '', $content );
-							$this->drawInfoForm();
 						} else {
 							$template = $this->createLoginForm();
 							// Give authentication and captcha plugins a chance to modify the form
