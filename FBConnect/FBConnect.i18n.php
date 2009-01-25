@@ -44,7 +44,8 @@ fb.'commdesc' => 'Facebook Connect ushers in a whole new level of networking. Se
 fb.'welcome'  => 'Welcome, Facebook Connect user!',
 fb.'loginbox' => "Or '''login''' with Facebook:\n\n$1",
 fb.'merge'    => 'Merge your wiki account with your Facebook ID',
-fb.'mergebox' => 'This feature is unfinished. Eventually, it will require [[MediaWikiWiki:Extension:User Merge and ' .
-                 "Delete|Extension:User Merge and Delete]].\n\n$1\n\n:Note: This can be undone by a sysop.",
+fb.'mergebox' => 'This feature has not yet been implemented. Accounts can be merged manually with [[Special:' .
+                 'Renameuser]] if it is installed. For more information, please visit [[MediaWikiWiki:Extension:' .
+                 "Renameuser|Extension:Renameuser]].\n\n\n$1\n\n\nNote: This can be undone by a sysop.",
 fb.'logoutbox'=> "$1\n\nThis will also log you out of Facebook and all Connected sites, including this wiki.",
 );
