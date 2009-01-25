@@ -61,18 +61,16 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->disallowUserJs();  # just in case...
 		
 		// Render the heading (general info and propoganda about Facebook Connect)
-		$this->drawHeading();
+		$this->renderHeading();
 		
 		// Render the Login and Connect/Merge forms
-		$this->drawForms();
+		$this->renderForms();
 	}
 	
 	/**
 	 * Creates a header outlining the benefits of using Facebook Connect.
-	 * 
-	 * @TODO: Move styles to a stylesheet.
 	 */
-	function drawHeading() {
+	function renderHeading() {
 		global $wgOut;
 		$heading = '
 			<div id="specialconnect_info">
@@ -93,7 +91,14 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addWikiText( $heading );
 	}
 	
-	function drawForms() {
+	/**
+	 * Renders two side-by-side boxes that differ based on who is logged in.
+	 * 
+	 * Anonymous user:     Draws the Special:Userlogin box and a Connect button.
+	 * Non-connected user: Draws the Special:Userlogin and a Merge box.
+	 * Connected user:     Draws some info about the user and a Logout box.
+	 */
+	function renderForms() {
 		global $wgOut, $wgAuth, $wgUser;
 		$wgOut->addHTML('
 			<table id="specialconnect_boxarea">
@@ -116,7 +121,6 @@ class SpecialConnect extends SpecialPage {
 						$wgOut->addHTML('
 					</td>
 					<td class="box_right">');
-						// Display login form and Facebook Connect form
 						if( !$wgUser->isLoggedIn() ) {
 							$this->drawBox( 'fbconnect', 'fbconnect-loginbox' );
 						} else if( !FBConnect::$api->isConnected() ) {
@@ -131,12 +135,12 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * If the user is already connected, then show some basic info about their Facebook
-	 * account (real name, profile picture, etc).
+	 * Draws a Facebook-style info box.
+	 *
+	 * @param string $h1   The name of the message for the title of the box
+	 * @param string $msg  The name of the message for the content, or blank to use $html
+	 * @param string $html The HTML to use if $msg is blank, or the $1 argument of the given message
 	 */
-	function drawInfoForm() {
-	}
-	
 	function drawBox( $h1, $msg, $html = '' ) {
 		global $wgOut;
 		$wgOut->addHTML('
@@ -211,10 +215,4 @@ class SpecialConnect extends SpecialPage {
 		// Spit out the form we just made
 		return $template;
 	}
-	
-	/**
-	 * Creates a button that allows users to merge their account with Facebook Connect.
-	 */
-	function drawConnectForm() {
-	}		
 }
