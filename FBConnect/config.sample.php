@@ -69,7 +69,11 @@ $fbUseMarkup = true;
 $fbAllowFacebookImages = true;
 
 // Groups
-$fbUserRightsFromGroup = false;
+$fbUserRightsFromGroup = false;  # Or a group ID
+
+$fbOfficerRights = 'officer';
+$fbRestrictToGroup = true;
+$fbRestrictToNotReplied = false;
 
 
 ### GLOBAL CONFIGURATION VARIABLES ###

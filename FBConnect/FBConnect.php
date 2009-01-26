@@ -38,29 +38,28 @@
 /**
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
+if ( !defined( 'MEDIAWIKI' )) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
 /**
- * FBConnect version. Note: this is not necessarily the most recent SVN revision number
+ * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
  */
-define('MEDIAWIKI_FBCONNECT_VERSION', '0.5 r16 (December 17, 2008)');
+define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r71, January 25, 2009' );
 
 /**
- * Add extension information to Special:Version
+ * Add information about this extension to Special:Version.
  */
-$wgExtensionCredits['other'][] = array(
-	'name' => 'Facebook Connect Plugin',
-	'author' => 'Garrett Brown',
-	'url' => 'http://www.mediawiki.org/wiki/Extension:FBConnect',
-	'description' => 'Facebook Connect',
+$wgExtensionCredits['specialpage'][] = array(
+	'name'           => 'Facebook Connect Plugin',
+	'author'         => 'Garrett Brown',
+	'url'            => 'http://www.mediawiki.org/wiki/Extension:FBConnect',
 	'descriptionmsg' => 'fbconnect-desc',
-	'version' => MEDIAWIKI_FBCONNECT_VERSION,
+	'version'        => MEDIAWIKI_FBCONNECT_VERSION,
 );
 
 /**
- * Initialization of the autoloaders, and special extension pages.
+ * Initialization of the autoloaders and special extension pages.
  */
 $dir = dirname(__FILE__) . '/'; 
 require_once $dir . 'config.php';
@@ -69,22 +68,40 @@ require_once $dir . 'facebook-client/facebook.php';
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
-// Let MediaWiki know about your special page
-$wgSpecialPages['Connect'] = 'SpecialConnect';
-// $wgSpecialPages['RegisterNewsFeed'] = 'SpecialRegisterNewsFeed';
-
-
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
 $wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
 
+$wgSpecialPages['Connect'] = 'SpecialConnect';
+#$wgSpecialPages['NewsFeed'] = 'SpecialNewsFeed';
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
+// If we are configured to pull group info from Facebook, then create the group permissions
+if( $fbUserRightsFromGroup ) {
+	$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
+	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
+	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
+	$wgGroupPermissions['fb-officer']['goodlooking'] = true;
+}
 
-//FBConnect::$api = new FBConnectAPI();
+/*
+// Define new autopromote condition (use quoted text, numbers can cause collisions)
+define( 'APCOND_FB_INGROUP',   'fb*g' );
+define( 'APCOND_FB_ISOFFICER', 'fb*o' );
+define( 'APCOND_FB_ISADMIN',   'fb*a' );
+
+$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
+$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+
+//$wgImplicitGroups[] = 'fb-groupie';
+/**/
+
+
 /**
  * Class FBConnect
  * 
@@ -103,13 +120,16 @@ class FBConnect {
 	public static function init() {
 		global $wgXhtmlNamespaces, $wgHooks;
 		
+		self::$special_connect = false;
+		self::$api = new FBConnectAPI();
+		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');
 		foreach( $hooks as $hookName ) {
-			$wgHooks["$hookName"][] = "FBConnectHooks::$hookName";
+			$wgHooks[$hookName][] = "FBConnectHooks::$hookName";
 		}
 		
 		// ParserFirstCallInit was introduced in modern (1.12+) MW versions so as to
@@ -118,26 +138,25 @@ class FBConnect {
 			global $wgParser;
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
-		
-		self::$special_connect = false;
-		self::$api = new FBConnectAPI();
 	}
 	
 	/**
 	 * Returns an array with the names of all public static functions
 	 * in the specified class.
 	 */
-	public static function enumMethods($className) {
+	public static function enumMethods( $className ) {
 		$hooks = array();
 		try {
-			$class = new ReflectionClass($className);
-			foreach( $class->getMethods(ReflectionMethod::IS_PUBLIC) as $method ) {
-				if ($method->isStatic()) {
+			$class = new ReflectionClass( $className );
+			foreach( $class->getMethods( ReflectionMethod::IS_PUBLIC ) as $method ) {
+				if ( $method->isStatic() ) {
 					$hooks[] = $method->getName();
 				}
 			}
-		} catch (Exception $e) {
-			// If PHP's version doesn't support the Reflection API
+		} catch( Exception $e ) {
+			// If PHP's version doesn't support the Reflection API, then exit
+			die( 'PHP version (' . phpversion() . ') must be great enough to support the Reflection API' );
+			// or...
 			$hooks = array('AuthPluginSetup', 'UserLoadFromSession',
 			               'RenderPreferencesForm', 'PersonalUrls',
 			               'ParserAfterTidy', 'BeforePageDisplay');

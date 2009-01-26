@@ -35,10 +35,96 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FBConnectHooks {
 	/**
-	 * Set the global variable $wgAuth to our custom authentification plugin
+	 * Set the global variable $wgAuth to our custom authentification plugin.
 	 */
-	static function AuthPluginSetup(&$auth) {
+	static function AuthPluginSetup( &$auth ) {
 		$auth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
+		return true;
+	}
+	
+	/**
+	 * Checks the autopromote condition for a user.
+	 * 
+	 * @TODO: Filter FBConnect::$api->getGroupRights() to reduce Facebook API overhead.
+	 */
+	static function XXXAutopromoteCondition( $cond_type, $args, $user, &$result ) {
+		//echo "\nAutopromoteCondition\n" . $user->getName() . "\n";
+		$types = array(APCOND_FB_INGROUP   => 'member',
+		               APCOND_FB_ISOFFICER => 'officer',
+		               APCOND_FB_ISADMIN   => 'admin');
+		$type = $types[$cond_type];
+		switch( $type ) {
+			case 'member':
+			case 'officer':
+			case 'admin':
+				$rights = FBConnect::$api->getGroupRights( $user );
+				$result = $rights[$type];
+				//echo "$type: \$result = $result\n";
+		}
+		return true;
+	}
+	
+	static function XXXUserEffectiveGroups( &$user, &$aUserGroups ) {
+		//echo "\nUserEffectiveGroups\n" . $user->getName() . "\n";
+		if( FBConnect::$api->isIdValid( $user->getName() ))
+			$aUserGroups[] = 'fb-user';
+		//var_dump( $aUserGroups );
+		return true;
+	}
+	
+	/**
+	 * Check against stricter requirements (if any) for Facebook Connect users. Counterintuitively,
+	 * we do the requirement checks first. This is to prevent unnecessary API group-related queries.
+	 * 
+	 * $promote contains the groups that will be added. If the user isn't entitled to these groups,
+	 * then we flush this array down the toilet.
+	 */
+	static function XXXGetAutoPromoteGroups( &$user, &$promote ) {
+		//echo "\nGetAutoPromoteGroups\n";
+		//var_dump( $promote );
+		
+		// If there isn't any groups to promote to anyway
+		if( !count($promote) ) {
+			return true;
+		}
+		
+		/**
+		// Requirement checks would go here to prevent unnecessary API group queries
+		// E.g. if there was a seperate AutoConfirmAge or AutoConfirmCount check for Facebook users
+		global $fbAutoConfirmAge, $fbAutoConfirmCount;
+		if( !isset( $fbAutoConfirmAge ))
+			$fbAutoConfirmAge = 0;
+		if( !isset( $fbAutoConfirmCount ))
+			$fbAutoConfirmCount = 0;
+		$age = time() - wfTimestampOrNull( TS_UNIX, $user->getRegistration() );
+		if( $age >= $fbAutoConfirmAge && $user->getEditCount() >= $fbAutoConfirmCount ) {
+			// Matches requirements, don't bother checking if we're in a group
+			return true;
+		}
+		/**/
+		
+		// If user is not in Facebook group, empty the $promote array
+		$inGroup = true;
+		if( !$inGroup ) {
+			$promote = array();
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Add a permissions error when permissions errors are checked for.
+	 * 
+	 * The difference between getUserPermissionsErrors and getUserPermissionsErrorsExpensive:
+	 * 
+	 * Typically, both hooks are run when checking for proper permissions in Title.php. When
+	 * it is desireable to skip potentially expensive cascading permission checks, only
+	 * getUserPermissionsErrors is run. This behavior is suitable for nonessential UI
+	 * controls in common cases, but _not_ for functional access control. This behavior
+	 * may provide false positives, but should never provide a false negative.
+	 */
+	static function XXXgetUserPermissionsErrorsExpensive( $title, $user, $action, &$result ) {
+		//echo "getUserPermissionsErrorsExpensive\n";
 		return true;
 	}
 	
@@ -92,7 +178,7 @@ class FBConnectHooks {
 	/**
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
-	static function BeforePageDisplay(&$out, &$sk) {
+	static function BeforePageDisplay( &$out, &$sk ) {
 		global $fbLogo, $wgScriptPath, $wgJsMimeType;
 		
 		// Parse page output for Facebook IDs
@@ -152,8 +238,9 @@ class FBConnectHooks {
 			return true;
 		
 		// Look to see if class="..." appears in the link
+		$regs = array();
 		preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
-		if (count( $regs ) > 0) {
+		if (count( $regs )) {
 			// If so, append " mw-userlink" to the end of the class list
 			$item = $regs[1] . "class=$regs[2]$regs[3] mw-userlink$regs[2]" . $regs[4];
 		} else {
@@ -246,8 +333,8 @@ class FBConnectHooks {
 		}
 		
 		// Unset user talk page links
-		if ($fbRemoveUserTalkLink && array_key_exists('mytalk', $personal_urls))
-			unset($personal_urls['mytalk']);
+		if ( $fbRemoveUserTalkLink && array_key_exists( 'mytalk', $personal_urls ))
+			unset( $personal_urls['mytalk'] );
 
 		return true;
 	}
@@ -256,7 +343,7 @@ class FBConnectHooks {
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
 	 */
-	public static function RenderPreferencesForm($form, $output) {
+	public static function RenderPreferencesForm( $form, $output ) {
 		global $wgUser;
 		
 		// If the user name is a valid Facebook ID, link to the Facebook profile
@@ -279,10 +366,9 @@ class FBConnectHooks {
 	/**
 	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect
 	 */
-	static function UserLoadFromSession($user, &$result) {
+	static function UserLoadFromSession( $user, &$result ) {
 		global $wgAuth;
 		
-		//FBConnect::onUserLoadFromSession();
 		$fb_uid = FBConnect::$api->user();
 		
 		if (!isset($fb_uid) || $fb_uid == 0) {

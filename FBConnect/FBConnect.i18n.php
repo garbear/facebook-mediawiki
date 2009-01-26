@@ -15,12 +15,35 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 $messages = array();
 
-define( 'fb', 'fbconnect-' );
+if (!defined( 'fb' )) {
+	define( 'fb', 'fbconnect-' );
+}
+
 
 /** English */
 $messages['en'] = array(
 // Extension name
 'fbconnect'   => 'Facebook Connect',
+fb.'desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http://www.facebook.com Facebook] ' .
+                 'accounts. Offers authentification based on Facebook groups (soon!) and the use of FBML in wiki text.',
+// Group containing Facebook Connect users
+'group-fb-user'           => 'Facebook Connect users',
+'group-fb-user-member'    => 'Facebook Connect user',
+'grouppage-fb-user'       => '{{ns:project}}:Facebook Connect users',
+// Group for Facebook Connect users beloning to the group specified by $fbUserRightsFromGroup
+'group-fb-groupie'        => 'Group members',
+'group-fb-groupie-member' => 'Group member',
+'grouppage-fb-groupie'    => '{{ns:project}}:Group members',
+// Officers of the Facebook group
+'group-fb-officer'        => 'Group officers',
+'group-fb-officer-member' => 'Group officer',
+'grouppage-fb-officer'    => '{{ns:project}}:Group officers',
+// Admins of the Facebook group
+'group-fb-admin'          => 'Group admins',
+'group-fb-admin-member'   => 'Group administrator',
+'grouppage-fb-admin'      => '{{ns:project}}:Group admins',
+// Incredibly good looking people
+'right-goodlooking'       => 'Really, really, ridiculously good looking',
 // Personal toolbar
 fb.'connect'  => 'Connect this account with Facebook',
 fb.'logout'   => 'Logout of Facebook',

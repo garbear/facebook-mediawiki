@@ -147,7 +147,7 @@ class FBConnectAPI {
 	}
 	
 	/**
-	 * Performs that query.
+	 * Performs that queries requested by addPersonById().
 	 */
 	public function getPersons() {
 		// If possible, switch to http://wiki.developers.facebook.com/index.php/Users.getStandardInfo
@@ -161,8 +161,63 @@ class FBConnectAPI {
 				$users->$fbuid->pic = ($user['pic_square'] != "" ? $user['pic_square'] :
 				                       'http://static.ak.connect.facebook.com/pics/q_silhouette.gif');
 			}
+			return $users;
 		}
-		return $users;
+		return array();
+	}
+	
+	/**
+	 * Retrieves group membership data from Facebook as specified by $fbUserRightsFromGroup.
+	 */
+	public function getGroupRights( $user = null ) {
+		global $fbUserRightsFromGroup;
+		
+		// Groupies can be members, officers or admins (the latter two infer the former)
+		$rights = array('member'  => false,
+		                'officer' => false,
+		                'admin'   => false);
+		
+		// If no group ID is specified by $fbUserRightsFromGroup, then there's no group to belong to
+		$gid = $fbUserRightsFromGroup;
+		if( !$gid || !$this->user() ) {
+			return $rights;
+		}
+		if( $user == null ) {
+			$user = $this->user();
+		} else if ( $user instanceof User ) {
+			$user = $user->getName();
+		}
+		if( !FBConnect::$api->isIdValid( $user )) {
+			return $rights;
+		}
+		if( is_int( $user )) {
+			$user = "$user";
+		}
+		
+		// Get a random 500 group members, along with officers, admins and not_replied's
+		$members = FBConnect::$api->getClient()->api_client->groups_getMembers( $gid );
+		if( in_array( $user, $members['officers'] )) {
+			$rights['member'] = $rights['officer'] = true;
+		}
+		if( in_array( $user, $members['admins'] )) {
+			$rights['member'] = $rights['admin'] = true;
+		}
+		// Because the latter two rights infer the former, this step isn't always necessary
+		if( !$rights['member'] ) {
+			// Check to see if we are one of the (up to 500) random users
+			if( in_array( "$user", $members['not_replied'] ) || in_array( "$user", $members['members'] )) {
+				$rights['member'] = true;
+			} else {
+				// For groups of over 500ish, we must use this extra API call
+				// Notice that it occurs last, because we can hopefully avoid having to call it
+				$group = FBConnect::$api->getClient()->api_client->groups_get( intval( $user ), $gid );
+				if( is_array( $group ) && is_array( $group[0] ) && $group[0]['gid'] == "$gid" ) {
+					$rights['member'] = true;
+				}
+			}
+		}
+		
+		return $rights;
 	}
 	
 	/*

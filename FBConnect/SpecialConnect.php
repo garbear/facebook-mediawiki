@@ -25,7 +25,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- *  Body class for the special page Special:Connect.
+ * Body class for the special page Special:Connect.
  */
 class SpecialConnect extends SpecialPage {
 	/**
