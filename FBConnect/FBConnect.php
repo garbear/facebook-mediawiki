@@ -80,15 +80,18 @@ $wgSpecialPages['Connect'] = 'SpecialConnect';
 $wgExtensionFunctions[] = 'FBConnect::init';
 
 // If we are configured to pull group info from Facebook, then create the group permissions
+$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 if( $fbUserRightsFromGroup ) {
-	$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
 	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
 	$wgGroupPermissions['fb-officer']['goodlooking'] = true;
+	$wgImplictGroups[] = 'fb-groupie';
+	$wgImplictGroups[] = 'fb-officer';
+	$wgImplictGroups[] = 'fb-admin';
 }
 
-/*
+/**/
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
 define( 'APCOND_FB_INGROUP',   'fb*g' );
 define( 'APCOND_FB_ISOFFICER', 'fb*o' );
@@ -98,8 +101,15 @@ $wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
 $wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
 $wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 
-//$wgImplicitGroups[] = 'fb-groupie';
+/**
+$wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoConfirmCount ),
+                                  array( APCOND_AGE, &$wgAutoConfirmAge ),
+                                  array( APCOND_FB_INGROUP ));
 /**/
+
+$wgImplicitGroups[] = 'fb-groupie';
+$wgImplicitGroups[] = 'fb-officer';
+$wgImplicitGroups[] = 'fb-admin';
 
 
 /**
@@ -118,13 +128,17 @@ class FBConnect {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgXhtmlNamespaces, $wgHooks;
+		global $wgXhtmlNamespaces, $wgAuth, $wgHooks;
 		
 		self::$special_connect = false;
 		self::$api = new FBConnectAPI();
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
+		
+		// Set the global variable $wgAuth to our custom authentification plugin.
+		// The AuthPluginSetup hook is called right before init(), so we can't use this hook
+		$wgAuth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');

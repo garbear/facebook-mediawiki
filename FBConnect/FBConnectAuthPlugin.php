@@ -19,16 +19,16 @@
 /**
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
+if ( !defined( 'MEDIAWIKI' )) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
 /**
  * Class AuthPlugin must be defined before we can extend it!
  */
-if (!isset($IP))
-	$IP = defined('MW_INSTALL_PATH') ? MW_INSTALL_PATH : dirname( __FILE__ ) . "/../..";
-require_once("$IP/includes/AuthPlugin.php");
+if ( !isset( $IP ))
+	$IP = defined( 'MW_INSTALL_PATH' ) ? MW_INSTALL_PATH : dirname( __FILE__ ) . '/../..';
+require_once( "$IP/includes/AuthPlugin.php" );
 
 
 /**
@@ -44,58 +44,58 @@ require_once("$IP/includes/AuthPlugin.php");
 class FBConnectAuthPlugin extends AuthPlugin {
 	/**
 	 * Returns whether $username is a valid username.
-	 * 
-	 * @return false if the username is invalid
 	 */
 	public function userExists( $username ) {
-		global $fbAllowOldAccounts;
-		if (!$fbAllowOldAccounts) {
-			return true;
-		}
 		return FBConnect::$api->isIdValid( $username );
 	}
 	
 	/**
-	 * Whether the given username and password authenticate as a valid login.
+	 * Whether the given username and password authenticate as a valid login. We should only
+	 * let people login if they are first connected through Facebook Connect.
 	 */
 	public function authenticate( $username, $password = '' ) {
-		// Only let people login if they are first connected through Facebook Connect
 		return $username == FBConnect::$api->user();
 	}
-
+	
 	/**
 	 * When a user logs in, attempt to fill in preferences and such. Here, we query
 	 * for the user's real name.
-	 *
+	 */
 	public function updateUser( &$user ) {
-		$realName = FBConnect::$api->get_fields($user->getName(), array('name'));
-		$realName = $realName['name'];
-		if ($realName != "" && $realName != $user->getRealName()) {
-			$user->setRealName($realName);
-			$user->saveSettings();
+		if ( FBConnect::$api->isIdValid( $user->getName() )) {
+			/**/
+			#$d = $user->getGroups();
+			#var_dump($d);
+			// Temporary fix for my personal wiki
+			if ( !in_array( 'fb-user', $user->getGroups() )) {
+				$user->addGroup( 'fb-user' );
+			}
+			/**/
+			$name = FBConnect::$api->getRealName( $user );
+			if ( $name != '' && $name != $user->getRealName() ) {
+				$user->setRealName( $name );
+				$user->saveSettings();
+			}
 		}
 		return true;
 	}
-
+	
 	/**
 	 * The authorization is external via Facebook Connect, so we would normally autocreate
 	 * accounts as necessary. However, we set this to false because automatic account
 	 * creation is handled internally by the FBConnect extension.
 	 */
 	public function autoCreate() {
-		return false;
+		return true;
 	}
 	
 	/**
-	 * Users cannot change their passwords, because passwords are not used.
-	 * 
-	 * @TODO: Should this return false if $wgUser is Connected?
+	 * Only nonconnected users can change their passwords.
 	 */
 	public function allowPasswordChange() {
-		global $fbAllowOldAccounts;
-		return $fbAllowOldAccounts;
+		return !$this->strict() && !FBConnect::$api->user();
 	}
-
+	
     /**
      * Check to see if external accounts can be created on Facebook. Returns false
      * because they obviously can't be.
@@ -103,7 +103,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
     public function canCreateAccounts() {
         return false;
     }
-
+	
 	/**
 	 * Do not look in the local database for user authentication because our
 	 * authentication method is all that counts. Returns true to prevent logins
@@ -114,36 +114,39 @@ class FBConnectAuthPlugin extends AuthPlugin {
 		global $fbAllowOldAccounts;
 		return !$fbAllowOldAccounts;
 	}
-
+	
 	/**
 	 * This function gets called when the user is created. $user is an instance of
-	 * the User class (see includes/User.php). Note the passed-by-reference.
+	 * the User class (see includes/User.php). Note the passed-by-reference nature.
 	 */
-	public function initUser(&$user, $autocreate=false) {
-		if ($autocreate || $this->autoCreate()) {
+	public function initUser( &$user, $autocreate = false ) {
+		if ( $autocreate && FBConnect::$api->isIdValid( $user->getName() )) {
 			$user->mEmailAuthenticated = wfTimestampNow();
 			// Turn on e-mail notifications by default
-			$user->setOption('enotifwatchlistpages', 1);
-			$user->setOption('enotifusertalkpages', 1);
-			$user->setOption('enotifminoredits', 1);
-			$user->setOption('enotifrevealaddr', 1);
-			$this->updateUser( $user );
+			$user->setOption( 'enotifwatchlistpages', 1 );
+			$user->setOption( 'enotifusertalkpages', 1 );
+			$user->setOption( 'enotifminoredits', 1 );
+			$user->setOption( 'enotifrevealaddr', 1 );
+			// No password to remember
+			$user->setOption( 'rememberpassword', 0 );
+			// Mark the user as a Facebook Connect user
+			$user->addGroup( 'fb-user' );
 		}
+		$this->updateUser( $user );
 		return true;
 	}
-
+	
 	/**
 	 * Modify options in the login template.
 	 */
-	public function modifyUITemplate(&$template) {
-		// Disable the mail new password box
-		$template->set("useemail", false);
-
-		// Disable 'remember me' box
-		$template->set("remember", false);
-
-		$template->set("create", false);
-		$template->set("domain", false);
-		$template->set("usedomain", false);
+	public function modifyUITemplate( &$template ) {
+		if( FBConnect::$api->user() ) {
+			// Disable the mail new password box
+			$template->set( "useemail", false );
+			// Disable 'remember me' box
+			$template->set( "remember", false );
+			// What happens if a Connected user creates an account while logged in?
+			$template->set( "create", false );
+		}
 	}
 }

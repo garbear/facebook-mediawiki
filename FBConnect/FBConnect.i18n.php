@@ -71,4 +71,8 @@ fb.'mergebox' => 'This feature has not yet been implemented. Accounts can be mer
                  'Renameuser]] if it is installed. For more information, please visit [[MediaWikiWiki:Extension:' .
                  "Renameuser|Extension:Renameuser]].\n\n\n$1\n\n\nNote: This can be undone by a sysop.",
 fb.'logoutbox'=> "$1\n\nThis will also log you out of Facebook and all Connected sites, including this wiki.",
+fb.'listusers-header'
+              => '$1 and $2 privileges are automatically transfered from the Officer and Admin titles of the ' .
+                 "Facebook group $3.\n\nFor more info, please contact the $4.",
+fb.'grp_cr8r' => 'Group Creator',
 );

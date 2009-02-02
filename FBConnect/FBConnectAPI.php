@@ -137,6 +137,11 @@ class FBConnectAPI {
 		return $this->getClient()->get_loggedin_user();
 	}
 	
+	public function getRealName( $user ) {
+		$name = $this->getFields( $user->getName(), array( 'name' ));
+		return $name[0]['name'];
+	}
+	
 	/**
 	 * Batches up user IDs so we can get their details with a single Platform query.
 	 */
@@ -167,6 +172,24 @@ class FBConnectAPI {
 	}
 	
 	/**
+	 * Returns the name of the group specified by $fbUserRightsFromGroup, or null if it is false.
+	 */
+	public function groupInfo() {
+		global $fbUserRightsFromGroup;
+		if ( !$fbUserRightsFromGroup ) {
+			return null;
+		}
+		$group = FBConnect::$api->getClient()->api_client->groups_get( null, $fbUserRightsFromGroup );
+		$info = null;
+		if ( is_array( $group ) && is_array( $group[0] )) {
+			$info['name'] = $group[0]['name'];
+			$info['creator'] = $group[0]['creator'];
+			$info['picture'] = $group[0]['pic'];
+		}
+		return  $info;
+	}
+	
+	/**
 	 * Retrieves group membership data from Facebook as specified by $fbUserRightsFromGroup.
 	 */
 	public function getGroupRights( $user = null ) {
@@ -194,29 +217,34 @@ class FBConnectAPI {
 			$user = "$user";
 		}
 		
+		// This can contain up to 500 ids, avoid requesting this info twice
+		static $members = false;
 		// Get a random 500 group members, along with officers, admins and not_replied's
-		$members = FBConnect::$api->getClient()->api_client->groups_getMembers( $gid );
-		if( in_array( $user, $members['officers'] )) {
-			$rights['member'] = $rights['officer'] = true;
-		}
-		if( in_array( $user, $members['admins'] )) {
-			$rights['member'] = $rights['admin'] = true;
-		}
-		// Because the latter two rights infer the former, this step isn't always necessary
-		if( !$rights['member'] ) {
-			// Check to see if we are one of the (up to 500) random users
-			if( in_array( "$user", $members['not_replied'] ) || in_array( "$user", $members['members'] )) {
-				$rights['member'] = true;
-			} else {
-				// For groups of over 500ish, we must use this extra API call
-				// Notice that it occurs last, because we can hopefully avoid having to call it
-				$group = FBConnect::$api->getClient()->api_client->groups_get( intval( $user ), $gid );
-				if( is_array( $group ) && is_array( $group[0] ) && $group[0]['gid'] == "$gid" ) {
+		if ( $members === false )
+			$members = FBConnect::$api->getClient()->api_client->groups_getMembers( $gid );
+		if ( $members ) {
+			if( array_key_exists( 'officers', $members ) && in_array( $user, $members['officers'] )) {
+				$rights['member'] = $rights['officer'] = true;
+			}
+			if( array_key_exists( 'admins', $members ) && in_array( $user, $members['admins'] )) {
+				$rights['member'] = $rights['admin'] = true;
+			}
+			// Because the latter two rights infer the former, this step isn't always necessary
+			if( !$rights['member'] ) {
+				// Check to see if we are one of the (up to 500) random users
+				if (( array_key_exists( 'not_replied', $members ) && is_array( $members['not_replied'] ) &&
+					  in_array( $user, $members['not_replied'] )) || in_array( $user, $members['members'] ))  {
 					$rights['member'] = true;
+				} else {
+					// For groups of over 500ish, we must use this extra API call
+					// Notice that it occurs last, because we can hopefully avoid having to call it
+					$group = FBConnect::$api->getClient()->api_client->groups_get( intval( $user ), $gid );
+					if( is_array( $group ) && is_array( $group[0] ) && $group[0]['gid'] == "$gid" ) {
+						$rights['member'] = true;
+					}
 				}
 			}
 		}
-		
 		return $rights;
 	}
 	
@@ -226,7 +254,7 @@ class FBConnectAPI {
 	 * If performance is an issue, then you may want to implement caching on top of this
 	 * function. The cache would have to be cleared every 24 hours.
 	 */
-	public function getFields( $fb_uids, $fields ) {
+	private function getFields( $fb_uids, $fields ) {
 		try {
 			$user_details = $this->getClient()->api_client->users_getInfo( $fb_uids, $fields );
 		} catch( Exception $e ) {
@@ -234,7 +262,7 @@ class FBConnectAPI {
 			           ' on uid ' . $fb_uids . ' : ' . $e->getMessage() );
 			return null;
 		}
-		return empty( $user_details ) ? null : $user_details;
+		return $user_details ? ( !empty( $user_details ) ? $user_details : null ) : null;
 	}
 
 	/**

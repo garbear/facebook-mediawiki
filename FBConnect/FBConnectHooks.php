@@ -35,20 +35,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FBConnectHooks {
 	/**
-	 * Set the global variable $wgAuth to our custom authentification plugin.
-	 */
-	static function AuthPluginSetup( &$auth ) {
-		$auth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
-		return true;
-	}
-	
-	/**
 	 * Checks the autopromote condition for a user.
 	 * 
 	 * @TODO: Filter FBConnect::$api->getGroupRights() to reduce Facebook API overhead.
 	 */
-	static function XXXAutopromoteCondition( $cond_type, $args, $user, &$result ) {
-		//echo "\nAutopromoteCondition\n" . $user->getName() . "\n";
+	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		$types = array(APCOND_FB_INGROUP   => 'member',
 		               APCOND_FB_ISOFFICER => 'officer',
 		               APCOND_FB_ISADMIN   => 'admin');
@@ -59,16 +50,7 @@ class FBConnectHooks {
 			case 'admin':
 				$rights = FBConnect::$api->getGroupRights( $user );
 				$result = $rights[$type];
-				//echo "$type: \$result = $result\n";
 		}
-		return true;
-	}
-	
-	static function XXXUserEffectiveGroups( &$user, &$aUserGroups ) {
-		//echo "\nUserEffectiveGroups\n" . $user->getName() . "\n";
-		if( FBConnect::$api->isIdValid( $user->getName() ))
-			$aUserGroups[] = 'fb-user';
-		//var_dump( $aUserGroups );
 		return true;
 	}
 	
@@ -79,15 +61,14 @@ class FBConnectHooks {
 	 * $promote contains the groups that will be added. If the user isn't entitled to these groups,
 	 * then we flush this array down the toilet.
 	 */
-	static function XXXGetAutoPromoteGroups( &$user, &$promote ) {
+	static function GetAutoPromoteGroups( &$user, &$promote ) {
 		//echo "\nGetAutoPromoteGroups\n";
 		//var_dump( $promote );
-		
+		/**/
 		// If there isn't any groups to promote to anyway
 		if( !count($promote) ) {
 			return true;
 		}
-		
 		/**
 		// Requirement checks would go here to prevent unnecessary API group queries
 		// E.g. if there was a seperate AutoConfirmAge or AutoConfirmCount check for Facebook users
@@ -101,14 +82,13 @@ class FBConnectHooks {
 			// Matches requirements, don't bother checking if we're in a group
 			return true;
 		}
-		/**/
-		
+		/**
 		// If user is not in Facebook group, empty the $promote array
 		$inGroup = true;
 		if( !$inGroup ) {
 			$promote = array();
 		}
-		
+		/**/
 		return true;
 	}
 	
@@ -362,79 +342,96 @@ class FBConnectHooks {
 		}
 		return true;
 	}
-
+	
 	/**
-	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect
+	 * Adds some info about the governing Facebook group to the header form of Special:ListUsers.
+	 */
+	static function SpecialListusersHeaderForm( &$pager, &$out ) {
+		global $fbUserRightsFromGroup, $fbLogo;
+		$gid = $fbUserRightsFromGroup;
+		if ( $gid ) {
+			$group = FBConnect::$api->groupInfo();
+			$groupName = $group['name'];
+			$cid = $group['creator'];
+			$pic = $group['picture'];
+			$out .= '
+				<table>
+					<tr>
+						<td>
+							' . wfMsgWikiHtml( 'fbconnect-listusers-header',
+							wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
+							"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$groupName</a>",
+							"<a href=\"http://www.facebook.com/profile.php?id=$cid#User:$cid\" " .
+							'class="mw-userlink" title="' . wfMsg( 'fbconnect-grp_cr8r') . '" ' .
+							'style="text-transform:lowercase">' . wfMsg( 'fbconnect-grp_cr8r') . '</a>') . '
+						</td>
+		        		<td>
+		        			<img src="' . $pic . '" alt="' . $groupName . '">
+		        		</td>
+		        	</tr>
+		        </table>';
+		}
+		return true;
+	}
+	
+	/**
+	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $wgAuth;
-		
+		global $wgAuth, $wgUser;
+		// Check to see if we have a connection with Facebook
 		$fb_uid = FBConnect::$api->user();
-		
-		if (!isset($fb_uid) || $fb_uid == 0) {
+		if ( $fb_uid == 0 ) {
 			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
+			if( $wgAuth->strict() ) {
+				$result = false;
+			}
 			return true;
 		}
-
-		// Username is the user's facebook ID
-		$userName = "$fb_uid";
-		if( $user->isLoggedIn() && $user->getName() == $userName ) {
-			return true;
-		}
-
-		$localId = User::idFromName( $userName );
-
-		// If the user does not exist locally, attempt to create it
-		if ( !$localId ) {
-			/*
-			// Are we denied by the configuration of FBConnectAuthPlugin?
-			if ( !$wgAuth->autoCreate() ) {
-				wfDebug( __METHOD__.": denied by the configuration of FBConnectAuthPlugin\n" );
-				// Can't create new user, give up now
-				return true;
-			}
-			/**/	
-			
-			/* Skip this check for now, until we hammer down the other problems
-			$anon = new User;
-			// Is the user blocked?
-			if ( !$anon->isAllowedToCreateAccount() ) {
-				wfDebug( __METHOD__.": denied by configuration. \$user->isAllowedToCreateAccount() returned false.\n" );
-				// Can't create new user, give up now
-				return true;
-			}
-			/**/
-
-			// Checks passed, create the user
-			//wfDebug( __METHOD__.": creating new user\n" );
-			$user->loadDefaults( $userName );
-			$user->addToDatabase();
-
-			$wgAuth->initUser( $user, true );
-			// updateUser() is called by $wgAuth->initUser(). Should it be called here instead?
-			//$wgAuth->updateUser( $user );
-
-			// Update user count
-			$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
-			$ssUpdate->doUpdate();
-
-			// Notify hooks (e.g. Newuserlog)
-			wfRunHooks( 'AuthPluginAutoCreate', array( $user ) );
-			// Which MediaWiki versions can we call this function in?
-			//$user->addNewUserLogEntryAutoCreate();
-		} else {
+		$localId = User::idFromName( "$fb_uid" );
+		// If the user exists, then log them in
+		if ( $localId ) {
 			$user->setID( $localId );
 			$user->loadFromId();
-			if ($user->getRealName() == '') {
-				$wgAuth->updateUser( $user );
+			// Updates the user's info from Facebook if no real name is set
+			#echo "Udating...\n";
+			$wgAuth->updateUser( $user );
+		} else {
+			// User has not visited the wiki before, so create a new user from their Facebook ID
+			$userName = "$fb_uid";
+			
+			// Test to see if we are denied by FBConnectAuthPlugin or the user can't create an account
+			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
+			     !$wgAuth->authenticate( $user->getName() ) || $wgUser->isBlockedFromCreateAccount() ) {
+				/*
+				if( $wgAuth->strict() ) {
+			     	$result = false;
+				}
+				/**/
+				return true;
 			}
+			
+			// Checks passed, create the user
+			$user->loadDefaults( $userName );
+			$user->addToDatabase();
+			
+			$wgAuth->initUser( $user, true );
+			$wgUser = $user;
+			
+			// Update the user count
+			$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
+			$ssUpdate->doUpdate();
+			
+			// Notify hooks (e.g. Newuserlog)
+			wfRunHooks( 'AuthPluginAutoCreate', array( $wgUser ));
+			
+			// Which MediaWiki versions can we call this function in?
+			$user->addNewUserLogEntryAutoCreate();
 		}
 		
-		// Auth OK.
-		wfDebug( __METHOD__.": logged in from session\n" );
+		// Authentification okay
 		wfSetupSession();
 		$result = true;
-		
 		return true;
 	}
 }

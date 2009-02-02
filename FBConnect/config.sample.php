@@ -52,7 +52,7 @@ $fbFeedBundleId  = 99999999;
 // The Facebook icon. You can copy this to your server if you want, or set to false to disable.
 $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
-// Allow non-Connected user accounts to login (false may work but is untested)
+// Allow non-Connected user accounts to login
 $fbAllowOldAccounts = true;
 
 // Disable new account creation (accounts can only be created by a successful Connection)
@@ -68,10 +68,17 @@ $fbUseMarkup = true;
 // <fb:photo> tags, set this to false.
 $fbAllowFacebookImages = true;
 
-// Groups
+// For easier wiki rights management, create a group on Facebook and place the group ID here.
+// Three new implicit groups will be created:
+//   fb-groupie, a member of the specified group
+//   fb-officer, a group member with an officer title
+//   fb-admin,   an administrator of the Facebook group
+// By default, they map to User, Bureaucrat and Sysop privileges, respectively. Users will
+// automatically be promoted or demoted when their membership, title or admin status is modified
+// from the group page within Facebook.
 $fbUserRightsFromGroup = false;  # Or a group ID
 
-$fbOfficerRights = 'officer';
+// Not used (yet...)
 $fbRestrictToGroup = true;
 $fbRestrictToNotReplied = false;
 
