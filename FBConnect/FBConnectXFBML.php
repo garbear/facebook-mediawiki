@@ -139,10 +139,12 @@ class FBConnectXFBML {
 		// Reject discarded tags (that return an empty string) from Special:Version
 		$tempParser = new DummyParser();
 		foreach( $tags as $i => $tag ) {
-			if (self::parserHook('', array(), $tempParser, $tag) == '') {
-				unset($tags[$i]);
+			if ( self::parserHook('', array(), $tempParser, $tag) == '' ) {
+				unset( $tags[$i] );
 			}
 		}
+		// Allow other functions to modify the available XFBML tags
+		wfRunHooks( 'FbmlAvailableTags', array( &$tags ));
 		return $tags;
 	}
 }
