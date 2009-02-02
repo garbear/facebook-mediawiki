@@ -210,7 +210,8 @@ class SpecialConnect extends SpecialPage {
 		$template->set( 'canreset', $wgAuth->allowPasswordChange() );
 		$template->set( 'canremember', ( $wgCookieExpiration > 0 ) );
 		$template->set( 'remember', $wgUser->getOption( 'rememberpassword' ) );
-		
+		// Look this setting up in SpecialUserLogin.php
+		$template->set( 'usedomain', false );
 		// Spit out the form we just made
 		return $template;
 	}
