@@ -45,10 +45,18 @@ class FBConnectXFBML {
 				break; // Error: We shouldn't be here!
 				
 			// To implement a custom XFBML tag handler, simply case it here like so
-			//case 'fb:login-button':
+			#case 'fb:login-button':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
 				break;
+			case 'fb:serverfbml':
+				echo $text;
+				$attrs = "";
+				foreach( $args as $name => $value ) {
+					if ( substr( $name, 0, 2 ) != "on" )
+						$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
+				}
+				return "<fb:serverfbml{$attrs}>$text</fb:serverfbml>";
 			case 'fb:profile-pic':
 			case 'fb:photo':
 			case 'fb:video':
@@ -60,7 +68,7 @@ class FBConnectXFBML {
 				$attrs = "";
 				foreach( $args as $name => $value ) {
 					// Disable all event handlers (e.g. onClick, onligin)
-					if (substr( $name, 0, 2 ) == "on")
+					if ( substr( $name, 0, 2 ) == "on" )
 						continue;
 					// Otherwise, pass the attribute through htmlspecialchars unmodified
 					$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
@@ -119,7 +127,7 @@ class FBConnectXFBML {
 		                   'fb:profile-pic',
 		                   'fb:prompt-permission',
 		                   'fb:pronoun',
-		                   'fb:serverFbml',
+		                   'fb:serverfbml',
 		                   'fb:unconnected-friends-count',
 		                   'fb:user-status');
 		// This tag is listed in the facebook dev wiki's documentation, but I couldn't
