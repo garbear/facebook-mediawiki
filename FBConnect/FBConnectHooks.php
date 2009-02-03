@@ -362,8 +362,7 @@ class FBConnectHooks {
 							wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
 							"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$groupName</a>",
 							"<a href=\"http://www.facebook.com/profile.php?id=$cid#User:$cid\" " .
-							'class="mw-userlink" title="' . wfMsg( 'fbconnect-grp_cr8r') . '" ' .
-							'style="text-transform:lowercase">' . wfMsg( 'fbconnect-grp_cr8r') . '</a>') . '
+							"class=\"mw-userlink\">$cid</a>") . '
 						</td>
 		        		<td>
 		        			<img src="' . $pic . '" alt="' . $groupName . '">
