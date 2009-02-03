@@ -36,8 +36,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 class FBConnectHooks {
 	/**
 	 * Checks the autopromote condition for a user.
-	 * 
-	 * @TODO: Filter FBConnect::$api->getGroupRights() to reduce Facebook API overhead.
 	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		$types = array(APCOND_FB_INGROUP   => 'member',

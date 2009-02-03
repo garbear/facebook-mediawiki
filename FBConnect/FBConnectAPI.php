@@ -217,6 +217,13 @@ class FBConnectAPI {
 			$user = "$user";
 		}
 		
+		// Cache the rights for an individual user to prevent hitting Facebook for duplicate info
+		static $rights_cache = array();
+		if ( array_key_exists( $user, $rights_cache )) {
+			// Retrieve the rights from the cache
+			return $rights_cache[$user];
+		}
+		
 		// This can contain up to 500 ids, avoid requesting this info twice
 		static $members = false;
 		// Get a random 500 group members, along with officers, admins and not_replied's
@@ -245,6 +252,8 @@ class FBConnectAPI {
 				}
 			}
 		}
+		// Cache the rights
+		$rights_cache[$user] = $rights;
 		return $rights;
 	}
 	
