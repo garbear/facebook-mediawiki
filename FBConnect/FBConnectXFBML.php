@@ -43,40 +43,44 @@ class FBConnectXFBML {
 		switch ($tag) {
 			case '':
 				break; // Error: We shouldn't be here!
-				
+			
 			// To implement a custom XFBML tag handler, simply case it here like so
 			#case 'fb:login-button':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
 				break;
 			case 'fb:serverfbml':
-				echo $text;
-				$attrs = "";
-				foreach( $args as $name => $value ) {
-					if ( substr( $name, 0, 2 ) != "on" )
-						$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
-				}
+				$attrs = self::implodeAttrs( $args );
 				return "<fb:serverfbml{$attrs}>$text</fb:serverfbml>";
 			case 'fb:profile-pic':
 			case 'fb:photo':
 			case 'fb:video':
 				if (!$fbAllowFacebookImages)
 					break;
-				// Careful - no break; if $fbAllowFacebookImages is true
+				// Careful - no "break;" if $fbAllowFacebookImages is true
 			default:
-				// The default action is to strip all event handlers and allow the tag
-				$attrs = "";
-				foreach( $args as $name => $value ) {
-					// Disable all event handlers (e.g. onClick, onligin)
-					if ( substr( $name, 0, 2 ) == "on" )
-						continue;
-					// Otherwise, pass the attribute through htmlspecialchars unmodified
-					$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
-				}
+				$attrs = self::implodeAttrs( $args );
 				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $text ) . "</$tag>";
 		}
 		// Strip the tag entirely
 		return '';
+	}
+	
+	/**
+	 * Helper function to create name-value pairs from the list of attributes passed to the
+	 * parser hook.
+	 */
+	private static function implodeAttrs( $args ) {
+		$attrs = "";
+		// The default action is to strip all event handlers and allow the tag
+		foreach( $args as $name => $value ) {
+			// Disable all event handlers (e.g. onClick, onligin)
+			if ( substr( $name, 0, 2 ) == "on" )
+				continue;
+			// Otherwise, pass the attribute through htmlspecialchars unmodified
+			$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
+		}
+		return $attrs;
 	}
 	
 	/**
