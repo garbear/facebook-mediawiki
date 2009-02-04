@@ -161,10 +161,12 @@ class FBConnectHooks {
 		
 		// Parse page output for Facebook IDs
 		$html = $out->getHTML();
-		// 64-bit user IDs can be up to 20 characters long in base 10
-		preg_match_all('/User:(\d{1,19})["\'&]/', $html, $ids);
-		foreach( $ids[1] as $id )
-			FBConnect::$api->addPersonById(intval( $id ));
+		preg_match_all('/User:([^"\'&#]+)/', $html, $usernames);
+		foreach( $usernames[1] as $name ) {
+			$id = FBConnect::$api->idFromName( $name );
+			if( $id )
+				FBConnect::$api->addPersonById( $id );
+		}
 		
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = '<style type="text/css">
@@ -346,14 +348,13 @@ class FBConnectHooks {
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
 		global $fbUserRightsFromGroup, $fbLogo;
-		$gid = $fbUserRightsFromGroup;
-		if ( $gid ) {
+		if ( $gid = $fbUserRightsFromGroup ) {
 			$group = FBConnect::$api->groupInfo();
 			$groupName = $group['name'];
 			$cid = $group['creator'];
 			$pic = $group['picture'];
 			$out .= '
-				<table>
+				<table style="border-collapse: collapse;">
 					<tr>
 						<td>
 							' . wfMsgWikiHtml( 'fbconnect-listusers-header',
@@ -363,7 +364,7 @@ class FBConnectHooks {
 							"class=\"mw-userlink\">$cid</a>") . '
 						</td>
 		        		<td>
-		        			<img src="' . $pic . '" alt="' . $groupName . '">
+		        			<img src="' . "$pic\" title=\"$groupName\" alt=\"$groupName" . '">
 		        		</td>
 		        	</tr>
 		        </table>';
@@ -385,7 +386,7 @@ class FBConnectHooks {
 			}
 			return true;
 		}
-		$localId = User::idFromName( "$fb_uid" );
+		$localId = User::idFromName( FBConnect::$api->userName() );
 		// If the user exists, then log them in
 		if ( $localId ) {
 			$user->setID( $localId );

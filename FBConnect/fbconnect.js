@@ -25,10 +25,14 @@ function facebook_add_user_tooltips() {
 }
 
 function extract_id(string) {
-	if (/User:(\d{6,19})$/.exec(string))
-		return /User:(\d{6,19})$/.exec(string)[1];
-	if (/User:(\d{6,19})[^a-zA-Z0-9_]/.exec(string))
-		return /User:(\d{6,19})[^a-zA-Z0-9_]/.exec(string)[1];
+	var userlink = /User:[^0-9]*(\d{6,19})/.exec(string)
+	if (userlink)
+		return userlink[1];
+	/**
+	var new_userlink = /User:[^0-9]*(\d{6,19})[^0-9]/.exec(string) 
+	if (new_userlink)
+		return new_userlink[1];
+	/**/
 	return 0;
 }
 

@@ -34,6 +34,42 @@ class FBConnectAPI {
 	// Stores a list of valid Facebook IDs for adding tooltip info
 	private $ids = array();
 	
+	private $pre  = '';
+	private $post = '';
+	
+	public function __construct() {
+		global $fbUserName, $wgContLang, $fbUserNameOK;
+		// If $fbUserName is set, parse it to determine the prefix and suffix
+		if ( isset ($fbUserName ) && $fbUserName !== '' ) {
+			// The first letter of wiki user names must be capitalized
+			$fbUserName = $wgContLang->ucfirst( $fbUserName );
+			if ( strpos( $fbUserName, '#' ) === false ) {
+				$this->pre = $fbUserName;
+			} else if ( strpos( $fbUserName, '#' ) == 0 ) {
+				$this->post = substr( $fbUserName, 1 );
+			} else {
+				$modifiers = explode( '#', $fbUserName );
+				$this->pre = $modifiers[0];
+				if ( count( $modifiers ) > 1 ) {
+					$this->post = $modifiers[count( $modifiers ) - 1];
+				}
+			}
+		}
+		// Check for user name conflicts if $fbUserNameOK is set to its default value of false
+		if ( !$fbUserNameOK ) {
+			$this->checkUserNameConflicts();
+		}
+	}
+	
+	/**
+	 * Checks for user name conflicts.
+	 */
+	public function checkUserNameConflicts() {
+		if ( $fbUserNameOK ) {
+			wfDie( 'User name conflicts found. Rename offending users or modify $fbUserName.' );
+		}
+	}
+	
 	/**
 	 * Retrieves the application's callback url as specified in the app's
 	 * developer settings. Eventually, this function may be replaced by code
@@ -66,7 +102,7 @@ class FBConnectAPI {
 	public function isIdValid( $id ) {
 		if (!is_numeric( $id ))
 			$id = intval( $id );
-		return 0 < $id && $id < hexdec("FFFFFFFFFFFFFFFF");
+		return 0 < $id && $id < hexdec( 'FFFFFFFFFFFFFFFF' );
 	}
 	
 	/**
@@ -137,6 +173,39 @@ class FBConnectAPI {
 		return $this->getClient()->get_loggedin_user();
 	}
 	
+	/**
+	 * Retrieves the wiki user name constructed from the Facebook ID of the current logged-
+	 * in user and the postfix/suffix specified in $fbUserName. If user() is 0, then this
+	 * returns an empty string.
+	 */
+	public function userName() {
+		$uid = $this->user();
+		return $uid ? $this->pre . $uid . $this->post : '';
+	}
+	
+	/**
+	 * Extracts the Facebook ID from a username with a prefix and / or suffix in $fbUserName.
+	 */
+	public function idFromName( $username ) {
+		if ( $this->pre == '' && $this->post == '' ) {
+			return intval( $username );
+		}
+		$id = null;
+		$found = preg_match( '/^' . $this->pre . '(\d{1,20})' . $this->post . '$/', $username, $id );
+		return $found && $this->isIdValid( $id[1] ) ? intval( $id[1] ) : 0;
+	}
+	
+	/**
+	 * For use with FBConnectAuthPlugin::userExists($username). Returns whether $username
+	 * is a valid username based on the prefix and suffix from $fbUserName.
+	 */
+	public function userExists( $username ) {
+		return $this->isIdValid( $this->idFromName( $username ));
+	}
+	
+	/**
+	 * Requests the user's full name from Facebook.
+	 */
 	public function getRealName( $user ) {
 		$name = $this->getFields( $user->getName(), array( 'name' ));
 		return $name[0]['name'];

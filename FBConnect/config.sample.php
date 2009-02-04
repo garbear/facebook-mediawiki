@@ -52,12 +52,20 @@ $fbFeedBundleId  = 99999999;
 // The Facebook icon. You can copy this to your server if you want, or set to false to disable.
 $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
+// This will be the form of Facebook Connect user name when the user Connects and an account is
+// automatically created. The first letter will of course be capitalized. The user's Facebook ID
+// takes place of the #. If no # is used, then the Facebook ID will be appended onto this string
+// to form the username.
+$fbUserName = '';  # I suggest 'FB_#' or '#_fb'
+
+// Unused. Set this to true (or leave it false, you little rebel)
+$fbUserNameOK = false;  # change this if there is no conflicts
+
 // Allow non-Connected user accounts to login
 $fbAllowOldAccounts = true;
 
 // Disable new account creation (accounts can only be created by a successful Connection)
-// Currently, this feature is locked to true. Look for dual-signin and account merging in the future
-$fbConnectOnly = true;
+$fbConnectOnly = false;
 
 // Allow the use of XFBML in wiki text
 $fbUseMarkup = true;

@@ -46,7 +46,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * Returns whether $username is a valid username.
 	 */
 	public function userExists( $username ) {
-		return FBConnect::$api->isIdValid( $username );
+		return FBConnect::$api->isIdValid( FBConnect::$api->idFromName( $username ));
 	}
 	
 	/**
@@ -55,29 +55,6 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 */
 	public function authenticate( $username, $password = '' ) {
 		return $username == FBConnect::$api->user();
-	}
-	
-	/**
-	 * When a user logs in, attempt to fill in preferences and such. Here, we query
-	 * for the user's real name.
-	 */
-	public function updateUser( &$user ) {
-		if ( FBConnect::$api->isIdValid( $user->getName() )) {
-			/**/
-			#$d = $user->getGroups();
-			#var_dump($d);
-			// Temporary fix for my personal wiki
-			if ( !in_array( 'fb-user', $user->getGroups() )) {
-				$user->addGroup( 'fb-user' );
-			}
-			/**/
-			$name = FBConnect::$api->getRealName( $user );
-			if ( $name != '' && $name != $user->getRealName() ) {
-				$user->setRealName( $name );
-				$user->saveSettings();
-			}
-		}
-		return true;
 	}
 	
 	/**
@@ -120,7 +97,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * the User class (see includes/User.php). Note the passed-by-reference nature.
 	 */
 	public function initUser( &$user, $autocreate = false ) {
-		if ( $autocreate && FBConnect::$api->isIdValid( $user->getName() )) {
+		if ( $autocreate && $this->userExists( $user->getName() )) {
 			$user->mEmailAuthenticated = wfTimestampNow();
 			// Turn on e-mail notifications by default
 			$user->setOption( 'enotifwatchlistpages', 1 );
@@ -137,10 +114,33 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	}
 	
 	/**
+	 * When a user logs in, attempt to fill in preferences and such. Here, we query
+	 * for the user's real name.
+	 */
+	public function updateUser( &$user ) {
+		if ( FBConnect::$api->isIdValid( $user->getName() )) {
+			/**/
+			// Temporary fix for my personal wiki
+			if ( !in_array( 'fb-user', $user->getGroups() )) {
+				$user->addGroup( 'fb-user' );
+			}
+			/**/
+			$name = FBConnect::$api->getRealName( $user );
+			if ( $name != '' && $name != $user->getRealName() ) {
+				$user->setRealName( $name );
+				$user->saveSettings();
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Modify options in the login template.
 	 */
 	public function modifyUITemplate( &$template ) {
 		if( FBConnect::$api->user() ) {
+			// Don't use domains
+			$template->set( 'usedomain', false );
 			// Disable the mail new password box
 			$template->set( "useemail", false );
 			// Disable 'remember me' box
