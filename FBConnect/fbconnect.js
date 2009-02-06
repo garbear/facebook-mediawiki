@@ -8,7 +8,7 @@ function facebook_add_user_tooltips() {
 		// Look for a Facebook user ID
 		id = extract_id(a[i].href);
 		if (id) {
-			a[i].innerText = fbNames["fb" + id].name;
+			a[i].innerHTML = fbNames["fb" + id].name;
 			a[i].className += " mw-fbconnectuser";
 			a[i].onmouseover = function() {
 				var fb_uid = extract_id(this.href);
