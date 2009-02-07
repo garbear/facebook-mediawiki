@@ -143,7 +143,7 @@ class FBConnectXFBML {
 		// http://wiki.developers.facebook.com/index.php/JS_API_N_FB.XFBML
 		$jsTags =    array('fb:add-section-button',
 		                   'fb:share-button',
-		                   'fb:userLink',
+		                   'fb:userlink',
 		                   'fb:video');
 		// Oh well, include them anyway
 		$tags = array_merge( $validTags, $wikiTags, $jsTags );
