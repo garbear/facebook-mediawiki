@@ -54,7 +54,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * let people login if they are first connected through Facebook Connect.
 	 */
 	public function authenticate( $username, $password = '' ) {
-		return $username == FBConnect::$api->user();
+		return FBConnect::$api->idFromName( $username ) == FBConnect::$api->user();
 	}
 	
 	/**
@@ -118,7 +118,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 * for the user's real name.
 	 */
 	public function updateUser( &$user ) {
-		if ( FBConnect::$api->isIdValid( $user->getName() )) {
+		if ( FBConnect::$api->isIdValid( FBConnect::$api->idFromName( $user->getName() ))) {
 			/**/
 			// Temporary fix for my personal wiki
 			if ( !in_array( 'fb-user', $user->getGroups() )) {
@@ -139,8 +139,6 @@ class FBConnectAuthPlugin extends AuthPlugin {
 	 */
 	public function modifyUITemplate( &$template ) {
 		if( FBConnect::$api->user() ) {
-			// Don't use domains
-			$template->set( 'usedomain', false );
 			// Disable the mail new password box
 			$template->set( "useemail", false );
 			// Disable 'remember me' box
@@ -148,5 +146,7 @@ class FBConnectAuthPlugin extends AuthPlugin {
 			// What happens if a Connected user creates an account while logged in?
 			$template->set( "create", false );
 		}
+		// Don't use domains
+		$template->set( 'usedomain', false );
 	}
 }

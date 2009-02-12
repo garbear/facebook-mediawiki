@@ -55,13 +55,15 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 // This will be the form of Facebook Connect user name when the user Connects and an account is
 // automatically created. The first letter will of course be capitalized. The user's Facebook ID
 // takes place of the #. If no # is used, then the Facebook ID will be appended onto this string
-// to form the username.
-$fbUserName = '';  # I suggest 'FB_#' or '#_fb'
+// to form the username. NOTE: Anything other than '' may currently have minor display problems.
+$fbUserName = '';  # I suggest 'FB ' or '#-fb'
 
-// Unused. Set this to true (or leave it false, you little rebel)
-$fbUserNameOK = false;  # change this if there is no conflicts
+// Uncomment this line to check for user name conflicts between existing user names in the database
+// and user names that could be generated for Facebook Connect users.
+#$fbCheckUserNames = true;
 
-// Allow non-Connected user accounts to login
+// Allow non-Connected user accounts to login. Set this to true to allow users to continue logging
+// into your site with old-style user names.
 $fbAllowOldAccounts = true;
 
 // Disable new account creation (accounts can only be created by a successful Connection)

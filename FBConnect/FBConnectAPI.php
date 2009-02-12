@@ -38,35 +38,77 @@ class FBConnectAPI {
 	private $post = '';
 	
 	public function __construct() {
-		global $fbUserName, $wgContLang, $fbUserNameOK;
+		global $fbUserName, $fbCheckUserNames;
+		
 		// If $fbUserName is set, parse it to determine the prefix and suffix
-		if ( isset ($fbUserName ) && $fbUserName !== '' ) {
-			// The first letter of wiki user names must be capitalized
-			$fbUserName = $wgContLang->ucfirst( $fbUserName );
-			if ( strpos( $fbUserName, '#' ) === false ) {
-				$this->pre = $fbUserName;
-			} else if ( strpos( $fbUserName, '#' ) == 0 ) {
-				$this->post = substr( $fbUserName, 1 );
-			} else {
-				$modifiers = explode( '#', $fbUserName );
-				$this->pre = $modifiers[0];
-				if ( count( $modifiers ) > 1 ) {
-					$this->post = $modifiers[count( $modifiers ) - 1];
-				}
-			}
+		if ( isset( $fbUserName ) && $fbUserName !== '' ) {
+			$this->setPrePost( $fbUserName );
 		}
+		
 		// Check for user name conflicts if $fbUserNameOK is set to its default value of false
-		if ( !$fbUserNameOK ) {
+		if ( isset( $fbCheckUserNames ) && $fbCheckUserNames ) {
 			$this->checkUserNameConflicts();
 		}
 	}
 	
 	/**
-	 * Checks for user name conflicts.
+	 * Sets $pre and $post by parsing $fbUserName.
+	 */
+	private function setPrePost( $fbUserName ) {
+		// The first letter of wiki user names must be capitalized
+		global $wgContLang;
+		$fbUserName = $wgContLang->ucfirst( $fbUserName );
+		// Explode $fbUserName around the # if it exists
+		if ( strpos( $fbUserName, '#' ) === false ) {
+			$this->pre = $fbUserName;
+		} else if ( strpos( $fbUserName, '#' ) == 0 ) {
+			$this->post = substr( $fbUserName, 1 );
+		} else {
+			$modifiers = explode( '#', $fbUserName );
+			$this->pre = $modifiers[0];
+			if ( count( $modifiers ) > 1 ) {
+				$this->post = $modifiers[count( $modifiers ) - 1];
+			}
+		}
+		// Make sure $pre and $post are valid (replace '_' with a space)
+		$u = User::newFromName( $this->pre . '18446744073709551614' . $this->post, 'creatable' ); 
+		if ( is_null( $u ) ) {
+			wfDie( "Bad \$fbUserName: $fbUserName." );
+		} else {
+			$mods = null;
+			if ( preg_match( '/^(.*?)18446744073709551614(.*)$/', $u->getName(), $mods )) {
+				$this->pre = $mods[1];
+				$this->post = $mods[2];
+			}
+		}
+	}
+		
+	/**
+	 * Checks existing users in the database for user name conflicts with Facebook Connect users.
 	 */
 	public function checkUserNameConflicts() {
-		if ( $fbUserNameOK ) {
-			wfDie( 'User name conflicts found. Rename offending users or modify $fbUserName.' );
+		// Query the database for all user names starting with $pre and ending with $post
+		$dbr = wfGetDB( DB_SLAVE );
+		$result = $dbr->select (
+				// SELECT user
+				wfGetDB( DB_SLAVE )->tableNamesN( 'user' ),
+				// FROM user_name
+				'user_name',
+				// WHERE user_name LIKE pre%post
+				array( "user_name LIKE '$this->pre%$this->post'" ),
+				__METHOD__ . ' (' . get_class( $this ) . ')',
+				array(),
+				array()
+			)->result;
+		$res = new ResultWrapper( $dbr, $result );
+		echo $res->numRows();
+		// Look for offending user names
+		for( $i = 0; $i < $res->numRows(); $i++ ) {
+			$row = $res->fetchRow();
+			if( $this->idFromName( $row['user_name'] ) ) {
+				wfDie( 'User name conflict found: "' . $row['user_name'] . '". ' .
+				       'Rename offending user or set $fbUserName = true.' );
+			}
 		}
 	}
 	
@@ -187,20 +229,13 @@ class FBConnectAPI {
 	 * Extracts the Facebook ID from a username with a prefix and / or suffix in $fbUserName.
 	 */
 	public function idFromName( $username ) {
+		// If nothing is added onto the ID, then return it
 		if ( $this->pre == '' && $this->post == '' ) {
 			return intval( $username );
 		}
 		$id = null;
 		$found = preg_match( '/^' . $this->pre . '(\d{1,20})' . $this->post . '$/', $username, $id );
 		return $found && $this->isIdValid( $id[1] ) ? intval( $id[1] ) : 0;
-	}
-	
-	/**
-	 * For use with FBConnectAuthPlugin::userExists($username). Returns whether $username
-	 * is a valid username based on the prefix and suffix from $fbUserName.
-	 */
-	public function userExists( $username ) {
-		return $this->isIdValid( $this->idFromName( $username ));
 	}
 	
 	/**

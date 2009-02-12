@@ -373,13 +373,28 @@ class FBConnectHooks {
 	}
 	
 	/**
+	 * Removes the 'createaccount' right from users if $fbConnectOnly is true.
+	 */
+	static function UserGetRights( &$user, &$aRights ) {
+		global $fbConnectOnly;
+		if ( $fbConnectOnly ) {
+			foreach ( $aRights as $i => $right ) {
+				if ( $right == 'createaccount' ) {
+					unset( $aRights[$i] );
+					break;
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
 		global $wgAuth, $wgUser;
 		// Check to see if we have a connection with Facebook
-		$fb_uid = FBConnect::$api->user();
-		if ( $fb_uid == 0 ) {
+		if ( !FBConnect::$api->user() ) {
 			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
 			if( $wgAuth->strict() ) {
 				$result = false;
@@ -387,25 +402,23 @@ class FBConnectHooks {
 			return true;
 		}
 		$localId = User::idFromName( FBConnect::$api->userName() );
+		
 		// If the user exists, then log them in
 		if ( $localId ) {
 			$user->setID( $localId );
 			$user->loadFromId();
 			// Updates the user's info from Facebook if no real name is set
-			#echo "Udating...\n";
 			$wgAuth->updateUser( $user );
 		} else {
 			// User has not visited the wiki before, so create a new user from their Facebook ID
-			$userName = "$fb_uid";
+			$userName = FBConnect::$api->userName();
 			
 			// Test to see if we are denied by FBConnectAuthPlugin or the user can't create an account
 			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
-			     !$wgAuth->authenticate( $user->getName() ) || $wgUser->isBlockedFromCreateAccount() ) {
-				/*
-				if( $wgAuth->strict() ) {
+			                               !$wgAuth->authenticate( $userName )) {
+				#if( $wgAuth->strict() ) {
 			     	$result = false;
-				}
-				/**/
+				#}
 				return true;
 			}
 			
