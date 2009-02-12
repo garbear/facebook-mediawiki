@@ -46,17 +46,25 @@ $fbBaseURL     = 'connect.facebook.com';
  * www.yourwiki.com/path/to/extensions/FBConnect/register_feed_forms.php
  *
  * Then copy/paste the resulting feed bundle ID here.
+ * 
+ * NOTE: This feature is currently unimplemented.
  */
 $fbFeedBundleId  = 99999999;
 
 // The Facebook icon. You can copy this to your server if you want, or set to false to disable.
 $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
-// This will be the form of Facebook Connect user name when the user Connects and an account is
-// automatically created. The first letter will of course be capitalized. The user's Facebook ID
-// takes place of the #. If no # is used, then the Facebook ID will be appended onto this string
-// to form the username. NOTE: Anything other than '' may currently have minor display problems.
-$fbUserName = '';  # I suggest 'FB ' or '#-fb'
+// This will be the form of the Facebook user's name when the user Connects and an account is
+// automatically created. The first letter will of course be capitalized, and '_' converted to
+// spaces. The user's Facebook ID takes place of the #. If no # is used, then the Facebook ID
+// will be appended onto this string to form the user name. Unless your wiki is a new installation
+// with a small user base, I recommend 'FB ' or '#-fb', e.g.
+//
+// To check if $fbUserName meshes with your current wiki setup, set $fbCheckUserNames to true.
+//
+// NOTE: As of r87, anything other than '' may currently cause tooltips have minor display
+// problems, like tooltips and the Facebook logo failing to show up on the page.
+$fbUserName = '';  # 'FB ' or '#-fb', for example
 
 // Uncomment this line to check for user name conflicts between existing user names in the database
 // and user names that could be generated for Facebook Connect users.
@@ -70,6 +78,7 @@ $fbAllowOldAccounts = true;
 $fbConnectOnly = false;
 
 // Allow the use of XFBML in wiki text
+// For more info, see http://wiki.developers.facebook.com/index.php/XFBML
 $fbUseMarkup = true;
 
 // If XFBML is enabled, then <fb:photo> maybe be used as a replacement for $wgAllowExternalImages
