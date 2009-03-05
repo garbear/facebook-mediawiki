@@ -107,6 +107,7 @@ class SpecialConnect extends SpecialPage {
 						if( FBConnect::$api->isConnected() ) {
 							// If the user is Connected, display info about them instead of a login form
 							$content = '<b><fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name></b> ' .
+							           // @TODO: (UCLA) should be replaced by the user's primary network
 							           '(UCLA)<br/><a href="/wiki/User:#">my user page</a> | <a href="#" ' .
 							           'onclick="return popupFacebookInvite();">invite friends</a>';
 							$this->drawBox( 'fbconnect-welcome', '', $content );
