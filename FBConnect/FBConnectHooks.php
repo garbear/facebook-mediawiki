@@ -107,6 +107,21 @@ class FBConnectHooks {
 	}
 	
 	/**
+	 * Fired when MediaWiki is updated to allow extensions to update the database.
+	 * 
+	 */
+	static function LoadExtensionSchemaUpdates() {
+		global $wgDBtype, $wgExtNewTables;
+		$base = dirname( __FILE__ );
+		if ( $wgDBtype == 'mysql' ) {
+			$wgExtNewTables[] = array( 'user_fbconnect', "$base/fbconnect_table.sql" );
+		} else if ( $wgDBtype == 'postgres' ) {
+			$wgExtNewTables[] = array( 'user_fbconnect', "$base/fbconnect_table.pg.sql" );
+		}
+		return true;
+	}
+	
+	/**
 	 * Adds several Facebook Connect variables to the page:
 	 * 
 	 * fbAPIKey			The application's API key (see $fbAPIKey in config.php)
