@@ -45,7 +45,9 @@ class Facebook {
   public $user;
   public $profile_user;
   public $canvas_user;
+  public $ext_perms = array();
   protected $base_domain;
+
   /*
    * Create a Facebook client like this:
    *
@@ -82,7 +84,8 @@ class Facebook {
 
 
     if (isset($this->fb_params['friends'])) {
-      $this->api_client->friends_list = explode(',', $this->fb_params['friends']);
+      $this->api_client->friends_list =
+        array_filter(explode(',', $this->fb_params['friends']));
     }
     if (isset($this->fb_params['added'])) {
       $this->api_client->added = $this->fb_params['added'];
@@ -107,13 +110,13 @@ class Facebook {
    * @param bool  resolve_auth_token  convert an auth token into a session
    */
   public function validate_fb_params($resolve_auth_token=true) {
-    $this->fb_params = $this->get_valid_fb_params($_POST, 48*3600, 'fb_sig');
+    $this->fb_params = $this->get_valid_fb_params($_POST, 48 * 3600, 'fb_sig');
 
     // note that with preload FQL, it's possible to receive POST params in
     // addition to GET, so use a different prefix to differentiate them
     if (!$this->fb_params) {
-      $fb_params = $this->get_valid_fb_params($_GET, 48*3600, 'fb_sig');
-      $fb_post_params = $this->get_valid_fb_params($_POST, 48*3600, 'fb_post_sig');
+      $fb_params = $this->get_valid_fb_params($_GET, 48 * 3600, 'fb_sig');
+      $fb_post_params = $this->get_valid_fb_params($_POST, 48 * 3600, 'fb_post_sig');
       $this->fb_params = array_merge($fb_params, $fb_post_params);
     }
 
@@ -127,6 +130,9 @@ class Facebook {
                             $this->fb_params['canvas_user'] : null;
       $this->base_domain  = isset($this->fb_params['base_domain']) ?
                             $this->fb_params['base_domain'] : null;
+      $this->ext_perms    = isset($this->fb_params['ext_perms']) ?
+                            explode(',', $this->fb_params['ext_perms'])
+                            : array();
 
       if (isset($this->fb_params['session_key'])) {
         $session_key =  $this->fb_params['session_key'];
@@ -212,26 +218,61 @@ class Facebook {
     }
   }
 
-  // Invalidate the session currently being used, and clear any state associated with it
+  // Invalidate the session currently being used, and clear any state associated
+  // with it. Note that the user will still remain logged into Facebook.
   public function expire_session() {
-    if ($this->api_client->auth_expireSession()) {
-      if (!$this->in_fb_canvas() && isset($_COOKIE[$this->api_key . '_user'])) {
-        $cookies = array('user', 'session_key', 'expires', 'ss');
-        foreach ($cookies as $name) {
-          setcookie($this->api_key . '_' . $name, false, time() - 3600);
-          unset($_COOKIE[$this->api_key . '_' . $name]);
-        }
-        setcookie($this->api_key, false, time() - 3600);
-        unset($_COOKIE[$this->api_key]);
+    try {
+      if ($this->api_client->auth_expireSession()) {
+        $this->clear_cookie_state();
+        return true;
+      } else {
+        return false;
       }
-
-      // now, clear the rest of the stored state
-      $this->user = 0;
-      $this->api_client->session_key = 0;
-      return true;
-    } else {
-      return false;
+    } catch (Exception $e) {
+      $this->clear_cookie_state();
     }
+  }
+
+  /** Logs the user out of all temporary application sessions as well as their
+   * Facebook session.  Note this will only work if the user has a valid current
+   * session with the application.
+   *
+   * @param string  $next  URL to redirect to upon logging out
+   *
+   */
+   public function logout($next) {
+    $logout_url = $this->get_logout_url($next);
+
+    // Clear any stored state
+    $this->clear_cookie_state();
+
+    $this->redirect($logout_url);
+  }
+
+  /**
+   *  Clears any persistent state stored about the user, including
+   *  cookies and information related to the current session in the
+   *  client.
+   *
+   */
+  public function clear_cookie_state() {
+    if (!$this->in_fb_canvas() && isset($_COOKIE[$this->api_key . '_user'])) {
+       $cookies = array('user', 'session_key', 'expires', 'ss');
+       foreach ($cookies as $name) {
+         setcookie($this->api_key . '_' . $name,
+                   false,
+                   time() - 3600,
+                   '',
+                   $this->base_domain);
+         unset($_COOKIE[$this->api_key . '_' . $name]);
+       }
+       setcookie($this->api_key, false, time() - 3600, '', $this->base_domain);
+       unset($_COOKIE[$this->api_key]);
+     }
+
+     // now, clear the rest of the stored state
+     $this->user = 0;
+     $this->api_client->session_key = 0;
   }
 
   public function redirect($url) {
@@ -248,7 +289,8 @@ class Facebook {
   }
 
   public function in_frame() {
-    return isset($this->fb_params['in_canvas']) || isset($this->fb_params['in_iframe']);
+    return isset($this->fb_params['in_canvas'])
+        || isset($this->fb_params['in_iframe']);
   }
   public function in_fb_canvas() {
     return isset($this->fb_params['in_canvas']);
@@ -272,11 +314,28 @@ class Facebook {
 
   // require_add and require_install have been removed.
   // see http://developer.facebook.com/news.php?blog=1&story=116 for more details
-  public function require_login() {
-    if ($user = $this->get_loggedin_user()) {
+  public function require_login($required_permissions = '') {
+    $user = $this->get_loggedin_user();
+    $has_permissions = true;
+
+    if ($required_permissions) {
+      $this->require_frame();
+      $permissions = array_map('trim', explode(',', $required_permissions));
+      foreach ($permissions as $permission) {
+        if (!in_array($permission, $this->ext_perms)) {
+          $has_permissions = false;
+          break;
+        }
+      }
+    }
+
+    if ($user && $has_permissions) {
       return $user;
     }
-    $this->redirect($this->get_login_url(self::current_url(), $this->in_frame()));
+
+    $this->redirect(
+      $this->get_login_url(self::current_url(), $this->in_frame(),
+                           $required_permissions));
   }
 
   public function require_frame() {
@@ -295,14 +354,43 @@ class Facebook {
   }
 
   public function get_add_url($next=null) {
-    return self::get_facebook_url().'/add.php?api_key='.$this->api_key .
-      ($next ? '&next=' . urlencode($next) : '');
+    $page = self::get_facebook_url().'/add.php';
+    $params = array('api_key' => $this->api_key);
+
+    if ($next) {
+      $params['next'] = $next;
+    }
+
+    return $page . '?' . http_build_query($params);
   }
 
-  public function get_login_url($next, $canvas) {
-    return self::get_facebook_url().'/login.php?v=1.0&api_key=' . $this->api_key .
-      ($next ? '&next=' . urlencode($next)  : '') .
-      ($canvas ? '&canvas' : '');
+  public function get_login_url($next, $canvas, $req_perms = '') {
+    $page = self::get_facebook_url().'/login.php';
+    $params = array('api_key'   => $this->api_key,
+                    'v'         => '1.0',
+                    'req_perms' => $req_perms);
+
+    if ($next) {
+      $params['next'] = $next;
+    }
+    if ($canvas) {
+      $params['canvas'] = '1';
+    }
+
+    return $page . '?' . http_build_query($params);
+  }
+
+  public function get_logout_url($next) {
+    $page = self::get_facebook_url().'/logout.php';
+    $params = array('app_key'     => $this->api_key,
+                    'session_key' => $this->api_client->session_key);
+
+    if ($next) {
+      $params['connect_next'] = 1;
+      $params['next'] = $next;
+    }
+
+    return $page . '?' . http_build_query($params);
   }
 
   public function set_user($user, $session_key, $expires=null, $session_secret=null) {
@@ -409,7 +497,20 @@ class Facebook {
     return $fb_params;
   }
 
-  /*
+  /**
+   *  Validates the account that a user was trying to set up an
+   *  independent account through Facebook Connect.
+   *
+   *  @param  user The user attempting to set up an independent account.
+   *  @param  hash The hash passed to the reclamation URL used.
+   *  @return bool True if the user is the one that selected the
+   *               reclamation link.
+   */
+  public function verify_account_reclamation($user, $hash) {
+    return $hash == md5($user . $this->secret);
+  }
+
+  /**
    * Validates that a given set of parameters match their signature.
    * Parameters all match a given input prefix, such as "fb_sig".
    *
@@ -419,6 +520,37 @@ class Facebook {
    */
   public function verify_signature($fb_params, $expected_sig) {
     return self::generate_sig($fb_params, $this->secret) == $expected_sig;
+  }
+
+  /**
+   * Validate the given signed public session data structure with
+   * public key of the app that
+   * the session proof belongs to.
+   *
+   * @param $signed_data the session info that is passed by another app
+   * @param string $public_key Optional public key of the app. If this
+   *               is not passed, function will make an API call to get it.
+   * return true if the session proof passed verification.
+   */
+  public function verify_signed_public_session_data($signed_data,
+                                                    $public_key = null) {
+
+    // If public key is not already provided, we need to get it through API
+    if (!$public_key) {
+      $public_key = $this->api_client->auth_getAppPublicKey(
+        $signed_data['api_key']);
+    }
+
+    // Create data to verify
+    $data_to_serialize = $signed_data;
+    unset($data_to_serialize['sig']);
+    $serialized_data = implode('_', $data_to_serialize);
+
+    // Decode signature
+    $signature = base64_decode($signed_data['sig']);
+    $result = openssl_verify($serialized_data, $signature, $public_key,
+                             OPENSSL_ALGO_SHA1);
+    return $result == 1;
   }
 
   /*
