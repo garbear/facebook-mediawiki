@@ -31,111 +31,47 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Facebook Platform API. 
  */
 class FBConnectAPI {
+	private static $__Facebook = null;
+	
 	// Stores a list of valid Facebook IDs for adding tooltip info
 	private $ids = array();
 	
-	private $pre  = '';
-	private $post = '';
-	
 	public function __construct() {
-		global $fbUserName, $fbCheckUserNames;
-		
-		// If $fbUserName is set, parse it to determine the prefix and suffix
-		if ( isset( $fbUserName ) && $fbUserName !== '' ) {
-			$this->setPrePost( $fbUserName );
+		/**
+		if (is_null($this->__Facebook)) {
+			$this->__Facebook = new Facebook($api_key, $)
 		}
-		
-		// Check for user name conflicts if $fbUserNameOK is set to its default value of false
-		if ( isset( $fbCheckUserNames ) && $fbCheckUserNames ) {
-			$this->checkUserNameConflicts();
-		}
+		/**/
 	}
 	
 	/**
-	 * Sets $pre and $post by parsing $fbUserName.
+	 * Get the Facebook client object for easy access.
 	 */
-	private function setPrePost( $fbUserName ) {
-		// The first letter of wiki user names must be capitalized
-		global $wgContLang;
-		$fbUserName = $wgContLang->ucfirst( $fbUserName );
-		// Explode $fbUserName around the # if it exists
-		if ( strpos( $fbUserName, '#' ) === false ) {
-			$this->pre = $fbUserName;
-		} else if ( strpos( $fbUserName, '#' ) == 0 ) {
-			$this->post = substr( $fbUserName, 1 );
-		} else {
-			$modifiers = explode( '#', $fbUserName );
-			$this->pre = $modifiers[0];
-			if ( count( $modifiers ) > 1 ) {
-				$this->post = $modifiers[count( $modifiers ) - 1];
+	public function Facebook() {
+		global $fbApiKey, $fbApiSecret;
+		// Construct a new Facebook object on first time access
+		if ( is_null(self::$__Facebook) && $this->isConfigSetup() ) {
+			self::$__Facebook = new Facebook( $fbApiKey, $fbApiSecret );
+			if (!self::$__Facebook) {
+				error_log('Could not create facebook client.');
 			}
 		}
-		// Make sure $pre and $post are valid (replace '_' with a space)
-		$u = User::newFromName( $this->pre . '18446744073709551614' . $this->post, 'creatable' ); 
-		if ( is_null( $u ) ) {
-			wfDie( "Bad \$fbUserName: $fbUserName." );
-		} else {
-			$mods = null;
-			if ( preg_match( '/^(.*?)18446744073709551614(.*)$/', $u->getName(), $mods )) {
-				$this->pre = $mods[1];
-				$this->post = $mods[2];
-			}
-		}
-	}
-		
-	/**
-	 * Checks existing users in the database for user name conflicts with Facebook Connect users.
-	 */
-	public function checkUserNameConflicts() {
-		// Query the database for all user names starting with $pre and ending with $post
-		$dbr = wfGetDB( DB_SLAVE );
-		$result = $dbr->select (
-				// SELECT user
-				wfGetDB( DB_SLAVE )->tableNamesN( 'user' ),
-				// FROM user_name
-				'user_name',
-				// WHERE user_name LIKE pre%post
-				array( "user_name LIKE '$this->pre%$this->post'" ),
-				__METHOD__ . ' (' . get_class( $this ) . ')',
-				array(),
-				array()
-			)->result;
-		$res = new ResultWrapper( $dbr, $result );
-		echo $res->numRows();
-		// Look for offending user names
-		for( $i = 0; $i < $res->numRows(); $i++ ) {
-			$row = $res->fetchRow();
-			if( $this->idFromName( $row['user_name'] ) ) {
-				wfDie( 'User name conflict found: "' . $row['user_name'] . '". ' .
-				       'Rename offending user or set $fbUserName = true.' );
-			}
-		}
+		return self::$__Facebook;
 	}
 	
 	/**
-	 * Retrieves the application's callback url as specified in the app's
-	 * developer settings. Eventually, this function may be replaced by code
-	 * that queries Facebook for this info, but for now it pulls the URL out
-	 * of the variable $fbCallbackURL specified in config.php.
+	 * Check to make sure config.sample.php was properly renamed to config.php
+	 * and the instructions to fill out the first three important variables were
+	 * followed correctly.
 	 */
-	public function getCallbackUrl() {
-		global $fbCallbackURL;
-		return isset( $fbCallbackURL ) ? $fbCallbackURL : '';
-	}
-	
-	/**
-	 * Returns the root of the Facebook site we'll be hitting.
-	 */
-	public function getBaseUrl() {
-		global $fbBaseURL;
-		return isset( $fbBaseURL ) ? $fbBaseURL : '';
-	}
-	
-	/**
-	 * Turns the base URL into a fully qualified, usable URL.
-	 */
-	public function getStaticRoot() {
-		return 'http://static.ak.' . $this->getBaseUrl();
+	public function isConfigSetup() {
+		global $fbApiKey, $fbApiSecret;
+		$isSetup = isset($fbApiKey) && $fbApiKey != 'YOUR_API_KEY' &&
+		           isset($fbApiSecret) && $fbApiSecret != 'YOUR_API_SECRET' &&
+		           !is_null($this->getCallbackUrl());
+		if( !$isSetup )
+			error_log( 'Please update the $fbApiKey in config.php' );
+		return $isSetup;
 	}
 	
 	/**
@@ -149,62 +85,10 @@ class FBConnectAPI {
 	
 	/**
 	 * Returns true if the name of the global user $wgUser is a valid Facebook ID.
-	 */
+	 *
 	public function isConnected() {
 		global $wgUser;
 		return $wgUser->isLoggedIn() && $this->isIdValid( $wgUser->getName() );
-	}
-	
-	/*
-	 * Get the Facebook client object for easy access.
-	 */
-	public function getClient() {
-		global $fbApiKey, $fbApiSecret;
-		
-		static $facebook = null;
-		
-		if ( $facebook === null && $this->isConfigSetup() ) {
-			$facebook = new Facebook( $fbApiKey, $fbApiSecret, false, $this->getBaseUrl() );
-			if (!$facebook) {
-				error_log('Could not create facebook client.');
-			}
-			/**
-			// Create a Facebook session
-			if (isset($_SESSION)) {
-				echo 'Error: isset($_SESSION)';
-			}
-			$session_key = md5(self::getClient()->api_client->session_key);
-			session_id( $session_key );
-			session_start();
-			/**/
-		}
-		return $facebook;
-	}
-	
-	/**
-	 * Check to make sure config.sample.php was properly renamed to config.php
-	 * and the instructions to fill out the first three important variables were
-	 * followed correctly.
-	 */
-	public function isConfigSetup() {
-		global $fbApiKey, $fbApiSecret;
-		$isSetup = isset($fbApiKey) && $fbApiKey != 'YOUR_API_KEY' &&
-		           isset($fbApiSecret) && $fbApiSecret != 'YOUR_API_SECRET' &&
-		           $this->getCallbackUrl() != null;
-		if( !$isSetup )
-			error_log( 'Please update the $fbApiKey in config.php' );
-		return $isSetup;
-	}
-	
-	/**
-	 * A simple question of whether the site is "connected" or not.
-	 */
-	public function isEnabled() {
-		if (!$this->isConfigSetup()) {
-			return false;
-		}
-		// Changing this disables Facebook Connect
-		return true;
 	}
 	
 	/**
@@ -212,43 +96,22 @@ class FBConnectAPI {
 	 * then an ID of 0 is returned (I think).
 	 */
 	public function user() {
-		return $this->getClient()->get_loggedin_user();
-	}
-	
-	/**
-	 * Retrieves the wiki user name constructed from the Facebook ID of the current logged-
-	 * in user and the postfix/suffix specified in $fbUserName. If user() is 0, then this
-	 * returns an empty string.
-	 */
-	public function userName() {
-		$uid = $this->user();
-		return $uid ? $this->pre . $uid . $this->post : '';
-	}
-	
-	/**
-	 * Extracts the Facebook ID from a username with a prefix and / or suffix in $fbUserName.
-	 */
-	public function idFromName( $username ) {
-		// If nothing is added onto the ID, then return it
-		if ( $this->pre == '' && $this->post == '' ) {
-			return intval( $username );
-		}
-		$id = null;
-		$found = preg_match( '/^' . $this->pre . '(\d{1,20})' . $this->post . '$/', $username, $id );
-		return $found && $this->isIdValid( $id[1] ) ? intval( $id[1] ) : 0;
+		return $this->Facebook()->get_loggedin_user();
 	}
 	
 	/**
 	 * Requests the user's full name from Facebook.
 	 */
 	public function getRealName( $user ) {
+		// eventually we'll need the following info about the user:
+		// "first_name, name, timezone, locale, username" and maybe "contact_email, proxied_email"
 		$name = $this->getFields( $user->getName(), array( 'name' ));
 		return $name[0]['name'];
 	}
 	
 	/**
 	 * Batches up user IDs so we can get their details with a single Platform query.
-	 */
+	 *
 	public function addPersonById( $id ) {
 		if ($this->isIdValid( $id ) && !in_array( $id, $this->ids )) {
 			$this->ids[] = $id;
@@ -257,7 +120,7 @@ class FBConnectAPI {
 	
 	/**
 	 * Performs that queries requested by addPersonById().
-	 */
+	 *
 	public function getPersons() {
 		// If possible, switch to http://wiki.developers.facebook.com/index.php/Users.getStandardInfo
 		//$user_details = $this->getClient()->api_client->users_getInfo($this->ids, array('last_name', 'first_name', 'pic', 'pic_big', 'pic_small', 'pic_square'));
@@ -283,7 +146,7 @@ class FBConnectAPI {
 		if ( !$fbUserRightsFromGroup ) {
 			return null;
 		}
-		$group = FBConnect::$api->getClient()->api_client->groups_get( null, $fbUserRightsFromGroup );
+		$group = $this->Facebook()->api_client->groups_get( null, $fbUserRightsFromGroup );
 		$info = null;
 		if ( is_array( $group ) && is_array( $group[0] )) {
 			$info['name'] = $group[0]['name'];
@@ -394,7 +257,7 @@ class FBConnectAPI {
 	 * Returns the "public" hash of the email address (i.e., the one Facebook
 	 * gives out via their API). The hash is of the form crc32($email)_md5($email).
 	 * 
-	 * @Unused
+	 * @Unused (for now)
 	 */
 	public function hashEmail($email) {
 		if ($email == null)

@@ -45,7 +45,7 @@ if ( !defined( 'MEDIAWIKI' )) {
 /**
  * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r71, January 25, 2009' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r97, March 18, 2010' );
 
 /**
  * Add information about this extension to Special:Version.
@@ -69,10 +69,11 @@ $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
-$wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
+#$wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
+
 
 $wgSpecialPages['Connect'] = 'SpecialConnect';
 #$wgSpecialPages['NewsFeed'] = 'SpecialNewsFeed';
@@ -138,7 +139,7 @@ class FBConnect {
 		
 		// Set the global variable $wgAuth to our custom authentification plugin.
 		// The AuthPluginSetup hook is called right before init(), so we can't use this hook
-		$wgAuth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
+		#$wgAuth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');
