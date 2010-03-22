@@ -70,30 +70,51 @@ class SpecialConnect extends SpecialPage {
 			if ($wgRequest->getCheck('wpCancel')) {
 				$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 			}
-			// Check to see if the user opted to connect an existing account
-			else if ($choice == 'existing') {
-				$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
-				                  $wgRequest->getText('wpExistingPassword'));
-			}
-			// Check to see if the user selected another valid option
-			else if (in_array($choice, array('nick', 'first', 'full', 'auto', 'manual'))) {
-				$this->createUser($fb_user, $choice,
-				                  $wgRequest->getText("wp{$choice}NameValue"));
-			} else {
-				// @TODO: Replace this with a message saying "invalid choice".
-				$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
+			else switch ($choice) {
+				// Check to see if the user opted to connect an existing account
+				case 'existing':
+					$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
+							$wgRequest->getText('wpExistingPassword'));
+					break;
+				// Check to see if the user selected another valid option
+				case 'nick':
+				case 'first':
+				case 'full':
+					// Get the username from Facebook (Note: not from the form)
+					$username = $this->getOptionFromInfo($choice . 'name', $fb->getUserInfo());
+				case 'manual':
+					if (!isset($username) || !$username || !$this->userNameOK($username)) {
+						// Use manual name if no username is set, even if manual wasn't chosen
+						$username = $wgRequest->getText('wpNameValue');
+					}
+					// If no valid username was found, something's not right; ask again
+					if (!$this->userNameOK($username)) {
+						$this->sendPage('chooseNameForm', 'fbconnect-invalidname');
+						break;
+					}
+				case 'auto':
+					if (!isset($username) || !$username) {
+						// Generate a unique username
+						$username = $this->generateUserName();
+					}
+					$this->createUser($fb_user, $username);
+					break;
+				default:
+					// TODO: Replace this with an error message saying "invalid choice"
+					$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 			}
 			break;
 		default:
 			// Main entry point
 			#if ( $wgRequest->getText( 'returnto' ) ) {
-			#	$this->setReturnTo( $wgRequest->getText( 'returnto' ), $wgRequest->getVal( 'returntoquery' ) );
+			#	$this->setReturnTo( $wgRequest->getText( 'returnto' ),
+			#				$wgRequest->getVal( 'returntoquery' ) );
 			#}
 			if ($fb_user) {
 				// If the user is connected, log them in
 				$this->login($fb_user);
 			} else {
-				// If the user isn't connected, then show them a form with the Connect button
+				// If the user isn't Connected, then show a form with the Connect button
 				$this->sendPage('connectForm');
 			}
 		}
@@ -121,7 +142,7 @@ class SpecialConnect extends SpecialPage {
 		} else if ($fb_user != 0) {
 			$this->sendPage('chooseNameForm');
 		} else {
-			// @TODO: send an error message saying only Connected users can log in
+			// TODO: send an error message saying only Connected users can log in
 			// or ask them to Connect.
 			$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 		}
@@ -177,7 +198,7 @@ class SpecialConnect extends SpecialPage {
 		global $wgOut, $wgUser;
 		// The user must be logged into Facebook before choosing a wiki username
 		if ( !$fb_user ) {
-			wfDebug("FBConnect: aborting in ChooseName because no Facebook ID was reported.\n");
+			wfDebug("FBConnect: aborting in attachUser(): no Facebook ID was reported.\n");
 			$wgOut->showErrorPage( 'fbconnect-error', 'fbconnect-errortext' );
 			return;
 		}
@@ -208,7 +229,8 @@ class SpecialConnect extends SpecialPage {
 		$userinfo = $fb->getUserInfo();
 		
 		// Update the following options if the user's settings allow it
-		$updateOptions = array('nickname', 'fullname', 'language', 'timecorrection', 'email');
+		$updateOptions = array('nickname', 'fullname', 'language',
+		                       'timecorrection', 'email');
 		foreach ($updateOptions as $option) {
 			// Translate Facebook parameters into MediaWiki parameters
 			$value = $this->getOptionFromInfo($option, $userinfo); 
@@ -233,13 +255,13 @@ class SpecialConnect extends SpecialPage {
 	 */
 	protected function getOptionFromInfo($option, $userinfo) {
 		// Lookup table for the names of the settings
-		$mw2fb = array('nickname'       => 'username',
-		               'fullname'       => 'name',
-		               'firstname'      => 'first_name',
-		               'language'       => 'locale',
-		               'timecorrection' => 'timezone',
-		               'email'          => 'contact_email');
-		$value = array_key_exists($mw2fb[$option], $userinfo) ? $userinfo[$mw2fb[$option]] : '';
+		$params = array('nickname'       => 'username',
+		                'fullname'       => 'name',
+		                'firstname'      => 'first_name',
+		                'language'       => 'locale',
+		                'timecorrection' => 'timezone',
+		                'email'          => 'contact_email');
+		$value = array_key_exists($params[$option], $userinfo) ? $userinfo[$params[$option]] : '';
 		// Special handling of several settings
 		switch ($option) {
 			case 'fullname':
@@ -281,19 +303,19 @@ class SpecialConnect extends SpecialPage {
 				break;
 			case 'timecorrection':
 				// Convert the timezone into a local timezone correction
-				// @TODO: $value = TimezoneToOffset($value);
+				// TODO: $value = TimezoneToOffset($value);
 				$value = '';
 				break;
 			case 'email':
 				// If a contact email isn't available, then use a proxied email
 				if ($value == '') {
-					// @TODO: update the user's email from $userinfo['proxied_email']
+					// TODO: update the user's email from $userinfo['proxied_email']
 					// instead (the address must stay hidden from the user)
 					$value = '';
 				}
 		}
 		// If an appropriate value was found, return it
-		return value == '' ? null : $value;
+		return $value == '' ? null : $value;
 	}
 	
 	/**
@@ -310,7 +332,8 @@ class SpecialConnect extends SpecialPage {
 	 * in the message 'fbconnect-usernameprefix'. 
 	 */
 	protected function generateUserName() {
-		// @TODO
+		// TODO: Transcribe this function
+		return wfMsg('fbconnect-usernameprefix') . '3';
 	}
 	
 	/**
@@ -346,7 +369,7 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	private function alreadyLoggedIn() {
-		global $wgOut;
+		global $wgOut, $wgUser, $wgRequest;
 		$wgOut->setPageTitle(wfMsg( 'fbconnect-error'));
 		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
 		// Render the "Return to" text retrieved from the URL
@@ -354,7 +377,7 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	private function displaySuccessLogin() {
-		global $wgOut;
+		global $wgOut, $wgRequest;
 		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
 		$wgOut->addWikiMsg('fbconnect-successtext');
 		// Run any hooks for UserLoginComplete
@@ -379,7 +402,7 @@ class SpecialConnect extends SpecialPage {
 		$this->outputHeader();
 		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
 		$wgOut->addWikiMsg( $messagekey );
-		// @TODO: Format the html a little nicer
+		// TODO: Format the html a little nicer
 		$wgOut->addHTML('
 		<form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
 			<fieldset id="mw-fbconnect-choosename">
@@ -422,6 +445,7 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// Add the options for nick name, first name and full name if we can get them
+		// TODO: Wikify the usernames (i.e. Full name should have an _ )
 		foreach (array('nick', 'first', 'full') as $option) {
 			$nickname = $this->getOptionFromInfo($option . 'name', $userinfo);
 			if ($nickname && $this->userNameOK($nickname)) {
@@ -456,7 +480,7 @@ class SpecialConnect extends SpecialPage {
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		
-		//@TODO: use wfMsgWikiHtml and then add html
+		//TODO: use wfMsgWikiHtml and then add html
 		$heading = '
 			<div id="specialconnect_info">
 				' . wfMsg( 'fbconnect-intro' ) . '
@@ -488,7 +512,7 @@ class SpecialConnect extends SpecialPage {
 						if( FBConnect::$api->isConnected() ) {
 							// If the user is Connected, display info about them instead of a login form
 							$content = '<b><fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name></b> ' .
-							           // @TODO: (UCLA) should be replaced by the user's primary network
+							           // TODO: (UCLA) should be replaced by the user's primary network
 							           '(UCLA)<br/><a href="/wiki/User:#">my user page</a> | <a href="#" ' .
 							           'onclick="return popupFacebookInvite();">invite friends</a>';
 							$this->drawBox( 'fbconnect-welcome', '', $content );

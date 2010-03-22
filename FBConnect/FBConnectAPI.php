@@ -69,8 +69,7 @@ class FBConnectAPI {
 	public function isConfigSetup() {
 		global $fbApiKey, $fbApiSecret;
 		$isSetup = isset($fbApiKey) && $fbApiKey != 'YOUR_API_KEY' &&
-		           isset($fbApiSecret) && $fbApiSecret != 'YOUR_API_SECRET' &&
-		           !is_null($this->getCallbackUrl());
+		           isset($fbApiSecret) && $fbApiSecret != 'YOUR_API_SECRET';
 		if( !$isSetup )
 			error_log( 'Please update the $fbApiKey in config.php' );
 		return $isSetup;
@@ -104,8 +103,8 @@ class FBConnectAPI {
 	/**
 	 * Requests the user's full name from Facebook.
 	 */
-	public function getUserInfo( $user = null ) {
-		if ($user == null) {
+	public function getUserInfo( $user = 0 ) {
+		if ($user == 0) {
 			$user = $this->user();
 		}
 		if ($user != 0 && !isset($userinfo[$user]))
@@ -124,6 +123,11 @@ class FBConnectAPI {
 			}
 		}
 		return $userinfo[$user];
+	}
+	
+	public function userName( $user = 0 ) {
+		$userinfo = $this->getUserInfo($user);
+		return $userinfo['name'];
 	}
 	
 	/**

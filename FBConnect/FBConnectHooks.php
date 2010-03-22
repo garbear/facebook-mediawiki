@@ -140,7 +140,7 @@ class FBConnectHooks {
 		$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
-		$vars['fbNames'] = FBConnect::$api->getPersons();
+		#$vars['fbNames'] = FBConnect::$api->getPersons();
 		return true;
 	}
 	
@@ -174,6 +174,8 @@ class FBConnectHooks {
 	static function BeforePageDisplay( &$out, &$sk ) {
 		global $fbLogo, $wgScriptPath, $wgJsMimeType;
 		
+		$fb = new FBConnectAPI();
+		
 		// Parse page output for Facebook IDs
 		$html = $out->getHTML();
 		preg_match_all('/User:([^"\'&#]+)/', $html, $usernames);
@@ -193,7 +195,7 @@ class FBConnectHooks {
 				padding-right: 17px;
 			}
 			
-			li#pt-fblink' . (FBConnect::$api->isConnected() ? ', li#pt-userpage' : '') . ' {
+			li#pt-fblink' . ($fb->user() != 0 ? ', li#pt-userpage' : '') . ' {
 				background: url(' . $fbLogo . ') top left no-repeat;
 				padding-left: 17px;
 			}' : '') . (FBConnect::$special_connect ? '
@@ -277,10 +279,12 @@ class FBConnectHooks {
 	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $wgUser, $fbAllowOldAccounts, $fbRemoveUserTalkLink;
 		
+		$fb = new FBConnectAPI();
+		
 		wfLoadExtensionMessages( 'FBConnect' );
 		
 		if ( $wgUser->isLoggedIn() ) {
-			if( FBConnect::$api->isConnected() ) {
+			if( $fb->user() != 0 ) {
 				
 				// Replace ugly Facebook ID numbers with the user's real name
 				if( $wgUser->getRealName() != "" )
@@ -405,18 +409,17 @@ class FBConnectHooks {
 	
 	/**
 	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect.
-	 */
+	 *
 	static function UserLoadFromSession( $user, &$result ) {
 		global $wgAuth, $wgUser;
+		$fb = new FBConnectAPI();
 		// Check to see if we have a connection with Facebook
-		if ( !FBConnect::$api->user() ) {
-			// No connection with facebook, so use local sessions only if FBConnectAuthPlugin allows it
-			if( $wgAuth->strict() ) {
-				$result = false;
-			}
-			return true;
+		if ( !$fb->user() ) {
+			// No connection with facebook, return $fbAllowOldAccounts
+			global $fbAllowOldAccounts;
+			return $fbAllowOldAccounts;
 		}
-		$localId = User::idFromName( FBConnect::$api->userName() );
+		$localId = User::idFromName( $fb->userName() );
 		
 		// If the user exists, then log them in
 		if ( $localId ) {
@@ -426,7 +429,7 @@ class FBConnectHooks {
 			$wgAuth->updateUser( $user );
 		} else {
 			// User has not visited the wiki before, so create a new user from their Facebook ID
-			$userName = FBConnect::$api->userName();
+			$userName = $fb->userName();
 			
 			// Test to see if we are denied by FBConnectAuthPlugin or the user can't create an account
 			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
@@ -460,4 +463,5 @@ class FBConnectHooks {
 		$result = true;
 		return true;
 	}
+	/**/
 }

@@ -69,7 +69,7 @@ $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
-#$wgAutoloadClasses['FBConnectAuthPlugin'] =	$dir . 'FBConnectAuthPlugin.php';
+$wgAutoloadClasses['FBConnectDB'] =			$dir . 'FBConnectDB.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';

@@ -90,6 +90,7 @@ fb.'language' => 'Language',
 fb.'timecorrection' => 'Time zone correction (hours)',
 fb.'chooselegend' => 'Username choice',
 fb.'chooseinstructions' => 'All users need a nickname; you can choose one from the options below.',
+fb.'invalidname' => 'The nickname you chose is already taken or not a valid nickname. Please chose a different one.',
 fb.'choosenick' => 'Your Facebook profile name ($1)',
 fb.'choosefirst' => 'Your first name ($1)',
 fb.'choosefull' => 'Your full name ($1)',
@@ -98,9 +99,9 @@ fb.'choosemanual' => 'A name of your choice:',
 fb.'chooseexisting' => 'An existing account on this wiki',
 fb.'chooseusername' => 'Username:',
 fb.'choosepassword' => 'Password:',
-fb.'alreadyloggedin' => "'''You are already logged in, $1!'''\n\nIf you want to use Facebook ' .
+fb.'alreadyloggedin' => "'''You are already logged in, $1!'''\n\nIf you want to use Facebook " .
                         'Connect to log in in the future, you can [[Special:Connect/Convert|' .
-                        'convert your account to use Facebook Connect]].",
+                        'convert your account to use Facebook Connect]].',
 /*
 fb.'convertinstructions' => 'This form lets you change your user account to use an OpenID URL or add more OpenID URLs',
 fb.'convertoraddmoreids' => 'Convert to OpenID or add another OpenID URL',
