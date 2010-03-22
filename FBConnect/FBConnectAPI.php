@@ -33,6 +33,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 class FBConnectAPI {
 	private static $__Facebook = null;
 	
+	private static $userinfo = array(array());
+	
 	// Stores a list of valid Facebook IDs for adding tooltip info
 	private $ids = array();
 	
@@ -93,10 +95,35 @@ class FBConnectAPI {
 	
 	/**
 	 * Retrieves the ID of the current logged-in user. If no user is logged in,
-	 * then an ID of 0 is returned (I think).
+	 * then an ID of 0 is returned.
 	 */
 	public function user() {
 		return $this->Facebook()->get_loggedin_user();
+	}
+	
+	/**
+	 * Requests the user's full name from Facebook.
+	 */
+	public function getUserInfo( $user = null ) {
+		if ($user == null) {
+			$user = $this->user();
+		}
+		if ($user != 0 && !isset($userinfo[$user]))
+		{
+			try {
+				$fields = array('first_name', 'name', 'timezone', 'locale, username');
+				#fields[] = 'contact_email';
+				#fields[] = 'proxied_email';
+				$user_details = $this->Facebook()->api_client->users_getInfo($user, $fields);
+				// Cache the data in the $userinfo array
+				$userinfo[$user] = $user_details[0];
+			} catch( Exception $e ) {
+				error_log( 'Failure in the api when requesting ' . join(',', $fields) .
+				           " on uid $user: " . $e->getMessage());
+				return null;
+			}
+		}
+		return $userinfo[$user];
 	}
 	
 	/**

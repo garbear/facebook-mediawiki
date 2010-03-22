@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -29,7 +29,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class SpecialConnect extends SpecialPage {
 	/**
-	 * Constructor
+	 * Constructor.
 	 */
 	function __construct() {
 		global $wgSpecialPageGroups;
@@ -59,98 +59,244 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		$this->FacebookAPI = new FBConnectAPI();
+		// Connect to the Facebook API
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
 		
 		// Look at the subpage name to discover where we are in the login process
 		switch ( $par ) {
-		case 'Login': # Returning from a server
-			$fb = new FBConnectAPI();
-			$fb_user = $fb->user();
-			
-			// Code to see if fb_user exists
-			$user = FBConnectDB::getUser( $fb_user );
-			
-			if ( $user instanceof User ) {
-				// @TODO: Update user from facebook
-				#$this->updateUser( $user, $sreg );
-				$wgUser = $user;
-				$this->setupSession();
-				$wgUser->SetCookies();
-				// @TODO (maybe): Set a cookie for later check-immediate use
-				#$this->loginSetCookie( $fb_user );
-				$this->sendPage('displaySuccessLogin');
-				return;
+		case 'ChooseName':
+			$choice = $wgRequest->getText('wpNameChoice');
+			if ($wgRequest->getCheck('wpCancel')) {
+				$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
+			}
+			// Check to see if the user opted to connect an existing account
+			else if ($choice == 'existing') {
+				$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
+				                  $wgRequest->getText('wpExistingPassword'));
+			}
+			// Check to see if the user selected another valid option
+			else if (in_array($choice, array('nick', 'first', 'full', 'auto', 'manual'))) {
+				$this->createUser($fb_user, $choice,
+				                  $wgRequest->getText("wp{$choice}NameValue"));
 			} else {
-				$this->sendPage('chooseNameForm');
-				return;
+				// @TODO: Replace this with a message saying "invalid choice".
+				$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 			}
 			break;
-		case 'ChooseName': # User logged into Facebook, but needs a wiki username
-			$fb = new FBConnectAPI();
-			$fb_user = $fb->user();
-			
-			if ( !$fb_user ) {
-				wfDebug("FBConnect: aborting in ChooseName because no Facebook UID was reported.\n");
-				$wgOut->showErrorPage( 'fbconnecterror', 'fbconnecterrortext' );
-				return;
-			}
-			
-			if ( $wgRequest->getCheck( 'wpCancel' ) ) {
-				$wgOut->showErrorPage( 'fbconnectcancel', 'fbconnectcanceltext' );
-				return;
-			}
-	
-			$choice = $wgRequest->getText( 'wpNameChoice' );
-			$nameValue = $wgRequest->getText( 'wpNameValue' );
-			
-			if ( $choice == 'existing' ) {
-				$user = $this->attachUser($fb_user, $wgRequest->getText('wpExistingName'), $wgRequest->getText('wpExistingPassword'));
-				if (!$user) {
-					$this->sendPage('chooseNameForm', 'fbconnectwrongpassword');
-					return;
-				}
-				// @TODO
-				#$this->updateUser($user);
-			} else {
-				// @TODO: fixme
-				#$name = $this->getUserName( $openid, $sreg, $choice, $nameValue );
-				
-				if (!$name || !$this->userNameOK($name)) {
-					wfDebug("FBConnect: Name not OK: '$name'\n");
-					$this->sendPage('chooseNameForm');
-					return;
-				}
-				
-				// @TODO: fixme
-				#$user = $this->createUser($openid, $sreg, $name);
-			}
-			
-			if (is_null($user)) {
-				wfDebug("FBConnect: aborting in ChooseName because we could not create user object\n");
-				$wgOut->showErrorPage('fbconnecterror', 'fbconnecterrortext');
-				return;
-			}
-			// Store the new user as the global user object
-			$wgUser = $user;
-			$this->sendPage('displaySuccessLogin');
-			break;
-		default: # Main entry point
-			if ( $wgRequest->getText( 'returnto' ) ) {
-				$this->setReturnTo( $wgRequest->getText( 'returnto' ), $wgRequest->getVal( 'returntoquery' ) );
-			}
-			
-			$fb = new FBConnectAPI();
-			$fb_user = $fb->user();
-			
+		default:
+			// Main entry point
+			#if ( $wgRequest->getText( 'returnto' ) ) {
+			#	$this->setReturnTo( $wgRequest->getText( 'returnto' ), $wgRequest->getVal( 'returntoquery' ) );
+			#}
 			if ($fb_user) {
-				$this->login($fb_user, $this->getTitle('Login'));
+				// If the user is connected, log them in
+				$this->login($fb_user);
 			} else {
+				// If the user isn't connected, then show them a form with the Connect button
 				$this->sendPage('connectForm');
 			}
 		}
 	}
 	
-	/*
+	/**
+	 * Logs in the user by their Facebook ID. If the Facebook user doesn't have
+	 * an account on the wiki, then they are presented with a form prompting
+	 * them to choose a wiki username.
+	 */
+	protected function login($fb_user) {
+		// Check to see if the Connected user exists in the database
+		if ($fb_user != 0) {
+			$user = FBConnectDB::getUser( $fb_user );
+		}
+		if ( isset($user) && $user instanceof User ) {
+			// Update user from facebook
+			$this->updateUser( $user );
+			$wgUser = $user;
+			$this->setupSession();
+			$wgUser->SetCookies();
+			// Set a cookie for later check-immediate use
+			#$this->loginSetCookie( $fb_user );
+			$this->sendPage('displaySuccessLogin');
+		} else if ($fb_user != 0) {
+			$this->sendPage('chooseNameForm');
+		} else {
+			// @TODO: send an error message saying only Connected users can log in
+			// or ask them to Connect.
+			$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
+		}
+	}
+	
+	protected function createUser($fb_id, $name) {
+		global $wgAuth, $wgOut, $wgUser;
+		/*
+		if (!$name || !$this->userNameOK($name)) {
+			wfDebug("FBConnect: Name not OK: '$name'\n");
+			$this->sendPage('chooseNameForm');
+			break;
+		}
+		*/	
+		
+		$user = User::newFromName($name);
+		if (!$user) {
+			wfDebug("FBConnecr: Error adding new user.\n");
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+			return;
+		}
+		$user->addToDatabase();
+		$user->addNewUserLogEntry();
+
+		if (!$user->getId()) {
+			wfDebug( "FBConnect: Error adding new user.\n" );
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+			return;
+		}
+		// Give $wgAuth a chance to deal with the user object
+		$wgAuth->initUser($user);
+		$wgAuth->updateUser($user);
+		// Update site statistics
+		$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
+		$ssUpdate->doUpdate();
+		// Attach the user to their Facebook account in the database
+		FBConnectDB::addFacebookID($user, $fb_id);
+		// Update the user with settings from Facebook
+		$this->updateUser($user);
+		// Store the new user as the global user object
+		$wgUser = $user;
+		$this->sendPage('displaySuccessLogin');
+		
+	}
+	
+	/**
+	 * Attaches the Facebook ID to an existing wiki account. If the user does
+	 * not exist, or the supplied password does not match, then null is
+	 * returned. Otherwise, the accounts are matched in the database and the
+	 * new user object is logged in.
+	 */
+	protected function attachUser($fb_user, $name, $password) {
+		global $wgOut, $wgUser;
+		// The user must be logged into Facebook before choosing a wiki username
+		if ( !$fb_user ) {
+			wfDebug("FBConnect: aborting in ChooseName because no Facebook ID was reported.\n");
+			$wgOut->showErrorPage( 'fbconnect-error', 'fbconnect-errortext' );
+			return;
+		}
+		// Look up the user by their name
+		$user = User::newFromName($name);
+		if (!$user || !$user->checkPassword($password)) {
+			$this->sendPage('chooseNameForm', 'wrongpassword');
+			return;
+		}
+		// Attach the user to their Facebook account in the database
+		FBConnectDB::addFacebookID($user, $fb_user);
+		// Update the user with settings from Facebook
+		$this->updateUser($user);
+		// Store the user in the global user object
+		$wgUser = $user;
+		$this->sendPage('displaySuccessLogin');
+	}
+	
+	/**
+	 * Update a user's settings with the values retrieved from the current
+	 * logged-in Facebook user. Settings are only updated if a different value
+	 * is returned from Facebook and the user's settings allow an update on
+	 * login.
+	 */
+	protected function updateUser($user, $force = false) {
+		// Connect to the Facebook API and retrieve the user's info 
+		$fb = new FBConnectAPI();
+		$userinfo = $fb->getUserInfo();
+		
+		// Update the following options if the user's settings allow it
+		$updateOptions = array('nickname', 'fullname', 'language', 'timecorrection', 'email');
+		foreach ($updateOptions as $option) {
+			// Translate Facebook parameters into MediaWiki parameters
+			$value = $this->getOptionFromInfo($option, $userinfo); 
+			if ($value && $value != $user->getOption($option) &&
+					$user->getOption("fbconnect-update-on-login-$option")) {
+				switch ($option) {
+					case 'fullname':
+						$user->setRealName($value);
+						break;
+					default:
+						$user->setOption($option, $value);
+				}
+			}
+		}
+		// Save the updated settings
+		$user->saveSettings();
+	}
+	
+	/**
+	 * Helper function for updateUser(). Takes an array of info from Facebook,
+	 * and looks up the corresponding MediaWiki parameter.
+	 */
+	protected function getOptionFromInfo($option, $userinfo) {
+		// Lookup table for the names of the settings
+		$mw2fb = array('nickname'       => 'username',
+		               'fullname'       => 'name',
+		               'firstname'      => 'first_name',
+		               'language'       => 'locale',
+		               'timecorrection' => 'timezone',
+		               'email'          => 'contact_email');
+		$value = array_key_exists($mw2fb[$option], $userinfo) ? $userinfo[$mw2fb[$option]] : '';
+		// Special handling of several settings
+		switch ($option) {
+			case 'fullname':
+			case 'firstname':
+				// If real names aren't allowed, then simply ignore the parameter from Facebook
+				global $wgAllowRealName;
+				if (!$wgAllowRealName) {
+					$value = '';
+				}
+				break;
+			case 'language':
+				/**
+				 * Convert Facebook's locale into a MediaWiki language code.
+				 * For an up-to-date list of Facebook locales, see:
+				 * <http://wiki.developers.facebook.com/index.php/Facebook_Locales>.
+				 * For an up-to-date list of MediaWiki languages, see:
+				 * <http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/languages/Names.php>.
+				 */
+				if ($value == '') {
+					break;
+				}
+				// These regional languages get special treatment
+				$locales = array('en_PI' => 'en', # Pirate English
+				                 'en_GB' => 'en-gb', # British English
+				                 'en_UD' => 'en', # Upside Down English
+				                 'fr_CA' => 'fr', # Canadian French
+				                 'fb_LT' => 'en', # Leet Speak
+				                 'pt_BR' => 'pt-br', # Brazilian Portuguese
+				                 'zh_CN' => 'zh-cn', # Simplified Chinese
+				                 'es_ES' => 'es', # European Spanish
+				                 'zh_HK' => 'zh-hk', # Traditional Chinese (Hong Kong)
+				                 'zh_TW' => 'zh-tw'); # Traditional Chinese (Taiwan)
+				if (array_key_exists($value, $locales)) {
+					$value = $locales[$value];
+				} else {
+					// No special regional treatment exists in MW; chop it off
+					$value = substr($value, 0, 2);
+				}
+				break;
+			case 'timecorrection':
+				// Convert the timezone into a local timezone correction
+				// @TODO: $value = TimezoneToOffset($value);
+				$value = '';
+				break;
+			case 'email':
+				// If a contact email isn't available, then use a proxied email
+				if ($value == '') {
+					// @TODO: update the user's email from $userinfo['proxied_email']
+					// instead (the address must stay hidden from the user)
+					$value = '';
+				}
+		}
+		// If an appropriate value was found, return it
+		return value == '' ? null : $value;
+	}
+	
+	/**
 	 * Sets up the session, if it hasn't already been started.
 	 */
 	protected function setupSession() {
@@ -159,102 +305,31 @@ class SpecialConnect extends SpecialPage {
 			wfSetupSession();
 	}
 	
-	protected function createUser($fb_id, $name) {
-		global $wgAuth;
-		$user = User::newFromName($name);
-		if (!$user) {
-			wfDebug("FBConnecr: Error adding new user.\n");
-			return null;
-		}
-		$user->addToDatabase();
-		$user->addNewUserLogEntry();
-
-		if (!$user->getId()) {
-			wfDebug( "FBConnect: Error adding new user.\n" );
-		} else {
-			// Give $wgAuth a chance to deal with the user object
-			$wgAuth->initUser($user);
-			$wgAuth->updateUser($user);
-			// Update site statistics
-			$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
-			$ssUpdate->doUpdate();
-			// 
-			self::addFacebookID($user, $fb_id);
-			// @TODO: fixme
-			#$this->updateUser( $user, $sreg, $ax, true );
-			$user->saveSettings();
-			return $user;
-		}
-	}
-	
-	protected function attachUser($fb_user, $name, $password) {
-		$user = User::newFromName($name);
-		if (!$user) {
-			return null;
-		}
-		if (!$user->checkPassword($password)) {
-			return null;
-		}
-		FBConnectDB::addFacebookID($user, $fb_user);
-		return $user;
-	}
-	
 	/**
-	 * Update some user's settings with value get from OpenID
-	 *
-	 * @param $user User object
-	 * @param $sreg Array of options get from OpenID
-	 * @param $force forces update regardless of user preferences
+	 * Generates a unique username for a wiki account based on the prefix specified
+	 * in the message 'fbconnect-usernameprefix'. 
 	 */
-	function updateUser( $user, $sreg, $ax, $force = false ) {
-		global $wgAllowRealName;
-		
-		// Nick name
-		if ( $this->updateOption( 'nickname', $user, $force ) ) {
-			if ( array_key_exists( 'nickname', $sreg ) && $sreg['nickname'] != $user->getOption( 'nickname' ) ) {
-				$user->setOption( 'nickname', $sreg['nickname'] );
-			}
-		}
-		
-		// Full name
-		if ( $wgAllowRealName && ( $this->updateOption( 'fullname', $user, $force ) ) ) {
-			if ( array_key_exists( 'fullname', $sreg ) ) {
-				$user->setRealName( $sreg['fullname'] );
-			}
-			
-			if ( array_key_exists( 'http://axschema.org/namePerson/first', $ax ) || array_key_exists( 'http://axschema.org/namePerson/last', $ax ) ) {
-				$user->setRealName($ax['http://axschema.org/namePerson/first'][0] . " " . $ax['http://axschema.org/namePerson/last'][0]);
-			}
-		}
-		
-		// Language
-		if ( $this->updateOption( 'language', $user, $force ) ) {
-			if ( array_key_exists( 'language', $sreg ) ) {
-				# FIXME: check and make sure the language exists
-				$user->setOption( 'language', $sreg['language'] );
-			}
-		}
-		
-		if ( $this->updateOption( 'timezone', $user, $force ) ) {
-			if ( array_key_exists( 'timezone', $sreg ) ) {
-				# FIXME: do something with it.
-				# $offset = OpenIDTimezoneToTzoffset($sreg['timezone']);
-				# $user->setOption('timecorrection', $offset);
-			}
-		}
-		
-		$user->saveSettings();
+	protected function generateUserName() {
+		// @TODO
 	}
 	
 	/**
 	 * Tests whether the name is OK to use as a user name.
 	 */
-	function userNameOK ($name) {
+	protected function userNameOK ($name) {
 		global $wgReservedUsernames;
 		return (0 == User::idFromName($name) && !in_array($name, $wgReservedUsernames));
 	}
 	
-	private function sendPage($function, $arg = NULL) {
+	/**
+	 * Displays a simple error page.
+	 */
+	protected function sendError($titleMsg, $textMsg) {
+		global $wgOut;
+		$wgOut->showErrorPage($titleMsg, $textMsg);
+	}
+	
+	protected function sendPage($function, $arg = NULL) {
 		global $wgOut;
 		// Setup the page for rendering
 		wfLoadExtensionMessages( 'FBConnect' );
@@ -272,61 +347,105 @@ class SpecialConnect extends SpecialPage {
 	
 	private function alreadyLoggedIn() {
 		global $wgOut;
-		// @TODO: Repalce these with i18n messages
-		#$wgOut->setPageTitle( wfMsg( 'fbconnecterror' ) );
-		$wgOut->setPageTitle( 'Verification error' );
-		#$wgOut->addWikiMsg( 'fbconnectalreadyloggedin', $wgUser->getName() );
-		$wgOut->addHtml('<p><b>You are already logged in, ' . $wgUser->getName() . '</b></p>\n' .
-		                '<p>If you want to use OpenID to log in in the future, you can ' .
-		                '[[Special:Connect/Convert|convert your account to use OpenID]].</p>');
+		$wgOut->setPageTitle(wfMsg( 'fbconnect-error'));
+		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
 	
 	private function displaySuccessLogin() {
 		global $wgOut;
-		// @TODO: Repalce these with i18n messages
-		#$wgOut->setPageTitle( wfMsg( 'fbconnectsuccess' ) );
-		$wgOut->setPageTitle( 'Verification succeeded' );
-		#$wgOut->addWikiMsg( 'openidsuccess', $wgUser->getName(), $openid );
-		$wgOut->addHtml( '<p>Verification succeeded</p>' );
-		
+		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
+		$wgOut->addWikiMsg('fbconnect-successtext');
 		// Run any hooks for UserLoginComplete
 		$inject_html = '';
 		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
 		$wgOut->addHtml( $inject_html );
-		// Render the "Return to" text retrieved from the URL
+		// Render the "return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
 	
-	private function chooseNameForm($messagekey = NULL) {
-		global $wgOut, $wgOpenIDOnly, $wgAllowRealName;
+	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
+		global $wgOut, $fbConnectOnly;
+		// Connect to the Facebook API 
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
+		$userinfo = $fb->getUserInfo($fb_user);
+		
+		// Keep track of when the first option visible to the user is checked
+		$checked = false;
+		
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
-		
-		#$fb = new FBConnectAPI();
-		#$fb_user = $fb->user();
-		
-		if ( $messagekey ) {
-			$wgOut->addWikiMsg( $messagekey );
+		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
+		$wgOut->addWikiMsg( $messagekey );
+		// @TODO: Format the html a little nicer
+		$wgOut->addHTML('
+		<form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
+			<fieldset id="mw-fbconnect-choosename">
+				<legend>' . wfMsg('fbconnect-chooselegend') . '</legend>
+				<table>');
+		// Let them attach to an existing user if $fbConnectOnly allows it
+		if (!$fbConnectOnly) {
+			// Grab the UserName from the cookie if it exists
+			global $wgCookiePrefix;
+			$name = isset($_COOKIE[$wgCookiePrefix . 'UserName']) ?
+						trim($_COOKIE[$wgCookiePrefix . 'UserName']) : '';
+			// Build an array of attributes to update
+			$updateOptions = array();
+			$checkUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
+			foreach ($checkUpdateOptions as $option) {
+				// Translate the MW parameter into a FB parameter
+				$value = $this->getOptionFromInfo($option, $userinfo);
+				// If no corresponding value was received from Facebook, then continue
+				if (!$value) {
+					continue;
+				}
+				// Build the list item for the update option
+				$updateOptions[] = "<li><input name=\"wpUpdateUserInfo$option\" type=\"checkbox\" " .
+					"value=\"1\" id=\"wpUpdateUserInfo$option\" /><label for=\"wpUpdateUserInfo$option\">" .
+					wfMsgHtml("fbconnect-$option") . wfMsgExt('colon-separator', array('escapenoentities')) .
+					" <i>$value</i></label></li>";
+			}
+			// Implode the update options into an unordered list
+			$updateChoices = count($updateOptions) > 0 ? "<br />\n" . wfMsgHtml('fbconnect-updateuserinfo') .
+				"\n<ul>\n" . implode("\n", $updateOptions) . "\n<ul>\n" : '';
+			// Create the HTML for the "existing account" option
+			$html .= '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
+				'value="existing" id="wpNameChoiceExisting"/></td><td class="mw-input">' .
+				'<label for="wnNameChoiceExisting">' . wfMsg('fbconnect-chooseexisting') . '<br/>' .
+				wfMsgHtml('fbconnect-chooseusername') . '<input name="wpExistingName" size="16" value="' .
+				$name . '" id="wpExistingName"/>' . wfMsgHtml('fbconnect-choosepassword') .
+				'<input name="wpExistingPassword" ' . 'size="" value="" type="password"/>' . $updateChoices .
+				'</td></tr>';
+			$wgOut->addHTML($html);
 		}
 		
-		#$wgOut->addWikiMsg( 'fbconnectchooseinstructions' );
-		$wgOut->addHtml('<p>All users need a nickname; you can choose one from the options below.</p>');
+		// Add the options for nick name, first name and full name if we can get them
+		foreach (array('nick', 'first', 'full') as $option) {
+			$nickname = $this->getOptionFromInfo($option . 'name', $userinfo);
+			if ($nickname && $this->userNameOK($nickname)) {
+				$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="' .
+					$option . ($checked ? '' : '" checked="checked') . '" id="wpNameChoice' . $option .
+					'"/></td><td class="mw-input"><label for="wpNameChoice' . $option . '">' .
+					wfMsg('fbconnect-choose' . $option, $nickname) . '</label></td></tr>');
+				// When the first radio is checked, this flag is set and subsequent options aren't checked
+				$checked = true;
+			}
+		}
 		
-		/* @TODO: put in options:
-		
-		 * An existing account on this wiki
-		   Username: ______ Password: ______
-		 * The username picked from your Facebook URL (gbruin)
-		 * Your first name (Garrett)
-		 * Your full name (Garrett_Brown)
-		 * An auto-generated name (FacebookUser2)
-		 * A name of your choice: _______
-		
-		   [Login]  [Cancel]
-		
-		 */
+		// The options for auto and manual usernames are always available
+		$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="auto" ' .
+			($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto"/></td><td class="mw-input">' .
+			'<label for="wpNameChoiceAuto">' . wfMsg('fbconnect-chooseauto', $this->generateUserName()) .
+			'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
+			'value="manual" id="wpNameChoiceManual"/></td><td class="mw-input"><label ' .
+			'for="wpNameChoiceManual">' . wfMsg('fbconnect-choosemanual') . '</label>&nbsp;' .
+			'<input name="wpNameValue" size="16" value="" id="wpNameValue"/></td></tr>' .
+			// Finish with two options, "Log in" or "Cancel"
+			'<tr><td></td><td class="mw-submit"><input type="submit" value="Log in" name="wpOK"/>' .
+			'<input type="submit" value="Cancel" name="wpCancel"/></td></tr></table></fieldset></form>'
+		);
 	}
 	
 	/**

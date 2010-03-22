@@ -1,8 +1,6 @@
 <?php
 /**
  * FBConnect.i18n.php - FBConnect for MediaWiki
- * 
- * Internationalization file... for when Facebook Connect is internationalized ;-)
  */
 
 
@@ -25,7 +23,7 @@ $messages['en'] = array(
 // Extension name
 'fbconnect'   => 'Facebook Connect',
 fb.'desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http://www.facebook.com Facebook] ' .
-                 'accounts. Offers authentification based on Facebook groups (soon!) and the use of FBML in wiki text.',
+                 'accounts. Offers authentification based on Facebook groups and the use of FBML in wiki text.',
 // Group containing Facebook Connect users
 'group-fb-user'           => 'Facebook Connect users',
 'group-fb-user-member'    => 'Facebook Connect user',
@@ -74,4 +72,71 @@ fb.'logoutbox'=> "$1\n\nThis will also log you out of Facebook and all Connected
 fb.'listusers-header'
               => '$1 and $2 privileges are automatically transfered from the Officer and Admin titles of the ' .
                  "Facebook group $3.\n\nFor more info, please contact the group creator $4.",
+// Prefix to use for automatically-generated usernames
+fb.'usernameprefix' => 'FacebookUser',
+// Special:Connect
+fb.'error' => 'Verification error',
+fb.'errortext' => 'An error occured during verification with Facebook Connect.',
+fb.'cancel' => 'Action cancelled',
+fb.'canceltext' => 'The previous action was cancelled by the user.',
+fb.'success' => 'Facebook verification succeeded',
+fb.'successtext' => 'You have been successfully logged in with Facebook Connect.',
+#fb.'optional' => 'Optional',
+#fb.'required' => 'Required',
+fb.'nickname' => 'Nickname',
+fb.'fullname' => 'Fullname',
+fb.'email' => 'E-mail address',
+fb.'language' => 'Language',
+fb.'timecorrection' => 'Time zone correction (hours)',
+fb.'chooselegend' => 'Username choice',
+fb.'chooseinstructions' => 'All users need a nickname; you can choose one from the options below.',
+fb.'choosenick' => 'Your Facebook profile name ($1)',
+fb.'choosefirst' => 'Your first name ($1)',
+fb.'choosefull' => 'Your full name ($1)',
+fb.'chooseauto' => 'An auto-generated name ($1)',
+fb.'choosemanual' => 'A name of your choice:',
+fb.'chooseexisting' => 'An existing account on this wiki',
+fb.'chooseusername' => 'Username:',
+fb.'choosepassword' => 'Password:',
+fb.'alreadyloggedin' => "'''You are already logged in, $1!'''\n\nIf you want to use Facebook ' .
+                        'Connect to log in in the future, you can [[Special:Connect/Convert|' .
+                        'convert your account to use Facebook Connect]].",
+/*
+fb.'convertinstructions' => 'This form lets you change your user account to use an OpenID URL or add more OpenID URLs',
+fb.'convertoraddmoreids' => 'Convert to OpenID or add another OpenID URL',
+fb.'convertsuccess' => 'Successfully converted to OpenID',
+fb.'convertsuccesstext' => 'You have successfully converted your OpenID to $1.',
+fb.'convertyourstext' => 'That is already your OpenID.',
+fb.'convertothertext' => 'That is someone else\'s OpenID.',
+*/
 );
+
+/** Message documentation (Message documentation)
+ * @author EugeneZelenko
+ * @author Fryed-peach
+ * @author IAlex
+ * @author Jon Harald Søby
+ * @author Purodha
+ * @author Raymond
+ * @author Siebrand
+ *
+$messages['qqq'] = array(
+	'fbconnect-desc' => 'Short description of the FBConnect extension, shown in [[Special:Version]]. Do not translate or change links.',
+	'fbconnect-trustinstructions' => '* $1 is a trust root. A trust root looks much like a normal URL, but is used to describe a set of URLs. Trust roots are used by OpenID to verify that a user has approved the OpenID enabled website.',
+	'fbconnect-optional' => '{{Identical|Optional}}',
+	'fbconnect-email' => '{{Identical|E-mail address}}',
+	'fbconnect-language' => '{{Identical|Language}}',
+	'fbconnect-timezone' => '{{Identical|Time zone}}',
+	'fbconnect-choosepassword' => '{{Identical|Password}}',
+	'fbconnect-alreadyloggedin' => '$1 is a user name.',
+	'fbconnect-autosubmit' => '{{doc-important|"Continue" will never be localised. It is hardcoded in a PHP extension. Translations could be made like ""Continue" (translation)"}}',
+	'fbconnect-delete-button' => '{{Identical|Confirm}}',
+	'prefs-fbconnect' => '{{optional}}
+OpenID preferences tab title',
+	'fbconnect-prefstext' => 'FBConnect preferences tab text above the list of preferences',
+	'fbconnect-pref-hide' => 'FBConnect preference label (Hide your FBConnect URL on your user page, if you log in with FBConnect)',
+	'fbconnect-pref-update-userinfo-on-login' => 'FBConnect preference label for updating from Facebook account upon login',
+	'fbconnect-urls-action' => '{{Identical|Action}}',
+	'fbconnect-urls-delete' => '{{identical|Delete}}',
+);
+/**/
