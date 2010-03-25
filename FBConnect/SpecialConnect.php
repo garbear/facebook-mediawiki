@@ -54,7 +54,7 @@ class SpecialConnect extends SpecialPage {
 		global $wgUser, $wgRequest;
 		
 		// Check to see if the user is already logged in
-		if ( $wgUser->getID() != 0 ) {
+		if ( $wgUser->getID() ) {
 			$this->sendPage('alreadyLoggedIn');
 			return;
 		}
@@ -127,8 +127,8 @@ class SpecialConnect extends SpecialPage {
 	 */
 	protected function login($fb_user) {
 		// Check to see if the Connected user exists in the database
-		if ($fb_user != 0) {
-			$user = FBConnectDB::getUser( $fb_user );
+		if ($fb_user) {
+			$user = FBConnectDB::getUser($fb_user);
 		}
 		if ( isset($user) && $user instanceof User ) {
 			// Update user from facebook
@@ -139,7 +139,7 @@ class SpecialConnect extends SpecialPage {
 			// Set a cookie for later check-immediate use
 			#$this->loginSetCookie( $fb_user );
 			$this->sendPage('displaySuccessLogin');
-		} else if ($fb_user != 0) {
+		} else if ($fb_user) {
 			$this->sendPage('chooseNameForm');
 		} else {
 			// TODO: send an error message saying only Connected users can log in
@@ -329,11 +329,25 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Generates a unique username for a wiki account based on the prefix specified
-	 * in the message 'fbconnect-usernameprefix'. 
+	 * in the message 'fbconnect-usernameprefix'. The number appended is equal to
+	 * the number of Facebook Connect to user ID associations in the user_fbconnect
+	 * table, so quite a few numbers will be skipped. However, this approach is
+	 * more scalable. For smaller wiki installations, uncomment the line $i = 1 to
+	 * have consecutive usernames starting at 1.
 	 */
 	protected function generateUserName() {
-		// TODO: Transcribe this function
-		return wfMsg('fbconnect-usernameprefix') . '3';
+		$prefix = wfMsg('fbconnect-usernameprefix');
+		// Because $i is incremented the first time through the while loop
+		$i = FBConnectDB::countUsers();
+		#$i = 1; // This is the DUMB WAY to do this
+		while ($i < Integer::MAXVALUE) { // TODO: Look up this constant
+			$name = "$prefix$i";
+			if ($this->userNameOK($name)) {
+				return $name;
+			}
+			++$i;
+		}
+		return $prefix;
 	}
 	
 	/**
@@ -370,7 +384,7 @@ class SpecialConnect extends SpecialPage {
 	
 	private function alreadyLoggedIn() {
 		global $wgOut, $wgUser, $wgRequest;
-		$wgOut->setPageTitle(wfMsg( 'fbconnect-error'));
+		$wgOut->setPageTitle(wfMsg('fbconnect-error'));
 		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
@@ -477,6 +491,9 @@ class SpecialConnect extends SpecialPage {
 	 */
 	private function connectForm() {
 		global $wgOut, $wgUser;
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
+		
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		
@@ -509,7 +526,7 @@ class SpecialConnect extends SpecialPage {
 			<table id="specialconnect_boxarea">
 				<tr>
 					<td class="box_left">');
-						if( FBConnect::$api->isConnected() ) {
+						if( $fb_user ) {
 							// If the user is Connected, display info about them instead of a login form
 							$content = '<b><fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name></b> ' .
 							           // TODO: (UCLA) should be replaced by the user's primary network
@@ -559,9 +576,12 @@ class SpecialConnect extends SpecialPage {
 					$wgOut->addHTML('
 				</h1>
 				<div class="box_content">');
+					global $wgServer, $wgScript;
+					$dbkey = wfUrlencode($this->getTitle()->getPrefixedDBkey());
 					$button = '<fb:login-button size="large" background="white" length="long" ' .
 					          'autologoutlink="true" onlogin="window.location = \'' .
-					          $this->scriptUrl( $this->getTitle( 'Login' )) . '\';">';
+					          "{$wgServer}{$wgScript}?title={$dbkey}" . '\';">';
+					$button = '[[Special:Connect]]';
 					if( $msg !== '' ) {
 						$wgOut->addWikiText( wfMsg( $msg, $button ));
 					} else {
@@ -600,8 +620,9 @@ class SpecialConnect extends SpecialPage {
 			$link_href = htmlspecialchars( $loginTitle->getLocalUrl( 'type=signup&returnto=' . $this_href ));
 			$link_text = wfMsgHtml( 'nologinlink' );
 			$link = wfMsgWikiHtml( 'nologin', "<a href=\"$link_href\">$link_text</a>" );
-		} else
+		} else {
 			$link = '';
+		}
 		
 		// Set the appropriate options for this template
 		$template->set( 'header', '' );
@@ -618,8 +639,11 @@ class SpecialConnect extends SpecialPage {
 		// Look this setting up in SpecialUserLogin.php
 		$template->set( 'usedomain', false );
 		// Give authentication and captcha plugins a chance to modify the form
-		$wgAuth->modifyUITemplate( $template, 'login' );
+		$type = 'login';
+		$wgAuth->modifyUITemplate( $template, $type );
 		wfRunHooks( 'UserLoginForm', array( &$template ));
+		
+		
 		// Spit out the form we just made
 		return $template;
 	}

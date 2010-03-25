@@ -35,6 +35,29 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FBConnectHooks {
 	/**
+	 * Hook is called whenever an article is being viewed... Currently, figures
+	 * out the Facebook ID of the user that the userpage belongs to.
+	 */
+	public static function ArticleViewHeader( &$article, &$outputDone, &$pcache ) {
+		global $wgOut;
+		// Get the article title
+		$nt = $article->getTitle();
+		// If the page being viewed is a user page
+		if ($nt && $nt->getNamespace() == NS_USER && strpos($nt->getText(), '/') === false) {
+			$user = User::newFromName($nt->getText());
+			if (!$user || $user->getID() == 0) {
+				return true;
+			}
+			$fb_id = FBConnectDB::getFacebookIDs($user->getId());
+			if (!count($fb_id) || !($fb_id = $fb_id[0])) {
+				return true;
+			}
+			// TODO: Something with the Facebook ID stored in $fb_id
+		}
+		return true;
+	}
+	
+	/**
 	 * Checks the autopromote condition for a user.
 	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
@@ -108,7 +131,6 @@ class FBConnectHooks {
 	
 	/**
 	 * Fired when MediaWiki is updated to allow extensions to update the database.
-	 * 
 	 */
 	static function LoadExtensionSchemaUpdates() {
 		global $wgDBtype, $wgExtNewTables;
@@ -277,7 +299,7 @@ class FBConnectHooks {
 	 * Modify the user's persinal toolbar (in the upper right)
 	 */
 	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $fbAllowOldAccounts, $fbRemoveUserTalkLink;
+		global $wgUser, $wgLang, $fbAllowOldAccounts, $fbRemoveUserTalkLink;
 		
 		$fb = new FBConnectAPI();
 		
@@ -387,6 +409,22 @@ class FBConnectHooks {
 		        		</td>
 		        	</tr>
 		        </table>';
+		}
+		return true;
+	}
+	
+	/**
+	 * Removes Special:UserLogin and Special:CreateAccount from the list of
+	 * Special Pages if $fbConnectOnly is set to true.
+	 */
+	static function SpecialPage_initList( &$aSpecialPages ) {
+		global $fbConnectOnly;
+		if ($fbConnectOnly) {
+			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin', 'Connect',
+				false, array('returnto', 'returntoquery'));
+			// Used in 1.12.x and above
+			$aSpecialPages['CreateAccount'] = array('SpecialRedirectToSpecial', 'CreateAccount',
+				'Connect');
 		}
 		return true;
 	}

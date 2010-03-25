@@ -99,4 +99,20 @@ class FBConnectDB {
 		);
 		return (bool)$dbw->affectedRows();
 	}
+	
+	/**
+	 * Returns the total number of User <-> Facebook ID associations in the
+	 * database.
+	 */
+	public static function countUsers() {
+		$dbr = wfGetDB( DB_SLAVE );
+		// TODO: Fixme
+		$count = $dbr->selectField(
+			'user_fbconnect',
+			'user_id',
+			array( 'user_fbid' => $fbid ),
+			__METHOD__
+		);
+		return $count;
+	}
 }
