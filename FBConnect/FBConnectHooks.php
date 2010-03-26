@@ -53,13 +53,14 @@ class FBConnectHooks {
 				return true;
 			}
 			// TODO: Something with the Facebook ID stored in $fb_id
+			return true;
 		}
 		return true;
 	}
 	
 	/**
 	 * Checks the autopromote condition for a user.
-	 */
+	 *
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		$types = array(APCOND_FB_INGROUP   => 'member',
 		               APCOND_FB_ISOFFICER => 'officer',
@@ -76,16 +77,14 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Check against stricter requirements (if any) for Facebook Connect users. Counterintuitively,
-	 * we do the requirement checks first. This is to prevent unnecessary API group-related queries.
+	 * Check against stricter requirements (if any) for Facebook Connect users.
+	 * Counterintuitively, we do the requirement checks first. This is to prevent
+	 * unnecessary API group-related queries.
 	 * 
-	 * $promote contains the groups that will be added. If the user isn't entitled to these groups,
-	 * then we flush this array down the toilet.
+	 * $promote contains the groups that will be added. If the user isn't entitled
+	 * to these groups, then we flush this array down the toilet.
 	 */
 	static function GetAutoPromoteGroups( &$user, &$promote ) {
-		//echo "\nGetAutoPromoteGroups\n";
-		//var_dump( $promote );
-		/**/
 		// If there isn't any groups to promote to anyway
 		if( !count($promote) ) {
 			return true;
@@ -124,13 +123,13 @@ class FBConnectHooks {
 	 * controls in common cases, but _not_ for functional access control. This behavior
 	 * may provide false positives, but should never provide a false negative.
 	 */
-	static function XXXgetUserPermissionsErrorsExpensive( $title, $user, $action, &$result ) {
+	static function getUserPermissionsErrorsExpensive( $title, $user, $action, &$result ) {
 		//echo "getUserPermissionsErrorsExpensive\n";
 		return true;
 	}
 	
 	/**
-	 * Fired when MediaWiki is updated to allow extensions to update the database.
+	 * Fired when MediaWiki is updated to allow FBConnect to update the database.
 	 */
 	static function LoadExtensionSchemaUpdates() {
 		global $wgDBtype, $wgExtNewTables;
@@ -147,8 +146,9 @@ class FBConnectHooks {
 	 * Adds several Facebook Connect variables to the page:
 	 * 
 	 * fbAPIKey			The application's API key (see $fbAPIKey in config.php)
-	 * fbLoggedIn		Whether the PHP client reports the user being Connected
-	 * fbLogoutURL		The URL to be redirected to on a disconnect
+	 * fbUseMarkup		Should XFBML tags be rendered? (see $fbUseMarkup in config.php)
+	 * fbLoggedIn		(deprecated) Whether the PHP client reports the user being Connected
+	 * fbLogoutURL		(deprecated) The URL to be redirected to on a disconnect
 	 * 
 	 * This hook was added in MediaWiki version 1.14. See:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
@@ -156,13 +156,14 @@ class FBConnectHooks {
 	 * to retain backward compatability.
 	 */
 	static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgTitle, $fbApiKey; 
+		global $wgTitle, $fbApiKey, $fbUseMarkup;
 		$thisurl = $wgTitle->getPrefixedURL();
 		$vars['fbApiKey'] = $fbApiKey;
-		$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
-		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
-		                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
+		#$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
+		#$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
+		#                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
 		#$vars['fbNames'] = FBConnect::$api->getPersons();
+		$vars['fbUseMarkup'] = $fbUseMarkup;
 		return true;
 	}
 	
@@ -194,10 +195,21 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	static function BeforePageDisplay( &$out, &$sk ) {
-		global $fbLogo, $wgScriptPath, $wgJsMimeType;
+		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript;
+		
+		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
+		$out->prependHTML('
+			<div id="fb-root"></div>
+			<script>
+				(function(){var e=document.createElement("script");e.type="' .
+				$wgJsMimeType . '";e.src="' . $fbScript .
+				'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
+			</script>' . "\n"
+		);
 		
 		$fb = new FBConnectAPI();
 		
+		/*
 		// Parse page output for Facebook IDs
 		$html = $out->getHTML();
 		preg_match_all('/User:([^"\'&#]+)/', $html, $usernames);
@@ -207,11 +219,12 @@ class FBConnectHooks {
 				FBConnect::$api->addPersonById( $id );
 		}
 		
+		/**
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = '<style type="text/css">
 			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
 			
-			/* Add a pretty Facebook logo to links of Connected users */
+			// Add a pretty Facebook logo to links of Connected users
 			.mw-fbconnectuser {
 				background: url(' . $fbLogo . ') top right no-repeat;
 				padding-right: 17px;
@@ -222,7 +235,7 @@ class FBConnectHooks {
 				padding-left: 17px;
 			}' : '') . (FBConnect::$special_connect ? '
 			
-			/* Modify the style of #userloginForm for Special:Connect */
+			// Modify the style of #userloginForm for Special:Connect
 			#userloginForm {
 				float: right;
 			}
@@ -232,18 +245,15 @@ class FBConnectHooks {
 			}' : '') . '
 		</style>';
 		
+		/**/
 		// Styles and Scripts have been built, so add them to the page
 		if (self::MGVS_hack( $mgvs_script ))
 			// Inserts list of global JavaScript variables
 			$out->addInlineScript( $mgvs_script );
-		// Enables DHTML tooltips
-		$out->addScript("<script type=\"$wgJsMimeType\" " .
-		                "src=\"$wgScriptPath/extensions/FBConnect/wz_tooltip/wz_tooltip.js\"></script>\n");
 		// Required Facebook Connect JavaScript code
-		$out->addScript("<script type=\"$wgJsMimeType\" " . 
-		                "src=\"$wgScriptPath/extensions/FBConnect/fbconnect.js\"></script>\n");
+		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.js");
 		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
-		$out->addScript( $style );
+		#$out->addScript( $style );
 		
 		return true;
 	}
@@ -274,14 +284,14 @@ class FBConnectHooks {
 	 * This script is necessary for Facebook Connect because it refers the browser to the
 	 * Facebook JavaScript Feature Loader file. This script should be referenced in the
 	 * BODY not in the HEAD, as low as possible before FB.init() is called.
-	 */
+	 *
 	static function SkinAfterBottomScripts( $skin, &$text ) {
 		$text = "\n\t\t<script type=\"text/javascript\" " .
 			"src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\">" .
 			"</script>$text";
 		return true;
 	}
-
+	
 	/**
 	 * Installs a parser hook for every tag reported by FBConnectXFBML::availableTags().
 	 * Accomplishes this by asking FBConnectXFBML to create a hook function that then

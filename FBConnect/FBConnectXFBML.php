@@ -59,6 +59,7 @@ class FBConnectXFBML {
 					break;
 				// Careful - no "break;" if $fbAllowFacebookImages is true
 			default:
+				// Allow other tags by default
 				$attrs = self::implodeAttrs( $args );
 				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $text ) . "</$tag>";
 		}
@@ -114,6 +115,9 @@ class FBConnectXFBML {
 	 * and the features they offer, our list of tags should not be hardcoded into this file.
 	 * 
 	 * But for now... HELP! Where does Firefox pull in the XFBML tags in from??
+	 * 
+	 * After switching to the new JavaScript SDK, these will be the only tags
+	 * implemented for a while: <http://github.com/facebook/connect-js>.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
@@ -121,7 +125,9 @@ class FBConnectXFBML {
 			return array( );
 		}
 		
-		// These are DEFINITELY valid tags (sarcasm intended -- see method doc comment)
+		// Older tags from the JavaScript API library in 2008
+		/*
+		// These are definitely valid tags
 		$validTags = array('fb:container',
 		                   'fb:eventLink',
 		                   'fb:groupLink',
@@ -147,6 +153,17 @@ class FBConnectXFBML {
 		                   'fb:video');
 		// Oh well, include them anyway
 		$tags = array_merge( $validTags, $wikiTags, $jsTags );
+		/**/
+		
+		// XFBML tags in the alpha version of the Facebook Connect JavaScript SDK
+		$tags = array('fb:comments',
+		              'fb:fan',
+		              'fb:live-stream',
+		              'fb:login-button',
+		              'fb:name',
+		              'fb:profile-pic',
+		              'fb:serverfbml',
+		              'fb:share-button');
 		
 		// Reject discarded tags (that return an empty string) from Special:Version
 		$tempParser = new DummyParser();
@@ -156,7 +173,7 @@ class FBConnectXFBML {
 			}
 		}
 		// Allow other functions to modify the available XFBML tags
-		wfRunHooks( 'FbmlAvailableTags', array( &$tags ));
+		wfRunHooks( 'XFBMLAvailableTags', array( &$tags ));
 		return $tags;
 	}
 }
@@ -166,7 +183,7 @@ class FBConnectXFBML {
  * Class DummyParser
  * 
  * Allows FBConnectXML::availableTags() to pre-sanatize the list of tags reported to
- * MediaWiki, excluding any tags that result in the tag breing replaced by an empty
+ * MediaWiki, excluding any tags that result in the tag being replaced by an empty
  * string. Sorry for the confusing summary here, its really late. =)
  */
 class DummyParser {

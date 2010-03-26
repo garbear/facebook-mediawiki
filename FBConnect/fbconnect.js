@@ -1,6 +1,64 @@
+/**
+ * FBConnect relies on several different libraries and frameworks for its JavaScript
+ * code. Each framework has its own method to verify that the propper code won't be
+ * called before it's ready. (Below, lambda represents a named or anonymous function.)
+ * 
+ * MediaWiki:             addOnloadHook(lambda);
+ *     This function manages an array of window.onLoad event handlers to be called
+ *     be called by a MediaWiki script when the window is fully loaded. Because the
+ *     DOM may be ready before the window (due to large images to be downloaded) a
+ *     faster alternative is JQuery's document-ready function.
+ * 
+ * FaceBook Connect SDK:  window.fbAsyncInit = lambda;
+ *     This global variable is called when the Facebook Connect SDK is fully
+ *     initialized asynchronously to the document's state. This might be long
+ *     after the document is finished rendering the first time the script is
+ *     downloaded. Subsequently, it may even be called before the DOM is ready.
+ * 
+ * JQuery:                $(document).ready(lambda);
+ *     Self-explanatory -- to be called when the DOM is ready to be manipulated.
+ *     Typically this should occur sooner than MediaWiki's addOnloadHook function
+ *     is called.
+ */
+
+/**
+ * After the Facebook Connect JavaScript SDK has been asynchronously loaded,
+ * it looks for the global fbAsyncInit and executes the function when found.
+ */
+window.fbAsyncInit = function() {
+	// Initialize the library with the API key
+	FB.init({
+		apiKey : window.fbApiKey,
+		status : true, // Check login status
+		cookie : true, // Enable cookies to allow the server to access the session
+		xfbml  : window.fbUseMarkup // Whether XFBML should be parsed
+	});
+	
+	// Check for changes in login status
+	FB.Event.subscribe('auth.login', function(response) {
+		// Refresh the page to transfer the session to the server
+		window.location.reload(true);
+	});
+	
+	// Check login status
+	/*
+	FB.getLoginStatus(function(response) {
+		if (response.session) {
+			// The user is logged in and connected
+			
+		} else {
+			// No user session available, monitor for when we get one
+			
+		}
+	});
+	/**/
+};
+
+
+
 /*
  * Transverses the DOM tree, adding useful tooltips to all Facebook Connected users.
- */
+ *
 function facebook_add_user_tooltips() {
 	var a = getElementsByClassName(document, "a", "mw-userlink");
 	//.concat(getElementsByClassName(document, "a", "new mw-userlink"));
@@ -28,18 +86,13 @@ function extract_id(string) {
 	var userlink = /User:[^0-9]*(\d{6,19})/.exec(string)
 	if (userlink)
 		return userlink[1];
-	/**
-	var new_userlink = /User:[^0-9]*(\d{6,19})[^0-9]/.exec(string) 
-	if (new_userlink)
-		return new_userlink[1];
-	/**/
 	return 0;
 }
 
 /*
  * Returns the HTML for the Connected user tooltips. Pretty simple HTML, just three divs
  * and an image (is <fb:profile-pic> possible here?). The layout is stored in fbconnect.css.
- */
+ *
 function facebook_make_info_box(name, line1, line2, imgsrc) {
 	return "<div class=\'tooltip-name\'>" + name + "</div><div class=\'tooltip-line1\'>" + line1 +
 	       "</div><div class=\'tooltip-line2\'>" + line2 + "</div><img src=\'" + imgsrc + "\'>";
@@ -48,7 +101,7 @@ function facebook_make_info_box(name, line1, line2, imgsrc) {
 /*
  * Initializes the Facebook Connect JavaScript libraries.
  * Make sure that the variable api_key is set!
- */
+ *
 function facebook_init() {
     FB_RequireFeatures(["XFBML"], function() {
         FB.init(fbApiKey, "/w/extensions/FBConnect/xd_receiver.php");
@@ -57,7 +110,7 @@ function facebook_init() {
 
 /*
  * Logs the user into Facebook. Upon login, the page is probably refreshed.
- */
+ *
 function facebook_login(){
     FB_RequireFeatures(["Connect"], function() {
         FB.Connect.requireSession(function() {
@@ -69,7 +122,7 @@ function facebook_login(){
 /*
  * Logs the user out of Facebook. When this is accomplished, the user is redirected to
  * the Wiki's logout page to keep things syncronized.
- */
+ *
 var ctime;
 function facebook_logout() {
     ctime = setTimeout("alert('Timeout waiting for FB.Connect.logoutAndRedirect(). The error returned was: " +
@@ -88,7 +141,7 @@ function facebook_logout() {
  * Because the PersonalUrls hook only accepts plain text...
  * 
  * @TODO: This can all be done with cascading style sheets! Modify this to only add "onclick" 
- */
+ *
 function facebook_onload_addFBConnectButtons() {
     if (document.getElementById("pt-fbconnect")) {
         // Either use a FBXML button, or render an html button
@@ -110,7 +163,7 @@ function facebook_onload_addFBConnectButtons() {
 /*
  * Not used. This was provided as an example by the Facebook Dev Wiki. This function alerts the user
  * that the session is ready, and then displays a message box containing the user's friends' IDs.
- */
+ *
 function facebook_alertfunction() {
     FB_RequireFeatures(["XFBML"], function()
     {
@@ -131,7 +184,7 @@ function facebook_alertfunction() {
 
 
 /*
- * The facebook_onload statement is printed out in the PHP. If the user's logged in
+ * The facebook_onload statement is printed out in the PHP. If the user's logged-in
  * status has changed since the last page load, then refresh the page to pick up
  * the change.
  *
@@ -142,7 +195,7 @@ function facebook_alertfunction() {
  * @param already_logged_into_facebook  reports whether the server thinks the user
  *                                      is logged in, based on their cookies
  *
- */
+ *
 function facebook_onload() {
   // user state is either: has a session, or does not.
   // if the state has changed, detect that and reload.
@@ -165,7 +218,7 @@ function facebook_onload() {
  * Our <fb:login-button> specifies this function in its onlogin attribute,
  * which is triggered after the user authenticates the app in the Connect
  * dialog and the Facebook session has been set in the cookies.
- */
+ *
 function facebook_onlogin_ready() {
   // In this app, we redirect the user back to index.php. The server will read
   // the cookie and see that the user is logged in, and will deliver a new page
@@ -183,7 +236,7 @@ function facebook_onlogin_ready() {
  * then you could change it in Javascript without refresh.
  *
  * This function was modified from The Run Around's original function to not load index.php.
- */
+ *
 function refresh_page() {
   window.location.reload(true);
 }
@@ -242,8 +295,9 @@ function facebook_show_feed_checkbox() {
 }
 /**/
 
-
+/*
 addOnloadHook(facebook_onload_addFBConnectButtons);
 addOnloadHook(facebook_add_user_tooltips);
 addOnloadHook(facebook_init);
 addOnloadHook(facebook_onload);
+/**/

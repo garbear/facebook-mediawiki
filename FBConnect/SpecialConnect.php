@@ -579,9 +579,7 @@ class SpecialConnect extends SpecialPage {
 					global $wgServer, $wgScript;
 					$dbkey = wfUrlencode($this->getTitle()->getPrefixedDBkey());
 					$button = '<fb:login-button size="large" background="white" length="long" ' .
-					          'autologoutlink="true" onlogin="window.location = \'' .
-					          "{$wgServer}{$wgScript}?title={$dbkey}" . '\';">';
-					$button = '[[Special:Connect]]';
+					          'autologoutlink="true">';
 					if( $msg !== '' ) {
 						$wgOut->addWikiText( wfMsg( $msg, $button ));
 					} else {

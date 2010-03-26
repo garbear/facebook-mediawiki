@@ -165,6 +165,18 @@ class Facebook {
                       $cookies['session_key'],
                       $expires);
     }
+    // check for new Open Source JS Lib format
+    else if (isset($_COOKIE['fbs_'.$this->api_key]) && $_COOKIE['fbs_'.$this->api_key]) {
+	$fb_params_str = ltrim($_COOKIE['fbs_'.$this->api_key], '\\"');
+	$fb_params_str = rtrim($fb_params_str, '\\"');
+	parse_str($fb_params_str,$fb_params);
+	$this->fb_params = $this->get_valid_fb_params($fb_params, null, $this->api_key);
+	$this->base_domain = $fb_params['base_domain'];
+	$expires = isset($fb_params['expires']) ? $fb_params['expires'] : null;
+	$this->set_user($fb_params['uid'],
+			$fb_params['session_key'],
+			$expires);
+    }
     // finally, if we received no parameters, but the 'auth_token' GET var
     // is present, then we are in the middle of auth handshake,
     // so go ahead and create the session
@@ -268,6 +280,10 @@ class Facebook {
        }
        setcookie($this->api_key, false, time() - 3600, '', $this->base_domain);
        unset($_COOKIE[$this->api_key]);
+     }
+     if (isset($_COOKIE['fbs_'.$this->api_key])) {
+       setcookie('fbs_'.$this->api_key, false, time() - 3600, '', $this->base_domain);
+       unset($_COOKIE['fbs_'.$this->api_key]);
      }
 
      // now, clear the rest of the stored state
@@ -394,8 +410,12 @@ class Facebook {
   }
 
   public function set_user($user, $session_key, $expires=null, $session_secret=null) {
+    $fb_params_str = ltrim($_COOKIE['fbs_'.$this->api_key], '\\"');
+    $fb_params_str = rtrim($fb_params_str, '\\"');
+    parse_str($fb_params_str,$fb_params);
+
     if (!$this->in_fb_canvas() && (!isset($_COOKIE[$this->api_key . '_user'])
-                                   || $_COOKIE[$this->api_key . '_user'] != $user)) {
+                                   || $_COOKIE[$this->api_key . '_user'] != $user || !isset($fb_params['uid']) || $fb_params['uid'])) {
       $this->set_cookies($user, $session_key, $expires, $session_secret);
     }
     $this->user = $user;
@@ -404,8 +424,10 @@ class Facebook {
   }
 
   public function set_cookies($user, $session_key, $expires=null, $session_secret=null) {
+
     $cookies = array();
     $cookies['user'] = $user;
+    $cookies['uid'] = $user;
     $cookies['session_key'] = $session_key;
     if ($expires != null) {
       $cookies['expires'] = $expires;
@@ -414,19 +436,24 @@ class Facebook {
       $cookies['ss'] = $session_secret;
     }
 
+    $fbs_str = '';
     foreach ($cookies as $name => $val) {
-      setcookie($this->api_key . '_' . $name, $val, (int)$expires, '', $this->base_domain);
-      $_COOKIE[$this->api_key . '_' . $name] = $val;
+      //setcookie($this->api_key . '_' . $name, $val, (int)$expires, '', $this->base_domain);
+      //$_COOKIE[$this->api_key . '_' . $name] = $val;
+      $fbs_str .= $name . '=' . $val . '&';
     }
     $sig = self::generate_sig($cookies, $this->secret);
-    setcookie($this->api_key, $sig, (int)$expires, '', $this->base_domain);
-    $_COOKIE[$this->api_key] = $sig;
+    //setcookie($this->api_key, $sig, (int)$expires, '', $this->base_domain);
+    //$_COOKIE[$this->api_key] = $sig;
 
     if ($this->base_domain != null) {
-      $base_domain_cookie = 'base_domain_' . $this->api_key;
-      setcookie($base_domain_cookie, $this->base_domain, (int)$expires, '', $this->base_domain);
-      $_COOKIE[$base_domain_cookie] = $this->base_domain;
+    //  $base_domain_cookie = 'base_domain_' . $this->api_key;
+    //  setcookie($base_domain_cookie, $this->base_domain, (int)$expires, '', $this->base_domain);
+    //  $_COOKIE[$base_domain_cookie] = $this->base_domain;
+      $fbs_str .= 'base_domain='.$this->base_domain;
     }
+
+    $_COOKIE['fbs_'.$this->api_key] = $fbs_str;
   }
 
   /**
@@ -481,6 +508,10 @@ class Facebook {
       if (strpos($name, $prefix) === 0) {
         $fb_params[substr($name, $prefix_len)] = self::no_magic_quotes($val);
       }
+    }
+
+    if (isset($fb_params['uid']) && $fb_params['uid']) {
+      $fb_params['user'] = $fb_params['uid'];
     }
 
     // validate that the request hasn't expired. this is most likely

@@ -7,7 +7,7 @@
 
 ### FBCONNECT CONFIGURATION VARIABLES ###
 
-/*
+/**
  * To use Facebook Connect you will first need to get a Facebook API Key:
  *    1.  Visit the Facebook application creation page:
  *        http://www.facebook.com/developers/createapp.php
@@ -22,7 +22,7 @@
 $fbApiKey         = 'YOUR_API_KEY';
 $fbApiSecret      = 'YOUR_SECRET';
 
-/*
+/**
  * Enter your callback URL here. That's the location where index.php resides.
  * Make sure it's your exact root - facebook.com and www.facebook.com are different.
  * 
@@ -31,40 +31,40 @@ $fbApiSecret      = 'YOUR_SECRET';
  * An example callback URL is http://www.yourwiki.com/callback/w/.
  * 
  * Note that each callback URL needs its own app id.
- */
+ *
 $fbCallbackURL    = $wgServer . $wgScriptPath . '/';
 
-/*
+/**
  * The Facebook icon. You can copy this to your server if you want, or set to false to disable.
  */
 $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
-/*
+/**
  * The prefix to be used for the auto-generated username suggestion when the user connects
  * for the first time. A number will be appended onto this prefix to prevent duplicate usernames.
  */
 $fbUserName = 'FacebookUser';
 
-/*
+/**
  * Disable new account creation (users can only log in if they are using Facebook Connect).
  */
 $fbConnectOnly = false;
 
-/*
+/**
  * Allow the use of XFBML in wiki text.
  * For more info, see http://wiki.developers.facebook.com/index.php/XFBML.
  */
 $fbUseMarkup = true;
 
-/*
+/**
  * If XFBML is enabled, then <fb:photo> maybe be used as a replacement for $wgAllowExternalImages
  * with the added benefit that all photos are screened against Facebook's Code of Conduct
  * <http://www.facebook.com/codeofconduct.php> and subject to dynamic privacy. To disable just
  * <fb:photo> tags, set this to false.
- */
+ *
 $fbAllowFacebookImages = true;
 
-/*
+/**
  * For easier wiki rights management, create a group on Facebook and place the group ID here.
  * Three new implicit groups will be created:
  *   fb-groupie, a member of the specified group
@@ -80,6 +80,14 @@ $fbUserRightsFromGroup = false;  # Or a group ID
 $fbRestrictToGroup = true;
 $fbRestrictToNotReplied = false;
 
+/**
+ * URL of the Facebook Connect JavaScript SDK. Because this library is currently
+ * an alpha release, changes to the APIs may be made on a regular basis. If you
+ * use FBConnect on your production website, you may wish to insulate yourself
+ * from these changes to the alpha library by downloading and hosting your own
+ * copy of the library.
+ */
+$fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 
 ### GLOBAL CONFIGURATION VARIABLES ###
 

@@ -106,13 +106,9 @@ class FBConnectDB {
 	 */
 	public static function countUsers() {
 		$dbr = wfGetDB( DB_SLAVE );
-		// TODO: Fixme
-		$count = $dbr->selectField(
-			'user_fbconnect',
-			'user_id',
-			array( 'user_fbid' => $fbid ),
-			__METHOD__
-		);
-		return $count;
+		// An estimate is good enough for choosing a unique nickname
+		$count = $dbr->estimateRowCount( 'user_fbconnect' );
+		// Avoid returning 0 or -1
+		return $count >= 1 ? $count : 1;
 	}
 }
