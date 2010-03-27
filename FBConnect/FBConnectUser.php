@@ -35,7 +35,7 @@ class FBConnectUser extends User {
 	 */
 	function __construct($user) {
 		$this->mId = $user->getId();
-		$this->from = 'id';
+		$this->mFrom = 'id';
 	}
 	
 	/**
@@ -63,8 +63,7 @@ class FBConnectUser extends User {
 		foreach ($updateOptions as $option) {
 			// Translate Facebook parameters into MediaWiki parameters
 			$value = self::getOptionFromInfo($option, $userinfo); 
-			if ($value && $value != $user->getOption($option) &&
-					$this->getOption("fbconnect-update-on-login-$option")) {
+			if ($value && $value != $this->getOption("fbconnect-update-on-login-$option")) {
 				switch ($option) {
 					case 'fullname':
 						$this->setRealName($value);

@@ -105,8 +105,7 @@ class SpecialConnect extends SpecialPage {
 					$this->createUser($fb_user, $username);
 					break;
 				default:
-					// TODO: Replace this with an error message saying "invalid choice"
-					$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
+					$this->sendError('fbconnect-invalid', 'fbconnect-invalidtext');
 			}
 			break;
 		default:
@@ -170,29 +169,41 @@ class SpecialConnect extends SpecialPage {
 		}
 		/**/
 		
-		// Unfortunately, performs two database lookups
-		$user = new FBConnectUser(User::newFromName($name));
+		$user = User::newFromName($name);
+		if (!$user) {
+			wfDebug("FBConnecr: Error adding new user.\n");
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+			return;
+		}
+		$user->addToDatabase();
 		if (!$user->getId()) {
 			wfDebug( "FBConnect: Error adding new user.\n" );
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		}
-		$user->addToDatabase();
 		// Which MediaWiki versions can we call this function in?
 		$user->addNewUserLogEntryAutoCreate();
 		#$user->addNewUserLogEntry();
+		
 		// Give $wgAuth a chance to deal with the user object
 		$wgAuth->initUser($user, true);
 		$wgAuth->updateUser($user);
+		
 		// Update site statistics
 		$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
 		$ssUpdate->doUpdate();
+		
 		// Attach the user to their Facebook account in the database
 		FBConnectDB::addFacebookID($user, $fb_id);
+		
+		// Unfortunately, performs a second database lookup
+		$fbUser = new FBConnectUser($user);
+		
 		// Update the user with settings from Facebook
-		$user->updateFromFacebook();
+		$fbUser->updateFromFacebook();
+		
 		// Store the new user as the global user object
-		$wgUser = $user;
+		$wgUser = $fbUser;
 		$this->sendPage('displaySuccessLogin');
 	}
 	
