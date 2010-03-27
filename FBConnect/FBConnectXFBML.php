@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2008 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+/*
+ * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
  */
 
 
-/**
+/*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
@@ -29,6 +29,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * 
  * This class allows FBML (Facebook Markup Language, an extension to HTML) to
  * be incorporated into the wiki through XFBML.
+ * 
+ * See: <http://wiki.developers.facebook.com/index.php/XFBML>
  */
 class FBConnectXFBML {
 	/**

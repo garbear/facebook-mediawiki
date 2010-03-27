@@ -49,7 +49,7 @@ window.fbAsyncInit = function() {
 		apiKey : window.fbApiKey,
 		status : true, // Check login status
 		cookie : true, // Enable cookies to allow the server to access the session
-		xfbml  : window.fbUseMarkup // Whether XFBML should be parsed
+		xfbml  : window.fbUseMarkup // Whether XFBML should be automatically parsed
 	});
 	
 	// Check for changes in login status

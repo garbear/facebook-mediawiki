@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright © 2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 
-/**
+/*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
@@ -36,7 +36,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FBConnectDB {
 	/**
-	 * Find the Facebook ID of the given user, if any.
+	 * Find the Facebook IDs of the given user, if any.
 	 */
 	public static function getFacebookIDs( $user ) {
 		$fbid = array();

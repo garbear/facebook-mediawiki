@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 
-/**
+/*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
@@ -25,7 +25,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Body class for the special page Special:Connect.
+ * Class SpecialConnect
+ * 
+ * This class represents the body class for the special page Special:Connect.
+ * 
+ * Currently, this page has one valid subpage at Special:Connect/ChooseName.
+ * Visiting the subpage will generate an error; it is only useful when POSTed to.
  */
 class SpecialConnect extends SpecialPage {
 	/**
@@ -166,14 +171,16 @@ class SpecialConnect extends SpecialPage {
 		}
 		$user->addToDatabase();
 		$user->addNewUserLogEntry();
-
+		// Which MediaWiki versions can we call this function in?
+		#$user->addNewUserLogEntryAutoCreate();
+		
 		if (!$user->getId()) {
 			wfDebug( "FBConnect: Error adding new user.\n" );
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		}
 		// Give $wgAuth a chance to deal with the user object
-		$wgAuth->initUser($user);
+		$wgAuth->initUser($user, true);
 		$wgAuth->updateUser($user);
 		// Update site statistics
 		$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);

@@ -1,6 +1,18 @@
 <?php
-/**
- * FBConnect.i18n.php - FBConnect for MediaWiki
+/*
+ * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -11,12 +23,20 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+
+/**
+ * FBConnect.i18n.php
+ * 
+ * Internationalization file for FBConnect.
+ */
+
+
 $messages = array();
 
+// Shorthand to make my life more sane
 if (!defined( 'fb' )) {
 	define( 'fb', 'fbconnect-' );
 }
-
 
 /** English */
 $messages['en'] = array(
@@ -112,14 +132,10 @@ fb.'convertothertext' => 'That is someone else\'s OpenID.',
 */
 );
 
-/** Message documentation (Message documentation)
- * @author EugeneZelenko
- * @author Fryed-peach
- * @author IAlex
- * @author Jon Harald SÃ¸by
- * @author Purodha
- * @author Raymond
- * @author Siebrand
+/**
+ * Message documentation (Message documentation)
+ * What is this used for?
+ * @author Garrett Brown
  *
 $messages['qqq'] = array(
 	'fbconnect-desc' => 'Short description of the FBConnect extension, shown in [[Special:Version]]. Do not translate or change links.',

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * To install:
  *    1.  Copy this file to config.php (remove the .sample part).
  *    2.  Follow the instructions below to make the extension work.

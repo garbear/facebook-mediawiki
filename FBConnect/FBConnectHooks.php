@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 
-/**
+/*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
@@ -28,10 +28,10 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Class FBConnectHooks
  * 
  * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
- * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a function with the same
- * name as the hook that provokes it, place it inside this class and let
+ * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a static function with the
+ * same name as the hook that provokes it, place it inside this class and let
  * FBConnect::init() do its magic. Helper functions should be private, because
- * only public static methods with an initial capital letter are added as hooks.
+ * only public static methods are added as hooks.
  */
 class FBConnectHooks {
 	/**

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2008 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+/*
+ * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -13,13 +13,9 @@
  * 
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
- * 
- * @author Garrett Bruin
- * @copyright Copyright © 2008 Garrett Brown
- * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
- * @addtogroup Extensions
- * 
- * 
+ */
+
+/**
  * FBConnect plugin. Integrates Facebook Connect into MediaWiki.
  * 
  * Facebook Connect single sign on (SSO) experience and XFBML are currently available.
@@ -31,23 +27,27 @@
  * 
  * Limited support is available at  http://www.mediawiki.org/wiki/Extension_talk:FBConnect
  * and at http://wiki.developers.facebook.com/index.php/Talk:MediaWiki
- *  
+ * 
+ * @author Garrett Bruin
+ * @copyright Copyright © 2008 Garrett Brown
+ * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
+ * @addtogroup Extensions
  */
 
 
-/**
+/*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
 if ( !defined( 'MEDIAWIKI' )) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
-/**
+/*
  * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r97, March 18, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r108, March 26, 2010' );
 
-/**
+/*
  * Add information about this extension to Special:Version.
  */
 $wgExtensionCredits['specialpage'][] = array(
@@ -58,7 +58,7 @@ $wgExtensionCredits['specialpage'][] = array(
 	'version'        => MEDIAWIKI_FBCONNECT_VERSION,
 );
 
-/**
+/*
  * Initialization of the autoloaders and special extension pages.
  */
 $dir = dirname(__FILE__) . '/'; 
@@ -74,9 +74,7 @@ $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
 
-
 $wgSpecialPages['Connect'] = 'SpecialConnect';
-#$wgSpecialPages['NewsFeed'] = 'SpecialNewsFeed';
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
