@@ -5,6 +5,7 @@
  *    2.  Follow the instructions below to make the extension work.
  */
 
+
 ### FBCONNECT CONFIGURATION VARIABLES ###
 
 /**
@@ -23,32 +24,17 @@ $fbApiKey         = 'YOUR_API_KEY';
 $fbApiSecret      = 'YOUR_SECRET';
 
 /**
- * Enter your callback URL here. That's the location where index.php resides.
- * Make sure it's your exact root - facebook.com and www.facebook.com are different.
- * 
- * Set the callback URL in your developer app to match the one you specify here.
- * This is important so that the Javascript cross-domain library works correctly.
- * An example callback URL is http://www.yourwiki.com/callback/w/.
- * 
- * Note that each callback URL needs its own app id.
- *
-$fbCallbackURL    = $wgServer . $wgScriptPath . '/';
-
-/**
- * The Facebook icon. You can copy this to your server if you want, or set to false to disable.
- */
-$fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
-
-/**
- * The prefix to be used for the auto-generated username suggestion when the user connects
- * for the first time. A number will be appended onto this prefix to prevent duplicate usernames.
- */
-$fbUserName = 'FacebookUser';
-
-/**
- * Disable new account creation (users can only log in if they are using Facebook Connect).
+ * Disables the creation of new accounts and prevents old accounts from being
+ * used to log in if they aren't associated with a Facebook Connect account.
  */
 $fbConnectOnly = false;
+
+/**
+ * The prefix to be used for the auto-generated username suggestion when the
+ * user connects for the first time. A number will be appended onto this prefix
+ * to prevent duplicate usernames.
+ */
+$fbUserName = 'FacebookUser';
 
 /**
  * Allow the use of XFBML in wiki text.
@@ -57,28 +43,34 @@ $fbConnectOnly = false;
 $fbUseMarkup = true;
 
 /**
- * If XFBML is enabled, then <fb:photo> maybe be used as a replacement for $wgAllowExternalImages
- * with the added benefit that all photos are screened against Facebook's Code of Conduct
- * <http://www.facebook.com/codeofconduct.php> and subject to dynamic privacy. To disable just
- * <fb:photo> tags, set this to false.
- *
-$fbAllowFacebookImages = true;
+ * If XFBML is enabled, then <fb:photo> maybe be used as a replacement for
+ * $wgAllowExternalImages with the added benefit that all photos are screened
+ * against Facebook's Code of Conduct <http://www.facebook.com/codeofconduct.php>
+ * and subject to dynamic privacy. To disable just <fb:photo> tags, set this to false.
+ * 
+ * Disabled until the alpha JS SDK supports <fb:photo> tags.
+ */
+#$fbAllowFacebookImages = true;
 
 /**
- * For easier wiki rights management, create a group on Facebook and place the group ID here.
- * Three new implicit groups will be created:
- *   fb-groupie, a member of the specified group
- *   fb-officer, a group member with an officer title
- *   fb-admin,   an administrator of the Facebook group
- * By default, they map to User, Bureaucrat and Sysop privileges, respectively. Users will
- * automatically be promoted or demoted when their membership, title or admin status is modified
- * from the group page within Facebook.
+ * For easier wiki rights management, create a group on Facebook and place the
+ * group ID here. Three new implicit groups will be created:
+ * 
+ *     fb-groupie    A member of the specified group
+ *     fb-officer    A group member with an officer title
+ *     fb-admin      An administrator of the Facebook group
+ * 
+ * By default, they map to User, Bureaucrat and Sysop privileges, respectively.
+ * Users will automatically be promoted or demoted when their membership, title
+ * or admin status is modified from the group page within Facebook.
  */
 $fbUserRightsFromGroup = false;  # Or a group ID
 
-// Not used (yet...)
-$fbRestrictToGroup = true;
-$fbRestrictToNotReplied = false;
+/**
+ * The Facebook icon. You can copy this image to your server if you want, or
+ * set to false to disable.
+ */
+$fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
  * URL of the Facebook Connect JavaScript SDK. Because this library is currently
@@ -88,6 +80,11 @@ $fbRestrictToNotReplied = false;
  * copy of the library.
  */
 $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
+
+// Not used (yet...)
+$fbRestrictToGroup = true;
+$fbRestrictToNotReplied = false;
+
 
 ### GLOBAL CONFIGURATION VARIABLES ###
 
