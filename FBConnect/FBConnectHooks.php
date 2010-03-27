@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2008 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -60,7 +60,7 @@ class FBConnectHooks {
 	
 	/**
 	 * Checks the autopromote condition for a user.
-	 *
+	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		$types = array(APCOND_FB_INGROUP   => 'member',
 		               APCOND_FB_ISOFFICER => 'officer',
@@ -70,7 +70,9 @@ class FBConnectHooks {
 			case 'member':
 			case 'officer':
 			case 'admin':
-				$rights = FBConnect::$api->getGroupRights( $user );
+				// Connect to the Facebook API and ask if the user is in the group
+				$fb = new FBConnectAPI();
+				$rights = $fb->getGroupRights($user);
 				$result = $rights[$type];
 		}
 		return true;
@@ -168,7 +170,7 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Hack: run MakeGlobalVariablesScript for backwards compatability.
+	 * Hack: Run MakeGlobalVariablesScript for backwards compatability.
 	 * The MakeGlobalVariablesScript hook was added to MediaWiki 1.14 in revision 38397:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
 	 */
@@ -207,19 +209,7 @@ class FBConnectHooks {
 			</script>' . "\n"
 		);
 		
-		$fb = new FBConnectAPI();
-		
 		/*
-		// Parse page output for Facebook IDs
-		$html = $out->getHTML();
-		preg_match_all('/User:([^"\'&#]+)/', $html, $usernames);
-		foreach( $usernames[1] as $name ) {
-			$id = FBConnect::$api->idFromName( $name );
-			if( $id )
-				FBConnect::$api->addPersonById( $id );
-		}
-		
-		/**
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		$style = '<style type="text/css">
 			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
@@ -251,7 +241,7 @@ class FBConnectHooks {
 			// Inserts list of global JavaScript variables
 			$out->addInlineScript( $mgvs_script );
 		// Required Facebook Connect JavaScript code
-		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.js");
+		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
 		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
 		#$out->addScript( $style );
 		
@@ -259,12 +249,17 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Adds Facebook tooltip info to the rows of Connected users in Special:ListUsers.
+	 * Adds the class "mw-userlink" to links belonging to Connect accounts on
+	 * the page Special:ListUsers.
 	 */
 	static function SpecialListusersFormatRow( &$item, $row ) {
-		// Only add DHTML tooltips to Facebook Connect users
-		if (!FBConnect::$api->isIdValid( $row->user_name ))  # || $row->edits == 0) {
+		global $fbSpecialUsers;
+		
+		// Only modify Facebook Connect users
+		if (!$fbSpecialUsers ||
+				!count(FBConnectDB::getFacebookIDs(User::newFromName($row->user_name)))) {
 			return true;
+		}
 		
 		// Look to see if class="..." appears in the link
 		$regs = array();
@@ -277,18 +272,6 @@ class FBConnectHooks {
 			preg_match( '/^([^>]*)(.*)/', $item, $regs );
 			$item = $regs[1] . ' class="mw-userlink"' . $regs[2];
 		}
-		return true;
-	}
-	
-	/**
-	 * This script is necessary for Facebook Connect because it refers the browser to the
-	 * Facebook JavaScript Feature Loader file. This script should be referenced in the
-	 * BODY not in the HEAD, as low as possible before FB.init() is called.
-	 *
-	static function SkinAfterBottomScripts( $skin, &$text ) {
-		$text = "\n\t\t<script type=\"text/javascript\" " .
-			"src=\"http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php\">" .
-			"</script>$text";
 		return true;
 	}
 	
@@ -306,7 +289,8 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Modify the user's persinal toolbar (in the upper right)
+	 * Modify the user's persinal toolbar (in the upper right).
+	 * TODO!
 	 */
 	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $wgUser, $wgLang, $fbAllowOldAccounts, $fbRemoveUserTalkLink;
@@ -373,6 +357,7 @@ class FBConnectHooks {
 	/**
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
+	 * TODO!
 	 */
 	public static function RenderPreferencesForm( $form, $output ) {
 		global $wgUser;
@@ -399,8 +384,12 @@ class FBConnectHooks {
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
 		global $fbUserRightsFromGroup, $fbLogo;
-		if ( $gid = $fbUserRightsFromGroup ) {
-			$group = FBConnect::$api->groupInfo();
+		if ($fbUserRightsFromGroup) {
+			// Shorten $fbUserRightsFromGroup
+			$gid = $fbUserRightsFromGroup;
+			// Connect to the API and get some info about the group
+			$fb = new FBConnectAPI();
+			$group = $fb->groupInfo();
 			$groupName = $group['name'];
 			$cid = $group['creator'];
 			$pic = $group['picture'];
@@ -456,22 +445,22 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * If the user isn't logged in, try to auto-authenticate via Facebook Connect.
-	 *
+	 * If the user isn't logged in, try to auto-authenticate via Facebook
+	 * Connect. The Single Sign On magic of FBConnect happens in this function.
+	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $wgAuth, $wgUser;
+		global $fbConnectOnly, $wgAuth, $wgUser;
 		$fb = new FBConnectAPI();
 		// Check to see if we have a connection with Facebook
-		if ( !$fb->user() ) {
-			// No connection with facebook, return $fbAllowOldAccounts
-			global $fbAllowOldAccounts;
-			return $fbAllowOldAccounts;
+		if (!$fb->user()) {
+			// No connection with facebook, return $fbConnectOnly
+			return $fbConnectOnly;
 		}
-		$localId = User::idFromName( $fb->userName() );
-		
+		// Look up the MW ID of the Facebook user
+		$localId = FBConnectDB::getUser($fb->user())->getId();
 		// If the user exists, then log them in
-		if ( $localId ) {
-			$user->setID( $localId );
+		if ($localId) {
+			$user->setID ($localId);
 			$user->loadFromId();
 			// Updates the user's info from Facebook if no real name is set
 			$wgAuth->updateUser( $user );
