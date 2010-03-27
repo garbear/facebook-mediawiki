@@ -27,7 +27,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  * Class SpecialConnect
  * 
- * This class represents the body class for the special page Special:Connect.
+ * This class represents the body class for the page Special:Connect.
  * 
  * Currently, this page has one valid subpage at Special:Connect/ChooseName.
  * Visiting the subpage will generate an error; it is only useful when POSTed to.
@@ -86,7 +86,7 @@ class SpecialConnect extends SpecialPage {
 				case 'first':
 				case 'full':
 					// Get the username from Facebook (Note: not from the form)
-					$username = $this->getOptionFromInfo($choice . 'name', $fb->getUserInfo());
+					$username = FBConnectUser::getOptionFromInfo($choice . 'name', $fb->getUserInfo());
 				case 'manual':
 					if (!isset($username) || !$username || !$this->userNameOK($username)) {
 						// Use manual name if no username is set, even if manual wasn't chosen
@@ -130,21 +130,21 @@ class SpecialConnect extends SpecialPage {
 	 * an account on the wiki, then they are presented with a form prompting
 	 * them to choose a wiki username.
 	 */
-	protected function login($fb_user) {
+	protected function login($fb_id) {
 		// Check to see if the Connected user exists in the database
-		if ($fb_user) {
-			$user = FBConnectDB::getUser($fb_user);
+		if ($fb_id) {
+			$user = FBConnectDB::getUser($fb_id);
 		}
 		if ( isset($user) && $user instanceof User ) {
-			// Update user from facebook
-			$this->updateUser( $user );
-			$wgUser = $user;
-			$this->setupSession();
-			$wgUser->SetCookies();
-			// Set a cookie for later check-immediate use
-			#$this->loginSetCookie( $fb_user );
+			$fbUser = new FBConnectUser($user);
+			// Update user from facebook (see class FBConnectUser)
+			$fbUser->updateFromFacebook();
+			// Setup the session (see class FBConnectUser)
+			$fbUser->setupSession();
+			$fbUser->setCookies();
+			$wgUser = $fbUser;
 			$this->sendPage('displaySuccessLogin');
-		} else if ($fb_user) {
+		} else if ($fb_id) {
 			$this->sendPage('chooseNameForm');
 		} else {
 			// TODO: send an error message saying only Connected users can log in
@@ -161,24 +161,26 @@ class SpecialConnect extends SpecialPage {
 			$this->sendPage('chooseNameForm');
 			break;
 		}
-		*/	
-		
-		$user = User::newFromName($name);
-		if (!$user) {
-			wfDebug("FBConnecr: Error adding new user.\n");
-			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-			return;
+		/**
+		// Test to see if we are denied by $wgAuth or the user can't create an account
+		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
+		                               !$wgAuth->authenticate( $userName )) {
+			$result = false;
+			return true;
 		}
-		$user->addToDatabase();
-		$user->addNewUserLogEntry();
-		// Which MediaWiki versions can we call this function in?
-		#$user->addNewUserLogEntryAutoCreate();
+		/**/
 		
+		// Unfortunately, performs two database lookups
+		$user = new FBConnectUser(User::newFromName($name));
 		if (!$user->getId()) {
 			wfDebug( "FBConnect: Error adding new user.\n" );
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		}
+		$user->addToDatabase();
+		// Which MediaWiki versions can we call this function in?
+		$user->addNewUserLogEntryAutoCreate();
+		#$user->addNewUserLogEntry();
 		// Give $wgAuth a chance to deal with the user object
 		$wgAuth->initUser($user, true);
 		$wgAuth->updateUser($user);
@@ -188,18 +190,17 @@ class SpecialConnect extends SpecialPage {
 		// Attach the user to their Facebook account in the database
 		FBConnectDB::addFacebookID($user, $fb_id);
 		// Update the user with settings from Facebook
-		$this->updateUser($user);
+		$user->updateFromFacebook();
 		// Store the new user as the global user object
 		$wgUser = $user;
 		$this->sendPage('displaySuccessLogin');
-		
 	}
 	
 	/**
 	 * Attaches the Facebook ID to an existing wiki account. If the user does
-	 * not exist, or the supplied password does not match, then null is
-	 * returned. Otherwise, the accounts are matched in the database and the
-	 * new user object is logged in.
+	 * not exist, or the supplied password does not match, then an error page
+	 * is sent. Otherwise, the accounts are matched in the database and the new
+	 * user object is logged in.
 	 */
 	protected function attachUser($fb_user, $name, $password) {
 		global $wgOut, $wgUser;
@@ -210,7 +211,7 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		// Look up the user by their name
-		$user = User::newFromName($name);
+		$user = new FBConnectUser(User::newFromName($name));
 		if (!$user || !$user->checkPassword($password)) {
 			$this->sendPage('chooseNameForm', 'wrongpassword');
 			return;
@@ -218,120 +219,10 @@ class SpecialConnect extends SpecialPage {
 		// Attach the user to their Facebook account in the database
 		FBConnectDB::addFacebookID($user, $fb_user);
 		// Update the user with settings from Facebook
-		$this->updateUser($user);
+		$user->updateFromFacebook();
 		// Store the user in the global user object
 		$wgUser = $user;
 		$this->sendPage('displaySuccessLogin');
-	}
-	
-	/**
-	 * Update a user's settings with the values retrieved from the current
-	 * logged-in Facebook user. Settings are only updated if a different value
-	 * is returned from Facebook and the user's settings allow an update on
-	 * login.
-	 */
-	protected function updateUser($user, $force = false) {
-		// Connect to the Facebook API and retrieve the user's info 
-		$fb = new FBConnectAPI();
-		$userinfo = $fb->getUserInfo();
-		
-		// Update the following options if the user's settings allow it
-		$updateOptions = array('nickname', 'fullname', 'language',
-		                       'timecorrection', 'email');
-		foreach ($updateOptions as $option) {
-			// Translate Facebook parameters into MediaWiki parameters
-			$value = $this->getOptionFromInfo($option, $userinfo); 
-			if ($value && $value != $user->getOption($option) &&
-					$user->getOption("fbconnect-update-on-login-$option")) {
-				switch ($option) {
-					case 'fullname':
-						$user->setRealName($value);
-						break;
-					default:
-						$user->setOption($option, $value);
-				}
-			}
-		}
-		// Save the updated settings
-		$user->saveSettings();
-	}
-	
-	/**
-	 * Helper function for updateUser(). Takes an array of info from Facebook,
-	 * and looks up the corresponding MediaWiki parameter.
-	 */
-	protected function getOptionFromInfo($option, $userinfo) {
-		// Lookup table for the names of the settings
-		$params = array('nickname'       => 'username',
-		                'fullname'       => 'name',
-		                'firstname'      => 'first_name',
-		                'language'       => 'locale',
-		                'timecorrection' => 'timezone',
-		                'email'          => 'contact_email');
-		$value = array_key_exists($params[$option], $userinfo) ? $userinfo[$params[$option]] : '';
-		// Special handling of several settings
-		switch ($option) {
-			case 'fullname':
-			case 'firstname':
-				// If real names aren't allowed, then simply ignore the parameter from Facebook
-				global $wgAllowRealName;
-				if (!$wgAllowRealName) {
-					$value = '';
-				}
-				break;
-			case 'language':
-				/**
-				 * Convert Facebook's locale into a MediaWiki language code.
-				 * For an up-to-date list of Facebook locales, see:
-				 * <http://wiki.developers.facebook.com/index.php/Facebook_Locales>.
-				 * For an up-to-date list of MediaWiki languages, see:
-				 * <http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/languages/Names.php>.
-				 */
-				if ($value == '') {
-					break;
-				}
-				// These regional languages get special treatment
-				$locales = array('en_PI' => 'en', # Pirate English
-				                 'en_GB' => 'en-gb', # British English
-				                 'en_UD' => 'en', # Upside Down English
-				                 'fr_CA' => 'fr', # Canadian French
-				                 'fb_LT' => 'en', # Leet Speak
-				                 'pt_BR' => 'pt-br', # Brazilian Portuguese
-				                 'zh_CN' => 'zh-cn', # Simplified Chinese
-				                 'es_ES' => 'es', # European Spanish
-				                 'zh_HK' => 'zh-hk', # Traditional Chinese (Hong Kong)
-				                 'zh_TW' => 'zh-tw'); # Traditional Chinese (Taiwan)
-				if (array_key_exists($value, $locales)) {
-					$value = $locales[$value];
-				} else {
-					// No special regional treatment exists in MW; chop it off
-					$value = substr($value, 0, 2);
-				}
-				break;
-			case 'timecorrection':
-				// Convert the timezone into a local timezone correction
-				// TODO: $value = TimezoneToOffset($value);
-				$value = '';
-				break;
-			case 'email':
-				// If a contact email isn't available, then use a proxied email
-				if ($value == '') {
-					// TODO: update the user's email from $userinfo['proxied_email']
-					// instead (the address must stay hidden from the user)
-					$value = '';
-				}
-		}
-		// If an appropriate value was found, return it
-		return $value == '' ? null : $value;
-	}
-	
-	/**
-	 * Sets up the session, if it hasn't already been started.
-	 */
-	protected function setupSession() {
-		global $wgSessionStarted;
-		if (!$wgSessionStarted)
-			wfSetupSession();
 	}
 	
 	/**
@@ -440,7 +331,7 @@ class SpecialConnect extends SpecialPage {
 			$checkUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
 			foreach ($checkUpdateOptions as $option) {
 				// Translate the MW parameter into a FB parameter
-				$value = $this->getOptionFromInfo($option, $userinfo);
+				$value = FBConnectUser::getOptionFromInfo($option, $userinfo);
 				// If no corresponding value was received from Facebook, then continue
 				if (!$value) {
 					continue;
@@ -468,7 +359,7 @@ class SpecialConnect extends SpecialPage {
 		// Add the options for nick name, first name and full name if we can get them
 		// TODO: Wikify the usernames (i.e. Full name should have an _ )
 		foreach (array('nick', 'first', 'full') as $option) {
-			$nickname = $this->getOptionFromInfo($option . 'name', $userinfo);
+			$nickname = FBConnectUser::getOptionFromInfo($option . 'name', $userinfo);
 			if ($nickname && $this->userNameOK($nickname)) {
 				$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="' .
 					$option . ($checked ? '' : '" checked="checked') . '" id="wpNameChoice' . $option .

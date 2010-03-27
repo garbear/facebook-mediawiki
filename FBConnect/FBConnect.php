@@ -118,26 +118,14 @@ $wgImplicitGroups[] = 'fb-admin';
  * non-authentification code.
  */
 class FBConnect {
-	// Instance of our Facebook API class
-	public static $api;
-	// Whether we are rendering the Special:Connect page
-	public static $special_connect;
-	
 	/**
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
 		global $wgXhtmlNamespaces, $wgAuth, $wgHooks;
 		
-		self::$special_connect = false;
-		self::$api = new FBConnectAPI();
-		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
-		
-		// Set the global variable $wgAuth to our custom authentification plugin.
-		// The AuthPluginSetup hook is called right before init(), so we can't use this hook
-		#$wgAuth = new StubObject( 'wgAuth', 'FBConnectAuthPlugin' );
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');

@@ -289,7 +289,7 @@ class FBConnectHooks {
 		}
 		
 		// If the user is logged in and connected
-		if ($wgUser->isLoggedIn() && 0 != $fb_user) {
+		if ($wgUser->isLoggedIn() && $fb_user) {
 			/*
 			 * Personal URLs option: use_real_name_from_fb
 			 */
@@ -481,7 +481,7 @@ class FBConnectHooks {
 	 * Connect. The Single Sign On magic of FBConnect happens in this function.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $fbConnectOnly, $wgAuth, $wgUser;
+		global $fbConnectOnly, $wgAuth, $wgUser, $wgTitle, $wgOut;
 		$fb = new FBConnectAPI();
 		// Check to see if we have a connection with Facebook
 		if (!$fb->user()) {
@@ -492,43 +492,22 @@ class FBConnectHooks {
 		$localId = FBConnectDB::getUser($fb->user())->getId();
 		// If the user exists, then log them in
 		if ($localId) {
-			$user->setID ($localId);
-			$user->loadFromId();
+			$fbUser = new FBConnectUser(User::newFromId($localId));
 			// Updates the user's info from Facebook if no real name is set
-			$wgAuth->updateUser( $user );
+			$fbUser->updateFromFacebook();
+			$fbUser->setupSession();
 		} else {
-			// User has not visited the wiki before, so create a new user from their Facebook ID
-			$userName = $fb->userName();
-			
-			// Test to see if we are denied by FBConnectAuthPlugin or the user can't create an account
-			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
-			                               !$wgAuth->authenticate( $userName )) {
-				#if( $wgAuth->strict() ) {
-			     	$result = false;
-				#}
-				return true;
+			$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
+						'' : 'returnto=' . $wgTitle->getPrefixedURL();
+			// Don't redirect if we're on certain special pages
+			if ($returnto != '') {
+				// Redirect to Special:Connect so the Facebook user can choose a nickname
+				$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl('Connect', $returnto));
 			}
-			
-			// Checks passed, create the user
-			$user->loadDefaults( $userName );
-			$user->addToDatabase();
-			
-			$wgAuth->initUser( $user, true );
-			$wgUser = $user;
-			
-			// Update the user count
-			$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
-			$ssUpdate->doUpdate();
-			
-			// Notify hooks (e.g. Newuserlog)
-			wfRunHooks( 'AuthPluginAutoCreate', array( $wgUser ));
-			
-			// Which MediaWiki versions can we call this function in?
-			$user->addNewUserLogEntryAutoCreate();
+			return true;
 		}
 		
 		// Authentification okay
-		wfSetupSession();
 		$result = true;
 		return true;
 	}
