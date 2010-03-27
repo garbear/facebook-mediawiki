@@ -20,8 +20,8 @@
  *    5.  Click Submit.
  *    6.  Copy the displayed API key and application secret into this config file.
  */
-$fbApiKey         = 'YOUR_API_KEY';
-$fbApiSecret      = 'YOUR_SECRET';
+$fbApiKey         = 'YOUR_API_KEY';    # Change this!
+$fbApiSecret      = 'YOUR_SECRET';    # Change this!
 
 /**
  * Disables the creation of new accounts and prevents old accounts from being
@@ -66,6 +66,26 @@ $fbUseMarkup = true;
  */
 $fbUserRightsFromGroup = false;  # Or a group ID
 
+// Not used (yet...)
+#$fbRestrictToGroup = true;
+#$fbRestrictToNotReplied = false;
+
+// Personal Urls options.
+// Remove link to user's talk page in the personal toolbar (upper right).
+// remove_user_talk_link - Unset user talk page links per config settings
+// Don't show IP or its talk link in the personal header. See also: http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader.
+// use_real_name_from_fb - Replace ugly Facebook ID numbers with the user's real name
+// Add a convenient link back to Facebook. This helps enforce the idea that this wiki is "in front" of Facebook.
+// Link to a special page that connects the user's account with their Facebook ID
+$fbPersonalUrls = array(
+	'hide_connect_button'   => false,
+	'hide_convert_button'   => false,
+	'remove_user_talk_link' => false,
+	'link_back_to_facebook' => true,
+	'show_ip_in_header'     => $wgShowIPinHeader,
+	'use_real_name_from_fb' => $fbUserName, # or true or false
+);
+
 /**
  * The Facebook icon. You can copy this image to your server if you want, or
  * set to false to disable.
@@ -81,16 +101,3 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  */
 $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 
-// Not used (yet...)
-$fbRestrictToGroup = true;
-$fbRestrictToNotReplied = false;
-
-
-### GLOBAL CONFIGURATION VARIABLES ###
-
-// Remove link to user's talk page in the personal toolbar (upper right).
-$fbRemoveUserTalkLink = true;
-
-// Don't show IP or its talk link in the personal header.
-// See also: http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader.
-$wgShowIPinHeader = false;

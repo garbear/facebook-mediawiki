@@ -79,6 +79,60 @@ class FBConnectHooks {
 	}
 	
 	/**
+	 * Injects some important CSS and Javascript into the <head> of the page.
+	 */
+	static function BeforePageDisplay( &$out, &$sk ) {
+		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript;
+		
+		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
+		$out->prependHTML('
+			<div id="fb-root"></div>
+			<script>
+				(function(){var e=document.createElement("script");e.type="' .
+				$wgJsMimeType . '";e.src="' . $fbScript .
+				'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
+			</script>' . "\n"
+		);
+		
+		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
+		$style = '<style type="text/css">
+			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
+			
+			/* Add a pretty Facebook logo to links of Connected users */
+			.mw-fbconnectuser {
+				background: url(' . $fbLogo . ') top right no-repeat;
+				padding-right: 17px;
+			}
+			
+			li#pt-fblink' . ($fb->user() != 0 ? ', li#pt-userpage' : '') . ' {
+				background: url(' . $fbLogo . ') top left no-repeat;
+				padding-left: 17px;
+			}' : '') . '
+			
+			/* Modify the style of #userloginForm for Special:Connect */
+			#userloginForm {
+				float: right;
+			}
+			
+			#userloginForm form {
+				margin: 0 !important;
+			}
+		</style>';
+		
+		/**/
+		// Styles and Scripts have been built, so add them to the page
+		if (self::MGVS_hack( $mgvs_script ))
+			// Inserts list of global JavaScript variables
+			$out->addInlineScript( $mgvs_script );
+		// Required Facebook Connect JavaScript code
+		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
+		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
+		#$out->addScript( $style );
+		
+		return true;
+	}
+	
+	/**
 	 * Check against stricter requirements (if any) for Facebook Connect users.
 	 * Counterintuitively, we do the requirement checks first. This is to prevent
 	 * unnecessary API group-related queries.
@@ -132,6 +186,10 @@ class FBConnectHooks {
 	
 	/**
 	 * Fired when MediaWiki is updated to allow FBConnect to update the database.
+	 * If the database type is supported, then a new tabled named 'user_fbconnect'
+	 * is created. For the table's layout, see fbconnect_table.sql.
+	 * 
+	 * TODO: Prefix the table with $wgDBprefix.
 	 */
 	static function LoadExtensionSchemaUpdates() {
 		global $wgDBtype, $wgExtNewTables;
@@ -194,57 +252,135 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Injects some important CSS and Javascript into the <head> of the page.
+	 * Installs a parser hook for every tag reported by FBConnectXFBML::availableTags().
+	 * Accomplishes this by asking FBConnectXFBML to create a hook function that then
+	 * redirects to FBConnectXFBML::parserHook().
 	 */
-	static function BeforePageDisplay( &$out, &$sk ) {
-		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript;
-		
-		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
-		$out->prependHTML('
-			<div id="fb-root"></div>
-			<script>
-				(function(){var e=document.createElement("script");e.type="' .
-				$wgJsMimeType . '";e.src="' . $fbScript .
-				'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
-			</script>' . "\n"
-		);
+	static function ParserFirstCallInit( &$parser ) {
+		$pHooks = FBConnectXFBML::availableTags();
+		foreach( $pHooks as $tag ) {
+			$parser->setHook( $tag, FBConnectXFBML::createParserHook( $tag ));
+		}
+		return true;
+	}
+	
+	/**
+	 * Modify the user's persinal toolbar (in the upper right).
+	 * TODO!
+	 */
+	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
+		global $wgUser, $wgLang, $wgShowIPinHeader, $fbPersonalUrls, $fbConnectOnly;
+		wfLoadExtensionMessages('FBConnect');
+		// Get the logged-in user from the Facebook API
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
 		
 		/*
-		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
-		$style = '<style type="text/css">
-			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
-			
-			// Add a pretty Facebook logo to links of Connected users
-			.mw-fbconnectuser {
-				background: url(' . $fbLogo . ') top right no-repeat;
-				padding-right: 17px;
-			}
-			
-			li#pt-fblink' . ($fb->user() != 0 ? ', li#pt-userpage' : '') . ' {
-				background: url(' . $fbLogo . ') top left no-repeat;
-				padding-left: 17px;
-			}' : '') . (FBConnect::$special_connect ? '
-			
-			// Modify the style of #userloginForm for Special:Connect
-			#userloginForm {
-				float: right;
-			}
-			
-			#userloginForm form {
-				margin: 0 !important;
-			}' : '') . '
-		</style>';
+		 * Personal URLs option: show_ip_in_header
+		 */
+		$wgShowIPinHeader = $fbPersonalUrls['show_ip_in_header'];
 		
-		/**/
-		// Styles and Scripts have been built, so add them to the page
-		if (self::MGVS_hack( $mgvs_script ))
-			// Inserts list of global JavaScript variables
-			$out->addInlineScript( $mgvs_script );
-		// Required Facebook Connect JavaScript code
-		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
-		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
-		#$out->addScript( $style );
+		/*
+		 * Personal URLs option: remove_user_talk_link
+		 */
+		if ($fbPersonalUrls['remove_user_talk_link'] &&
+				array_key_exists('mytalk', $personal_urls)) {
+			unset($personal_urls['mytalk']);
+		}
 		
+		// If the user is logged in and connected
+		if ($wgUser->isLoggedIn() && 0 != $fb_user) {
+			/*
+			 * Personal URLs option: use_real_name_from_fb
+			 */
+			$option = $fbPersonalUrls['use_real_name_from_fb'];
+			if ($option === true || ($option && strpos($wgUser->getName(), $option) === 0)) {
+				// Start with the real name in the database
+				$name = $wgUser->getRealName();
+				// Ask Facebook for the real name
+				if (!$name || $name == '') {
+					$name = $fb->userName();
+				}
+				// Make sure we were able to get a name from the database or Facebook
+				if ($name && $name != '') {
+					$personal_urls['userpage']['text'] = $name;
+				}
+			}
+			// Replace logout link with a button to disconnect from Facebook Connect
+			// TODO: Use JQuery to set logout action
+			unset( $personal_urls['logout'] );
+			$personal_urls['fblogout'] = array(
+				'text'   => wfMsg( 'fbconnect-logout' ),
+				'href'   => '#',
+				'active' => false );
+			/*
+			 * Personal URLs option: link_back_to_facebook
+			 */
+			if ($fbPersonalUrls['link_back_to_facebook']) {
+				$personal_urls['fblink'] = array(
+					'text'   => wfMsg( 'fbconnect-link' ),
+					'href'   => "http://www.facebook.com/profile.php?id=$fb_user",
+					'active' => false );
+			}
+		}
+		// User is logged in but not Connected
+		else if ($wgUser->isLoggedIn()) {
+			/*
+			 * Personal URLs option: hide_convert_button
+			 */
+			// TODO: Link to Special:Connect/Convert
+			if (!$fbPersonalUrls['hide_convert_button']) {
+				$personal_urls['fblink'] = array(
+					'text'   => wfMsg( 'fbconnect-connect' ),
+					'href'   => Skin::makeSpecialUrl( 'Connect', '' ),
+					'active' => false );
+			}
+		}
+		// User is not logged in
+		else {
+			// Add an option to connect via Facebook Connect
+			$personal_urls['fbconnect'] = array(
+				'text'   => wfMsg( 'fbconnectlogin' ),
+				'href'   => SpecialPage::getTitleFor( 'Connect' )->
+				              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
+			//	'href'   => '#',   # TODO: Update JavaScript and then use this href
+				'active' => $wgTitle->isSpecial( 'Connect' )
+			);
+			
+			// Remove other personal toolbar links
+			if ($fbConnectOnly) {
+				foreach (array('login', 'anonlogin') as $k) {
+					if (array_key_exists($k, $personal_urls)) {
+						unset($personal_urls[$k]);
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Modify the preferences form. At the moment, we simply turn the user name
+	 * into a link to the user's facebook profile.
+	 * TODO!
+	 */
+	public static function RenderPreferencesForm( $form, $output ) {
+		global $wgUser;
+		
+		// If the user name is a valid Facebook ID, link to the Facebook profile
+		if( FBConnect::$api->isConnected() ) {
+			$html = $output->getHTML();
+			$name = $wgUser->getName();
+			$i = strpos( $html, $name );
+			if ($i !== FALSE) {
+				// Replace the old output with the new output
+				$html =  substr( $html, 0, $i ) . preg_replace( "/$name/",
+				    "<a href=\"http://www.facebook.com/profile.php?id=$name\" " .
+					"class='mw-userlink mw-fbconnectuser'>$name</a>", substr( $html, $i ), 1 );
+				$output->clearHTML();
+				$output->addHTML( $html );
+			}
+		}
 		return true;
 	}
 	
@@ -276,139 +412,35 @@ class FBConnectHooks {
 	}
 	
 	/**
-	 * Installs a parser hook for every tag reported by FBConnectXFBML::availableTags().
-	 * Accomplishes this by asking FBConnectXFBML to create a hook function that then
-	 * redirects to FBConnectXFBML::parserHook().
-	 */
-	static function ParserFirstCallInit( &$parser ) {
-		$pHooks = FBConnectXFBML::availableTags();
-		foreach( $pHooks as $tag ) {
-			$parser->setHook( $tag, FBConnectXFBML::createParserHook( $tag ));
-		}
-		return true;
-	}
-	
-	/**
-	 * Modify the user's persinal toolbar (in the upper right).
-	 * TODO!
-	 */
-	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $wgLang, $fbAllowOldAccounts, $fbRemoveUserTalkLink;
-		
-		$fb = new FBConnectAPI();
-		
-		wfLoadExtensionMessages( 'FBConnect' );
-		
-		if ( $wgUser->isLoggedIn() ) {
-			if( $fb->user() != 0 ) {
-				
-				// Replace ugly Facebook ID numbers with the user's real name
-				if( $wgUser->getRealName() != "" )
-					$personal_urls['userpage']['text'] = $wgUser->getRealName();
-				
-				// Replace logout link with a button to disconnect from Facebook Connect
-				unset( $personal_urls['logout'] );
-				$personal_urls['fblogout'] = array(
-					'text'   => wfMsg( 'fbconnect-logout' ),
-					'href'   => '#',
-					'active' => false );
-				
-				// Add a convenient link back to facebook.com
-				// This helps enforce the idea that this wiki is "in front" of Facebook
-				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnect-link' ),
-					'href'   => 'http://www.facebook.com/profile.php?id=' . $wgUser->getName(),
-					'active' => false );
-				
-			} else {  # User is logged in but not Connected
-				
-				// Link to a special page that connects the user's account with their Facebook ID
-				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnect-connect' ),
-					'href'   => Skin::makeSpecialUrl( 'Connect', '' ),
-					'active' => false );
-			}
-		} else {  # User is not logged in
-			
-			// Add an option to connect via Facebook Connect
-			$personal_urls['fbconnect'] = array(
-				'text'   => wfMsg( 'fbconnectlogin' ),
-				'href'   => SpecialPage::getTitleFor( 'Connect' )->
-				              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
-			//	'href'   => '#',   # TODO: Update JavaScript and then use this href
-				'active' => $wgTitle->isSpecial( 'Connect' ) );
-			
-			// Remove other personal toolbar links
-			if( !$fbAllowOldAccounts ) {
-				foreach( array( 'login', 'anonlogin' ) as $k ) {
-					if( array_key_exists( $k, $personal_urls ) )
-						unset( $personal_urls[$k] );
-				}
-			}
-		}
-		
-		// Unset user talk page links
-		if ( $fbRemoveUserTalkLink && array_key_exists( 'mytalk', $personal_urls ))
-			unset( $personal_urls['mytalk'] );
-
-		return true;
-	}
-	
-	/**
-	 * Modify the preferences form. At the moment, we simply turn the user name
-	 * into a link to the user's facebook profile.
-	 * TODO!
-	 */
-	public static function RenderPreferencesForm( $form, $output ) {
-		global $wgUser;
-		
-		// If the user name is a valid Facebook ID, link to the Facebook profile
-		if( FBConnect::$api->isConnected() ) {
-			$html = $output->getHTML();
-			$name = $wgUser->getName();
-			$i = strpos( $html, $name );
-			if ($i !== FALSE) {
-				// Replace the old output with the new output
-				$html =  substr( $html, 0, $i ) . preg_replace( "/$name/",
-				    "<a href=\"http://www.facebook.com/profile.php?id=$name\" " .
-					"class='mw-userlink mw-fbconnectuser'>$name</a>", substr( $html, $i ), 1 );
-				$output->clearHTML();
-				$output->addHTML( $html );
-			}
-		}
-		return true;
-	}
-	
-	/**
 	 * Adds some info about the governing Facebook group to the header form of Special:ListUsers.
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
 		global $fbUserRightsFromGroup, $fbLogo;
-		if ($fbUserRightsFromGroup) {
-			// Shorten $fbUserRightsFromGroup
-			$gid = $fbUserRightsFromGroup;
-			// Connect to the API and get some info about the group
-			$fb = new FBConnectAPI();
-			$group = $fb->groupInfo();
-			$groupName = $group['name'];
-			$cid = $group['creator'];
-			$pic = $group['picture'];
-			$out .= '
-				<table style="border-collapse: collapse;">
-					<tr>
-						<td>
-							' . wfMsgWikiHtml( 'fbconnect-listusers-header',
-							wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
-							"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$groupName</a>",
-							"<a href=\"http://www.facebook.com/profile.php?id=$cid#User:$cid\" " .
-							"class=\"mw-userlink\">$cid</a>") . '
-						</td>
-		        		<td>
-		        			<img src="' . "$pic\" title=\"$groupName\" alt=\"$groupName" . '">
-		        		</td>
-		        	</tr>
-		        </table>';
+		if (!$fbUserRightsFromGroup) {
+			return true;
 		}
+		$gid = $fbUserRightsFromGroup;
+		// Connect to the API and get some info about the group
+		$fb = new FBConnectAPI();
+		$group = $fb->groupInfo();
+		$groupName = $group['name'];
+		$cid = $group['creator'];
+		$pic = $group['picture'];
+		$out .= '
+			<table style="border-collapse: collapse;">
+				<tr>
+					<td>
+						' . wfMsgWikiHtml( 'fbconnect-listusers-header',
+						wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
+						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$groupName</a>",
+						"<a href=\"http://www.facebook.com/profile.php?id=$cid#User:$cid\" " .
+						"class=\"mw-userlink\">$cid</a>") . '
+					</td>
+	        		<td>
+	        			<img src="' . "$pic\" title=\"$groupName\" alt=\"$groupName" . '">
+	        		</td>
+	        	</tr>
+	        </table>';
 		return true;
 	}
 	
