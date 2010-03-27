@@ -41,7 +41,7 @@ class FBConnectUser extends User {
 	/**
 	 * Private constructor. FBConnectUsers can currently only be created from
 	 * existing User objects.
-	 */
+	 *
 	private function __construct() {
 	}
 	

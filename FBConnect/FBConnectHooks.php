@@ -94,40 +94,12 @@ class FBConnectHooks {
 			</script>' . "\n"
 		);
 		
-		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
-		$style = '<style type="text/css">
-			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
-			
-			/* Add a pretty Facebook logo to links of Connected users */
-			.mw-fbconnectuser {
-				background: url(' . $fbLogo . ') top right no-repeat;
-				padding-right: 17px;
-			}
-			
-			li#pt-fblink' . ($fb->user() != 0 ? ', li#pt-userpage' : '') . ' {
-				background: url(' . $fbLogo . ') top left no-repeat;
-				padding-left: 17px;
-			}' : '') . '
-			
-			/* Modify the style of #userloginForm for Special:Connect */
-			#userloginForm {
-				float: right;
-			}
-			
-			#userloginForm form {
-				margin: 0 !important;
-			}
-		</style>';
-		
-		/**/
 		// Styles and Scripts have been built, so add them to the page
 		if (self::MGVS_hack( $mgvs_script ))
 			// Inserts list of global JavaScript variables
 			$out->addInlineScript( $mgvs_script );
 		// Required Facebook Connect JavaScript code
 		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
-		// Styles DHTML tooltips, adds pretty Facebook logos to userpage links
-		#$out->addScript( $style );
 		
 		return true;
 	}
@@ -486,10 +458,12 @@ class FBConnectHooks {
 		// Check to see if we have a connection with Facebook
 		if (!$fb->user()) {
 			// No connection with facebook, return $fbConnectOnly
-			return $fbConnectOnly;
+			#return $fbConnectOnly;
+			return true;
 		}
 		// Look up the MW ID of the Facebook user
-		$localId = FBConnectDB::getUser($fb->user())->getId();
+		$user = FBConnectDB::getUser($fb->user());
+		$localId = $user ? $user->getId() : 0;
 		// If the user exists, then log them in
 		if ($localId) {
 			$fbUser = new FBConnectUser(User::newFromId($localId));
