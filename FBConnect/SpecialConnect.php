@@ -340,7 +340,7 @@ class SpecialConnect extends SpecialPage {
 		// Because $i is incremented the first time through the while loop
 		$i = FBConnectDB::countUsers();
 		#$i = 1; // This is the DUMB WAY to do this
-		while ($i < Integer::MAXVALUE) { // TODO: Look up this constant
+		while ($i < PHP_INT_MAX) {
 			$name = "$prefix$i";
 			if ($this->userNameOK($name)) {
 				return $name;
