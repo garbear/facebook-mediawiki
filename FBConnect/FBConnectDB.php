@@ -25,7 +25,14 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class for manipulating the custom users_fbconnect table.
+ * Class FBConnectDB
+ * 
+ * This class abstracts the manipulation of the custom table used by this
+ * extension. If the table 'users_fbconnect' does not exist in your database
+ * and you are receiving errors like '...TODO...', then you need to run the MW
+ * updater: 'php maintenance/update.php'.
+ * 
+ * TODO: Modify this class to respect $wgDBprefix.
  */
 class FBConnectDB {
 	/**
@@ -33,7 +40,6 @@ class FBConnectDB {
 	 */
 	public static function getFacebookIDs( $user ) {
 		$fbid = array();
-
 		if ( $user instanceof User && $user->getId() != 0 ) {
 			$dbr = wfGetDB( DB_SLAVE );
 			$res = $dbr->select(
@@ -42,7 +48,6 @@ class FBConnectDB {
 				array( 'user_id' => $user->getId() ),
 				__METHOD__
 			);
-
 			foreach( $res as $row ) {
 				$fbid[] = $row->user_fbid;
 			}
@@ -97,7 +102,7 @@ class FBConnectDB {
 			),
 			__METHOD__
 		);
-		return (bool)$dbw->affectedRows();
+		return (bool) $dbw->affectedRows();
 	}
 	
 	/**
