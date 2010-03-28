@@ -63,9 +63,11 @@ fb.'desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http:
 // Incredibly good looking people
 'right-goodlooking'       => 'Really, really, ridiculously good looking',
 // Personal toolbar
-fb.'connect'  => 'Connect this account with Facebook',
+fb.'connect'  => 'Log in with Facebook Connect',
+fb.'convert'  => 'Connect this account with Facebook',
 fb.'logout'   => 'Logout of Facebook',
 fb.'link'     => 'Back to facebook.com',
+
 // Special:Connect
 fb.'title'    => 'Connect account with Facebook',
 fb.'intro'    => 'This wiki is enabled with Facebook Connect, the next evolution of Facebook Platform. This means ' .
@@ -121,6 +123,7 @@ fb.'choosemanual' => 'A name of your choice:',
 fb.'chooseexisting' => 'An existing account on this wiki',
 fb.'chooseusername' => 'Username:',
 fb.'choosepassword' => 'Password:',
+fb.'updateuserinfo' => 'Update the following personal information:',
 fb.'alreadyloggedin' => "'''You are already logged in, $1!'''\n\nIf you want to use Facebook " .
                         'Connect to log in in the future, you can [[Special:Connect/Convert|' .
                         'convert your account to use Facebook Connect]].',
