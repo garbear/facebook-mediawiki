@@ -98,6 +98,8 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * use FBConnect on your production website, you may wish to insulate yourself
  * from these changes to the alpha library by downloading and hosting your own
  * copy of the library.
+ * 
+ * For more info, see <http://github.com/facebook/connect-js>.
  */
 $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 
