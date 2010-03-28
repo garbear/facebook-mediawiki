@@ -70,21 +70,31 @@ $fbUserRightsFromGroup = false;  # Or a group ID
 #$fbRestrictToGroup = true;
 #$fbRestrictToNotReplied = false;
 
-// Personal Urls options.
-// Remove link to user's talk page in the personal toolbar (upper right).
-// remove_user_talk_link - Unset user talk page links per config settings
-// Don't show IP or its talk link in the personal header. See also: http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader.
-// use_real_name_from_fb - Replace ugly Facebook ID numbers with the user's real name
-// Add a convenient link back to Facebook. This helps enforce the idea that this wiki is "in front" of Facebook.
-// Link to a special page that connects the user's account with their Facebook ID
+/**
+ * Options regarding the personal toolbar (upper right).
+ * 
+ * == Key ==              == Effect ==
+ * hide_connect_button    Hides the "Log in with Facebook Connect" button.
+ * hide_convert_button    Hides "Connect this account with Facebook" for non-
+ *                        Connected users.
+ * link_back_to_facebook  Shows a handy "Back to facebook.com" link for Connected
+ *                        users. This helps enforce the idea that this wiki is
+ *                        "in front" of Facebook.
+ * remove_user_talk_link  Remove link to user's talk page
+ * use_real_name_from_fb  $fbUserName to show the real name for auto-usernames,
+ *                        true to show the real name for all Connected users
+ * 
+ * Additionally, use $wgShowIPinHeader to hide the IP and its talk link.
+ * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
+ */
 $fbPersonalUrls = array(
 	'hide_connect_button'   => false,
 	'hide_convert_button'   => false,
-	'remove_user_talk_link' => false,
 	'link_back_to_facebook' => true,
-	'show_ip_in_header'     => $wgShowIPinHeader,
+	'remove_user_talk_link' => false,
 	'use_real_name_from_fb' => $fbUserName, # or true or false
 );
+#$wgShowIPinHeader = false;
 
 /**
  * The Facebook icon. You can copy this image to your server if you want, or

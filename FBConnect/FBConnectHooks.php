@@ -265,11 +265,6 @@ class FBConnectHooks {
 		$fb_user = $fb->user();
 		
 		/*
-		 * Personal URLs option: show_ip_in_header
-		 */
-		$wgShowIPinHeader = $fbPersonalUrls['show_ip_in_header'];
-		
-		/*
 		 * Personal URLs option: remove_user_talk_link
 		 */
 		if ($fbPersonalUrls['remove_user_talk_link'] &&
@@ -296,7 +291,6 @@ class FBConnectHooks {
 				}
 			}
 			// Replace logout link with a button to disconnect from Facebook Connect
-			// TODO: Use JQuery to set logout action
 			unset( $personal_urls['logout'] );
 			$personal_urls['fblogout'] = array(
 				'text'   => wfMsg( 'fbconnect-logout' ),
@@ -317,7 +311,6 @@ class FBConnectHooks {
 			/*
 			 * Personal URLs option: hide_convert_button
 			 */
-			// TODO: Link to Special:Connect/Convert
 			if (!$fbPersonalUrls['hide_convert_button']) {
 				$personal_urls['fbconvert'] = array(
 					'text'   => wfMsg( 'fbconnect-convert' ),
@@ -329,14 +322,18 @@ class FBConnectHooks {
 		}
 		// User is not logged in
 		else {
-			// Add an option to connect via Facebook Connect
-			$personal_urls['fbconnect'] = array(
-				'text'   => wfMsg( 'fbconnect-connect' ),
-				'href'   => SpecialPage::getTitleFor( 'Connect' )->
-				              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
-			//	'href'   => '#',   # TODO: Update JavaScript and then use this href
-				'active' => $wgTitle->isSpecial( 'Connect' )
-			);
+			/*
+			 * Personal URLs option: hide_connect_button
+			 */
+			if (!$fbPersonalUrls['hide_connect_button']) {
+				// Add an option to connect via Facebook Connect
+				$personal_urls['fbconnect'] = array(
+					'text'   => wfMsg( 'fbconnect-connect' ),
+					'href'   => SpecialPage::getTitleFor( 'Connect' )->
+					              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
+					'active' => $wgTitle->isSpecial('Connect')
+				);
+			}
 			
 			// Remove other personal toolbar links
 			if ($fbConnectOnly) {
