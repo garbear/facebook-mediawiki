@@ -33,7 +33,7 @@
  *     after the document is finished rendering the first time the script is
  *     downloaded. Subsequently, it may even be called before the DOM is ready.
  * 
- * JQuery:                $(document).ready(lambda);
+ * jQuery:                $(document).ready(lambda);
  *     Self-explanatory -- to be called when the DOM is ready to be manipulated.
  *     Typically this should occur sooner than MediaWiki's addOnloadHook function
  *     is called.
@@ -73,9 +73,21 @@ window.fbAsyncInit = function() {
 };
 
 /**
- * JQuery code to be run when the DOM is ready to be manhandled.
+ * jQuery code to be run when the DOM is ready to be manhandled.
  */
 $(document).ready(function() {
 	// Add a pretty logo to Facebook links
 	$('#pt-fbconnect,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
+	
+	// Add the logout behaviour to the "Logout of Facebook" button
+	$('#pt-fblogout').click(function() {
+		// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
+		// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
+		var logout = confirm("You are loggin out of both this site and Facebook.");
+		if (logout) {
+			FB.logout(function(response) {
+				window.location = window.fbLogoutURL;
+			});
+		}
+	});
 });
