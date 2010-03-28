@@ -1,1 +1,1 @@
-window.fbAsyncInit=function(){FB.init({apiKey:window.fbApiKey,status:true,cookie:true,xfbml:window.fbUseMarkup});FB.Event.subscribe("auth.login",function(){window.location.reload(true)})};
+window.fbAsyncInit=function(){FB.init({apiKey:window.fbApiKey,status:true,cookie:true,xfbml:window.fbUseMarkup});FB.Event.subscribe("auth.login",function(){window.location.reload(true)})};$(document).ready(function(){$("#pt-fbconnect,#pt-fblink,#pt-fbconvert").addClass("mw-fblink")});

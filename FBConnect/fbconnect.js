@@ -71,3 +71,11 @@ window.fbAsyncInit = function() {
 	});
 	/**/
 };
+
+/**
+ * JQuery code to be run when the DOM is ready to be manhandled.
+ */
+$(document).ready(function() {
+	// Add a pretty logo to Facebook links
+	$('#pt-fbconnect,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
+});

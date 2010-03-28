@@ -94,22 +94,27 @@ class FBConnectHooks {
 			</script>' . "\n"
 		);
 		
-		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
-		$style = '<style type="text/css">
-			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
-			
-			/* Add a pretty logo to Facebook links */
-			.mw-fblink {
-				background: url(' . $fbLogo . ') top left no-repeat;
-				padding-left: 17px;
-			}' : '') . '
-		</style>';
-		$out->addScript( $style );
-		
 		// Inserts list of global JavaScript variables if necessary
 		if (self::MGVS_hack( $mgvs_script )) {
 			$out->addInlineScript( $mgvs_script );
 		}
+		
+		// Include the extension's stylesheet
+		$out->addExtensionStyle("$wgScriptPath/extensions/FBConnect/fbconnect.css");
+		
+		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
+		if ($fbLogo) {
+			$out->addInlineStyle('
+			/* Add a pretty logo to Facebook links */
+			.mw-fblink {
+				background: url(' . $fbLogo . ') top left no-repeat !important;
+				padding-left: 17px !important;
+			}
+			');
+		}
+		
+		// JQuery 1.4.2
+		$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
 		
 		// FBConnect JavaScript code
 		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
@@ -314,7 +319,7 @@ class FBConnectHooks {
 			 */
 			// TODO: Link to Special:Connect/Convert
 			if (!$fbPersonalUrls['hide_convert_button']) {
-				$personal_urls['fblink'] = array(
+				$personal_urls['fbconvert'] = array(
 					'text'   => wfMsg( 'fbconnect-convert' ),
 					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL('returnto=' .
 								$wgTitle->getPrefixedURL()),
