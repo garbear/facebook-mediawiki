@@ -88,21 +88,20 @@ class SpecialConnect extends SpecialPage {
 					// Get the username from Facebook (Note: not from the form)
 					$username = FBConnectUser::getOptionFromInfo($choice . 'name', $fb->getUserInfo());
 				case 'manual':
-					if (!isset($username) || !$username || !$this->userNameOK($username)) {
+					if (!isset($username) || !$this->userNameOK($username)) {
 						// Use manual name if no username is set, even if manual wasn't chosen
 						$username = $wgRequest->getText('wpNameValue');
 					}
 					// If no valid username was found, something's not right; ask again
 					if (!$this->userNameOK($username)) {
 						$this->sendPage('chooseNameForm', 'fbconnect-invalidname');
-						break;
+					} else {
+						$this->createUser($fb_user, $username);
 					}
+					break;
 				case 'auto':
-					if (!isset($username) || !$username) {
-						// Generate a unique username
-						$username = $this->generateUserName();
-					}
-					$this->createUser($fb_user, $username);
+					// Create a user with a unique generated username
+					$this->createUser($fb_user, $this->generateUserName());
 					break;
 				default:
 					$this->sendError('fbconnect-invalid', 'fbconnect-invalidtext');
@@ -269,7 +268,7 @@ class SpecialConnect extends SpecialPage {
 	 */
 	protected function userNameOK ($name) {
 		global $wgReservedUsernames;
-		return (0 == User::idFromName($name) && !in_array($name, $wgReservedUsernames));
+		return ($name && 0 == User::idFromName($name) && !in_array($name, $wgReservedUsernames));
 	}
 	
 	/**
