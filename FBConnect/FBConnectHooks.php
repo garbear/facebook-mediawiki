@@ -94,11 +94,24 @@ class FBConnectHooks {
 			</script>' . "\n"
 		);
 		
-		// Styles and Scripts have been built, so add them to the page
-		if (self::MGVS_hack( $mgvs_script ))
-			// Inserts list of global JavaScript variables
+		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
+		$style = '<style type="text/css">
+			@import url("' . $wgScriptPath . '/extensions/FBConnect/fbconnect.css");' . ($fbLogo ? '
+			
+			/* Add a pretty logo to Facebook links */
+			.mw-fblink {
+				background: url(' . $fbLogo . ') top left no-repeat;
+				padding-left: 17px;
+			}' : '') . '
+		</style>';
+		$out->addScript( $style );
+		
+		// Inserts list of global JavaScript variables if necessary
+		if (self::MGVS_hack( $mgvs_script )) {
 			$out->addInlineScript( $mgvs_script );
-		// Required Facebook Connect JavaScript code
+		}
+		
+		// FBConnect JavaScript code
 		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
 		
 		return true;
@@ -188,14 +201,14 @@ class FBConnectHooks {
 	 * to retain backward compatability.
 	 */
 	static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgTitle, $fbApiKey, $fbUseMarkup;
+		global $wgTitle, $fbApiKey, $fbUseMarkup, $fbLogo;
 		$thisurl = $wgTitle->getPrefixedURL();
 		$vars['fbApiKey'] = $fbApiKey;
 		#$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
-		#$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
-		#                       $wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
-		#$vars['fbNames'] = FBConnect::$api->getPersons();
 		$vars['fbUseMarkup'] = $fbUseMarkup;
+		$vars['fbLogo'] = $fbLogo ? true : false;
+		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
+						$wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
 		return true;
 	}
 	
