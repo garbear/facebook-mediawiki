@@ -238,7 +238,6 @@ class FBConnectHooks {
 	
 	/**
 	 * Modify the user's persinal toolbar (in the upper right).
-	 * TODO!
 	 */
 	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $wgUser, $wgLang, $wgShowIPinHeader, $fbPersonalUrls, $fbConnectOnly;
@@ -303,16 +302,18 @@ class FBConnectHooks {
 			// TODO: Link to Special:Connect/Convert
 			if (!$fbPersonalUrls['hide_convert_button']) {
 				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnect-connect' ),
-					'href'   => Skin::makeSpecialUrl( 'Connect', '' ),
-					'active' => false );
+					'text'   => wfMsg( 'fbconnect-convert' ),
+					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL('returnto=' .
+								$wgTitle->getPrefixedURL()),
+					'active' => $wgTitle->isSpecial( 'Connect' )
+				);
 			}
 		}
 		// User is not logged in
 		else {
 			// Add an option to connect via Facebook Connect
 			$personal_urls['fbconnect'] = array(
-				'text'   => wfMsg( 'fbconnectlogin' ),
+				'text'   => wfMsg( 'fbconnect-connect' ),
 				'href'   => SpecialPage::getTitleFor( 'Connect' )->
 				              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
 			//	'href'   => '#',   # TODO: Update JavaScript and then use this href
@@ -464,13 +465,8 @@ class FBConnectHooks {
 		// Look up the MW ID of the Facebook user
 		$user = FBConnectDB::getUser($fb->user());
 		$localId = $user ? $user->getId() : 0;
-		// If the user exists, then log them in
-		if ($localId) {
-			$fbUser = new FBConnectUser(User::newFromId($localId));
-			// Updates the user's info from Facebook if no real name is set
-			$fbUser->updateFromFacebook();
-			$fbUser->setupSession();
-		} else {
+		// If the user doesn't exist, ask them to name their new account
+		if (!$localId) {
 			$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
 						'' : 'returnto=' . $wgTitle->getPrefixedURL();
 			// Don't redirect if we're on certain special pages
@@ -480,7 +476,19 @@ class FBConnectHooks {
 			}
 			return true;
 		}
+		$user = User::newFromId($localId);
+		$fbUser = new FBConnectUser($user);
+		// Updates the user's info from Facebook
+		$fbUser->updateFromFacebook();
 		
+		// Setup the session
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+		
+		$user->setCookies();
+		$wgUser = $user;
 		// Authentification okay
 		$result = true;
 		return true;

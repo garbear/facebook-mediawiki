@@ -138,10 +138,15 @@ class SpecialConnect extends SpecialPage {
 			$fbUser = new FBConnectUser($user);
 			// Update user from facebook (see class FBConnectUser)
 			$fbUser->updateFromFacebook();
-			// Setup the session (see class FBConnectUser)
-			$fbUser->setupSession();
-			$fbUser->setCookies();
-			$wgUser = $fbUser;
+			
+			// Setup the session
+			global $wgSessionStarted;
+			if (!$wgSessionStarted) {
+				wfSetupSession();
+			}
+			
+			$user->setCookies();
+			$wgUser = $user;
 			$this->sendPage('displaySuccessLogin');
 		} else if ($fb_id) {
 			$this->sendPage('chooseNameForm');
@@ -203,7 +208,7 @@ class SpecialConnect extends SpecialPage {
 		$fbUser->updateFromFacebook();
 		
 		// Store the new user as the global user object
-		$wgUser = $fbUser;
+		$wgUser = $user;
 		$this->sendPage('displaySuccessLogin');
 	}
 	
@@ -357,7 +362,7 @@ class SpecialConnect extends SpecialPage {
 			$updateChoices = count($updateOptions) > 0 ? "<br />\n" . wfMsgHtml('fbconnect-updateuserinfo') .
 				"\n<ul>\n" . implode("\n", $updateOptions) . "\n<ul>\n" : '';
 			// Create the HTML for the "existing account" option
-			$html .= '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
+			$html = '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
 				'value="existing" id="wpNameChoiceExisting"/></td><td class="mw-input">' .
 				'<label for="wnNameChoiceExisting">' . wfMsg('fbconnect-chooseexisting') . '<br/>' .
 				wfMsgHtml('fbconnect-chooseusername') . '<input name="wpExistingName" size="16" value="' .
@@ -521,10 +526,10 @@ class SpecialConnect extends SpecialPage {
 		$loginTitle = self::getTitleFor( 'Userlogin' );
 		$this_href = wfUrlencode( $this->getTitle() );
 		// Action URL that gets posted to
-		$action = $loginTitle->getLocalUrl( 'action=submitlogin&type=login&returnto=' . $this_href );
+		$action = $loginTitle->getLocalUrl('action=submitlogin&type=login&returnto=' . $this_href);
 		// Don't show a "create account" link if the user is not allowed to create an account
 		if ($wgUser->isAllowed( 'createaccount' )) {
-			$link_href = htmlspecialchars( $loginTitle->getLocalUrl( 'type=signup&returnto=' . $this_href ));
+			$link_href = htmlspecialchars($loginTitle->getLocalUrl('type=signup&returnto=' . $this_href));
 			$link_text = wfMsgHtml( 'nologinlink' );
 			$link = wfMsgWikiHtml( 'nologin', "<a href=\"$link_href\">$link_text</a>" );
 		} else {

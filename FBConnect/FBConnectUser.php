@@ -31,18 +31,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FBConnectUser extends User {
 	/**
-	 * Constructor.
+	 * Constructor: Create this object from an existing User. Bonus points if
+	 * the existing User was created form an ID and has not yet been loaded! 
 	 */
 	function __construct($user) {
 		$this->mId = $user->getId();
 		$this->mFrom = 'id';
-	}
-	
-	/**
-	 * Private constructor. FBConnectUsers can currently only be created from
-	 * existing User objects.
-	 *
-	private function __construct() {
 	}
 	
 	/**
@@ -148,22 +142,4 @@ class FBConnectUser extends User {
 		// If an appropriate value was found, return it
 		return $value == '' ? null : $value;
 	}
-	
-	/**
-	 * Sets up the session, if it hasn't already been started.
-	 */
-	function setupSession() {
-		global $wgSessionStarted;
-		if (!$wgSessionStarted)
-			wfSetupSession();
-	}
-	
-	
-	/*
-	function setCookies() {
-		// Set a cookie for later check-immediate use
-		#$this->loginSetCookie( $fb_id );
-		parent::setCookies();
-	}
-	/**/
 }
