@@ -88,8 +88,9 @@ class FBConnectAPI {
 		if ($user != 0 && !isset($userinfo[$user]))
 		{
 			try {
-				$fields = array('first_name', 'name', 'timezone', 'locale, username, ' .
-				                'contact_email, proxied_email');
+				$fields = array('first_name', 'name', 'sex', 'timezone', 'locale',
+				                /*'profile_url',*/
+				                'username', 'proxied_email', 'contact_email');
 				// Query the Facebook API with the users.getInfo method
 				$user_details = $this->Facebook()->api_client->users_getInfo($user, $fields);
 				// Cache the data in the $userinfo array
