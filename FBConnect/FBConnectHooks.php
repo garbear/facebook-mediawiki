@@ -183,7 +183,7 @@ class FBConnectHooks {
 	 * sure that fbconnect_table.sql is updated with the database prefix beforehand.
 	 */
 	static function LoadExtensionSchemaUpdates() {
-		global $wgDBtype, $wgExtNewTables;
+		global $wgDBtype, $wgDBprefix, $wgExtNewTables;
 		$base = dirname( __FILE__ );
 		if ( $wgDBtype == 'mysql' ) {
 			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/fbconnect_table.sql");
