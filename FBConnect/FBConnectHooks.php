@@ -125,7 +125,7 @@ class FBConnectHooks {
 		$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
 		
 		// FBConnect JavaScript code
-		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
+		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js");
 		
 		return true;
 	}
