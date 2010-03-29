@@ -138,6 +138,9 @@ class FBConnectUser extends User {
 					// instead (the address must stay hidden from the user)
 					$value = '';
 				}
+				// TODO: if the user's email is updated from Facebook, then
+				// automatically authenticate the email address
+				#$user->mEmailAuthenticated = wfTimestampNow();
 		}
 		// If an appropriate value was found, return it
 		return $value == '' ? null : $value;

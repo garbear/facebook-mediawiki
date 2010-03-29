@@ -185,9 +185,19 @@ class SpecialConnect extends SpecialPage {
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		}
-		// Which MediaWiki versions can we call this function in?
+		
+		// TODO: Which MediaWiki versions can we call this function in?
 		$user->addNewUserLogEntryAutoCreate();
 		#$user->addNewUserLogEntry();
+		
+		// Mark that the user is a Facebook user
+		$user->addGroup('fb-user');
+		
+		// By default, update all info from Facebook on login
+		foreach (array('nickname', 'fullname', 'language',
+		               'timecorrection', 'email') as $option) {
+			$user->setOption("fbconnect-update-on-login-$option", 1);
+		}
 		
 		// Give $wgAuth a chance to deal with the user object
 		$wgAuth->initUser($user, true);
@@ -202,7 +212,6 @@ class SpecialConnect extends SpecialPage {
 		
 		// Unfortunately, performs a second database lookup
 		$fbUser = new FBConnectUser($user);
-		
 		// Update the user with settings from Facebook
 		$fbUser->updateFromFacebook();
 		

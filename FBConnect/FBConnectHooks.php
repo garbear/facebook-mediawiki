@@ -62,6 +62,13 @@ class FBConnectHooks {
 	 * Checks the autopromote condition for a user.
 	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
+		global $fbUserRightsFromGroup;
+		// Probably a redundant check, but with PHP you can never be too sure...
+		if (!$fbUserRightsFromGroup) {
+			// No group to pull rights from, so the user can't be a member
+			$result = false;
+			return true;
+		}
 		$types = array(APCOND_FB_INGROUP   => 'member',
 		               APCOND_FB_ISOFFICER => 'officer',
 		               APCOND_FB_ISADMIN   => 'admin');
@@ -120,58 +127,6 @@ class FBConnectHooks {
 		// FBConnect JavaScript code
 		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect-min.js");
 		
-		return true;
-	}
-	
-	/**
-	 * Check against stricter requirements (if any) for Facebook Connect users.
-	 * Counterintuitively, we do the requirement checks first. This is to prevent
-	 * unnecessary API group-related queries.
-	 * 
-	 * $promote contains the groups that will be added. If the user isn't entitled
-	 * to these groups, then we flush this array down the toilet.
-	 */
-	static function GetAutoPromoteGroups( &$user, &$promote ) {
-		// If there isn't any groups to promote to anyway
-		if( !count($promote) ) {
-			return true;
-		}
-		/**
-		// Requirement checks would go here to prevent unnecessary API group queries
-		// E.g. if there was a seperate AutoConfirmAge or AutoConfirmCount check for Facebook users
-		global $fbAutoConfirmAge, $fbAutoConfirmCount;
-		if( !isset( $fbAutoConfirmAge ))
-			$fbAutoConfirmAge = 0;
-		if( !isset( $fbAutoConfirmCount ))
-			$fbAutoConfirmCount = 0;
-		$age = time() - wfTimestampOrNull( TS_UNIX, $user->getRegistration() );
-		if( $age >= $fbAutoConfirmAge && $user->getEditCount() >= $fbAutoConfirmCount ) {
-			// Matches requirements, don't bother checking if we're in a group
-			return true;
-		}
-		/**
-		// If user is not in Facebook group, empty the $promote array
-		$inGroup = true;
-		if( !$inGroup ) {
-			$promote = array();
-		}
-		/**/
-		return true;
-	}
-	
-	/**
-	 * Add a permissions error when permissions errors are checked for.
-	 * 
-	 * The difference between getUserPermissionsErrors and getUserPermissionsErrorsExpensive:
-	 * 
-	 * Typically, both hooks are run when checking for proper permissions in Title.php. When
-	 * it is desireable to skip potentially expensive cascading permission checks, only
-	 * getUserPermissionsErrors is run. This behavior is suitable for nonessential UI
-	 * controls in common cases, but _not_ for functional access control. This behavior
-	 * may provide false positives, but should never provide a false negative.
-	 */
-	static function getUserPermissionsErrorsExpensive( $title, $user, $action, &$result ) {
-		//echo "getUserPermissionsErrorsExpensive\n";
 		return true;
 	}
 	
@@ -257,6 +212,8 @@ class FBConnectHooks {
 	
 	/**
 	 * Modify the user's persinal toolbar (in the upper right).
+	 * 
+	 * TODO: Better 'returnto' code
 	 */
 	static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $wgUser, $wgLang, $wgShowIPinHeader, $fbPersonalUrls, $fbConnectOnly;
@@ -315,8 +272,8 @@ class FBConnectHooks {
 			if (!$fbPersonalUrls['hide_convert_button']) {
 				$personal_urls['fbconvert'] = array(
 					'text'   => wfMsg( 'fbconnect-convert' ),
-					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL('returnto=' .
-								$wgTitle->getPrefixedURL()),
+					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
+					                          'returnto=' . $wgTitle->getPrefixedURL()),
 					'active' => $wgTitle->isSpecial( 'Connect' )
 				);
 			}
@@ -436,7 +393,7 @@ class FBConnectHooks {
 	
 	/**
 	 * Removes Special:UserLogin and Special:CreateAccount from the list of
-	 * Special Pages if $fbConnectOnly is set to true.
+	 * special pages if $fbConnectOnly is set to true.
 	 */
 	static function SpecialPage_initList( &$aSpecialPages ) {
 		global $fbConnectOnly;
@@ -447,6 +404,28 @@ class FBConnectHooks {
 			$aSpecialPages['CreateAccount'] = array('SpecialRedirectToSpecial', 'CreateAccount',
 				'Connect');
 		}
+		return true;
+	}
+	
+	/**
+	 * HACK: Please someone fix me or explain why this is necessary!
+	 * 
+	 * Unstub $wgUser to avoid race conditions and stop returning stupid false
+	 * negatives!
+	 * 
+	 * This might be due to a bug in User::getRights() [called from
+	 * User::isAllowed('read'), called from Title::userCanRead()], where mRights
+	 * is retrieved from an uninitialized user. From my probing, it seems that
+	 * the user is uninitialized with almost all members blank except for mFrom,
+	 * equal to 'session'. The second time around, $user seems to point to the
+	 * User object after being loaded from the session. After the user is loaded
+	 * it has all the appropriate groups. However, before being laoded it seems
+	 * that instead of being null, mRights is equal to the array
+	 * (createaccount, createpage, createtalk, writeapi).
+	 */
+	static function userCan (&$title, &$user, $action, &$result) {
+		// Unstub $wgUser (is there a more succinct way to do this?)
+		$user->getId();
 		return true;
 	}
 	
@@ -510,5 +489,4 @@ class FBConnectHooks {
 		$result = true;
 		return true;
 	}
-	/**/
 }

@@ -149,7 +149,7 @@ class FBConnectAPI {
 		
 		// If no group ID is specified, then there's no group to belong to
 		$gid = $fbUserRightsFromGroup;
-		if( !$gid || !$this->user() ) {
+		if( !$gid ) {
 			return $rights;
 		}
 		

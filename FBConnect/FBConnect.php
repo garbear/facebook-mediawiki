@@ -79,37 +79,33 @@ $wgSpecialPages['Connect'] = 'SpecialConnect';
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
-// If we are configured to pull group info from Facebook, then create the group permissions
-$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
-if( $fbUserRightsFromGroup ) {
-	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
-	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
-	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
-	$wgGroupPermissions['fb-officer']['goodlooking'] = true;
-	$wgImplictGroups[] = 'fb-groupie';
-	$wgImplictGroups[] = 'fb-officer';
-	$wgImplictGroups[] = 'fb-admin';
-}
-
-/**/
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
 define( 'APCOND_FB_INGROUP',   'fb*g' );
 define( 'APCOND_FB_ISOFFICER', 'fb*o' );
 define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
-$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
-$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
-$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+// Create a new group for Facebook users
+$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
+
+// If we are configured to pull group info from Facebook, then create the group permissions
+if ($fbUserRightsFromGroup) {
+	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
+	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
+	#$wgGroupPermissions['fb-officer']['goodlooking'] = true;
+	$wgImplictGroups[] = 'fb-groupie';
+	$wgImplictGroups[] = 'fb-officer';
+	$wgImplictGroups[] = 'fb-admin';
+	$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+	$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
+	$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+}
 
 /**
 $wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoConfirmCount ),
                                   array( APCOND_AGE, &$wgAutoConfirmAge ),
                                   array( APCOND_FB_INGROUP ));
 /**/
-
-$wgImplicitGroups[] = 'fb-groupie';
-$wgImplicitGroups[] = 'fb-officer';
-$wgImplicitGroups[] = 'fb-admin';
 
 
 /**
@@ -158,10 +154,10 @@ class FBConnect {
 		} catch( Exception $e ) {
 			// If PHP's version doesn't support the Reflection API, then exit
 			die( 'PHP version (' . phpversion() . ') must be great enough to support the Reflection API' );
-			// or...
+			// Or list the extensions here manually...
 			$hooks = array('AuthPluginSetup', 'UserLoadFromSession',
 			               'RenderPreferencesForm', 'PersonalUrls',
-			               'ParserAfterTidy', 'BeforePageDisplay');
+			               'ParserAfterTidy', 'BeforePageDisplay', /*...*/ );
 		}
 		return $hooks;
 	}

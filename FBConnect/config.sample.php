@@ -71,7 +71,7 @@ $fbUserRightsFromGroup = false;  # Or a group ID
 #$fbRestrictToNotReplied = false;
 
 /**
- * Options regarding the personal toolbar (upper right).
+ * Options regarding the personal toolbar (in the upper right).
  * 
  * == Key ==              == Effect ==
  * hide_connect_button    Hides the "Log in with Facebook Connect" button.
