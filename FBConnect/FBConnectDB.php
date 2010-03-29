@@ -28,11 +28,15 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Class FBConnectDB
  * 
  * This class abstracts the manipulation of the custom table used by this
- * extension. If the table 'users_fbconnect' does not exist in your database
- * and you are receiving errors like '...TODO...', then you need to run the MW
- * updater: 'php maintenance/update.php'.
+ * extension. If $wgDBprefix is set, this class will pull from the translated
+ * tables. If the table 'users_fbconnect' does not exist in your database
+ * you will receive errors like this:
  * 
- * TODO: Modify this class to respect $wgDBprefix.
+ * Database error from within function "FBConnectDB::getUser". Database
+ * returned error "Table 'user_fbconnect' doesn't exist".
+ * 
+ * In this case, you will need to fix this by running the MW updater:
+ * >php maintenance/update.php
  */
 class FBConnectDB {
 	/**
@@ -43,7 +47,7 @@ class FBConnectDB {
 		if ( $user instanceof User && $user->getId() != 0 ) {
 			$dbr = wfGetDB( DB_SLAVE );
 			$res = $dbr->select(
-				array( 'user_fbconnect' ),
+				array( "{$wgDBprefix}user_fbconnect" ),
 				array( 'user_fbid' ),
 				array( 'user_id' => $user->getId() ),
 				__METHOD__
@@ -62,7 +66,7 @@ class FBConnectDB {
 	public static function getUser( $fbid ) {
 		$dbr = wfGetDB( DB_SLAVE );
 		$id = $dbr->selectField(
-			'user_fbconnect',
+			"{$wgDBprefix}user_fbconnect",
 			'user_id',
 			array( 'user_fbid' => $fbid ),
 			__METHOD__
@@ -80,7 +84,7 @@ class FBConnectDB {
 	public static function addFacebookID( $user, $fbid ) {
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->insert(
-			'user_fbconnect',
+			"{$wgDBprefix}user_fbconnect",
 			array(
 				'user_id' => $user->getId(),
 				'user_fbid' => $fbid
@@ -95,7 +99,7 @@ class FBConnectDB {
 	public static function removeFacebookID( $user, $fbid ) {
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->delete(
-			'user_fbconnect',
+			"{$wgDBprefix}user_fbconnect",
 			array(
 				'user_id' => $user->getId(),
 				'user_fbid' => $fbid
@@ -106,13 +110,13 @@ class FBConnectDB {
 	}
 	
 	/**
-	 * Returns the total number of User <-> Facebook ID associations in the
-	 * database.
+	 * Estimates the total number of User <-> Facebook ID associations in the
+	 * database. If there are no users, then the estimate will probably be 1.
 	 */
 	public static function countUsers() {
 		$dbr = wfGetDB( DB_SLAVE );
 		// An estimate is good enough for choosing a unique nickname
-		$count = $dbr->estimateRowCount( 'user_fbconnect' );
+		$count = $dbr->estimateRowCount("{$wgDBprefix}user_fbconnect");
 		// Avoid returning 0 or -1
 		return $count >= 1 ? $count : 1;
 	}

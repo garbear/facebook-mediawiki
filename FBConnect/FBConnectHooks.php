@@ -114,6 +114,7 @@ class FBConnectHooks {
 		}
 		
 		// JQuery 1.4.2
+		// TODO: Does this conflict with jQuery 1.3.2 included with MW for page editing?
 		$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
 		
 		// FBConnect JavaScript code
@@ -177,17 +178,17 @@ class FBConnectHooks {
 	/**
 	 * Fired when MediaWiki is updated to allow FBConnect to update the database.
 	 * If the database type is supported, then a new tabled named 'user_fbconnect'
-	 * is created. For the table's layout, see fbconnect_table.sql.
-	 * 
-	 * TODO: Prefix the table with $wgDBprefix.
+	 * is created. For the table's layout, see fbconnect_table.sql. If $wgDBprefix
+	 * is set, then the table 'user_fbconnect' will be prefixed accordingly. Make
+	 * sure that fbconnect_table.sql is updated with the database prefix beforehand.
 	 */
 	static function LoadExtensionSchemaUpdates() {
 		global $wgDBtype, $wgExtNewTables;
 		$base = dirname( __FILE__ );
 		if ( $wgDBtype == 'mysql' ) {
-			$wgExtNewTables[] = array( 'user_fbconnect', "$base/fbconnect_table.sql" );
+			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/fbconnect_table.sql");
 		} else if ( $wgDBtype == 'postgres' ) {
-			$wgExtNewTables[] = array( 'user_fbconnect', "$base/fbconnect_table.pg.sql" );
+			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/fbconnect_table.pg.sql");
 		}
 		return true;
 	}
@@ -350,6 +351,7 @@ class FBConnectHooks {
 	/**
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
+	 * 
 	 * TODO!
 	 */
 	public static function RenderPreferencesForm( $form, $output ) {
