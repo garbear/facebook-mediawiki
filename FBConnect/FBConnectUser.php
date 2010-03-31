@@ -83,9 +83,13 @@ class FBConnectUser extends User {
 		$params = array('nickname'       => 'username',
 		                'fullname'       => 'name',
 		                'firstname'      => 'first_name',
+		                'gender'         => 'sex',
 		                'language'       => 'locale',
 		                'timecorrection' => 'timezone',
 		                'email'          => 'contact_email');
+		if (empty($userinfo)) {
+			return null;
+		}
 		$value = array_key_exists($params[$option], $userinfo) ? $userinfo[$params[$option]] : '';
 		// Special handling of several settings
 		switch ($option) {
@@ -94,6 +98,12 @@ class FBConnectUser extends User {
 				// If real names aren't allowed, then simply ignore the parameter from Facebook
 				global $wgAllowRealName;
 				if (!$wgAllowRealName) {
+					$value = '';
+				}
+				break;
+			case 'gender':
+				// Unfortunately, Facebook genders are localized (but this might change)
+				if ($value != 'male' || $value != 'female') {
 					$value = '';
 				}
 				break;
