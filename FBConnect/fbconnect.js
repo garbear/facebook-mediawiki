@@ -52,25 +52,21 @@ window.fbAsyncInit = function() {
 		xfbml  : window.fbUseMarkup // Whether XFBML should be automatically parsed
 	});
 	
-	// Check for changes in login status
+	// Register a function for when the user logs in to Facebook
 	FB.Event.subscribe('auth.login', function(response) {
 		// Refresh the page to transfer the session to the server
 		window.location.reload(true);
 	});
 	
-	// Check login status
-	// TODO: Log the user out if they log out of Facebook
-	/*
-	FB.getLoginStatus(function(response) {
-		if (response.session) {
-			// The user is logged in and connected
-			
-		} else {
-			// No user session available, monitor for when we get one
-			
+	// Register a function for when the user logs out of Facebook
+	FB.Event.subscribe('auth.logout', function(response) {
+		var login = confirm("Not logged in.\n\nYou have been loggout out of " +
+		                    "Facebook. Press OK to log in via Facebook Connect " +
+		                    "again, or press Cancel to stay on the current page.");
+		if (login) {
+			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
 		}
 	});
-	/**/
 };
 
 /**
