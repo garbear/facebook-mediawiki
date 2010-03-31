@@ -177,8 +177,16 @@ class FBConnectAPI {
 		// This can contain up to 500 IDs, avoid requesting this info twice
 		static $members = false;
 		// Get a random 500 group members, along with officers, admins and not_replied's
-		if ($members === false)
-			$members = $this->Facebook()->api_client->groups_getMembers( $gid );
+		if ($members === false) {
+			try {
+				// Check to make sure our session is still valid
+				$members = $this->Facebook()->api_client->groups_getMembers($gid);
+			} catch (FacebookRestClientException $e) {
+				// Invalid session; we're not going to be able to get the rights
+				$rights_cache[$user] = $rights;
+				return $rights;
+			}
+		}
 		
 		if ( $members ) {
 			// Check to see if the user is an officer
