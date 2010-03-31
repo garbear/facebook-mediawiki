@@ -324,6 +324,12 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
 	
+	/**
+	 * TODO: Add an option to disallow this extension to access your Facebook
+	 * information. This option could simply point you to your Facebook privacy
+	 * settings. This is necessary in case the user wants to perpetually browse
+	 * the wiki anonymously, while still being logged in to Facebook.
+	 */
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
 		global $wgOut, $fbConnectOnly;
 		// Connect to the Facebook API 
