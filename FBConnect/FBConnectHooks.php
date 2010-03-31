@@ -450,7 +450,7 @@ class FBConnectHooks {
 	 * Connect. The Single Sign On magic of FBConnect happens in this function.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $wgCookiePrefix, $wgTitle, $wgOut;
+		global $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
 		
 		// Check to see if the user can be logged in from Facebook
 		$fb = new FBConnectAPI();
