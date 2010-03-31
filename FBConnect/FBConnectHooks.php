@@ -450,43 +450,60 @@ class FBConnectHooks {
 	 * Connect. The Single Sign On magic of FBConnect happens in this function.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $fbConnectOnly, $wgAuth, $wgUser, $wgTitle, $wgOut;
+		global $wgCookiePrefix, $wgTitle, $wgOut;
+		
+		// Check to see if the user can be logged in from Facebook
 		$fb = new FBConnectAPI();
-		// Check to see if we have a connection with Facebook
-		if (!$fb->user()) {
-			// No connection with facebook, return $fbConnectOnly
-			#return $fbConnectOnly;
-			return true;
-		}
-		// Look up the MW ID of the Facebook user
-		$user = FBConnectDB::getUser($fb->user());
-		$localId = $user ? $user->getId() : 0;
-		// If the user doesn't exist, ask them to name their new account
-		if (!$localId) {
-			$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
-						'' : 'returnto=' . $wgTitle->getPrefixedURL();
-			// Don't redirect if we're on certain special pages
-			if ($returnto != '') {
-				// Redirect to Special:Connect so the Facebook user can choose a nickname
-				$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl('Connect', $returnto));
+		$fbId = $fb->user();
+		// Check to see if the user can be loaded from the session
+		$localId = isset($_COOKIE["{$wgCookiePrefix}UserID"]) ? 
+				intval($_COOKIE["{$wgCookiePrefix}UserID"]) :
+				(isset($_SESSION['wsUserID']) ? $_SESSION['wsUserID'] : 0);
+		
+		// Case: Not logged into Facebook, but logged into the wiki
+		if (!$fbId && $localId) {
+			$mwUser = User::newFromId($localId);
+			// If the user was Connected, the JS should have logged them out...
+			// TODO: test to see if they logged in normally (with a password)
+			#if (FBConnectDB::userLoggedInWithPassword($mwUser)) return true;
+			if (count(FBConnectDB::getFacebookIDs($mwUser))) {
+				// Oh well, they shouldn't be here anyways; silently log them out
+				$mwUser->logout();
+				// Defaults have just been loaded, so save some time
+				$result = false;
 			}
-			return true;
 		}
-		$user = User::newFromId($localId);
-		$fbUser = new FBConnectUser($user);
-		// Updates the user's info from Facebook
-		$fbUser->updateFromFacebook();
-		
-		// Setup the session
-		global $wgSessionStarted;
-		if (!$wgSessionStarted) {
-			wfSetupSession();
+		// Case: Logged into Facebook, not logged into the wiki
+		else if ($fbId && !$localId) {
+			// Look up the MW ID of the Facebook user
+			$mwUser = FBConnectDB::getUser($fbId);
+			$id = $mwUser ? $mwUser->getId() : 0;
+			// If the user doesn't exist, ask them to name their new account
+			if (!$id) {
+				$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
+							'' : 'returnto=' . $wgTitle->getPrefixedURL();
+				// Don't redirect if we're on certain special pages
+				if ($returnto != '') {
+					// Redirect to Special:Connect so the Facebook user can choose a nickname
+					$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl('Connect', $returnto));
+				}
+			} else {
+				// TODO: To complete the SSO experience, this should log the user on
+				/*
+				// Load the user from their ID
+				$user->mId = $id;
+				$user->mFrom = 'id';
+				$user->load();
+				// Update user's info from Facebook
+				$fbUser = new FBConnectUser($mwUser);
+				$fbUser->updateFromFacebook();
+				// Authentification okay, no need to continue with User::loadFromSession()
+				$result = true;
+				/**/
+			}
 		}
-		
-		$user->setCookies();
-		$wgUser = $user;
-		// Authentification okay
-		$result = true;
+		// Case: Not logged into Facebook or the wiki
+		// Case: Logged into Facebook, logged into the wiki
 		return true;
 	}
 }

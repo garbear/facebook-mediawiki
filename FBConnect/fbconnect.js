@@ -59,6 +59,7 @@ window.fbAsyncInit = function() {
 	});
 	
 	// Check login status
+	// TODO: Log the user out if they log out of Facebook
 	/*
 	FB.getLoginStatus(function(response) {
 		if (response.session) {
