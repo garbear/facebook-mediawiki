@@ -425,104 +425,17 @@ class SpecialConnect extends SpecialPage {
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		
-		//TODO: use wfMsgWikiHtml and then add html
-		$heading = '
-			<div id="specialconnect_info">
-				' . wfMsg( 'fbconnect-intro' ) . '
-				<table>
-					<tr>
-						<th>' . wfMsg( 'fbconnect-conv' ) . '</th>
-						<th>' . wfMsg( 'fbconnect-fbml' ) . '</th>
-						<th>' . wfMsg( 'fbconnect-comm' ) . '</th>
-					</tr>
-					<tr>
-						<td>' . wfMsg( 'fbconnect-convdesc' ) . '</td>
-						<td>' . wfMsg( 'fbconnect-fbmldesc' ) . '</td>
-						<td>' . wfMsg( 'fbconnect-commdesc' ) . '</td>
-					</tr>
-				</table>
-			</div>';
-		$wgOut->addWikiText( $heading );
-		/**
-		 * Renders two side-by-side boxes that differ based on who is logged in.
-		 * 
-		 * Anonymous user:     Draws the Special:UserLogin box and a Connect button.
-		 * Non-connected user: Draws the Special:UserLogin and a Merge box.
-		 * Connected user:     Draws some info about the user and a Logout box.
-		 */
-		$wgOut->addHTML('
-			<table id="specialconnect_boxarea">
-				<tr>
-					<td class="box_left">');
-						if( $fb_user ) {
-							// If the user is Connected, display info about them instead of a login form
-							$content = '<b><fb:name uid="loggedinuser" useyou="false" linked="false"></fb:name></b> ' .
-							           // TODO: (UCLA) should be replaced by the user's primary network
-							           '(UCLA)<br/><a href="/wiki/User:#">my user page</a> | <a href="#" ' .
-							           'onclick="return popupFacebookInvite();">invite friends</a>';
-							$this->drawBox( 'fbconnect-welcome', '', $content );
-						} else {
-							$wgOut->addTemplate( $this->createLoginForm() );
-						}
-						$wgOut->addHTML('
-					</td>
-					<td class="box_right">');
-						if( !$wgUser->isLoggedIn() ) {
-							$this->drawBox( 'fbconnect', 'fbconnect-loginbox' );
-						} else if( !FBConnect::$api->isConnected() ) {
-							$this->drawBox( 'fbconnect-merge', 'fbconnect-mergebox' );
-						} else {
-							$this->drawBox( 'fbconnect-logout', 'fbconnect-logoutbox' );
-						}
-						$wgOut->addHTML('
-					</td>
-				</tr>
-			</table>'
+		// Render a humble Facebook Connect button
+		$wgOut->addHTML('<h2>' . wfMsg( 'fbconnect' ) . '</h2>
+			<div>To log in to Triangle Labs,
+			<fb:login-button size="large" background="black" length="long"></fb:login-button>
+			</div>'
 		);
-	}
-
-	/**
-	 * Draws a Facebook-style info box.
-	 *
-	 * @param string $h1   The name of the message for the title of the box
-	 * @param string $msg  The name of the message for the content, or blank to use $html
-	 * @param string $html The HTML to use if $msg is blank, or the $1 argument of the given message
-	 */
-	private function drawBox( $h1, $msg, $html = '' ) {
-		global $wgOut;
-		$wgOut->addHTML('
-			<div id="specialconnect_box">
-				<div>');
-					if( $html !== '' ) {
-						$wgOut->addHTML( '<fb:profile-pic uid="loggedinuser" size="small" ' .
-						                 'facebook-logo="true"></fb:profile-pic>' );
-					}
-					$wgOut->addHTML('
-				</div>
-				<h1>');
-					$wgOut->addWikiText( wfMsg( $h1 ));
-					$wgOut->addHTML('
-				</h1>
-				<div class="box_content">');
-					global $wgServer, $wgScript;
-					$dbkey = wfUrlencode($this->getTitle()->getPrefixedDBkey());
-					$button = '<fb:login-button size="large" background="white" length="long" ' .
-					          'autologoutlink="true">';
-					if( $msg !== '' ) {
-						$wgOut->addWikiText( wfMsg( $msg, $button ));
-					} else {
-						if( $html == '' )
-							$html = $button;
-						$wgOut->addHTML( '<p>' . $html . '</p>' );
-					}
-					$wgOut->addHTML('
-				</div>
-			</div>');
 	}
 	
 	/**
 	 * Creates a Login Form template object and propogates it with parameters.
-	 */
+	 *
 	private function createLoginForm() {
 		global $wgUser, $wgEnableEmail, $wgEmailConfirmToEdit,
 		       $wgCookiePrefix, $wgCookieExpiration, $wgAuth;
@@ -573,11 +486,5 @@ class SpecialConnect extends SpecialPage {
 		// Spit out the form we just made
 		return $template;
 	}
-	
-	private function anything() {
-		global $wgOut;
-		// Outputs the canonical name of the special page at the top of the page
-		$this->outputHeader();
-	}
-	
+	/**/
 }
