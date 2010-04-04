@@ -111,13 +111,20 @@ class FBConnectHooks {
 		
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		if ($fbLogo) {
-			$out->addInlineStyle('
+			global $wgVersion;
+			$style = <<<STYLE
 			/* Add a pretty logo to Facebook links */
 			.mw-fblink {
-				background: url(' . $fbLogo . ') top left no-repeat !important;
+				background: url($fbLogo) top left no-repeat !important;
 				padding-left: 17px !important;
 			}
-			');
+STYLE;
+			// OutputPage::addInlineStyle() was added in r53282
+			if (version_compare($wgVersion, '1.16', '>=')) {
+				$out->addInlineStyle($style);
+			} else {
+				$out->addScript(Html::inlineStyle($style));
+			}
 		}
 		
 		// JQuery 1.4.2
