@@ -89,7 +89,7 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript;
+		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript, $wgStyleVersion;
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
 		$out->prependHTML('
@@ -107,7 +107,7 @@ class FBConnectHooks {
 		}
 		
 		// Include the extension's stylesheet
-		$out->addExtensionStyle("$wgScriptPath/extensions/FBConnect/fbconnect.css");
+		$out->addExtensionStyle("$wgScriptPath/extensions/FBConnect/fbconnect.css?$wgStyleVersion");
 		
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		if ($fbLogo) {
@@ -134,8 +134,8 @@ STYLE;
 		}
 
 		// FBConnect JavaScript code
-		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js");
-		
+		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion");
+
 		return true;
 	}
 	
