@@ -123,7 +123,7 @@ STYLE;
 			if (version_compare($wgVersion, '1.16', '>=')) {
 				$out->addInlineStyle($style);
 			} else {
-				$out->addScript(Html::inlineStyle($style));
+				$out->addScript('<style type="text/css">' . $style . '</style>');
 			}
 		}
 		
