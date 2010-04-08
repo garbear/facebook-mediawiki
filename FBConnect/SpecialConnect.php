@@ -63,7 +63,7 @@ class SpecialConnect extends SpecialPage {
 			$this->sendPage('alreadyLoggedIn');
 			return;
 		}
-		
+
 		// Connect to the Facebook API
 		$fb = new FBConnectAPI();
 		$fb_user = $fb->user();
@@ -305,9 +305,11 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	private function alreadyLoggedIn() {
-		global $wgOut, $wgUser, $wgRequest;
+		global $wgOut, $wgUser, $wgRequest, $wgSitename;
 		$wgOut->setPageTitle(wfMsg('fbconnect-error'));
 		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
+		$wgOut->addWikiMsg('fbconnect-click-to-connect-existing', $wgSitename);
+		$wgOut->addHTML('<fb:login-button></fb:login-button>');
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
@@ -418,16 +420,16 @@ class SpecialConnect extends SpecialPage {
 	 * Displays the main connect form.
 	 */
 	private function connectForm() {
-		global $wgOut, $wgUser;
+		global $wgOut, $wgUser, $wgSitename;
 		$fb = new FBConnectAPI();
 		$fb_user = $fb->user();
-		
+
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
-		
+
 		// Render a humble Facebook Connect button
 		$wgOut->addHTML('<h2>' . wfMsg( 'fbconnect' ) . '</h2>
-			<div>To log in to Triangle Labs,
+			<div>'.wfMsgExt( 'fbconnect-intro', array('parse', 'content')) . '<br/>' . wfMsg( 'fbconnect-click-to-login', $wgSitename ) .'
 			<fb:login-button size="large" background="black" length="long"></fb:login-button>
 			</div>'
 		);
