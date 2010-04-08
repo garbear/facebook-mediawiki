@@ -129,8 +129,10 @@ STYLE;
 
 		// JQuery 1.4.2
 		// TODO: Does this conflict with jQuery 1.3.2 included with MW for page editing?
-		$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
-		
+		if(!empty($fbIncludeJquery)){
+			$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
+		}
+
 		// FBConnect JavaScript code
 		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js");
 		
