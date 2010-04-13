@@ -108,7 +108,7 @@ class FBConnectHooks {
 		
 		// Include the extension's stylesheet
 		$out->addExtensionStyle("$wgScriptPath/extensions/FBConnect/fbconnect.css?$wgStyleVersion");
-		
+
 		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
 		if ($fbLogo) {
 			global $wgVersion;
@@ -134,7 +134,11 @@ STYLE;
 		}
 
 		// FBConnect JavaScript code
-		$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion");
+		if (version_compare($wgVersion, '1.16', '>=')) {
+			$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion");
+		} else {
+			$out->addScript("<script type='text/javascript' src='$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion'></script>\n");
+		}
 
 		return true;
 	}
