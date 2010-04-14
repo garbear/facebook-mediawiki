@@ -89,7 +89,8 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $fbLogo, $wgScriptPath, $wgJsMimeType, $fbScript, $wgStyleVersion;
+		global $wgVersion, $fbLogo, $fbScript, $fbIncludeJquery,
+		       $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
 		$out->prependHTML('
@@ -106,40 +107,46 @@ class FBConnectHooks {
 			$out->addInlineScript( $mgvs_script );
 		}
 		
-		// Include the extension's stylesheet
-		$out->addExtensionStyle("$wgScriptPath/extensions/FBConnect/fbconnect.css?$wgStyleVersion");
-
-		// Add a pretty Facebook logo in front of userpage links if $fbLogo is set
-		if ($fbLogo) {
-			global $wgVersion;
-			$style = <<<STYLE
-			/* Add a pretty logo to Facebook links */
-			.mw-fblink {
-				background: url($fbLogo) top left no-repeat !important;
-				padding-left: 17px !important;
-			}
+		// Add a Facebook logo to the class .mw-fblink
+		$style = empty($fbLogo) ? '' : <<<STYLE
+		/* Add a pretty logo to Facebook links */
+		.mw-fblink {
+			background: url($fbLogo) top left no-repeat !important;
+			padding-left: 17px !important;
+		}
 STYLE;
-			// OutputPage::addInlineStyle() was added in r53282
-			if (version_compare($wgVersion, '1.16', '>=')) {
+		
+		// Link to the extension's client-side JavaScript
+		$js = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
+		
+		// Things get a little simpler in 1.16...
+		if (version_compare($wgVersion, '1.16', '>=')) {
+			// Add a pretty Facebook logo if $fbLogo is set
+			if ($fbLogo) {
 				$out->addInlineStyle($style);
-			} else {
+			}
+			
+			// Don't include jQuery if it's already in use on the site
+			#$out->includeJQuery();
+			// Temporary workaround until until MW is bundled with jQuery 1.4.2:
+			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
+			
+			// Add the script file specified by $url
+			$out->addScriptFile($js);
+		} else {
+			// Add a pretty Facebook logo if $fbLogo is set
+			if ($fbLogo) {
 				$out->addScript('<style type="text/css">' . $style . '</style>');
 			}
+			
+			// Don't include jQuery if it's already in use on the site
+			if (!empty($fbIncludeJquery)){
+				$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
+			}
+			
+			// Add the script file specified by $url
+			$out->addScript("<script type=\"$wgJsMimeType\" src=\"$js?$wgStyleVersion\"></script>\n");
 		}
-
-		// JQuery 1.4.2
-		// TODO: Does this conflict with jQuery 1.3.2 included with MW for page editing?
-		if(!empty($fbIncludeJquery)){
-			$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
-		}
-
-		// FBConnect JavaScript code
-		if (version_compare($wgVersion, '1.16', '>=')) {
-			$out->addScriptFile("$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion");
-		} else {
-			$out->addScript("<script type='text/javascript' src='$wgScriptPath/extensions/FBConnect/fbconnect.min.js?$wgStyleVersion'></script>\n");
-		}
-
 		return true;
 	}
 	
