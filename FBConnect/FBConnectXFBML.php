@@ -48,17 +48,20 @@ class FBConnectXFBML {
 			
 			// To implement a custom XFBML tag handler, simply case it here like so
 			#case 'fb:login-button':
+			case 'fb:login-button-perms':
 			case 'fb:prompt-permission':
 				// Disable these tags by returning an empty string
 				break;
 			case 'fb:serverfbml':
+				// TODO: Is this safe? Does it respect $fbAllowFacebookImages?
 				$attrs = self::implodeAttrs( $args );
 				return "<fb:serverfbml{$attrs}>$text</fb:serverfbml>";
 			case 'fb:profile-pic':
 			case 'fb:photo':
 			case 'fb:video':
-				if (!$fbAllowFacebookImages)
+				if (!$fbAllowFacebookImages) {
 					break;
+				}
 				// Careful - no "break;" if $fbAllowFacebookImages is true
 			default:
 				// Allow other tags by default
@@ -119,7 +122,7 @@ class FBConnectXFBML {
 	 * But for now... HELP! Where does Firefox pull in the XFBML tags in from??
 	 * 
 	 * After switching to the new JavaScript SDK, these will be the only tags
-	 * implemented for a while: <http://github.com/facebook/connect-js>.
+	 * implemented for a while: <http://github.com/facebook/connect-js/xfbml>.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
@@ -158,6 +161,7 @@ class FBConnectXFBML {
 		/**/
 		
 		// XFBML tags in the alpha version of the Facebook Connect JavaScript SDK
+		// <http://wiki.github.com/facebook/connect-js/xfbml/5>
 		$tags = array('fb:comments',
 		              'fb:fan',
 		              'fb:live-stream',
@@ -165,8 +169,9 @@ class FBConnectXFBML {
 		              'fb:name',
 		              'fb:profile-pic',
 		              'fb:serverfbml',
-		              'fb:share-button');
-		
+		              'fb:share-button',
+		              'fb:login-button-perms',
+		              'fb:name');
 		// Reject discarded tags (that return an empty string) from Special:Version
 		$tempParser = new DummyParser();
 		foreach( $tags as $i => $tag ) {
