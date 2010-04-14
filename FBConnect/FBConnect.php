@@ -124,6 +124,9 @@ class FBConnect {
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
 		
+		// Facebook/username associations should be shared when $wgSharedDB is enabled
+		$wgSharedTables[] = 'user_fbconnect';
+		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');
 		foreach( $hooks as $hookName ) {
