@@ -119,7 +119,7 @@ class FBConnectDB {
 	 */
 	public static function countUsers() {
 		$prefix = self::getPrefix();
-		$dbr = wfGetDB( DB_SLAVE, array(), $this->sharedDB() );
+		$dbr = wfGetDB( DB_SLAVE, array(), self::sharedDB() );
 		// An estimate is good enough for choosing a unique nickname
 		$count = $dbr->estimateRowCount("{$prefix}user_fbconnect");
 		// Avoid returning 0 or -1
@@ -144,7 +144,7 @@ class FBConnectDB {
 			// Include 'user_fbconnect' in case someone forgot to set the shared prefix
 			if (in_array('user_fbconnect', $wgSharedTables) ||
 			    in_array("{$wgSharedPrefix}user_fbconnect", $wgSharedTables)) {
-				return true;
+				return $wgSharedDB;
 			}
 		}
 		return false;

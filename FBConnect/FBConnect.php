@@ -119,7 +119,7 @@ class FBConnect {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgXhtmlNamespaces, $wgAuth, $wgHooks;
+		global $wgXhtmlNamespaces, $wgAuth, $wgHooks, $wgSharedTables;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
