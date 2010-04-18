@@ -269,11 +269,14 @@ STYLE;
 				}
 			}
 			// Replace logout link with a button to disconnect from Facebook Connect
-			unset( $personal_urls['logout'] );
-			$personal_urls['fblogout'] = array(
-				'text'   => wfMsg( 'fbconnect-logout' ),
-				'href'   => '#',
-				'active' => false );
+			if(empty($fbPersonalUrls['hide_logout_of_fb'])){
+				unset( $personal_urls['logout'] );
+				$personal_urls['fblogout'] = array(
+					'text'   => wfMsg( 'fbconnect-logout' ),
+					'href'   => '#',
+					'active' => false );
+			}
+
 			/*
 			 * Personal URLs option: link_back_to_facebook
 			 */

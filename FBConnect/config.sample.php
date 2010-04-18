@@ -80,6 +80,8 @@ $fbUserRightsFromGroup = false;  # Or a group ID
  * hide_connect_button    Hides the "Log in with Facebook Connect" button.
  * hide_convert_button    Hides "Connect this account with Facebook" for non-
  *                        Connected users.
+ * hide_logout_of_fb      Hides the "logout of facebook" button and leaves only
+ *                        the button to log out of the current MediaWiki.
  * link_back_to_facebook  Shows a handy "Back to facebook.com" link for Connected
  *                        users. This helps enforce the idea that this wiki is
  *                        "in front" of Facebook.
@@ -93,6 +95,7 @@ $fbUserRightsFromGroup = false;  # Or a group ID
 $fbPersonalUrls = array(
 	'hide_connect_button'   => false,
 	'hide_convert_button'   => false,
+	'hide_logout_of_fb'     => false,
 	'link_back_to_facebook' => true,
 	'remove_user_talk_link' => false,
 	'use_real_name_from_fb' => $fbUserName, # or true or false
