@@ -158,12 +158,15 @@ class SpecialConnect extends SpecialPage {
 	
 	protected function createUser($fb_id, $name) {
 		global $wgAuth, $wgOut, $wgUser;
-		/*
+		
+		// Make sure we're not stealing an existing user account.
 		if (!$name || !$this->userNameOK($name)) {
+			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
 			wfDebug("FBConnect: Name not OK: '$name'\n");
 			$this->sendPage('chooseNameForm');
 			break;
 		}
+
 		/**
 		// Test to see if we are denied by $wgAuth or the user can't create an account
 		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
