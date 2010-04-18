@@ -335,7 +335,9 @@ STYLE;
 		global $wgUser;
 		
 		// If the user name is a valid Facebook ID, link to the Facebook profile
-		if( FBConnect::$api->isConnected() ) {
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
+		if( $fb_user ) {
 			$html = $output->getHTML();
 			$name = $wgUser->getName();
 			$i = strpos( $html, $name );
