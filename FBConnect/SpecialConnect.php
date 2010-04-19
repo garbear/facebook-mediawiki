@@ -336,6 +336,12 @@ class SpecialConnect extends SpecialPage {
 	 * the wiki anonymously, while still being logged in to Facebook.
 	 */
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
+
+		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
+		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$messagekey ) ) ){
+			return;
+		}
+
 		global $wgOut, $fbConnectOnly;
 		// Connect to the Facebook API 
 		$fb = new FBConnectAPI();
