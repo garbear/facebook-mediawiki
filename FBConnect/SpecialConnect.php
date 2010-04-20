@@ -33,6 +33,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Visiting the subpage will generate an error; it is only useful when POSTed to.
  */
 class SpecialConnect extends SpecialPage {
+	private $userNamePrefix;
+
 	/**
 	 * Constructor.
 	 */
@@ -42,6 +44,17 @@ class SpecialConnect extends SpecialPage {
 		parent::__construct( 'Connect' );
 		// Add this special page to the "login" group of special pages
 		$wgSpecialPageGroups['Connect'] = 'login';
+
+		wfLoadExtensionMessages( 'FBConnect' );
+		$userNamePrefix = wfMsg('fbconnect-usernameprefix');
+	}
+	
+	/**
+	 * Allows the prefix to be changed at runtime.  This is useful, for example,
+	 * to generate a username based off of a facebook name.
+	 */
+	public function setUserNamePrefix( $prefix ){
+		$this->userNamePrefix = $prefix;
 	}
 	
 	/**
@@ -158,7 +171,7 @@ class SpecialConnect extends SpecialPage {
 	
 	protected function createUser($fb_id, $name) {
 		global $wgAuth, $wgOut, $wgUser;
-		
+
 		// Make sure we're not stealing an existing user account.
 		if (!$name || !$this->userNameOK($name)) {
 			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
@@ -251,7 +264,7 @@ class SpecialConnect extends SpecialPage {
 		$wgUser = $user;
 		$this->sendPage('displaySuccessLogin');
 	}
-	
+
 	/**
 	 * Generates a unique username for a wiki account based on the prefix specified
 	 * in the message 'fbconnect-usernameprefix'. The number appended is equal to
@@ -260,13 +273,12 @@ class SpecialConnect extends SpecialPage {
 	 * more scalable. For smaller wiki installations, uncomment the line $i = 1 to
 	 * have consecutive usernames starting at 1.
 	 */
-	protected function generateUserName() {
-		$prefix = wfMsg('fbconnect-usernameprefix');
+	public function generateUserName() {
 		// Because $i is incremented the first time through the while loop
 		$i = FBConnectDB::countUsers();
 		#$i = 1; // This is the DUMB WAY to do this
 		while ($i < PHP_INT_MAX) {
-			$name = "$prefix$i";
+			$name = $this->userNamePrefix.$i;
 			if ($this->userNameOK($name)) {
 				return $name;
 			}
@@ -274,11 +286,11 @@ class SpecialConnect extends SpecialPage {
 		}
 		return $prefix;
 	}
-	
+
 	/**
 	 * Tests whether the name is OK to use as a user name.
 	 */
-	protected function userNameOK ($name) {
+	public function userNameOK ($name) {
 		global $wgReservedUsernames;
 		return ($name && 0 == User::idFromName($name) && !in_array($name, $wgReservedUsernames));
 	}
@@ -316,7 +328,7 @@ class SpecialConnect extends SpecialPage {
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
-	
+
 	private function displaySuccessLogin() {
 		global $wgOut, $wgRequest;
 		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
@@ -328,7 +340,7 @@ class SpecialConnect extends SpecialPage {
 		// Render the "return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
-	
+
 	/**
 	 * TODO: Add an option to disallow this extension to access your Facebook
 	 * information. This option could simply point you to your Facebook privacy
@@ -338,19 +350,19 @@ class SpecialConnect extends SpecialPage {
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
 
 		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
-		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$messagekey ) ) ){
+		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){
 			return;
 		}
 
 		global $wgOut, $fbConnectOnly;
-		// Connect to the Facebook API 
+		// Connect to the Facebook API
 		$fb = new FBConnectAPI();
 		$fb_user = $fb->user();
 		$userinfo = $fb->getUserInfo($fb_user);
-		
+
 		// Keep track of when the first option visible to the user is checked
 		$checked = false;
-		
+
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
@@ -410,7 +422,7 @@ class SpecialConnect extends SpecialPage {
 				$checked = true;
 			}
 		}
-		
+
 		// The options for auto and manual usernames are always available
 		$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="auto" ' .
 			($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto"/></td><td class="mw-input">' .
