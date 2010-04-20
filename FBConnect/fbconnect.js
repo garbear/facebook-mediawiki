@@ -78,7 +78,7 @@ $(document).ready(function() {
 	// Add a pretty logo to Facebook links
 	$('#pt-fbconnect,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
 	
-	// Add the logout behaviour to the "Logout of Facebook" button
+	// Add the logout behavior to the "Logout of Facebook" button
 	$('#pt-fblogout').click(function() {
 		// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
 		// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
