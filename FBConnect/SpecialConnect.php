@@ -34,7 +34,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class SpecialConnect extends SpecialPage {
 	private $userNamePrefix;
-
+	private static $availableUserUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
+	
 	/**
 	 * Constructor.
 	 */
@@ -57,6 +58,13 @@ class SpecialConnect extends SpecialPage {
 		$this->userNamePrefix = $prefix;
 	}
 	
+	/**
+	 * Returns the list of user options that can be updated by facebook on each login.
+	 */
+	public function getAvailableUserUpdateOptions(){
+		return $this->availableUserUpdateOptions;
+	}
+
 	/**
 	 * Overrides getDescription() in SpecialPage. Looks in a different wiki message
 	 * for this extension's description.
@@ -168,9 +176,9 @@ class SpecialConnect extends SpecialPage {
 			$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 		}
 	}
-	
+
 	protected function createUser($fb_id, $name) {
-		global $wgAuth, $wgOut, $wgUser;
+		global $wgAuth, $wgOut, $wgUser, $wgRequest;
 
 		// Make sure we're not stealing an existing user account.
 		if (!$name || !$this->userNameOK($name)) {
@@ -179,7 +187,7 @@ class SpecialConnect extends SpecialPage {
 			$this->sendPage('chooseNameForm');
 			break;
 		}
-
+		
 		/**
 		// Test to see if we are denied by $wgAuth or the user can't create an account
 		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
@@ -208,13 +216,16 @@ class SpecialConnect extends SpecialPage {
 		
 		// Mark that the user is a Facebook user
 		$user->addGroup('fb-user');
-		
-		// By default, update all info from Facebook on login
-		foreach (array('nickname', 'fullname', 'language',
-		               'timecorrection', 'email') as $option) {
-			$user->setOption("fbconnect-update-on-login-$option", 1);
+
+		$updateFormPrefix = "wpUpdateUserInfo";
+		foreach ($this->availableUserUpdateOptions as $option) {
+			if($wgRequest->getVal($updateFormPrefix.$option, '') != ""){
+				$user->setOption("fbconnect-update-on-login-$option", 1);
+			} else {
+				$user->setOption("fbconnect-update-on-login-$option", 0);
+			}
 		}
-		
+
 		// Give $wgAuth a chance to deal with the user object
 		$wgAuth->initUser($user, true);
 		$wgAuth->updateUser($user);
@@ -380,10 +391,8 @@ class SpecialConnect extends SpecialPage {
 			$name = isset($_COOKIE[$wgCookiePrefix . 'UserName']) ?
 						trim($_COOKIE[$wgCookiePrefix . 'UserName']) : '';
 			// Build an array of attributes to update
-			// TODO: It seems that these options aren't processed when the form is posted and that currently, we always update all of the options.
 			$updateOptions = array();
-			$checkUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
-			foreach ($checkUpdateOptions as $option) {
+			foreach ($this->availableUserUpdateOptions as $option) {
 				// Translate the MW parameter into a FB parameter
 				$value = FBConnectUser::getOptionFromInfo($option, $userinfo);
 				// If no corresponding value was received from Facebook, then continue
@@ -437,7 +446,7 @@ class SpecialConnect extends SpecialPage {
 			'<input type="submit" value="Cancel" name="wpCancel"/></td></tr></table></fieldset></form>'
 		);
 	}
-	
+
 	/**
 	 * Displays the main connect form.
 	 */
