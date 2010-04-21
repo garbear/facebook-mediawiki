@@ -103,7 +103,7 @@ class SpecialConnect extends SpecialPage {
 				case 'manual':
 					if (!isset($username) || !$this->userNameOK($username)) {
 						// Use manual name if no username is set, even if manual wasn't chosen
-						$username = $wgRequest->getText('wpNameValue');
+						$username = $wgRequest->getText('wpName2');
 					}
 					// If no valid username was found, something's not right; ask again
 					if (!$this->userNameOK($username)) {
@@ -380,6 +380,7 @@ class SpecialConnect extends SpecialPage {
 			$name = isset($_COOKIE[$wgCookiePrefix . 'UserName']) ?
 						trim($_COOKIE[$wgCookiePrefix . 'UserName']) : '';
 			// Build an array of attributes to update
+			// TODO: It seems that these options aren't processed when the form is posted and that currently, we always update all of the options.
 			$updateOptions = array();
 			$checkUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
 			foreach ($checkUpdateOptions as $option) {
@@ -430,7 +431,7 @@ class SpecialConnect extends SpecialPage {
 			'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
 			'value="manual" id="wpNameChoiceManual"/></td><td class="mw-input"><label ' .
 			'for="wpNameChoiceManual">' . wfMsg('fbconnect-choosemanual') . '</label>&nbsp;' .
-			'<input name="wpNameValue" size="16" value="" id="wpNameValue"/></td></tr>' .
+			'<input name="wpName2" size="16" value="" id="wpName2"/></td></tr>' .
 			// Finish with two options, "Log in" or "Cancel"
 			'<tr><td></td><td class="mw-submit"><input type="submit" value="Log in" name="wpOK"/>' .
 			'<input type="submit" value="Cancel" name="wpCancel"/></td></tr></table></fieldset></form>'
