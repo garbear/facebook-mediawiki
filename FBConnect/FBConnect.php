@@ -71,6 +71,7 @@ $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
 $wgAutoloadClasses['FBConnectDB'] =			$dir . 'FBConnectDB.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
+$wgAutoloadClasses['FBConnectPushEvent'] =	$dir . 'FBConnectPushEvent.php';
 $wgAutoloadClasses['FBConnectUser'] =		$dir . 'FBConnectUser.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
@@ -139,8 +140,13 @@ class FBConnect {
 			global $wgParser;
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
+		
+		global $fbEnablePushToFacebook;
+		if(!empty($fbEnablePushToFacebook)){
+			FBConnectPushEvent::initAll();
+		}
 	}
-	
+
 	/**
 	 * Returns an array with the names of all public static functions
 	 * in the specified class.
