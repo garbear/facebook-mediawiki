@@ -154,7 +154,7 @@ if(!empty($fbEnablePushToFacebook)){
 	);
 	foreach($pushEventClassNames as $pClassName){
 		$fbPushEventClasses[] = $pClassName;
-		$wgAutoloadClasses[$pClassName] = $fbPushDir . '$pClassName.php';
+		$wgAutoloadClasses[$pClassName] = $fbPushDir . "$pClassName.php";
 	}
 
 	// Example of explicitly adding a push event which doesn't meet the criteria above.

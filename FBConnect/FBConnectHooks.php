@@ -337,7 +337,7 @@ STYLE;
 	public static function RenderPreferencesForm( $form, $output ) {
 		global $wgUser;
 		
-		// If the user name is a valid Facebook ID, link to the Facebook profile
+		// If the user has a valid Facebook ID, link to the Facebook profile
 		$fb = new FBConnectAPI();
 		$fb_user = $fb->user();
 		if( $fb_user ) {
@@ -347,15 +347,15 @@ STYLE;
 			if ($i !== FALSE) {
 				// Replace the old output with the new output
 				$html =  substr( $html, 0, $i ) . preg_replace( "/$name/",
-				    "<a href=\"http://www.facebook.com/profile.php?id=$name\" " .
-					"class='mw-userlink mw-fbconnectuser'>$name</a>", substr( $html, $i ), 1 );
+					"$name (<a href=\"http://www.facebook.com/profile.php?id=$fb_user\" " .
+					"class='mw-userlink mw-fbconnectuser'>".wfMsg('fbconnect-link-to-profile')."</a>", substr( $html, $i ), 1 );
 				$output->clearHTML();
 				$output->addHTML( $html );
 			}
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Adds the class "mw-userlink" to links belonging to Connect accounts on
 	 * the page Special:ListUsers.

@@ -137,6 +137,9 @@ fb.'convertsuccesstext' => 'You have successfully converted your OpenID to $1.',
 fb.'convertyourstext' => 'That is already your OpenID.',
 fb.'convertothertext' => 'That is someone else\'s OpenID.',
 */
+
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook profile',
 );
 
 /**
@@ -162,5 +165,6 @@ OpenID preferences tab title',
 	'fbconnect-pref-update-userinfo-on-login' => 'FBConnect preference label for updating from Facebook account upon login',
 	'fbconnect-urls-action' => '{{Identical|Action}}',
 	'fbconnect-urls-delete' => '{{identical|Delete}}',
+	'fbconnect-link-to-profile' => 'Appears next to the user\s name in their Preferences page and this text is made into link to the profile of that user if they are connected.',
 );
 /**/

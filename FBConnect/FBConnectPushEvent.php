@@ -8,7 +8,8 @@
  * defined in config.sample.php.
  */
 
- 
+$wgExtensionFunctions[] = 'FBConnectPushEvent::initExtension';
+
 class FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = ''; // implementing classes MUST override this with their own value.
 
@@ -19,12 +20,52 @@ class FBConnectPushEvent {
 	public function getUserPreferenceName(){
 		return $this->isAllowedUserPreferenceName;
 	}
+	
+	/**
+	 * Initialize the extension itself.  This includes creating the user-preferences for
+	 * the push events.
+	 */
+	static public function initExtension(){
+		wfProfileIn(__METHOD__);
+
+		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
+		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
+
+		
+		$PREFERENCES_TAB_NAME = "fbconnect-prefstext"; // this must correspond to the name of the message for the text on the tab itself.
+
+		// Adds the user-preferences (making use of the "PreferencesExtension" extension).
+		/*
+		$checkBoxName = "fbtest";
+		wfAddPreferences(array(
+			array(
+				"name" => $checkBoxName,
+				"section" => $PREFERENCES_TAB_NAME,
+				"type" => PREF_TOGGLE_T,
+				//"size" => "", // Not relevant to this type.
+				//"html" => "",
+				//"min" => "",
+				//"max" => "",
+				//"validate" => "",
+				//"save" => "",
+				//"load" => "",
+				"default" => "",
+			)
+		));
+		*/
+		
+		
+		
+		
+		
+		wfProfileOut(__METHOD__);
+	}
 
 	/**
 	 * This static function is called by the FBConnect extension if push events are enabled.  It checks
 	 * to make sure that the configured push-events are valid and then gives them each a chance to initialize.
 	 */
-	public static function initAll(){
+	static public function initAll(){
 		global $fbPushEventClasses;
 		if(!empty($fbPushEventClasses)){
 			// Fail fast (and hard) if a push event was coded incorrectly.
@@ -56,5 +97,6 @@ class FBConnectPushEvent {
 	 * and the getUserPreferenceName() call checks out (the result must be non-empty).
 	 */
 	public function init(){}
+
 
 } // end FBConnectPushEvent class

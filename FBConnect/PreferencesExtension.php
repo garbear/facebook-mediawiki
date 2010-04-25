@@ -7,15 +7,15 @@
  *
  * Author: Austin Che <http://openwetware.org/wiki/User:Austin_J._Che>
  */
- 
+
+$wgExtensionFunctions[] = "wfPreferencesExtension";
 $wgExtensionCredits['specialpage'][] = array(
     'name' => 'PreferencesExtension',
-    'version' => '2006/11/16',
+    'version' => '2008/02/10.2',
     'author' => 'Austin Che',
     'url' => 'http://openwetware.org/wiki/User:Austin_J._Che/Extensions/PreferencesExtension',
     'description' => 'Enables extending user preferences',
 );
-$wgHooks['SpecialPage_initList'][] = 'wfOverridePreferences';
  
 // constants for pref types
 define('PREF_USER_T', 1);
@@ -23,12 +23,24 @@ define('PREF_TOGGLE_T', 2);
 define('PREF_TEXT_T', 3);
 define('PREF_PASSWORD_T', 4);
 define('PREF_INT_T', 5);
+define('PREF_DROPDOWN_T', 6);
  
 // each element of the following should be an array that can have keys:
 // name, section, type, size, validate, load, save, html, min, max, default
 if (!isset($wgExtensionPreferences))
      $wgExtensionPreferences = array();
  
+function wfPreferencesExtension()
+{
+	wfProfileIn(__METHOD__);
+	
+    wfUseMW('1.7');
+    global $wgHooks;
+    $wgHooks['SpecialPage_initList'][] = 'wfOverridePreferences';
+	
+	wfProfileOut(__METHOD__);
+}
+
 /**
  * Adds an array of prefs to be displayed in the user preferences
  *
@@ -37,25 +49,32 @@ if (!isset($wgExtensionPreferences))
 function wfAddPreferences($prefs)
 {
     global $wgExtensionPreferences;
+	wfProfileIn(__METHOD__);
  
     foreach ($prefs as $pref)
     {
         $wgExtensionPreferences[] = $pref;
     }
+	wfProfileOut(__METHOD__);
 }
  
 function wfOverridePreferences(&$list)
 {
+	wfProfileIn(__METHOD__);
+	
     // we 'override' the default preferences special page with our own
     $list["Preferences"] = array("SpecialPage", "Preferences", "", true, "wfSpecialPreferencesExtension");
+	
+	wfProfileOut(__METHOD__);
     return true;
 }
  
 function wfSpecialPreferencesExtension()
 {
-	// Should be able to auto-load this.
-	//global $IP;
-    //require_once($IP.'SpecialPreferences.php');
+	wfProfileIn(__METHOD__);
+
+	global $IP;
+    require_once($IP . '/includes/specials/SpecialPreferences.php');
  
     // override the default preferences form
     class SpecialPreferencesExtension extends PreferencesForm
@@ -68,10 +87,11 @@ function wfSpecialPreferencesExtension()
         // one for displaying the form and one for saving the values
  
         function savePreferences() 
-        {    
+        {
             // handle extension prefs first
             global $wgUser, $wgRequest;
             global $wgExtensionPreferences;
+			wfProfileIn(__METHOD__);
  
             foreach ($wgExtensionPreferences as $p)
             {
@@ -99,6 +119,13 @@ function wfSpecialPreferencesExtension()
                             $wgUser->setOption($name, $this->validateIntOrNull($value, $min, $max));
                         break;
  
+                    case PREF_DROPDOWN_T:
+                        if (isset($p['save']))
+                            $p['save']($name, $value);
+                        else
+                            $wgUser->setOption($name, $value);
+                        break;
+ 
                     case PREF_PASSWORD_T:
                     case PREF_TEXT_T:
                     case PREF_USER_T:
@@ -115,12 +142,15 @@ function wfSpecialPreferencesExtension()
  
             // call parent's function which saves the normal prefs and writes to the db
             parent::savePreferences();
+
+			wfProfileOut(__METHOD__);
         }
- 
+
         function mainPrefsForm( $status , $message = '' )
         {
             global $wgOut, $wgRequest, $wgUser;
             global $wgExtensionPreferences;
+			wfProfileIn(__METHOD__);
  
             // first get original form, then hack into it new options
             parent::mainPrefsForm($status, $message);
@@ -159,19 +189,20 @@ function wfSpecialPreferencesExtension()
                     if (! preg_match($regex, $html, $m))
                     {
                         // doesn't exist so add an empty section to end
-                        $addhtml = "<fieldset><legend>$sectext</legend></fieldset>";
-                        $html = preg_replace("/(<div id='prefsubmit'.*)/s", "$addhtml $1", $html);
+                        $addhtml = "<fieldset><legend>$sectext</legend></fieldset>\n";
+                        $html = preg_replace("/(<(div|table) id='prefsubmit'.*)/s", "$addhtml $1", $html);
                     }
- 
+
                 }
- 
+
                 $type = isset($p['type']) ? $p['type'] : PREF_USER_T;
+                $pos = isset($p['pos']) ? $p['pos'] : '';
                 switch ($type)
                 {
                     case PREF_TOGGLE_T:
                         $addhtml = $this->getToggle($name);
                         break;
- 
+
                     case PREF_INT_T:
                     case PREF_TEXT_T:
                     case PREF_PASSWORD_T:
@@ -181,9 +212,35 @@ function wfSpecialPreferencesExtension()
                             $type = "password";
                         else
                             $type = "text";
-                        $addhtml = "<table>" . 
-                            $this->addRow("<label for=\"{$name}\">$caption</label>",
-                                          "<input type=\"$type\" name=\"{$name}\" value=\"{$value}\" $size />") . "</table>" ;
+ 
+                        if ($pos == 'first' || $pos == '')
+                            $addhtml = "\n<table>\n";
+                        else
+                            $addhtml = '';
+                        $addhtml .= $this->addRow("<label for=\"{$name}\">$caption</label>",
+                                                  "<input type=\"$type\" id=\"{$name}\" name=\"{$name}\" value=\"{$value}\" $size />")."\n";
+                        if ($pos == 'last' || $pos == '')	
+                            $addhtml .="</table>\n";
+                        break;
+ 
+                    case PREF_DROPDOWN_T:
+                        $caption = isset($p['caption']) && $p['caption'] ? $p['caption'] : wfMsg($name);
+                        $onchange = isset($p['onchange']) && $p['onchange'] ? (" onchange='" . $p['onchange'] . "'") : ''; 
+                        $row = "\n      <select id=\"{$name}\"$onchange name=\"{$name}\">\n";
+                        $options = is_array($p['options']) ? $p['options'] : array();
+                        foreach($options as $option)
+                        {
+                            $row .= "        <option>$option</option>\n";
+                        }
+                        $row .= "      </select>";
+ 
+                        if ($pos == 'first' || $pos == '')
+                            $addhtml = "\n<table>\n";
+                        else
+                            $addhtml = '';
+                        $addhtml .= $this->addRow("<label for=\"{$name}\">$caption</label>", $row)."\n";
+                        if ($pos == 'last' || $pos == '') 
+                            $addhtml .="</table>\n";
                         break;
  
                     case PREF_USER_T:
@@ -195,15 +252,19 @@ function wfSpecialPreferencesExtension()
                 // the section exists
                 $html = preg_replace($regex, "$1 $addhtml $2", $html);
             }
- 
+
             $wgOut->addHTML($html);
- 
+
             // debugging
             //$wgOut->addHTML($wgUser->encodeOptions());
+			
+			wfProfileOut(__METHOD__);
         }
     }
- 
+
     global $wgRequest;
     $prefs = new SpecialPreferencesExtension($wgRequest);
     $prefs->execute();
+	
+	wfProfileOut(__METHOD__);
 }

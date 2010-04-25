@@ -67,7 +67,18 @@ require_once $dir . 'facebook-client/facebook.php';
 if(!empty($fbIncludePreferencesExtension)){
 	// TODO: This inclusion isn't needed at the moment unless fbEnablePushToFacebook is also true.
 	// If we never need non-push preferences, just add an additional conditional.
+	// TODO: This extension is obsolete in v1.16... do a version-compare and skip this extension
+	// for >= 1.16 and use this hook instead: http://www.mediawiki.org/wiki/Manual:Hooks/GetPreferences
 	require_once $dir . 'PreferencesExtension.php';
+}
+
+$wgExtensionFunctions[] = 'FBConnect::init';
+
+if(!empty($fbEnablePushToFacebook)){
+	// Need to include it explicitly instead of autoload since it has initialization code of its own.
+	// This should be done after FBConnect::init is added to wgExtensionFunctions so that FBConnect
+	// gets fully initialized first.
+	require_once $dir . 'FBConnectPushEvent.php';
 }
 
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
@@ -76,14 +87,11 @@ $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
 $wgAutoloadClasses['FBConnectDB'] =			$dir . 'FBConnectDB.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
-$wgAutoloadClasses['FBConnectPushEvent'] =	$dir . 'FBConnectPushEvent.php';
 $wgAutoloadClasses['FBConnectUser'] =		$dir . 'FBConnectUser.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
 
 $wgSpecialPages['Connect'] = 'SpecialConnect';
-
-$wgExtensionFunctions[] = 'FBConnect::init';
 
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
 define( 'APCOND_FB_INGROUP',   'fb*g' );
