@@ -64,6 +64,11 @@ $wgExtensionCredits['specialpage'][] = array(
 $dir = dirname(__FILE__) . '/';
 require_once $dir . 'config.php';
 require_once $dir . 'facebook-client/facebook.php';
+if(!empty($fbIncludePreferencesExtension)){
+	// TODO: This inclusion isn't needed at the moment unless fbEnablePushToFacebook is also true.
+	// If we never need non-push preferences, just add an additional conditional.
+	require_once $dir . 'PreferencesExtension.php';
+}
 
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';

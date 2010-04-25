@@ -127,6 +127,14 @@ $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 $fbIncludeJquery = true;
 
 /**
+ * Optionally turn off the inclusion of the PreferencesExtension.  Since this
+ * is an extension that you may already have installed in your instance of
+ * MediaWiki, there is the option to turn off FBConnect's inclusion of it (which
+ * will require you to already have PreferencesExtension enabled elsewhere).
+ */
+$fbIncludePreferencesExtension = true;
+
+/**
  * PUSH EVENTS
  *
  * This section allows controlling of whether push events are enabled, and which

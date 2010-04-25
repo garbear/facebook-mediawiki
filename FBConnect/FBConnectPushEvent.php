@@ -31,14 +31,15 @@ class FBConnectPushEvent {
 			foreach($fbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
 				$className = get_class();
-				if(empty($pushObj->getUserPreferenceName())){
+				$prefName = $pushObj->getUserPreferenceName();
+				if(empty($prefName)){
 					$dirName = dir( __FILE__ );
 					$msg = "FATAL ERROR: The push event class <strong>\"$pushEventClassName\"</strong> does not return a valid user preference name! ";
-					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>");
+					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>";
 					die($msg);
 				} else if(!is_subclass_of($className)){
 					$msg = "FATAL ERROR: The push event class <strong>\"$pushEventClassName\"</strong> is not a subclass of <strong>$className</strong>! ";
-					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>");
+					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>";
 					die($msg);
 				}
 				
