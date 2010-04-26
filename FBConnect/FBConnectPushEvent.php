@@ -10,8 +10,16 @@
 
 $wgExtensionFunctions[] = 'FBConnectPushEvent::initExtension';
 
+// PreferencesExtension is needed up until 1.16, then the needed functionality is built in.
+if (version_compare($wgVersion, '1.16', '>=')) {
+	$wgHooks['GetPreferences'][] = 'FBConnectPushEvent::addPreferencesToggles';
+}
+
 class FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = ''; // implementing classes MUST override this with their own value.
+
+	// This must correspond to the name of the message for the text on the tab itself.
+	static protected $PREFERENCES_TAB_NAME = "fbconnect-prefstext";
 
 	/**
 	 * Accessor for the user preference to which (if set to 1) allows this type of event
@@ -20,7 +28,7 @@ class FBConnectPushEvent {
 	public function getUserPreferenceName(){
 		return $this->isAllowedUserPreferenceName;
 	}
-	
+
 	/**
 	 * Initialize the extension itself.  This includes creating the user-preferences for
 	 * the push events.
@@ -28,38 +36,72 @@ class FBConnectPushEvent {
 	static public function initExtension(){
 		wfProfileIn(__METHOD__);
 
+		// Make sure that all of the push events were configured correctly.
+		self::initAll();
+
 		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
 		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
 
-		
-		$PREFERENCES_TAB_NAME = "fbconnect-prefstext"; // this must correspond to the name of the message for the text on the tab itself.
+		// TODO: Can we detect if this is Special:Preferences and only add the checkboxes if that is the case?  Can't think of anything else that would break.
+		// TODO: Can we detect if this is Special:Preferences and only add the checkboxes if that is the case?  Can't think of anything else that would break.
 
-		// Adds the user-preferences (making use of the "PreferencesExtension" extension).
-		/*
-		$checkBoxName = "fbtest";
-		wfAddPreferences(array(
-			array(
-				"name" => $checkBoxName,
-				"section" => $PREFERENCES_TAB_NAME,
-				"type" => PREF_TOGGLE_T,
-				//"size" => "", // Not relevant to this type.
-				//"html" => "",
-				//"min" => "",
-				//"max" => "",
-				//"validate" => "",
-				//"save" => "",
-				//"load" => "",
-				"default" => "",
-			)
-		));
-		*/
-		
-		
-		
-		
-		
+
+		// Only add the preferences using PreferencesExtension for versions prior to 1.16.
+		// The code for 1.16+ will be done in FBConnectPushEvent::addPreferencesToggles
+		global $wgVersion;
+		if (version_compare($wgVersion, '1.16', '<')) {
+			global $fbPushEventClasses;
+			if(!empty($fbPushEventClasses)){
+ 				foreach($fbPushEventClasses as $pushEventClassName){
+					$pushObj = new $pushEventClassName;
+					$className = get_class();
+					$prefName = $pushObj->getUserPreferenceName();
+
+					// Adds the user-preferences (making use of the "PreferencesExtension" extension).
+					wfAddPreferences(array(
+						array(
+							"name" => $prefName,
+							"section" => self::$PREFERENCES_TAB_NAME,
+							"type" => PREF_TOGGLE_T,
+							//"size" => "", // Not relevant to this type.
+							//"html" => "",
+							//"min" => "",
+							//"max" => "",
+							//"validate" => "",
+							//"save" => "",
+							//"load" => "",
+							"default" => "1",
+						)
+					));
+				}
+			}
+		}
+
 		wfProfileOut(__METHOD__);
-	}
+	} // end initExtension()
+	
+	/**
+	 * Adds enable/disable toggles to the Preferences form for controlling all push events.
+	 * NOTE: This is only for v1.16+ of MW.  For prior versions, the toggles are added in initExtension().
+	 */
+	static public function addPreferencesToggles( $user, &$preferences ){
+		global $fbPushEventClasses;
+		if(!empty($fbPushEventClasses)){
+			foreach($fbPushEventClasses as $pushEventClassName){
+				$pushObj = new $pushEventClassName;
+				$className = get_class();
+				$prefName = $pushObj->getUserPreferenceName();
+
+				$preferences[$prefName] = array(
+					'type' => 'toggle',
+					'label-message' => $prefName,
+					'section' => self::$PREFERENCES_TAB_NAME,
+				);
+			}
+		}
+
+		return true;
+	} // end addPreferencesToggles()
 
 	/**
 	 * This static function is called by the FBConnect extension if push events are enabled.  It checks
@@ -67,6 +109,8 @@ class FBConnectPushEvent {
 	 */
 	static public function initAll(){
 		global $fbPushEventClasses;
+		wfProfileIn(__METHOD__);
+
 		if(!empty($fbPushEventClasses)){
 			// Fail fast (and hard) if a push event was coded incorrectly.
 			foreach($fbPushEventClasses as $pushEventClassName){
@@ -78,7 +122,7 @@ class FBConnectPushEvent {
 					$msg = "FATAL ERROR: The push event class <strong>\"$pushEventClassName\"</strong> does not return a valid user preference name! ";
 					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>";
 					die($msg);
-				} else if(!is_subclass_of($className)){
+				} else if(!is_subclass_of($pushObj, $className)){
 					$msg = "FATAL ERROR: The push event class <strong>\"$pushEventClassName\"</strong> is not a subclass of <strong>$className</strong>! ";
 					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>";
 					die($msg);
@@ -88,6 +132,8 @@ class FBConnectPushEvent {
 				$pushObj->init();
 			}
 		}
+		
+		wfProfileOut(__METHOD__);
 	}
 
 	/**

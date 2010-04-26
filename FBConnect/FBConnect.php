@@ -153,11 +153,6 @@ class FBConnect {
 			global $wgParser;
 			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
-		
-		global $fbEnablePushToFacebook;
-		if(!empty($fbEnablePushToFacebook)){
-			FBConnectPushEvent::initAll();
-		}
 	}
 
 	/**
