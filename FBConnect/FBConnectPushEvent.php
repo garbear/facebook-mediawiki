@@ -36,6 +36,15 @@ class FBConnectPushEvent {
 	static public function initExtension(){
 		wfProfileIn(__METHOD__);
 
+		// The push feature of the extension requires the publish_stream extended permission.
+		global $fbExtendedPermissions;
+		$PERMISSION_TO_PUBLISH = 'publish_stream';
+		if(empty($fbExtendedPermissions) || !is_array($fbExtendedPermissions)){
+			$fbExtendedPermissions = array($PERMISSION_TO_PUBLISH);
+		} else if(!in_array($PERMISSION_TO_PUBLISH, $fbExtendedPermissions)){
+			$fbExtendedPermissions[] = $PERMISSION_TO_PUBLISH;
+		}
+
 		// Make sure that all of the push events were configured correctly.
 		self::initAll();
 
@@ -79,9 +88,10 @@ class FBConnectPushEvent {
 
 		wfProfileOut(__METHOD__);
 	} // end initExtension()
-	
+
 	/**
 	 * Adds enable/disable toggles to the Preferences form for controlling all push events.
+	 *
 	 * NOTE: This is only for v1.16+ of MW.  For prior versions, the toggles are added in initExtension().
 	 */
 	static public function addPreferencesToggles( $user, &$preferences ){
@@ -102,6 +112,37 @@ class FBConnectPushEvent {
 
 		return true;
 	} // end addPreferencesToggles()
+	
+	/**
+	 * This function returns HTML which contains toggles (in a list) for setting the push
+	 * Preferences.  It is designed to be used inside of a form (such as on Special:Connect).
+	 *
+	 * This is not used by the code which adds the form to Special:Preferences.
+	 */
+	static public function createPreferencesToggles(){
+		global $wgUser, $wgLang;
+		global $fbPushEventClasses;
+		wfProfileIn(__METHOD__);
+
+		$html = "";
+		if(!empty($fbPushEventClasses)){
+			foreach($fbPushEventClasses as $pushEventClassName){
+				$pushObj = new $pushEventClassName;
+				$className = get_class();
+				$prefName = $pushObj->getUserPreferenceName();
+
+				$prefText = $wgLang->getUserToggle( $prefName );
+				$checked = $wgUser->getOption( $prefName ) == 1 ? ' checked="checked"' : '';
+				$html .= "<div class='toggle'>";
+				$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"wpOp$prefName\"$checked />";
+				$html .= " <span class='toggletext'><label for=\"$prefName\">$prefText</label></span>";
+				$html .= "</div>\n";
+			}
+		}
+
+		wfProfileOut(__METHOD__);
+		return $html;
+	} // end createPreferencesToggles()
 
 	/**
 	 * This static function is called by the FBConnect extension if push events are enabled.  It checks
@@ -127,12 +168,12 @@ class FBConnectPushEvent {
 					$msg.= " It was probably written incorrectly.  Either fix the class or remove it from being used in <strong>$dirName/config.php</strong>";
 					die($msg);
 				}
-				
+
 				// The push event is valid, let it initialize itself if needed.
 				$pushObj->init();
 			}
 		}
-		
+
 		wfProfileOut(__METHOD__);
 	}
 

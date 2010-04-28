@@ -131,8 +131,31 @@ $fbIncludeJquery = true;
  * is an extension that you may already have installed in your instance of
  * MediaWiki, there is the option to turn off FBConnect's inclusion of it (which
  * will require you to already have PreferencesExtension enabled elsewhere).
+ *
+ * When running on MediaWiki v1.16 and above, the extension won't be included anyway.
  */
 $fbIncludePreferencesExtension = true;
+
+/**
+ * An array of extended permissions to request from the user while they are
+ * signing up.
+ *
+ * NOTE: If fbEnablePushToFacebook is true, then publish_stream will automatically be
+ * added to this array.
+ *
+ * For more details see: http://wiki.developers.facebook.com/index.php/Extended_permissions
+ */
+$fbExtendedPermissions = array(
+	//'publish_stream',
+	//'read_stream',
+	//'email',
+	//'read_mailbox',
+	//'offline_access',
+	//'create_event',
+	//'rsvp_event',
+	//'sms',
+	//'xmpp_login',
+);
 
 /**
  * PUSH EVENTS

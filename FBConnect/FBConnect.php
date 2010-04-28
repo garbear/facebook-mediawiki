@@ -178,4 +178,16 @@ class FBConnect {
 		}
 		return $hooks;
 	}
+	
+	/**
+	 * Return the code for the permissions attribute (with leading space) to use on all fb:login-buttons.
+	 */
+	public static function getPermissionsAttribute(){
+		global $fbExtendedPermissions;
+		$attr = "";
+		if(!empty($fbExtendedPermissions)){
+			$attr = " perms=\"".implode(",", $fbExtendedPermissions)."\"";
+		}
+		return $attr;
+	} // end getPermissionsAttribute()
 }

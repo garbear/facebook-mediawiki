@@ -140,6 +140,9 @@ fb.'convertothertext' => 'That is someone else\'s OpenID.',
 
 	'fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Facebook profile',
+	'fbconnect-prefsheader' => "To control which events will push an item to your Facebook News Feed, 
+		<a id='fbConnectPushEventBar_show' href='#'>show preferences</a>
+		<a id='fbConnectPushEventBar_hide' href='#' style='display:none'>hide preferences</a>",
 );
 
 /**
