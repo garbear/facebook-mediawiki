@@ -143,6 +143,7 @@ fb.'convertothertext' => 'That is someone else\'s OpenID.',
 	'fbconnect-prefsheader' => "To control which events will push an item to your Facebook News Feed, 
 		<a id='fbConnectPushEventBar_show' href='#'>show preferences</a>
 		<a id='fbConnectPushEventBar_hide' href='#' style='display:none'>hide preferences</a>",
+	'fbconnect-prefs-can-be-updated' => "You can update these any time by visiting the '$1' tab of your Preferences page.",
 );
 
 /**

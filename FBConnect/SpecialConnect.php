@@ -89,9 +89,6 @@ class SpecialConnect extends SpecialPage {
 		$fb = new FBConnectAPI();
 		$fb_user = $fb->user();
 
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms.
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms.
-
 		// Look at the subpage name to discover where we are in the login process
 		switch ( $par ) {
 		case 'ChooseName':
@@ -202,7 +199,7 @@ class SpecialConnect extends SpecialPage {
 				$wgOut->readOnlyPage();
 				return;
 			} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-				$this->userBlockedMessage();
+				$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
 				return;
 			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
 				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
@@ -217,9 +214,12 @@ class SpecialConnect extends SpecialPage {
 			}
 			/**/
 
-
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms... is there a way to optionally do only additional processing? Maybe put hook at the end of the form?
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms... is there a way to optionally do only additional processing? Maybe put hook at the end of the form?
+			// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
+			// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
+			// Can use 'this' to call sendPage('chooseNameForm', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
+			if(! wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )){
+				return;
+			}
 
 			$user = User::newFromName($name);
 			if (!$user) {
@@ -288,6 +288,11 @@ class SpecialConnect extends SpecialPage {
 
 			// Store the new user as the global user object
 			$wgUser = $user;
+
+			// Allow custom form processing to store values since this form submission was successful.
+			// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
+			wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
+
 			$this->sendPage('displaySuccessLogin');
 		}
 
@@ -365,7 +370,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->showErrorPage($titleMsg, $textMsg);
 	}
 	
-	protected function sendPage($function, $arg = NULL) {
+	public function sendPage($function, $arg = NULL) {
 		global $wgOut;
 		// Setup the page for rendering
 		wfLoadExtensionMessages( 'FBConnect' );
@@ -420,7 +425,7 @@ class SpecialConnect extends SpecialPage {
 			$wgOut->readOnlyPage();
 			return;
 		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-			$this->userBlockedMessage();
+			$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
 			return;
 		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
 			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
