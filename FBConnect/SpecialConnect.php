@@ -155,6 +155,7 @@ class SpecialConnect extends SpecialPage {
 			$user = FBConnectDB::getUser($fb_id);
 		}
 		if ( isset($user) && $user instanceof User ) {
+			global $wgUser;
 			$fbUser = new FBConnectUser($user);
 			// Update user from facebook (see class FBConnectUser)
 			$fbUser->updateFromFacebook();
@@ -285,6 +286,9 @@ class SpecialConnect extends SpecialPage {
 			$fbUser = new FBConnectUser($user);
 			// Update the user with settings from Facebook
 			$fbUser->updateFromFacebook();
+			
+			// Log the user in.
+			$user->setCookies();
 
 			// Store the new user as the global user object
 			$wgUser = $user;

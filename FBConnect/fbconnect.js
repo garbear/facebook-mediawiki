@@ -56,6 +56,7 @@ window.fbAsyncInit = function() {
 	
 	// Register a function for when the user logs out of Facebook
 	FB.Event.subscribe('auth.logout', function(response) {
+		// TODO: Internationalize
 		var login = confirm("Not logged in.\n\nWe detected that you have been logged " +
 		                    "out of Facebook. If this isn't the case, don't worry! " +
 		                    "Facebook's new library seems to have some growing pains. " +
@@ -86,3 +87,15 @@ $(document).ready(function() {
 		}
 	});
 });
+
+/**
+ * An optional handler to use in fbOnLoginJsOverride for when a user logs in via facebook connect.
+ *
+ * This will redirect to Special:Connect with the returnto variables configured properly.
+ *
+ * TODO: Also set the value for 'returntoquery'!!
+ */
+function sendToConnectOnLogin(){
+	var destUrl = wgServer + wgScript + "?title=Special:Connect&returnto=" + wgPageName;
+	window.location.href = destUrl;
+}

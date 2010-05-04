@@ -134,7 +134,7 @@ $fbIncludeJquery = true;
  * NOTE: This will be put inside of double-quotes, so any single-quotes should be used inside
  * of any JS in this variable.
  */
-//$fbOnLoginJsOverride = "window.location.reload(true);";
+//$fbOnLoginJsOverride = "sendToConnectOnLogin();";
 
 /**
  * Optionally turn off the inclusion of the PreferencesExtension.  Since this
