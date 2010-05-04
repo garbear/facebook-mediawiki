@@ -150,6 +150,7 @@ class FBConnect {
 		}
 
 		// Allow configurable over-riding of the onLogin handler.
+		global $fbOnLoginJsOverride;
 		if(!empty($fbOnLoginJsOverride)){
 			self::$fbOnLoginJs = $fbOnLoginJsOverride;
 		} else {
