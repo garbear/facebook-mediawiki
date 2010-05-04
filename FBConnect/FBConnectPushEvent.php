@@ -118,8 +118,11 @@ class FBConnectPushEvent {
 	 * Preferences.  It is designed to be used inside of a form (such as on Special:Connect).
 	 *
 	 * This is not used by the code which adds the form to Special:Preferences.
+	 *
+	 * If firstTime is set to true, the checkboxes will default to being checked, otherwise
+	 * they will default to the current user-option setting for the user.
 	 */
-	static public function createPreferencesToggles(){
+	static public function createPreferencesToggles($firstTime = false){
 		global $wgUser, $wgLang;
 		global $fbPushEventClasses;
 		wfProfileIn(__METHOD__);
@@ -132,9 +135,13 @@ class FBConnectPushEvent {
 				$prefName = $pushObj->getUserPreferenceName();
 
 				$prefText = $wgLang->getUserToggle( $prefName );
-				$checked = $wgUser->getOption( $prefName ) == 1 ? ' checked="checked"' : '';
+				if($firstTime){
+					$checked = ' checked="checked"';
+				} else {
+					$checked = $wgUser->getOption( $prefName ) == 1 ? ' checked="checked"' : '';
+				}
 				$html .= "<div class='toggle'>";
-				$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"wpOp$prefName\"$checked />";
+				$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"$prefName\"$checked />";
 				$html .= " <span class='toggletext'><label for=\"$prefName\">$prefText</label></span>";
 				$html .= "</div>\n";
 			}

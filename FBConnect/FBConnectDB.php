@@ -43,9 +43,12 @@ class FBConnectDB {
 	 * Find the Facebook IDs of the given user, if any.
 	 */
 	public static function getFacebookIDs( $user ) {
-		$prefix = self::getPrefix();
 		$fbid = array();
 		if ( $user instanceof User && $user->getId() != 0 ) {
+			$prefix = self::getPrefix();
+			
+			// NOTE: Do not just pass this dbr into getFacebookIDsFromDB since that function prevents
+			// rewriting of the database name for shared tables.
 			$dbr = wfGetDB( DB_SLAVE, array(), self::sharedDB() );
 			$res = $dbr->select(
 				array( "{$prefix}user_fbconnect" ),
@@ -61,6 +64,30 @@ class FBConnectDB {
 		return $fbid;
 	}
 	
+	/**
+	 * Find the Facebook IDs of the given user, if any, using the database connection provided.
+	 *
+	 * This function will use the dbr provided and will use grave-accents around the table-name
+	 * which will prevent the DB class from rewriting the database name.
+	 */
+	public static function getFacebookIDsFromDB( $user, $dbr ){
+		$fbid = array();
+		if ( $user instanceof User && $user->getId() != 0 ) {
+			$prefix = self::getPrefix();
+			$res = $dbr->select(
+				array( "`{$prefix}user_fbconnect`" ),
+				array( 'user_fbid' ),
+				array( 'user_id' => $user->getId() ),
+				__METHOD__
+			);
+			foreach( $res as $row ) {
+				$fbid[] = $row->user_fbid;
+			}
+			$res->free();
+		}
+		return $fbid;
+	}
+
 	/**
 	 * Find the user by their Facebook ID.
 	 */
@@ -84,6 +111,11 @@ class FBConnectDB {
 	 * Add a User <-> Facebook ID association to the database.
 	 */
 	public static function addFacebookID( $user, $fbid ) {
+		wfProfileIn(__METHOD__);
+		if( !wfRunHooks( 'FBConnectDB::addFacebookID', array( $user, $fbid ) ) ){
+			return;
+		}
+
 		$prefix = self::getPrefix();
 		$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
 		$dbw->insert(
@@ -94,6 +126,7 @@ class FBConnectDB {
 			),
 			__METHOD__
 		);
+		wfProfileOut(__METHOD__);
 	}
 	
 	/**

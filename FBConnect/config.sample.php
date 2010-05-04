@@ -127,6 +127,16 @@ $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 $fbIncludeJquery = true;
 
 /**
+ * Optionally override the default javascript handling which occurs when a user logs in.
+ *
+ * This will generally not be needed unless you are doing heavy customization of this extension.
+ *
+ * NOTE: This will be put inside of double-quotes, so any single-quotes should be used inside
+ * of any JS in this variable.
+ */
+//$fbOnLoginJsOverride = "window.location.reload(true);";
+
+/**
  * Optionally turn off the inclusion of the PreferencesExtension.  Since this
  * is an extension that you may already have installed in your instance of
  * MediaWiki, there is the option to turn off FBConnect's inclusion of it (which

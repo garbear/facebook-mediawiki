@@ -129,6 +129,8 @@ $wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoC
  * non-authentification code.
  */
 class FBConnect {
+	static private $fbOnLoginJs;
+
 	/**
 	 * Initializes and configures the extension.
 	 */
@@ -146,7 +148,14 @@ class FBConnect {
 		foreach( $hooks as $hookName ) {
 			$wgHooks[$hookName][] = "FBConnectHooks::$hookName";
 		}
-		
+
+		// Allow configurable over-riding of the onLogin handler.
+		if(!empty($fbOnLoginJsOverride)){
+			self::$fbOnLoginJs = $fbOnLoginJsOverride;
+		} else {
+			self::$fbOnLoginJs = "window.location.reload(true);";
+		}
+
 		// ParserFirstCallInit was introduced in modern (1.12+) MW versions so as to
 		// avoid unstubbing $wgParser on setHook() too early, as per r35980
 		if (!defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) {
@@ -190,4 +199,18 @@ class FBConnect {
 		}
 		return $attr;
 	} // end getPermissionsAttribute()
+	
+	/**
+	 * Return the code for the onlogin attribute which should be appended to all fb:login-button's in this
+	 * extension.
+	 *
+	 * TODO: Generate the entire fb:login-button in a function in this class.  We have numerous buttons now.
+	 */
+	public static function getOnLoginAttribute(){
+		$attr = "";
+		if(!empty(self::$fbOnLoginJs)){
+			$attr = " onlogin=\"".self::$fbOnLoginJs."\"";
+		}
+		return $attr;
+	} // end getOnLoginAttribute()
 }

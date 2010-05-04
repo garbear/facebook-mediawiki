@@ -184,30 +184,42 @@ class SpecialConnect extends SpecialPage {
 		global $wgAuth, $wgOut, $wgUser, $wgRequest;
 		wfProfileIn(__METHOD__);
 
-		// Make sure we're not stealing an existing user account.
-		if (!$name || !$this->userNameOK($name)) {
-			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
-			wfDebug("FBConnect: Name not OK: '$name'\n");
-			$this->sendPage('chooseNameForm');
-			return;
-		}
-		
-		/**
-		// Test to see if we are denied by $wgAuth or the user can't create an account
-		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
-		                               !$wgAuth->authenticate( $userName )) {
-			$result = false;
-			return true;
-		}
-		/**/
-		
 		// Handle accidental reposts.
 		if($wgUser->isLoggedIn()){
 			$this->sendPage('displaySuccessLogin');
 		} else {
+			// Make sure we're not stealing an existing user account.
+			if (!$name || !$this->userNameOK($name)) {
+				// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
+				wfDebug("FBConnect: Name not OK: '$name'\n");
+				$this->sendPage('chooseNameForm');
+				return;
+			}
 
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms.
-// TODO: Add a hook so that custom connectForms can also do custom processing of those forms.
+			// Check the restrictions again to make sure that the user can create this account.
+			$titleObj = SpecialPage::getTitleFor( 'Connect' );
+			if ( wfReadOnly() ) {
+				$wgOut->readOnlyPage();
+				return;
+			} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
+				$this->userBlockedMessage();
+				return;
+			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
+				return;
+			}
+			/**
+			// Test to see if we are denied by $wgAuth or the user can't create an account
+			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
+										   !$wgAuth->authenticate( $userName )) {
+				$result = false;
+				return true;
+			}
+			/**/
+
+
+// TODO: Add a hook so that custom connectForms can also do custom processing of those forms... is there a way to optionally do only additional processing? Maybe put hook at the end of the form?
+// TODO: Add a hook so that custom connectForms can also do custom processing of those forms... is there a way to optionally do only additional processing? Maybe put hook at the end of the form?
 
 			$user = User::newFromName($name);
 			if (!$user) {
@@ -216,7 +228,6 @@ class SpecialConnect extends SpecialPage {
 				return;
 			}
 
-// TODO: Will people be able to log in using this empty password?  If so, perhaps we should just cryptographically-secure PR[String]G to make up a garbage-password?
 			$pass = $email = $realName = ""; // the real values will get filled in outside of the scope of this function.
 			$pass = null;
 			if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
@@ -224,7 +235,13 @@ class SpecialConnect extends SpecialPage {
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 				return;
 			}
-			
+
+			// Attach the user to their Facebook account in the database
+			// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups.
+			FBConnectDB::addFacebookID($user, $fb_id);
+
+			wfRunHooks( 'AddNewAccount', array( $user ) );
+
 			// TODO: Which MediaWiki versions can we call this function in?
 			$user->addNewUserLogEntryAutoCreate();
 			#$user->addNewUserLogEntry();
@@ -241,8 +258,20 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 
-// TODO: Process the FBConnectPushEvent togggles if fbConnectPushEvents are enabled.
-// TODO: Process the FBConnectPushEvent togggles if fbConnectPushEvents are enabled.
+			// Process the FBConnectPushEvent preference checkboxes if fbConnectPushEvents are enabled.
+			global $fbEnablePushToFacebook;
+			if($fbEnablePushToFacebook){
+				global $fbPushEventClasses;
+				if(!empty($fbPushEventClasses)){
+					foreach($fbPushEventClasses as $pushEventClassName){
+						$pushObj = new $pushEventClassName;
+						$className = get_class();
+						$prefName = $pushObj->getUserPreferenceName();
+
+						$user->setOption($prefName, ($wgRequest->getCheck($prefName)?"1":"0"));
+					}
+				}
+			}
 
 			// Give $wgAuth a chance to deal with the user object
 			$wgAuth->initUser($user, true);
@@ -251,9 +280,6 @@ class SpecialConnect extends SpecialPage {
 			// Update site statistics
 			$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
 			$ssUpdate->doUpdate();
-			
-			// Attach the user to their Facebook account in the database
-			FBConnectDB::addFacebookID($user, $fb_id);
 
 			// Unfortunately, performs a second database lookup
 			$fbUser = new FBConnectUser($user);
@@ -360,7 +386,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->setPageTitle(wfMsg('fbconnect-error'));
 		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
 		$wgOut->addWikiMsg('fbconnect-click-to-connect-existing', $wgSitename);
-		$wgOut->addHTML('<fb:login-button'.FBConnect::getPermissionsAttribute().'></fb:login-button>');
+		$wgOut->addHTML('<fb:login-button'.FBConnect::getPermissionsAttribute().FBConnect::getOnLoginAttribute().'></fb:login-button>');
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
@@ -382,8 +408,24 @@ class SpecialConnect extends SpecialPage {
 	 * information. This option could simply point you to your Facebook privacy
 	 * settings. This is necessary in case the user wants to perpetually browse
 	 * the wiki anonymously, while still being logged in to Facebook.
+	 *
+	 * NOTE: The above might be done now that we have checkboxes for which options
+	 * to update from fb. Haven't tested it though.
 	 */
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
+		// Permissions restrictions.
+		global $wgUser;
+		$titleObj = SpecialPage::getTitleFor( 'Connect' );
+		if ( wfReadOnly() ) {
+			$wgOut->readOnlyPage();
+			return;
+		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
+			$this->userBlockedMessage();
+			return;
+		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
+			return;
+		}
 
 		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
 		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){
@@ -486,7 +528,7 @@ class SpecialConnect extends SpecialPage {
 		// Render a humble Facebook Connect button
 		$wgOut->addHTML('<h2>' . wfMsg( 'fbconnect' ) . '</h2>
 			<div>'.wfMsgExt( 'fbconnect-intro', array('parse', 'content')) . '<br/>' . wfMsg( 'fbconnect-click-to-login', $wgSitename ) .'
-			<fb:login-button size="large" background="black" length="long"'.FBConnect::getPermissionsAttribute().'></fb:login-button>
+			<fb:login-button size="large" background="black" length="long"'.FBConnect::getPermissionsAttribute().FBConnect::getOnLoginAttribute().'></fb:login-button>
 			</div>'
 		);
 	}

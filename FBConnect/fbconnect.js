@@ -51,12 +51,8 @@ window.fbAsyncInit = function() {
 		cookie : true, // Enable cookies to allow the server to access the session
 		xfbml  : window.fbUseMarkup // Whether XFBML should be automatically parsed
 	});
-	
-	// Register a function for when the user logs in to Facebook
-	FB.Event.subscribe('auth.login', function(response) {
-		// Refresh the page to transfer the session to the server
-		window.location.reload(true);
-	});
+
+	// NOTE: Auth.login doesn't appear to work anymore.  The onlogin attribute of the fb:login-buttons is being used instead.
 	
 	// Register a function for when the user logs out of Facebook
 	FB.Event.subscribe('auth.logout', function(response) {
