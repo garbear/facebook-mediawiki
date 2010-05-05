@@ -120,6 +120,13 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 $fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
 
 /**
+ * Path to the extension's client-side JavaScript
+ */
+global $wgScriptPath;
+//$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // only recommended if you are changing this extension.
+$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
+
+/**
  * Whether to include jQuery. This option is for backwards compatibility and is
  * ignored in version 1.16. Otherwise, if you already have jQuery included on
  * your site, you can safely set this to false.

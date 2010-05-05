@@ -89,18 +89,20 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $wgVersion, $fbLogo, $fbScript, $fbIncludeJquery,
+		global $wgVersion, $fbLogo, $fbScript, $fbExtensionScript, $fbIncludeJquery,
 		       $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
-		$out->prependHTML('
-			<div id="fb-root"></div>
-			<script>
-				(function(){var e=document.createElement("script");e.type="' .
-				$wgJsMimeType . '";e.src="' . $fbScript .
-				'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
-			</script>' . "\n"
-		);
+		if(!empty($fbScript)){
+			$out->prependHTML('
+				<div id="fb-root"></div>
+				<script>
+					(function(){var e=document.createElement("script");e.type="' .
+					$wgJsMimeType . '";e.src="' . $fbScript .
+					'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
+				</script>' . "\n"
+			);
+		}
 		
 		// Inserts list of global JavaScript variables if necessary
 		if (self::MGVS_hack( $mgvs_script )) {
@@ -115,10 +117,7 @@ class FBConnectHooks {
 			padding-left: 17px !important;
 		}
 STYLE;
-		
-		// Link to the extension's client-side JavaScript
-		$js = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
-		
+
 		// Things get a little simpler in 1.16...
 		if (version_compare($wgVersion, '1.16', '>=')) {
 			// Add a pretty Facebook logo if $fbLogo is set
@@ -132,7 +131,9 @@ STYLE;
 			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
 			
 			// Add the script file specified by $url
-			$out->addScriptFile($js);
+			if(!empty($fbExtensionScript)){
+				$out->addScriptFile($fbExtensionScript);
+			}
 		} else {
 			// Add a pretty Facebook logo if $fbLogo is set
 			if ($fbLogo) {
@@ -145,7 +146,9 @@ STYLE;
 			}
 			
 			// Add the script file specified by $url
-			$out->addScript("<script type=\"$wgJsMimeType\" src=\"$js?$wgStyleVersion\"></script>\n");
+			if(!empty($fbExtensionScript)){
+				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n");
+			}
 		}
 		return true;
 	}
