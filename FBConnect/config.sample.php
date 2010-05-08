@@ -110,14 +110,14 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
  * URL of the Facebook Connect JavaScript SDK. Because this library is currently
- * an alpha release, changes to the APIs may be made on a regular basis. If you
+ * a beta release, changes to the APIs may be made on a regular basis. If you
  * use FBConnect on your production website, you may wish to insulate yourself
- * from these changes to the alpha library by downloading and hosting your own
- * copy of the library.
+ * from these changes by downloading and hosting your own copy of the library.
  * 
- * For more info, see <http://github.com/facebook/connect-js>.
+ * For more info, see <http://developers.facebook.com/docs/reference/javascript/>
  */
-$fbScript = 'http://static.ak.fbcdn.net/connect/en_US/core.js';
+$fbScript = 'http://connect.facebook.net/en_US/all.js';
+#$fbScript = 'https://connect.facebook.net/en_US/all.js';
 
 /**
  * Path to the extension's client-side JavaScript
