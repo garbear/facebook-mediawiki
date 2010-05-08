@@ -153,6 +153,7 @@ class FBConnectXFBML {
 		              #'fb:serverFbml',
 		              'fb:login-button-perms',
 		              'fb:like',
+		              'fb:like-box',
 		              'fb:name',
 		              /*
 		               * From the Facebook Developer's Wiki under the old JS library.
