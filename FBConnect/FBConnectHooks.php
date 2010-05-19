@@ -77,9 +77,9 @@ class FBConnectHooks {
 			case 'member':
 			case 'officer':
 			case 'admin':
+				global $facebook;
 				// Connect to the Facebook API and ask if the user is in the group
-				$fb = new FBConnectAPI();
-				$rights = $fb->getGroupRights($user);
+				$rights = $facebook->getGroupRights();
 				$result = $rights[$type];
 		}
 		return true;
@@ -117,11 +117,11 @@ class FBConnectHooks {
 			padding-left: 17px !important;
 		}
 STYLE;
-
+		
 		// Things get a little simpler in 1.16...
 		if (version_compare($wgVersion, '1.16', '>=')) {
 			// Add a pretty Facebook logo if $fbLogo is set
-			if ($fbLogo) {
+			if ( !empty( $fbLogo) ) {
 				$out->addInlineStyle($style);
 			}
 			
@@ -136,7 +136,7 @@ STYLE;
 			}
 		} else {
 			// Add a pretty Facebook logo if $fbLogo is set
-			if ($fbLogo) {
+			if ( !empty( $fbLogo) ) {
 				$out->addScript('<style type="text/css">' . $style . '</style>');
 			}
 			
@@ -174,10 +174,11 @@ STYLE;
 	/**
 	 * Adds several Facebook Connect variables to the page:
 	 * 
-	 * fbAPIKey			The application's API key (see $fbAPIKey in config.php)
-	 * fbUseMarkup		Should XFBML tags be rendered? (see $fbUseMarkup in config.php)
-	 * fbLoggedIn		(deprecated) Whether the PHP client reports the user being Connected
-	 * fbLogoutURL		(deprecated) The URL to be redirected to on a disconnect
+	 * fbAppId		 The application ID (see $fbAppId in config.php)
+	 * fbSession     Assist the JavaScript SDK with loading the session
+	 * fbUseMarkup   Should XFBML tags be rendered (see $fbUseMarkup in config.php)
+	 * fbLogo        Facebook logo (see $fbLogo in config.php)
+	 * fbLogoutURL   The URL to be redirected to on a disconnect
 	 * 
 	 * This hook was added in MediaWiki version 1.14. See:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
@@ -185,14 +186,14 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgTitle, $fbAppId, $fbUseMarkup, $fbLogo;
-		$thisurl = $wgTitle->getPrefixedURL();
+		global $fbAppId, $facebook, $fbUseMarkup, $fbLogo, $wgTitle;
 		$vars['fbAppId'] = $fbAppId;
-		#$vars['fbLoggedIn'] = FBConnect::$api->user() ? true : false;
+		$vars['fbSession'] = $facebook->getSession();
 		$vars['fbUseMarkup'] = $fbUseMarkup;
 		$vars['fbLogo'] = $fbLogo ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
-						$wgTitle->isSpecial('Preferences') ? '' : "returnto={$thisurl}");
+		                       $wgTitle->isSpecial('Preferences') ? '' :
+		                       "returnto={$wgTitle->getPrefixedURL()}");
 		return true;
 	}
 	
@@ -239,12 +240,10 @@ STYLE;
 	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $wgLang, $wgShowIPinHeader, $fbPersonalUrls, $fbConnectOnly;
+		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader;
+		global $fbPersonalUrls, $fbConnectOnly;
 		wfLoadExtensionMessages('FBConnect');
-		// Get the logged-in user from the Facebook API
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
-
+		
 		/*
 		 * Personal URLs option: remove_user_talk_link
 		 */
@@ -254,7 +253,7 @@ STYLE;
 		}
 		
 		// If the user is logged in and connected
-		if ($wgUser->isLoggedIn() && $fb_user) {
+		if ( $wgUser->isLoggedIn() && $facebook->getSession() ) {
 			/*
 			 * Personal URLs option: use_real_name_from_fb
 			 */
@@ -264,7 +263,12 @@ STYLE;
 				$name = $wgUser->getRealName();
 				// Ask Facebook for the real name
 				if (!$name || $name == '') {
-					$name = $fb->userName();
+					try {
+						$fbUser = $facebook->api('/me');
+					} catch (FacebookApiException $e) {
+						error_log($e);
+					}
+					$name = $fbUser['name'];
 				}
 				// Make sure we were able to get a name from the database or Facebook
 				if ($name && $name != '') {
@@ -279,15 +283,23 @@ STYLE;
 					'href'   => '#',
 					'active' => false );
 			}
-
+			
 			/*
 			 * Personal URLs option: link_back_to_facebook
 			 */
 			if ($fbPersonalUrls['link_back_to_facebook']) {
+				try {
+					$fbUser = $facebook->api('/me');
+					$link = $fbUser['link'];
+				} catch (FacebookApiException $e) {
+					$link = 'http://www.facebook.com/profile.php?id=' .
+						    $facebook->getUser();
+				}
 				$personal_urls['fblink'] = array(
 					'text'   => wfMsg( 'fbconnect-link' ),
-					'href'   => "http://www.facebook.com/profile.php?id=$fb_user",
-					'active' => false );
+					'href'   => $link,
+					'active' => false
+				);
 			}
 		}
 		// User is logged in but not Connected
@@ -338,22 +350,30 @@ STYLE;
 	 * TODO!
 	 */
 	public static function RenderPreferencesForm( $form, $output ) {
-		global $wgUser;
+		global $facebook, $wgUser;
 		
-		// If the user has a valid Facebook ID, link to the Facebook profile
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
-		if( $fb_user ) {
+		// This hook no longer seems to work...
+		return true;
+		
+		if( $facebook->getSession() ) {
 			$html = $output->getHTML();
 			$name = $wgUser->getName();
 			$i = strpos( $html, $name );
 			if ($i !== FALSE) {
-				// Replace the old output with the new output
-				$html =  substr( $html, 0, $i ) . preg_replace( "/$name/",
-					"$name (<a href=\"http://www.facebook.com/profile.php?id=$fb_user\" " .
-					"class='mw-userlink mw-fbconnectuser'>".wfMsg('fbconnect-link-to-profile')."</a>", substr( $html, $i ), 1 );
-				$output->clearHTML();
-				$output->addHTML( $html );
+				// If the user has a valid Facebook ID, link to the Facebook profile
+				try {
+					$fbUser = $facebook->api('/me');
+					// Replace the old output with the new output
+					$html = substr( $html, 0, $i ) .
+					        preg_replace("/$name/", "$name (<a href=\"$fbUser[link]\" " .
+					                     "class='mw-userlink mw-fbconnectuser'>" .
+					                     wfMsg('fbconnect-link-to-profile') . "</a>",
+					                     substr( $html, $i ), 1);
+					$output->clearHTML();
+					$output->addHTML( $html );
+				} catch (FacebookApiException $e) {
+					error_log($e);
+				}
 			}
 		}
 		return true;
@@ -387,35 +407,39 @@ STYLE;
 	}
 	
 	/**
-	 * Adds some info about the governing Facebook group to the header form of Special:ListUsers.
+	 * Adds some info about the governing Facebook group to the header form of
+	 * Special:ListUsers.
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
-		global $fbUserRightsFromGroup, $fbLogo;
-		if (!$fbUserRightsFromGroup) {
+		global $fbUserRightsFromGroup, $facebook, $fbLogo;
+		if ( empty($fbUserRightsFromGroup) ) {
 			return true;
 		}
+		
+		// TODO: Do we need to verify the Facebook session here?
+		
 		$gid = $fbUserRightsFromGroup;
 		// Connect to the API and get some info about the group
-		$fb = new FBConnectAPI();
-		$group = $fb->groupInfo();
-		$groupName = $group['name'];
-		$cid = $group['creator'];
-		$pic = $group['picture'];
+		try {
+			$group = $facebook->api('/' . $gid);
+		} catch (FacebookApiException $e) {
+			error_log($e);
+		}
 		$out .= '
 			<table style="border-collapse: collapse;">
 				<tr>
 					<td>
 						' . wfMsgWikiHtml( 'fbconnect-listusers-header',
 						wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
-						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$groupName</a>",
-						"<a href=\"http://www.facebook.com/profile.php?id=$cid#User:$cid\" " .
-						"class=\"mw-userlink\">$cid</a>") . '
+						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$group[name]</a>",
+						"<a href=\"http://www.facebook.com/profile.php?id={$group[owner][id]}\" " .
+						"class=\"mw-userlink\">{$group[owner][name]}</a>") . "
 					</td>
 	        		<td>
-	        			<img src="' . "$pic\" title=\"$groupName\" alt=\"$groupName" . '">
+	        			<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
 	        		</td>
 	        	</tr>
-	        </table>';
+	        </table>";
 		return true;
 	}
 	
@@ -426,11 +450,11 @@ STYLE;
 	static function SpecialPage_initList( &$aSpecialPages ) {
 		global $fbConnectOnly;
 		if ($fbConnectOnly) {
-			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin', 'Connect',
-				false, array('returnto', 'returntoquery'));
+			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin',
+			                       'Connect', false, array('returnto', 'returntoquery'));
 			// Used in 1.12.x and above
-			$aSpecialPages['CreateAccount'] = array('SpecialRedirectToSpecial', 'CreateAccount',
-				'Connect');
+			$aSpecialPages['CreateAccount'] = array('SpecialRedirectToSpecial',
+			                                        'CreateAccount', 'Connect');
 		}
 		return true;
 	}
@@ -462,7 +486,7 @@ STYLE;
 	 */
 	static function UserGetRights( &$user, &$aRights ) {
 		global $fbConnectOnly;
-		if ( $fbConnectOnly ) {
+		if ( !empty( $fbConnectOnly ) ) {
 			foreach ( $aRights as $i => $right ) {
 				if ( $right == 'createaccount' ) {
 					unset( $aRights[$i] );
@@ -478,11 +502,10 @@ STYLE;
 	 * Connect. The Single Sign On magic of FBConnect happens in this function.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
-		global $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
+		global $facebook, $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
 		
 		// Check to see if the user can be logged in from Facebook
-		$fb = new FBConnectAPI();
-		$fbId = $fb->user();
+		$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
 		// Check to see if the user can be loaded from the session
 		$localId = isset($_COOKIE["{$wgCookiePrefix}UserID"]) ? 
 				intval($_COOKIE["{$wgCookiePrefix}UserID"]) :

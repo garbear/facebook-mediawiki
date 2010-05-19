@@ -77,18 +77,25 @@ class SpecialConnect extends SpecialPage {
 	 * Performs any necessary execution and outputs the resulting Special page.
 	 */
 	function execute( $par ) {
-		global $wgUser, $wgRequest;
-
+		global $wgUser, $facebook, $wgRequest;
+		
 		// Check to see if the user is already logged in
 		if ( $wgUser->getID() ) {
 			$this->sendPage('alreadyLoggedIn');
 			return;
 		}
-
+		
+		$fbid = $facebook->getUser();
+		/*
 		// Connect to the Facebook API
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
-
+		try {
+			$me = $facebook->api('/me');
+			
+		} catch (FacebookApiException $e) {
+			error_log($e);
+		}
+		*/
+		
 		// Look at the subpage name to discover where we are in the login process
 		switch ( $par ) {
 		case 'ChooseName':
@@ -99,7 +106,7 @@ class SpecialConnect extends SpecialPage {
 			else switch ($choice) {
 				// Check to see if the user opted to connect an existing account
 				case 'existing':
-					$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
+					$this->attachUser($fbid, $wgRequest->getText('wpExistingName'),
 							$wgRequest->getText('wpExistingPassword'));
 					break;
 				// Check to see if the user selected another valid option
@@ -107,7 +114,8 @@ class SpecialConnect extends SpecialPage {
 				case 'first':
 				case 'full':
 					// Get the username from Facebook (Note: not from the form)
-					$username = FBConnectUser::getOptionFromInfo($choice . 'name', $fb->getUserInfo());
+					$username = FBConnectUser::getOptionFromInfo($choice . 'name',
+					                                             $facebook->getUserInfo());
 				case 'manual':
 					if (!isset($username) || !$this->userNameOK($username)) {
 						// Use manual name if no username is set, even if manual wasn't chosen
@@ -117,12 +125,12 @@ class SpecialConnect extends SpecialPage {
 					if (!$this->userNameOK($username)) {
 						$this->sendPage('chooseNameForm', 'fbconnect-invalidname');
 					} else {
-						$this->createUser($fb_user, $username);
+						$this->createUser($fbid, $username);
 					}
 					break;
 				case 'auto':
 					// Create a user with a unique generated username
-					$this->createUser($fb_user, $this->generateUserName());
+					$this->createUser($fbid, $this->generateUserName());
 					break;
 				default:
 					$this->sendError('fbconnect-invalid', 'fbconnect-invalidtext');
@@ -134,9 +142,9 @@ class SpecialConnect extends SpecialPage {
 			#	$this->setReturnTo( $wgRequest->getText( 'returnto' ),
 			#				$wgRequest->getVal( 'returntoquery' ) );
 			#}
-			if ($fb_user) {
+			if ($fbid) {
 				// If the user is connected, log them in
-				$this->login($fb_user);
+				$this->login($fbid);
 			} else {
 				// If the user isn't Connected, then show a form with the Connect button
 				$this->sendPage('connectForm');
@@ -181,54 +189,67 @@ class SpecialConnect extends SpecialPage {
 	protected function createUser($fb_id, $name) {
 		global $wgAuth, $wgOut, $wgUser, $wgRequest;
 		wfProfileIn(__METHOD__);
-
+		
 		// Handle accidental reposts.
-		if($wgUser->isLoggedIn()){
+		if ( $wgUser->isLoggedIn() ) {
 			$this->sendPage('displaySuccessLogin');
-		} else {
-			// Make sure we're not stealing an existing user account.
-			if (!$name || !$this->userNameOK($name)) {
-				// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
-				wfDebug("FBConnect: Name not OK: '$name'\n");
-				$this->sendPage('chooseNameForm');
-				return;
-			}
+			wfProfileOut(__METHOD__);
+			return;
+		}
+		
+		// Make sure we're not stealing an existing user account.
+		if (!$name || !$this->userNameOK($name)) {
+			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
+			wfDebug("FBConnect: Name not OK: '$name'\n");
+			$this->sendPage('chooseNameForm');
+			return;
+		}
 
-			// Check the restrictions again to make sure that the user can create this account.
-			$titleObj = SpecialPage::getTitleFor( 'Connect' );
-			if ( wfReadOnly() ) {
-				$wgOut->readOnlyPage();
-				return;
-			} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-				$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
-				return;
-			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
-				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-				return;
-			}
-			/**
-			// Test to see if we are denied by $wgAuth or the user can't create an account
-			if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
-										   !$wgAuth->authenticate( $userName )) {
-				$result = false;
-				return true;
-			}
-			/**/
+		// Check the restrictions again to make sure that the user can create this account.
+		$titleObj = SpecialPage::getTitleFor( 'Connect' );
+		if ( wfReadOnly() ) {
+			$wgOut->readOnlyPage();
+			return;
+		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
+			$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
+			return;
+		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
+			return;
+		}
+		/**
+		// Test to see if we are denied by $wgAuth or the user can't create an account
+		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
+									   !$wgAuth->authenticate( $userName )) {
+			$result = false;
+			return true;
+		}
+		/**/
 
-			// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
-			// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
-			// Can use 'this' to call sendPage('chooseNameForm', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
-			if(! wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )){
-				return;
-			}
+		// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
+		// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
+		// Can use 'this' to call sendPage('chooseNameForm', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
+		if(! wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )){
+			return;
+		}
 
-			$user = User::newFromName($name);
-			if (!$user) {
-				wfDebug("FBConnect: Error adding new user.\n");
+		$user = User::newFromName($name);
+		
+		if (!$user) {
+			wfDebug("FBConnect: Error creating new user.\n");
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+			return;
+		}
+		
+		// TODO: Merge conflicting ways to add a user to a single/clusterd database
+		if ( function_exists( 'wikia_fbconnect_init' ) ) { # :)
+			$user->addToDatabase();
+			if ( !$user->getId() ) {
+				wfDebug("FBConnect: Error adding new user to database.\n");
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 				return;
 			}
-
+		} else {
 			$pass = $email = $realName = ""; // the real values will get filled in outside of the scope of this function.
 			$pass = null;
 			if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
@@ -236,70 +257,70 @@ class SpecialConnect extends SpecialPage {
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 				return;
 			}
-
-			// Attach the user to their Facebook account in the database
-			// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups.
-			FBConnectDB::addFacebookID($user, $fb_id);
-
-			wfRunHooks( 'AddNewAccount', array( $user ) );
-
-			// TODO: Which MediaWiki versions can we call this function in?
-			$user->addNewUserLogEntryAutoCreate();
-			#$user->addNewUserLogEntry();
-			
-			// Mark that the user is a Facebook user
-			$user->addGroup('fb-user');
-
-			$updateFormPrefix = "wpUpdateUserInfo";
-			foreach (self::$availableUserUpdateOptions as $option) {
-				if($wgRequest->getVal($updateFormPrefix.$option, '') != ""){
-					$user->setOption("fbconnect-update-on-login-$option", 1);
-				} else {
-					$user->setOption("fbconnect-update-on-login-$option", 0);
-				}
-			}
-
-			// Process the FBConnectPushEvent preference checkboxes if fbConnectPushEvents are enabled.
-			global $fbEnablePushToFacebook;
-			if($fbEnablePushToFacebook){
-				global $fbPushEventClasses;
-				if(!empty($fbPushEventClasses)){
-					foreach($fbPushEventClasses as $pushEventClassName){
-						$pushObj = new $pushEventClassName;
-						$className = get_class();
-						$prefName = $pushObj->getUserPreferenceName();
-
-						$user->setOption($prefName, ($wgRequest->getCheck($prefName)?"1":"0"));
-					}
-				}
-			}
-
-			// Give $wgAuth a chance to deal with the user object
-			$wgAuth->initUser($user, true);
-			$wgAuth->updateUser($user);
-			
-			// Update site statistics
-			$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
-			$ssUpdate->doUpdate();
-
-			// Unfortunately, performs a second database lookup
-			$fbUser = new FBConnectUser($user);
-			// Update the user with settings from Facebook
-			$fbUser->updateFromFacebook();
-			
-			// Log the user in.
-			$user->setCookies();
-
-			// Store the new user as the global user object
-			$wgUser = $user;
-
-			// Allow custom form processing to store values since this form submission was successful.
-			// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
-			wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
-
-			$this->sendPage('displaySuccessLogin');
 		}
+		
+		// Attach the user to their Facebook account in the database
+		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups.
+		FBConnectDB::addFacebookID($user, $fb_id);
+		
+		wfRunHooks( 'AddNewAccount', array( $user ) );
+		
+		// TODO: Which MediaWiki versions can we call this function in?
+		$user->addNewUserLogEntryAutoCreate();
+		#$user->addNewUserLogEntry();
+		
+		// Mark that the user is a Facebook user
+		$user->addGroup('fb-user');
+		
+		$updateFormPrefix = "wpUpdateUserInfo";
+		foreach (self::$availableUserUpdateOptions as $option) {
+			if($wgRequest->getVal($updateFormPrefix.$option, '') != ""){
+				$user->setOption("fbconnect-update-on-login-$option", 1);
+			} else {
+				$user->setOption("fbconnect-update-on-login-$option", 0);
+			}
+		}
+		
+		// Process the FBConnectPushEvent preference checkboxes if fbConnectPushEvents are enabled.
+		global $fbEnablePushToFacebook;
+		if($fbEnablePushToFacebook){
+			global $fbPushEventClasses;
+			if(!empty($fbPushEventClasses)){
+				foreach($fbPushEventClasses as $pushEventClassName){
+					$pushObj = new $pushEventClassName;
+					$className = get_class();
+					$prefName = $pushObj->getUserPreferenceName();
+					
+					$user->setOption($prefName, ($wgRequest->getCheck($prefName)?"1":"0"));
+				}
+			}
+		}
+		
+		// Give $wgAuth a chance to deal with the user object
+		$wgAuth->initUser($user, true);
+		$wgAuth->updateUser($user);
+		
+		// Update site statistics
+		$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
+		$ssUpdate->doUpdate();
+		
+		// Unfortunately, performs a second database lookup
+		$fbUser = new FBConnectUser($user);
+		// Update the user with settings from Facebook
+		$fbUser->updateFromFacebook();
+		
+		// Log the user in.
+		$user->setCookies();
 
+		// Store the new user as the global user object
+		$wgUser = $user;
+
+		// Allow custom form processing to store values since this form submission was successful.
+		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
+		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
+
+		$this->sendPage('displaySuccessLogin');
+		
 		wfProfileOut(__METHOD__);
 	}
 	
@@ -309,12 +330,12 @@ class SpecialConnect extends SpecialPage {
 	 * is sent. Otherwise, the accounts are matched in the database and the new
 	 * user object is logged in.
 	 */
-	protected function attachUser($fb_user, $name, $password) {
+	protected function attachUser($fbid, $name, $password) {
 		global $wgOut, $wgUser;
 		wfProfileIn(__METHOD__);
 
 		// The user must be logged into Facebook before choosing a wiki username
-		if ( !$fb_user ) {
+		if ( !$fbid ) {
 			wfDebug("FBConnect: aborting in attachUser(): no Facebook ID was reported.\n");
 			$wgOut->showErrorPage( 'fbconnect-error', 'fbconnect-errortext' );
 			return;
@@ -326,7 +347,7 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		// Attach the user to their Facebook account in the database
-		FBConnectDB::addFacebookID($user, $fb_user);
+		FBConnectDB::addFacebookID($user, $fbid);
 		// Update the user with settings from Facebook
 		$user->updateFromFacebook();
 		// Store the user in the global user object
@@ -423,7 +444,7 @@ class SpecialConnect extends SpecialPage {
 	 */
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
 		// Permissions restrictions.
-		global $wgUser;
+		global $wgUser, $facebook, $wgOut, $fbConnectOnly;
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			$wgOut->readOnlyPage();
@@ -440,12 +461,9 @@ class SpecialConnect extends SpecialPage {
 		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){
 			return;
 		}
-
-		global $wgOut, $fbConnectOnly;
+		
 		// Connect to the Facebook API
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
-		$userinfo = $fb->getUserInfo($fb_user);
+		$userinfo = $facebook->getUserInfo();
 
 		// Keep track of when the first option visible to the user is checked
 		$checked = false;
@@ -527,9 +545,8 @@ class SpecialConnect extends SpecialPage {
 	 * Displays the main connect form.
 	 */
 	private function connectForm() {
-		global $wgOut, $wgUser, $wgSitename;
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
+		global $facebook, $wgOut, $wgUser, $wgSitename;
+		//$fbid = $facebook->getUser();
 
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();

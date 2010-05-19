@@ -17,51 +17,52 @@
 /**
  * fbconnect.js and fbconnect-min.js
  * 
- * FBConnect relies on several different libraries and frameworks for its JavaScript
- * code. Each framework has its own method to verify that the proper code won't be
- * called before it's ready. (Below, lambda represents a named or anonymous function.)
+ * FBConnect relies on several different libraries and frameworks for its
+ * JavaScript code. Each framework has its own method to verify that the proper
+ * code won't be called before it's ready. (Below, lambda represents a named or
+ * anonymous function.)
  * 
- * MediaWiki:             addOnloadHook(lambda);
- *     This function manages an array of window.onLoad event handlers to be called
- *     be called by a MediaWiki script when the window is fully loaded. Because the
- *     DOM may be ready before the window (due to large images to be downloaded) a
- *     faster alternative is JQuery's document-ready function.
+ * MediaWiki:                addOnloadHook(lambda);
+ *     This function manages an array of window.onLoad event handlers to be
+ *     called be called by a MediaWiki script when the window is fully loaded.
+ *     Because the DOM may be ready before the window (due to large images to
+ *     be downloaded), a faster alternative is JQuery's document-ready function.
  * 
- * FaceBook Connect SDK:  window.fbAsyncInit = lambda;
- *     This global variable is called when the Facebook Connect SDK is fully
+ * Facebook JavaScript SDK:  window.fbAsyncInit = lambda;
+ *     This global variable is called when the JavaScript SDK is fully
  *     initialized asynchronously to the document's state. This might be long
  *     after the document is finished rendering the first time the script is
  *     downloaded. Subsequently, it may even be called before the DOM is ready.
  * 
- * jQuery:                $(document).ready(lambda);
- *     Self-explanatory -- to be called when the DOM is ready to be manipulated.
- *     Typically this should occur sooner than MediaWiki's addOnloadHook function
- *     is called.
+ * jQuery:                   $(document).ready(lambda);
+ *     Self-explanatory; to be called when the DOM is ready to be manipulated.
+ *     Typically this should occur sooner than MediaWiki's addOnloadHook
+ *     function is called.
  */
 
 /**
- * After the Facebook Connect JavaScript SDK has been asynchronously loaded,
+ * After the Facebook JavaScript SDK has been asynchronously loaded,
  * it looks for the global fbAsyncInit and executes the function when found.
  */
 window.fbAsyncInit = function() {
 	// Initialize the library with the API key
 	FB.init({
-		appId : window.fbAppId,
+		appId : window.fbAppId, // See $fbAppId in config.php
+		session: window.fbSession, // Don't re-fetch the session if PHP provides it
 		status : true, // Check login status
 		cookie : true, // Enable cookies to allow the server to access the session
 		xfbml  : window.fbUseMarkup // Whether XFBML should be automatically parsed
 	});
 
-	// NOTE: Auth.login doesn't appear to work anymore.  The onlogin attribute of the fb:login-buttons is being used instead.
+	// NOTE: Auth.login doesn't appear to work anymore.
+	// The onlogin attribute of the fb:login-buttons is being used instead.
 	
 	// Register a function for when the user logs out of Facebook
 	FB.Event.subscribe('auth.logout', function(response) {
 		// TODO: Internationalize
-		var login = confirm("Not logged in.\n\nWe detected that you have been logged " +
-		                    "out of Facebook. If this isn't the case, don't worry! " +
-		                    "Facebook's new library seems to have some growing pains. " +
-		                    "Just press Cancel to stay on the current page. Otherwise, " +
-		                    "Press OK to log in via Facebook Connect again.");
+		var login = confirm("Not logged in.\n\nYou have been loggout out of " +
+                            "Facebook. Press OK to log in via Facebook Connect " +
+                            "again, or press Cancel to stay on the current page.");
 		if (login) {
 			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
 		}
@@ -89,9 +90,9 @@ $(document).ready(function() {
 });
 
 /**
- * An optional handler to use in fbOnLoginJsOverride for when a user logs in via facebook connect.
- *
- * This will redirect to Special:Connect with the returnto variables configured properly.
+ * An optional handler to use in fbOnLoginJsOverride for when a user logs in
+ * via Facebook Connect. This will redirect to Special:Connect with the
+ * returnto variables configured properly.
  *
  * TODO: Also set the value for 'returntoquery'!!
  */

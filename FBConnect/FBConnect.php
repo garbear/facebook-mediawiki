@@ -45,7 +45,7 @@ if ( !defined( 'MEDIAWIKI' )) {
 /*
  * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r152, April 14, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r182, May 19, 2010' );
 
 /*
  * Add information about this extension to Special:Version.
@@ -63,12 +63,8 @@ $wgExtensionCredits['specialpage'][] = array(
  */
 $dir = dirname(__FILE__) . '/';
 require_once $dir . 'config.php';
-require_once $dir . 'facebook-client/facebook.php';
-if(!empty($fbIncludePreferencesExtension)){
-	// TODO: This inclusion isn't needed at the moment unless fbEnablePushToFacebook is also true.
-	// If we never need non-push preferences, just add an additional conditional.
-	// TODO: This extension is obsolete in v1.16... do a version-compare and skip this extension
-	// for >= 1.16 and use this hook instead: http://www.mediawiki.org/wiki/Manual:Hooks/GetPreferences
+require_once $dir . 'php-sdk/facebook.php';
+if (!empty( $fbIncludePreferencesExtension ) && version_compare($wgVersion, '1.16', '<')) {
 	require_once $dir . 'PreferencesExtension.php';
 }
 
@@ -106,7 +102,6 @@ if ($fbUserRightsFromGroup) {
 	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
 	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
-	#$wgGroupPermissions['fb-officer']['goodlooking'] = true;
 	$wgImplictGroups[] = 'fb-groupie';
 	$wgImplictGroups[] = 'fb-officer';
 	$wgImplictGroups[] = 'fb-admin';
@@ -135,13 +130,17 @@ class FBConnect {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgXhtmlNamespaces, $wgAuth, $wgHooks, $wgSharedTables;
+		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks;
+		global $fbOnLoginJsOverride;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
 		
 		// Facebook/username associations should be shared when $wgSharedDB is enabled
 		$wgSharedTables[] = 'user_fbconnect';
+		
+		// Create our Facebook instance and make it available through $facebook
+		$facebook = new FBConnectAPI();
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
 		$hooks = self::enumMethods('FBConnectHooks');
@@ -150,7 +149,6 @@ class FBConnect {
 		}
 
 		// Allow configurable over-riding of the onLogin handler.
-		global $fbOnLoginJsOverride;
 		if(!empty($fbOnLoginJsOverride)){
 			self::$fbOnLoginJs = $fbOnLoginJsOverride;
 		} else {

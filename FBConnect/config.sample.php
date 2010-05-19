@@ -15,21 +15,19 @@
  *    2.  Enter a descriptive name for your wiki in the Site Name field.
  *        This will be seen by users when they sign up for your site.
  *    3.  Enter the Site URL and Locale, then click "Create application".
- *    4.  Copy the displayed App ID and App Secret into this config file.
- *   *5.  UNTIL WE UPGRADE TO THE NEW PHP-SDK (http://github.com/facebook/php-sdk):
- *        Just kidding, don't actually copy the App ID into this config file.
- *        Instead, visit the developer dashboard and copy the API Key into the
- *        $fbAppId variable.
+ *    4.  Copy the displayed App ID and Secret into this config file.
  * 
  * Optionally, you may customize your application:
  *    A.  Click "developer dashboard" link on the previous screen or visit:
  *        http://www.facebook.com/developers/apps.php
  *    B.  Select your application and click "Edit Settings".
  *    C.  Upload icon and logo images. The icon appears in Stream stories.
- *    D.  In the "Connect" section, set your base domain and Connect Logo.
+ *    D.  In the "Connect" section, set your Connect Logo and base domain
+ *        (which should also be copied into this config file).
  */
 $fbAppId          = 'YOUR_APP_ID';    # Change this!
-$fbAppSecret      = 'YOUR_SECRET';    # Change this!
+$fbSecret         = 'YOUR_SECRET';    # Change this!
+#$fbDomain         = 'BASE_DOMAIN';    # Optional
 
 /**
  * Disables the creation of new accounts and prevents old accounts from being
@@ -56,7 +54,7 @@ $fbUseMarkup = true;
  * against Facebook's Code of Conduct <http://www.facebook.com/codeofconduct.php>
  * and subject to dynamic privacy. To disable just <fb:photo> tags, set this to false.
  * 
- * Disabled until the alpha JS SDK supports <fb:photo> tags.
+ * Disabled until the JavaScript SDK supports <fb:photo> tags.
  */
 #$fbAllowFacebookImages = true;
 

@@ -30,30 +30,24 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * This class contains the code used to interface with Facebook via the
  * Facebook Platform API. 
  */
-class FBConnectAPI {
-	// Holds a static reference to our Facebook object
-	private static $__Facebook = null;
-	
-	// Caches information about users to reduce the number of Facebook hits
-	private static $userinfo = array(array());
-	
+class FBConnectAPI extends Facebook {
 	// Constructor
 	public function __construct() {
-	}
-	
-	/**
-	 * Get the Facebook client object for easy access.
-	 */
-	public function Facebook() {
-		global $fbAppId, $fbAppSecret;
-		// Construct a new Facebook object on first time access
-		if ( is_null(self::$__Facebook) && self::isConfigSetup() ) {
-			self::$__Facebook = new Facebook( $fbAppId, $fbAppSecret );
-			if (!self::$__Facebook) {
-				error_log('Could not create facebook client.');
-			}
+		global $fbAppId, $fbSecret, $fbDomain;
+		// Check to make sure config.sample.php was renamed properly
+		if ( !$this->isConfigSetup() ) {
+			error_log('Could not create facebook client.');
 		}
-		return self::$__Facebook;
+		$config = array(
+			'appId' => $fbAppId,
+			'secret' => $fbSecret,
+			'cookie' => true,
+		);
+		// Include the optional domain parameter if it has been set
+		if ( !empty($fbDomain) && $fbDomain != 'BASE_DOMAIN' ) {
+			$config['domain'] = $fbDomain;
+		}
+		parent::__construct( $config );
 	}
 	
 	/**
@@ -61,89 +55,58 @@ class FBConnectAPI {
 	 * and the instructions to fill out the first two important variables were
 	 * followed correctly.
 	 */
-	public static function isConfigSetup() {
-		global $fbAppId, $fbAppSecret;
+	public function isConfigSetup() {
+		global $fbAppId, $fbSecret;
 		$isSetup = isset($fbAppId) && $fbAppId != 'YOUR_APP_KEY' &&
-		           isset($fbAppSecret) && $fbAppSecret != 'YOUR_SECRET';
+		           isset($fbSecret) && $fbSecret != 'YOUR_SECRET';
 		if(!$isSetup) {
 			// Check to see if they are using the old variables
 			global $fbApiKey, $fbApiSecret;
 			if (isset($fbApiKey) && isset($fbApiSecret)) {
 				$fbAppId = $fbApiKey;
-				$fbAppSecret= $fbApiSecret;
+				$fbSecret= $fbApiSecret;
 				$isSetup = true;
 			} else {
-				error_log('Please update the $fbAppId in config.php');
+				exit( 'Please update the $fbAppId in config.php' );
 			}
 		}
 		return $isSetup;
 	}
 	
 	/**
-	 * Retrieves the ID of the current logged-in user. If no user is logged in,
-	 * then an ID of 0 is returned.
-	 */
-	public function user() {
-		return $this->Facebook()->get_loggedin_user();
-	}
-	
-	/**
 	 * Calls users.getInfo. Requests information about the user from Facebook.
 	 */
-	public function getUserInfo( $user = 0 ) {
-		if ($user == 0) {
-			$user = $this->user();
-		}
-		if ($user != 0 && !isset($userinfo[$user]))
-		{
-			try {
-				$fields = array('first_name', 'name', 'sex', 'timezone', 'locale',
-				                /*'profile_url',*/
-				                'username', 'proxied_email', 'contact_email');
-				// Query the Facebook API with the users.getInfo method
-				$user_details = $this->Facebook()->api_client->users_getInfo($user, $fields);
-				// Cache the data in the $userinfo array
-				$userinfo[$user] = $user_details[0];
-			} catch( Exception $e ) {
-				error_log( 'Failure in the api when requesting ' . join(',', $fields) .
-				           " on uid $user: " . $e->getMessage());
-			}
-		}
-		return isset($userinfo[$user]) ? $userinfo[$user] : null;
-	}
-	
-	/**
-	 * Returns the full name of the Facebook user.
-	 */
-	public function userName( $user = 0 ) {
-		$userinfo = $this->getUserInfo($user);
-		return $userinfo['name'];
-	}
-	
-	/**
-	 * Returns the name of the group specified by $fbUserRightsFromGroup, or
-	 * null if it is false.
-	 * 
-	 * groups.get
-	 */
-	public function groupInfo() {
-		global $fbUserRightsFromGroup;
-		// If $fbUserRightsFromGroup is false instead of a group id, return null
-		if (!$fbUserRightsFromGroup) {
+	public function getUserInfo() {
+		// First check to see if we have a session (if not, return null)
+		$user = $this->getUser();
+		if ( !$user ) {
 			return null;
 		}
-		// Cache the info returned from Facebook about this group
-		static $info;
-		if (!isset($info)) {
-			$info = array();
-			$group = $this->Facebook()->api_client->groups_get(null, $fbUserRightsFromGroup);
-			if ( is_array( $group ) && is_array( $group[0] )) {
-				$info['name'] = $group[0]['name'];
-				$info['creator'] = $group[0]['creator'];
-				$info['picture'] = $group[0]['pic'];
+		try {
+			// Cache information about users to reduce the number of Facebook hits
+			static $userinfo = array();
+			
+			if ( !isset($userinfo[$user]) ) {
+				// Query the Facebook API with the users.getInfo method
+				$query = array(
+						'method' => 'users.getInfo',
+						'uids' => $user,
+						'fields' => join(',', array(
+							'first_name', 'name', 'sex', 'timezone', 'locale',
+							/*'profile_url',*/
+							'username', 'proxied_email', 'contact_email',
+						)),
+				);
+				$user_details = $this->api( $query );
+				// Cache the data in the $userinfo array
+				$userinfo[$user] = $user_details[0];
 			}
+			return isset($userinfo[$user]) ? $userinfo[$user] : null;
+		} catch (FacebookApiException $e) {
+			error_log( 'Failure in the api when requesting users.getInfo ' .
+			           "on uid $user: " . $e->getMessage());
 		}
-		return $info;
+		return null;
 	}
 	
 	/**
@@ -157,16 +120,21 @@ class FBConnectAPI {
 		                'officer' => false,
 		                'admin'   => false);
 		
-		// If no group ID is specified, then there's no group to belong to
-		$gid = $fbUserRightsFromGroup;
-		if( !$gid ) {
+		
+		$gid = !empty($fbUserRightsFromGroup) ? $fbUserRightsFromGroup : false;
+		if (// If no group ID is specified, then there's no group to belong to
+			!$gid ||
+			// If $user wasn't specified, set it to the logged in user
+			!$user ||
+			// If there is no logged in user
+			!($user = $this->getUser())
+		) {
 			return $rights;
 		}
 		
-		// Translate $user into a Facebook ID
-		if (!$user) {
-			$user = $this->user();
-		} else if ($user instanceof User) {
+		// If a User object was provided, translate it into a Facebook ID
+		if ($user instanceof User) {
+			// TODO: Does this need a special api call sans access_token?
 			$users = FBConnectDB::getFacebookIDs($user);
 			if (count($users)) {
 				$user = $users[0];
@@ -189,9 +157,14 @@ class FBConnectAPI {
 		if ($members === false) {
 			try {
 				// Check to make sure our session is still valid
-				$members = $this->Facebook()->api_client->groups_getMembers($gid);
-			} catch (FacebookRestClientException $e) {
+				$members = $this->api(array(
+						'method' => 'groups.getMembers',
+						'gid' => $gid
+				));
+			} catch (FacebookApiException $e) {
+			#} catch (FacebookRestClientException $e) {
 				// Invalid session; we're not going to be able to get the rights
+				error_log($e);
 				$rights_cache[$user] = $rights;
 				return $rights;
 			}
@@ -215,7 +188,15 @@ class FBConnectAPI {
 				} else {
 					// For groups of over 500ish, we must use this extra API call
 					// Notice that it occurs last, because we can hopefully avoid having to call it
-					$group = $this->Facebook()->api_client->groups_get(intval($user), $gid);
+					try {
+						$group = $this->api(array(
+								'method' => 'groups.get',
+								'uid' => $user,
+								'gids' => $gid
+						));
+					} catch (FacebookApiException $e) {
+						error_log($e);
+					}
 					if (is_array($group) && is_array($group[0]) && $group[0]['gid'] == "$gid") {
 						$rights['member'] = true;
 					}
@@ -225,18 +206,5 @@ class FBConnectAPI {
 		// Cache the rights
 		$rights_cache[$user] = $rights;
 		return $rights;
-	}
-	
-	/**
-	 * Returns the "public" hash of the email address (i.e., the one Facebook
-	 * gives out via their API). The hash is of the form crc32($email)_md5($email).
-	 * 
-	 * @Unused (for now)
-	 */
-	public function hashEmail($email) {
-		if ($email == null)
-			return '';
-		$email = trim(strtolower($email));
-		return crc32($email) . '_' . md5($email);
 	}
 }

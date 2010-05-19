@@ -47,12 +47,12 @@ class FBConnectUser extends User {
 	 */
 	function updateFromFacebook() {
 		wfProfileIn(__METHOD__);
-
+		global $facebook;
+		
 		// Keep track of whether any settings were modified
 		$mod = false;
 		// Connect to the Facebook API and retrieve the user's info 
-		$fb = new FBConnectAPI();
-		$userinfo = $fb->getUserInfo();
+		$userinfo = $facebook->getUserInfo();
 		// Update the following options if the user's settings allow it
 		$updateOptions = array('nickname', 'fullname', 'language',
 		                       'timecorrection', 'email');
