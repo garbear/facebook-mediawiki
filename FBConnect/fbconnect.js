@@ -18,7 +18,7 @@
  * fbconnect.js and fbconnect-min.js
  * 
  * FBConnect relies on several different libraries and frameworks for its JavaScript
- * code. Each framework has its own method to verify that the propper code won't be
+ * code. Each framework has its own method to verify that the proper code won't be
  * called before it's ready. (Below, lambda represents a named or anonymous function.)
  * 
  * MediaWiki:             addOnloadHook(lambda);
