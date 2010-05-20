@@ -126,7 +126,7 @@ $fbScript = 'http://connect.facebook.net/en_US/all.js';
  * Path to the extension's client-side JavaScript
  */
 global $wgScriptPath;
-//$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // only recommended if you are changing this extension.
+#$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for development
 $fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
 
 /**

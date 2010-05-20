@@ -332,7 +332,7 @@ STYLE;
 			}
 			
 			// Remove other personal toolbar links
-			if ($fbConnectOnly) {
+			if ( !empty( $fbConnectOnly ) ) {
 				foreach (array('login', 'anonlogin') as $k) {
 					if (array_key_exists($k, $personal_urls)) {
 						unset($personal_urls[$k]);
@@ -449,7 +449,7 @@ STYLE;
 	 */
 	static function SpecialPage_initList( &$aSpecialPages ) {
 		global $fbConnectOnly;
-		if ($fbConnectOnly) {
+		if ( !empty( $fbConnectOnly) ) {
 			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin',
 			                       'Connect', false, array('returnto', 'returntoquery'));
 			// Used in 1.12.x and above
