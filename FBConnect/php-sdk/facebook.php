@@ -88,7 +88,7 @@ class Facebook
     CURLOPT_CONNECTTIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 60,
-    CURLOPT_USERAGENT      => 'facebook-php-2.0.3',
+    CURLOPT_USERAGENT      => 'facebook-php-2.0',
   );
 
   /**
@@ -143,7 +143,7 @@ class Facebook
    * Initialize a Facebook Application.
    *
    * The configuration:
-   * - appId: the application API key
+   * - appId: the application ID
    * - secret: the application secret
    * - cookie: (optional) boolean true to enable cookie support
    * - domain: (optional) domain for the cookie
@@ -164,7 +164,7 @@ class Facebook
   /**
    * Set the Application ID.
    *
-   * @param String $appId the API key
+   * @param String $appId the Application ID
    */
   public function setAppId($appId) {
     $this->appId = $appId;
@@ -172,9 +172,9 @@ class Facebook
   }
 
   /**
-   * Get the API Key.
+   * Get the Application ID.
    *
-   * @return String the API key
+   * @return String the Application ID
    */
   public function getAppId() {
     return $this->appId;
@@ -474,8 +474,7 @@ class Facebook
       if ($session) {
         $params['access_token'] = $session['access_token'];
       } else {
-        // TODO (naitik) sync with abanker
-        //$params['access_token'] = $this->getAppId() .'|'. $this->getApiSecret();
+        $params['access_token'] = $this->getAppId() .'|'. $this->getApiSecret();
       }
     }
 
@@ -504,7 +503,7 @@ class Facebook
     }
 
     $opts = self::$CURL_OPTS;
-    $opts[CURLOPT_POSTFIELDS] = http_build_query($params, null, '&');
+    $opts[CURLOPT_POSTFIELDS] = $params;
     $opts[CURLOPT_URL] = $url;
     curl_setopt_array($ch, $opts);
     $result = curl_exec($ch);
@@ -555,6 +554,11 @@ class Facebook
       $expires = $session['expires'];
     }
 
+    // prepend dot if a domain is found
+    if ($domain) {
+      $domain = '.' . $domain;
+    }
+
     // if an existing cookie is not set, we dont need to delete it
     if ($value == 'deleted' && empty($_COOKIE[$cookieName])) {
       return;
@@ -572,7 +576,7 @@ class Facebook
     // environment
     // @codeCoverageIgnoreStart
     } else {
-      setcookie($cookieName, $value, $expires, '/', '.' . $domain);
+      setcookie($cookieName, $value, $expires, '/', $domain);
     }
     // @codeCoverageIgnoreEnd
   }
