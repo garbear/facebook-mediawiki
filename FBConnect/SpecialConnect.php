@@ -79,6 +79,10 @@ class SpecialConnect extends SpecialPage {
 	function execute( $par ) {
 		global $wgUser, $facebook, $wgRequest;
 		
+		if ( $wgRequest->getVal("action", "") == "disconnect" ) {
+			self::disconnectAction(); 
+		}
+		
 		// Check to see if the user is already logged in
 		if ( $wgUser->getID() ) {
 			$this->sendPage('alreadyLoggedIn');
@@ -158,12 +162,21 @@ class SpecialConnect extends SpecialPage {
 	 * them to choose a wiki username.
 	 */
 	protected function login($fb_id) {
+		global $wgUser;
+		
 		// Check to see if the Connected user exists in the database
 		if ($fb_id) {
 			$user = FBConnectDB::getUser($fb_id);
 		}
+		
+		// If the user doesn't exist yet locally, allow hooks to check to see if this is a clustered set up
+		if ( ! (isset($user) && $user instanceof User ) ) {
+			if(!wfRunHooks( 'SpecialConnect::login::notFoundLocally', array( &$this, &$user, $fb_id ) )){
+				return;
+			}
+		}
+		
 		if ( isset($user) && $user instanceof User ) {
-			global $wgUser;
 			$fbUser = new FBConnectUser($user);
 			// Update user from facebook (see class FBConnectUser)
 			$fbUser->updateFromFacebook();
@@ -176,6 +189,14 @@ class SpecialConnect extends SpecialPage {
 			
 			$user->setCookies();
 			$wgUser = $user;
+			
+			// Similar to what's done in LoginForm::authenticateUserData(). 
+			// Load $wgUser now. This is necessary because loading $wgUser (say by calling 
+			// getName()) calls the UserLoadFromSession hook, which potentially 
+			// creates the user in the local database. 
+			$sessionUser = User::newFromSession(); 
+			$sessionUser->load(); 
+			
 			$this->sendPage('displaySuccessLogin');
 		} else if ($fb_id) {
 			$this->sendPage('chooseNameForm');
@@ -187,7 +208,7 @@ class SpecialConnect extends SpecialPage {
 	}
 
 	protected function createUser($fb_id, $name) {
-		global $wgAuth, $wgOut, $wgUser, $wgRequest;
+		global $wgAuth, $wgOut, $wgUser, $wgRequest, $wgMemc;
 		wfProfileIn(__METHOD__);
 		
 		// Handle accidental reposts.
@@ -204,19 +225,46 @@ class SpecialConnect extends SpecialPage {
 			$this->sendPage('chooseNameForm');
 			return;
 		}
-
+		
+		/// START OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
+		
 		// Check the restrictions again to make sure that the user can create this account.
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			$wgOut->readOnlyPage();
 			return;
 		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-			$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
+			wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
 			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
 			return;
 		}
+		
+		// If we are not allowing users to login locally, we should be checking
+		// to see if the user is actually able to authenticate to the authenti-
+		// cation server before they create an account (otherwise, they can
+		// create a local account and login as any domain user). We only need
+		// to check this for domains that aren't local.
+		$mDomain = $wgRequest->getText( 'wpDomain' );
+		if( 'local' != $mDomain && '' != $mDomain ) {
+			if( !$wgAuth->canCreateAccounts() && ( !$wgAuth->userExists( $name ) ) ) {
+				$wgOut->showErrorPage('fbconnect-error', 'wrongpassword');
+				return false;
+			}
+		}
+		
+		// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
+		global $wgEnableSorbs, $wgProxyWhitelist;
+		$ip = wfGetIP();
+		if ( $wgEnableSorbs && !in_array( $ip, $wgProxyWhitelist ) &&
+					$wgUser->inSorbsBlacklist( $ip ) )
+		{
+			$wgOut->showErrorPage('fbconnect-error', 'sorbs_create_account_reason');
+			return;
+		}
+ 		
 		/**
 		// Test to see if we are denied by $wgAuth or the user can't create an account
 		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
@@ -237,30 +285,56 @@ class SpecialConnect extends SpecialPage {
 		
 		if (!$user) {
 			wfDebug("FBConnect: Error creating new user.\n");
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-error-creating-user');
+			return;
+		}
+		
+		// Let extensions abort the account creation.  If you have extensions which are expecting a Real Name or Email, you may need to disable
+		// them since these are not requirements of Facebook Connect (so users will not have them).
+		// NOTE: Currently this is commented out because it seems that most wikis might have a handful of restrictions that won't be needed on
+		// Facebook Connections.  For instance, requiring a CAPTCHA or age-verification, etc.  Having a Facebook account as a pre-requisitie removes the need for that.
+		/*
+		$abortError = '';
+		if( !wfRunHooks( 'AbortNewAccount', array( $user, &$abortError ) ) ) {
+			// Hook point to add extra creation throttles and blocks
+			wfDebug( "SpecialConnect::createUser: a hook blocked creation\n" );
+			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-error-user-creation-hook-aborted', array($abortError));
+			return false;
+		}
+		*/
+		
+		// Apply account-creation throttles
+		global $wgAccountCreationThrottle;
+		if ( $wgAccountCreationThrottle && $wgUser->isPingLimitable() ) {
+			$key = wfMemcKey( 'acctcreate', 'ip', $ip );
+			$value = $wgMemc->get( $key );
+			if ( !$value ) {
+				$wgMemc->set( $key, 0, 86400 );
+			}
+			if ( $value >= $wgAccountCreationThrottle ) {
+				$this->throttleHit( $wgAccountCreationThrottle );
+				return false;
+			}
+			$wgMemc->incr( $key );
+		}
+		
+		/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
+ 		
+		
+		// Create the account (locally on main cluster or via wgAuth on other clusters)
+		$pass = $email = $realName = ""; // The real values will get filled in outside of the scope of this function.
+		$pass = null;
+		if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
+			wfDebug("FBConnect: Error adding new user to database.\n");
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
 			return;
 		}
 		
-		// TODO: Merge conflicting ways to add a user to a single/clusterd database
-		if ( function_exists( 'wikia_fbconnect_init' ) ) { # :)
-			$user->addToDatabase();
-			if ( !$user->getId() ) {
-				wfDebug("FBConnect: Error adding new user to database.\n");
-				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-				return;
-			}
-		} else {
-			$pass = $email = $realName = ""; // the real values will get filled in outside of the scope of this function.
-			$pass = null;
-			if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
-				wfDebug("FBConnect: Error adding new user to database.\n");
-				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-				return;
-			}
-		}
+		// Adds the user to the local database (regardless of whether wgAuth was used)
+		$user = $this->initUser( $user, true );
 		
 		// Attach the user to their Facebook account in the database
-		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups.
+		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups
 		FBConnectDB::addFacebookID($user, $fb_id);
 		
 		wfRunHooks( 'AddNewAccount', array( $user ) );
@@ -272,6 +346,7 @@ class SpecialConnect extends SpecialPage {
 		// Mark that the user is a Facebook user
 		$user->addGroup('fb-user');
 		
+		// Store which fields should be auto-updated from Facebook when the user logs in. 
 		$updateFormPrefix = "wpUpdateUserInfo";
 		foreach (self::$availableUserUpdateOptions as $option) {
 			if($wgRequest->getVal($updateFormPrefix.$option, '') != ""){
@@ -296,14 +371,6 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		
-		// Give $wgAuth a chance to deal with the user object
-		$wgAuth->initUser($user, true);
-		$wgAuth->updateUser($user);
-		
-		// Update site statistics
-		$ssUpdate = new SiteStatsUpdate(0, 0, 0, 0, 1);
-		$ssUpdate->doUpdate();
-		
 		// Unfortunately, performs a second database lookup
 		$fbUser = new FBConnectUser($user);
 		// Update the user with settings from Facebook
@@ -322,6 +389,48 @@ class SpecialConnect extends SpecialPage {
 		$this->sendPage('displaySuccessLogin');
 		
 		wfProfileOut(__METHOD__);
+	}
+	
+	/** 
+	 * Actually add a user to the database. 
+	 * Give it a User object that has been initialised with a name. 
+	 * 
+	 * This is a custom version of similar code in SpecialUserLogin's LoginForm with differences 
+	 * due to the fact that this code doesn't require a password, etc. 
+	 * 
+	 * @param $u User object. 
+	 * @param $autocreate boolean -- true if this is an autocreation via auth plugin 
+	 * @return User object. 
+	 * @private 
+	 */ 
+	function initUser( $u, $autocreate ) {
+		global $wgAuth;
+		
+		$u->addToDatabase();
+		
+		// No passwords for FBConnect accounts.
+		/**
+		if ( $wgAuth->allowPasswordChange() ) {
+		      $u->setPassword( $this->mPassword );
+		}
+		/**
+		$u->setEmail( $this->mEmail ); // emails aren't required by FBConnect extension (some customizations such as Wikia require it on their own).
+		$u->setRealName( $this->mRealName ); // real name isn't required for FBConnect
+		/**/
+		$u->setToken();
+
+		$wgAuth->initUser( $u, $autocreate );
+		$wgAuth->updateUser($u);
+
+		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
+		$u->setOption('skinoverwrite', 1);
+		$u->saveSettings();
+
+		# Update user count
+		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
+		$ssUpdate->doUpdate();
+
+		return $u;
 	}
 	
 	/**
@@ -557,6 +666,25 @@ class SpecialConnect extends SpecialPage {
 			<fb:login-button size="large" background="black" length="long"'.FBConnect::getPermissionsAttribute().FBConnect::getOnLoginAttribute().'></fb:login-button>
 			</div>'
 		);
+	}
+	
+	/** 
+	 * Disconnect from Facebook
+	 */ 
+	private function disconnectAction() {
+		global $wgRequest, $wgOut, $wgUser;
+		
+		if( $wgRequest->wasPosted() ) {
+			$id = FBConnectDB::getFacebookIDs($wgUser);
+			if( count($id) > 0 ) {
+				FBConnectDB::removeFacebookID( $wgUser, $id['user_fbid'] );
+			}
+		}
+		
+		$title = Title::makeTitle( NS_SPECIAL, "Preferences" );
+		$url = $title->getFullUrl("#prefsection-10");
+		$wgOut->redirect($url);
+		return true;
 	}
 	
 	/**
