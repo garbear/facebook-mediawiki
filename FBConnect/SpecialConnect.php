@@ -45,9 +45,9 @@ class SpecialConnect extends SpecialPage {
 		parent::__construct( 'Connect' );
 		// Add this special page to the "login" group of special pages
 		$wgSpecialPageGroups['Connect'] = 'login';
-
+		
 		wfLoadExtensionMessages( 'FBConnect' );
-		$userNamePrefix = wfMsg('fbconnect-usernameprefix');
+		$this->userNamePrefix = wfMsg('fbconnect-usernameprefix');
 	}
 	
 	/**
@@ -64,7 +64,7 @@ class SpecialConnect extends SpecialPage {
 	public function getAvailableUserUpdateOptions(){
 		return self::$availableUserUpdateOptions;
 	}
-
+	
 	/**
 	 * Overrides getDescription() in SpecialPage. Looks in a different wiki message
 	 * for this extension's description.
@@ -477,9 +477,9 @@ class SpecialConnect extends SpecialPage {
 	public function generateUserName() {
 		// Because $i is incremented the first time through the while loop
 		$i = FBConnectDB::countUsers();
-		#$i = 1; // This is the DUMB WAY to do this
+		#$i = 1; // This is the DUMB WAY to do this for large databases
 		while ($i < PHP_INT_MAX) {
-			$name = $this->userNamePrefix.$i;
+			$name = $this->userNamePrefix . $i;
 			if ($this->userNameOK($name)) {
 				return $name;
 			}
