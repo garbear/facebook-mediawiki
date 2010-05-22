@@ -190,12 +190,12 @@ class SpecialConnect extends SpecialPage {
 			$user->setCookies();
 			$wgUser = $user;
 			
-			// Similar to what's done in LoginForm::authenticateUserData(). 
-			// Load $wgUser now. This is necessary because loading $wgUser (say by calling 
-			// getName()) calls the UserLoadFromSession hook, which potentially 
-			// creates the user in the local database. 
-			$sessionUser = User::newFromSession(); 
-			$sessionUser->load(); 
+			// Similar to what's done in LoginForm::authenticateUserData().
+			// Load $wgUser now. This is necessary because loading $wgUser (say
+			// by calling getName()) calls the UserLoadFromSession hook, which
+			// potentially creates the user in the local database.
+			$sessionUser = User::newFromSession();
+			$sessionUser->load();
 			
 			$this->sendPage('displaySuccessLogin');
 		} else if ($fb_id) {
@@ -322,7 +322,7 @@ class SpecialConnect extends SpecialPage {
  		
 		
 		// Create the account (locally on main cluster or via wgAuth on other clusters)
-		$pass = $email = $realName = ""; // The real values will get filled in outside of the scope of this function.
+		$email = $realName = ""; // The real values will get filled in outside of the scope of this function.
 		$pass = null;
 		if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
 			wfDebug("FBConnect: Error adding new user to database.\n");
@@ -376,16 +376,30 @@ class SpecialConnect extends SpecialPage {
 		// Update the user with settings from Facebook
 		$fbUser->updateFromFacebook();
 		
-		// Log the user in.
+		// Start the session if it's not already been started
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+		
+		// Log the user in
 		$user->setCookies();
-
 		// Store the new user as the global user object
 		$wgUser = $user;
-
+		
+		/*
+		 * Similar to what's done in LoginForm::authenticateUserData(). Load
+		 * $wgUser now. This is necessary because loading $wgUser (say by
+		 * calling getName()) calls the UserLoadFromSession hook, which
+		 * potentially creates the user in the local database.
+		 */
+		$sessionUser = User::newFromSession();
+		$sessionUser->load();
+		
 		// Allow custom form processing to store values since this form submission was successful.
 		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
-
+		
 		$this->sendPage('displaySuccessLogin');
 		
 		wfProfileOut(__METHOD__);
@@ -403,7 +417,7 @@ class SpecialConnect extends SpecialPage {
 	 * @return User object. 
 	 * @private 
 	 */ 
-	function initUser( $u, $autocreate ) {
+	protected function initUser( $u, $autocreate ) {
 		global $wgAuth;
 		
 		$u->addToDatabase();
@@ -418,18 +432,18 @@ class SpecialConnect extends SpecialPage {
 		$u->setRealName( $this->mRealName ); // real name isn't required for FBConnect
 		/**/
 		$u->setToken();
-
+		
 		$wgAuth->initUser( $u, $autocreate );
 		$wgAuth->updateUser($u);
-
+		
 		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
 		$u->setOption('skinoverwrite', 1);
 		$u->saveSettings();
-
+		
 		# Update user count
 		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
 		$ssUpdate->doUpdate();
-
+		
 		return $u;
 	}
 	
