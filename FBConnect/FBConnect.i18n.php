@@ -60,8 +60,6 @@ fb.'desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http:
 'group-fb-admin'          => 'Group admins',
 'group-fb-admin-member'   => 'Group administrator',
 'grouppage-fb-admin'      => '{{ns:project}}:Group admins',
-// Incredibly good looking people
-'right-goodlooking'       => 'Really, really, ridiculously good looking',
 // Personal toolbar
 fb.'connect'  => 'Log in with Facebook Connect',
 fb.'convert'  => 'Connect this account with Facebook',
