@@ -36,13 +36,6 @@ $fbSecret         = 'YOUR_SECRET';    # Change this!
 $fbConnectOnly = false;
 
 /**
- * The prefix to be used for the auto-generated username suggestion when the
- * user connects for the first time. A number will be appended onto this prefix
- * to prevent duplicate usernames.
- */
-$fbUserName = 'FacebookUser';
-
-/**
  * Allow the use of XFBML in wiki text.
  * For more info, see http://wiki.developers.facebook.com/index.php/XFBML.
  */
@@ -89,8 +82,7 @@ $fbUserRightsFromGroup = false;  # Or a group ID
  *                        users. This helps enforce the idea that this wiki is
  *                        "in front" of Facebook.
  * remove_user_talk_link  Remove link to user's talk page
- * use_real_name_from_fb  $fbUserName to show the real name for auto-usernames,
- *                        true to show the real name for all Connected users
+ * use_real_name_from_fb  Show the real name for all Connected users
  * 
  * Additionally, use $wgShowIPinHeader to hide the IP and its talk link.
  * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
@@ -101,7 +93,7 @@ $fbPersonalUrls = array(
 	'hide_logout_of_fb'     => false,
 	'link_back_to_facebook' => true,
 	'remove_user_talk_link' => false,
-	'use_real_name_from_fb' => $fbUserName, # or true or false
+	'use_real_name_from_fb' => false,
 );
 #$wgShowIPinHeader = false;
 

@@ -257,8 +257,7 @@ STYLE;
 			/*
 			 * Personal URLs option: use_real_name_from_fb
 			 */
-			$option = $fbPersonalUrls['use_real_name_from_fb'];
-			if ($option === true || ($option && strpos($wgUser->getName(), $option) === 0)) {
+			if ( !empty( $fbPersonalUrls['use_real_name_from_fb'] ) ) {
 				// Start with the real name in the database
 				$name = $wgUser->getRealName();
 				// Ask Facebook for the real name
@@ -276,7 +275,7 @@ STYLE;
 				}
 			}
 			// Replace logout link with a button to disconnect from Facebook Connect
-			if(empty($fbPersonalUrls['hide_logout_of_fb'])){
+			if( empty( $fbPersonalUrls['hide_logout_of_fb'] ) ){
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
 					'text'   => wfMsg( 'fbconnect-logout' ),
