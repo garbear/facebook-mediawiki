@@ -40,25 +40,36 @@ class FBConnectXFBML {
 	 * function that simply redirects to parserHook(), filling in the missing
 	 * $tag argument with the $tag provided to createParserHook.
 	 */
-	static function parserHook($text, $args, &$parser, $tag = '' ) {
+	static function parserHook($innertext, $args, &$parser, $tag = '' ) {
 		global $fbAllowFacebookImages;
+		
+		// Run hook to allow modifying the default behavior. If $override is
+		// set, it is used instead. Return false to disable the tag. 
+		$override = '';
+		if ( !wfRunHooks('XFBMLParseTag',
+				array( $tag, &$args, &$innertext, &$override )) ) {
+			return '';
+		}
+		if ( $override != '' ) {
+			return $override;
+		}
+		
 		switch ($tag) {
 			case '':
 				break; // Error: We shouldn't be here!
 			
 			// To implement a custom XFBML tag handler, simply case it here like so
-			#case 'fb:login-button':
-			case 'fb:login-button-perms':
-			case 'fb:prompt-permission':
+			case 'fb:add-profile-tab':
 				// Disable these tags by returning an empty string
 				break;
 			case 'fb:serverfbml':
 				// TODO: Is this safe? Does it respect $fbAllowFacebookImages?
 				$attrs = self::implodeAttrs( $args );
-				return "<fb:serverfbml{$attrs}>$text</fb:serverfbml>";
+				// Don't recursively parse $innertext
+				return "<fb:serverfbml{$attrs}>$innertext</fb:serverfbml>";
 			case 'fb:profile-pic':
-			case 'fb:photo':
-			case 'fb:video':
+			#case 'fb:photo': // Dropped in new JavaScript SDK
+			#case 'fb:video': // Dropped in new JavaScript SDK
 				if (!$fbAllowFacebookImages) {
 					break;
 				}
@@ -66,7 +77,7 @@ class FBConnectXFBML {
 			default:
 				// Allow other tags by default
 				$attrs = self::implodeAttrs( $args );
-				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $text ) . "</$tag>";
+				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $innertext ) . "</$tag>";
 		}
 		// Strip the tag entirely
 		return '';
@@ -76,7 +87,7 @@ class FBConnectXFBML {
 	 * Helper function to create name-value pairs from the list of attributes passed to the
 	 * parser hook.
 	 */
-	private static function implodeAttrs( $args ) {
+	static function implodeAttrs( $args ) {
 		$attrs = "";
 		// The default action is to strip all event handlers and allow the tag
 		foreach( $args as $name => $value ) {
@@ -109,20 +120,15 @@ class FBConnectXFBML {
 	}
 	
 	/**
-	 * Returns the availabe XFBML tags. For now, this is just an array copied from
-	 * <http://wiki.developers.facebook.com/index.php/XFBML> and the second-to-last line in
-	 * <http://static.ak.fbcdn.net/rsrc.php/zAE5U/lpkg/2netpns0/en_US/141/136684/js/connect.js.pkg.php>.
-	 * Eventually, this method can be replaced with one that gathers these tags
-	 * from the internet (e.g. by downloading an xml or js file) in real time.
+	 * Returns the availabe XFBML tags. This list was obtained from the list of
+	 * tags currently rendered by the new JavaScript SDK:
+	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js>
 	 * 
-	 * This is necessary because the Facebook Platform is so new, and major updates
-	 * are being pushed out every week. With such turmoil regarding the available tags
-	 * and the features they offer, our list of tags should not be hardcoded into this file.
+	 * If Facebook adds a new tag (or you create your own!) then this list can
+	 * be updated with the XFBMLAvailableTags hook
 	 * 
-	 * But for now... HELP! Where does Firefox pull in the XFBML tags in from??
-	 * 
-	 * After switching to the new JavaScript SDK, these will be the only tags
-	 * implemented for a while: <http://github.com/facebook/connect-js/xfbml>.
+	 * For help on including these in your site, please see:
+	 * <http://developers.facebook.com/plugins>
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
@@ -130,25 +136,27 @@ class FBConnectXFBML {
 			return array( );
 		}
 		
-		// XFBML tags in the beta version of the Facebook Connect JavaScript SDK
-		// <http://wiki.github.com/facebook/connect-js/xfbml/5>
-		$tags = array('fb:comments',
-		              'fb:login-button',
-		              'fb:bookmark',
-		              'fb:recommendations',
+		$tags = array('fb:activity',
 		              'fb:add-profile-tab',
-		              'fb:share-button',
+		              'fb:bookmark',
+		              'fb:comments',
+		              'fb:connect-bar',
 		              'fb:fan',
-		              'fb:activity',
-		              'fb:live-stream',
-		              'fb:profile-pic',
-		              'fb:serverfbml',
 		              'fb:like',
 		              'fb:like-box',
+		              'fb:live-stream',
+		              'fb:login',
+		              'fb:login-button',
+		              'fb:facepile',
 		              'fb:name',
+		              'fb:profile-pic',
+		              'fb:recommendations',
+		              'fb:serverfbml',
+		              'fb:share-button',
+		              'fb:social-bar',
 		              /*
 		               * From the Facebook Developer's Wiki under the old JS library.
-		               * Currently, these must be rendered in a <fb:serverFbml> tag.
+		               * These may still be possible with a <fb:serverFbml> tag.
 		               * <http://wiki.developers.facebook.com/index.php/XFBML>
 		               */
 		              #'fb:connect-form',
@@ -163,8 +171,7 @@ class FBConnectXFBML {
 		              /*
 		               * In 2008 I found these in the deprecated Facebook Connect
 		               * JavaScript library, connect.js.pkg.php, though no documentation
-		               * was available for them on the Facebook dev wiki. Will they be
-		               * implemented in the new JS SDK?
+		               * was available for them on the Facebook dev wiki.
 		               */
 		              #'fb:add-section-button',
 		              #'fb:share-button',
