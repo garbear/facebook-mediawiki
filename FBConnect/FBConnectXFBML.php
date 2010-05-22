@@ -120,22 +120,18 @@ class FBConnectXFBML {
 	}
 	
 	/**
-	 * Returns the availabe XFBML tags. This list was obtained from the list of
-	 * tags currently rendered by the new JavaScript SDK:
-	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js>
+	 * Returns the availabe XFBML tags. For help on including these in your
+	 * site, please see: <http://developers.facebook.com/plugins>.
 	 * 
 	 * If Facebook adds a new tag (or you create your own!) then this list can
-	 * be updated with the XFBMLAvailableTags hook
-	 * 
-	 * For help on including these in your site, please see:
-	 * <http://developers.facebook.com/plugins>
+	 * be updated with the XFBMLAvailableTags hook.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
 			// If XFBML isn't enabled, then don't report any tags
 			return array( );
 		}
-		
+		// http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L237
 		$tags = array('fb:activity',
 		              'fb:add-profile-tab',
 		              'fb:bookmark',
