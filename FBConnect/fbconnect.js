@@ -80,7 +80,7 @@ $(document).ready(function() {
 	$('#pt-fblogout').click(function() {
 		// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
 		// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
-		var logout = confirm("You are loggin out of both this site and Facebook.");
+		var logout = confirm("You are logging out of both this site and Facebook.");
 		if (logout) {
 			FB.logout(function(response) {
 				window.location = window.fbLogoutURL;
