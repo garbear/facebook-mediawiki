@@ -61,7 +61,14 @@ class FBConnectPushEvent {
 	static public function addPreferencesToggles( $user, &$preferences ){
 		global $fbPushEventClasses;
 		
-		if(!empty($fbPushEventClasses)){
+		// TODO: PREF_TOGGLE_T is not defined in v1.16
+		/**
+		if( !defined('PREF_TOGGLE_T') ) {
+			return true;
+		}
+		/**/
+		
+		if( !empty($fbPushEventClasses) ){
 			foreach($fbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
 				$className = get_class();
@@ -75,7 +82,7 @@ class FBConnectPushEvent {
 				);
 				
 				// Prior to v1.16
-				if( defined(PREF_TOGGLE_T) ) {
+				if( defined('PREF_TOGGLE_T') ) {
 					$preferences[$prefName]['int-type'] = PREF_TOGGLE_T;
 					$preferences[$prefName]['name'] = $prefName;
 				}

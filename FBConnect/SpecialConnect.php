@@ -170,10 +170,9 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// If the user doesn't exist yet locally, allow hooks to check to see if this is a clustered set up
-		if ( ! (isset($user) && $user instanceof User ) ) {
-			if(!wfRunHooks( 'SpecialConnect::login::notFoundLocally', array( &$this, &$user, $fb_id ) )){
-				return;
-			}
+		if ( !(isset($user) && $user instanceof User ) &&
+				!wfRunHooks('SpecialConnect::login::notFoundLocally', array(&$this, &$user, $fb_id))) {
+			return;
 		}
 		
 		if ( isset($user) && $user instanceof User ) {

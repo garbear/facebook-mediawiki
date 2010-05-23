@@ -535,8 +535,13 @@ STYLE;
 			$id = $mwUser ? $mwUser->getId() : 0;
 			// If the user doesn't exist, ask them to name their new account
 			if (!$id) {
-				$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
-							'' : 'returnto=' . $wgTitle->getPrefixedURL();
+				// TODO: $wgTitle was empty for some strange reason...
+				if (!empty( $wgTitle )) {
+					$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
+								'' : 'returnto=' . $wgTitle->getPrefixedURL();
+				} else {
+					$returnto = '';
+				}
 				// Don't redirect if we're on certain special pages
 				if ($returnto != '') {
 					// Redirect to Special:Connect so the Facebook user can choose a nickname
