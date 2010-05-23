@@ -155,7 +155,7 @@ $fbIncludePreferencesExtension = true;
  * NOTE: If fbEnablePushToFacebook is true, then publish_stream will automatically be
  * added to this array.
  *
- * For more details see: http://wiki.developers.facebook.com/index.php/Extended_permissions
+ * For more details see: http://developers.facebook.com/docs/authentication/permissions
  */
 $fbExtendedPermissions = array(
 	//'publish_stream',
