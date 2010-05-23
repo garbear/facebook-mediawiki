@@ -208,7 +208,7 @@ class SpecialConnect extends SpecialPage {
 	}
 
 	protected function createUser($fb_id, $name) {
-		global $wgAuth, $wgOut, $wgUser, $wgRequest, $wgMemc;
+		global $wgUser, $wgOut, $fbConnectOnly, $wgAuth, $wgRequest, $wgMemc;
 		wfProfileIn(__METHOD__);
 		
 		// Handle accidental reposts.
@@ -233,13 +233,16 @@ class SpecialConnect extends SpecialPage {
 		if ( wfReadOnly() ) {
 			$wgOut->readOnlyPage();
 			return;
-		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-			wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
-			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-			return;
-		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
-			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-			return;
+		} elseif ( !isset($fbConnectOnly) || !$fbConnectOnly ) {
+			// These two permissions don't apply in $fbConnectOnly mode
+			if ( $wgUser->isBlockedFromCreateAccount() ) {
+				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
+				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+				return;
+			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
+				return;
+			}
 		}
 		
 		// If we are not allowing users to login locally, we should be checking
@@ -273,7 +276,7 @@ class SpecialConnect extends SpecialPage {
 			return true;
 		}
 		/**/
-
+		
 		// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
 		// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
 		// Can use 'this' to call sendPage('chooseNameForm', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
@@ -282,7 +285,6 @@ class SpecialConnect extends SpecialPage {
 		}
 
 		$user = User::newFromName($name);
-		
 		if (!$user) {
 			wfDebug("FBConnect: Error creating new user.\n");
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-error-creating-user');
@@ -301,7 +303,7 @@ class SpecialConnect extends SpecialPage {
 			$wgOut->showErrorPage('fbconnect-error', 'fbconnect-error-user-creation-hook-aborted', array($abortError));
 			return false;
 		}
-		*/
+		/**/
 		
 		// Apply account-creation throttles
 		global $wgAccountCreationThrottle;
@@ -320,7 +322,6 @@ class SpecialConnect extends SpecialPage {
 		
 		/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
  		
-		
 		// Create the account (locally on main cluster or via wgAuth on other clusters)
 		$email = $realName = ""; // The real values will get filled in outside of the scope of this function.
 		$pass = null;
@@ -570,15 +571,21 @@ class SpecialConnect extends SpecialPage {
 		global $wgUser, $facebook, $wgOut, $fbConnectOnly;
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
+			// The wiki is in read-only mode
 			$wgOut->readOnlyPage();
 			return;
-		} elseif ( $wgUser->isBlockedFromCreateAccount() ) {
-			$this->userBlockedMessage(); // TODO: FIXME: Is this valid? I think it was in the context of LoginForm before.
-			return;
-		} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
-			$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-			return;
+		} elseif ( !isset($fbConnectOnly) || !$fbConnectOnly ) {
+			// These two permissions don't apply in $fbConnectOnly mode
+			if ( $wgUser->isBlockedFromCreateAccount() ) {
+				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
+				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+				return;
+			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
+				return;
+			}
 		}
+			
 
 		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
 		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){

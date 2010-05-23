@@ -45,7 +45,7 @@ if ( !defined( 'MEDIAWIKI' )) {
 /*
  * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r189, May 20, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r198, May 22, 2010' );
 
 /*
  * Add information about this extension to Special:Version.
@@ -70,7 +70,7 @@ if (!empty( $fbIncludePreferencesExtension ) && version_compare($wgVersion, '1.1
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
-if(!empty($fbEnablePushToFacebook)){
+if( !empty( $fbEnablePushToFacebook ) ){
 	// Need to include it explicitly instead of autoload since it has initialization code of its own.
 	// This should be done after FBConnect::init is added to wgExtensionFunctions so that FBConnect
 	// gets fully initialized first.
