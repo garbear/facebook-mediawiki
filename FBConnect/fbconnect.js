@@ -97,6 +97,6 @@ $(document).ready(function() {
  * TODO: Also set the value for 'returntoquery'!!
  */
 function sendToConnectOnLogin(){
-	var destUrl = wgServer + wgScript + "?title=Special:Connect&returnto=" + wgPageName;
+	var destUrl = wgServer + wgScript + "?title=Special:Connect&returnto=" + wgPageName + "&returntoquery=" + wgPagequery;
 	window.location.href = destUrl;
 }

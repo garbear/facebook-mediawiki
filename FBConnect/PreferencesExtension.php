@@ -82,9 +82,9 @@ function wfSpecialPreferencesExtension()
     {
 		// overload to add new field by hook
     	function __construct( &$request ) {
-			global $wgExtensionPreferences;
+			global $wgExtensionPreferences, $wgUser;
 			parent::__construct($request);
-			wfRunHooks( 'initPreferencesExtensionForm', array( $this, $request, &$wgExtensionPreferences ) );
+			wfRunHooks( 'initPreferencesExtensionForm', array( $wgUser, &$wgExtensionPreferences ) );
 		}
         // unlike parent, we don't load in posted form values in constructor
         // until savePreferences when we need it
@@ -99,17 +99,21 @@ function wfSpecialPreferencesExtension()
             global $wgUser, $wgRequest;
             global $wgExtensionPreferences;
 			wfProfileIn(__METHOD__);
- 
-
 			
             foreach ($wgExtensionPreferences as $p)
             {
                 $name = isset($p['name']) ? $p['name'] : "";
-                if (! $name)
-                    continue;
+                if ( !$name ) {
+                	continue;
+                }
  
                 $value = $wgRequest->getVal($name);
                 $type = isset($p['type']) ? $p['type'] : PREF_USER_T;
+                
+                if ( !empty($p['int-type']) ) {
+                	$type = $p['int-type'];
+                }
+                
                 switch ($type)
                 {
                     case PREF_TOGGLE_T:
@@ -160,13 +164,12 @@ function wfSpecialPreferencesExtension()
             global $wgOut, $wgRequest, $wgUser;
             global $wgExtensionPreferences;
 			wfProfileIn(__METHOD__);
- 
+			
             // first get original form, then hack into it new options
             parent::mainPrefsForm($status, $message);
             $html = $wgOut->getHTML();
             $wgOut->clearHTML();
             $sections = array();
-
             foreach ($wgExtensionPreferences as $p)
             {
                 if (! isset($p['section']) || ! $p['section'])
@@ -174,6 +177,7 @@ function wfSpecialPreferencesExtension()
                  $section = $p['section'];
  
                 $name = isset($p['name']) ? $p['name'] : "";
+                
                 $value = "";
                 if ($name)
                 {
@@ -205,6 +209,10 @@ function wfSpecialPreferencesExtension()
                 }
 
                 $type = isset($p['type']) ? $p['type'] : PREF_USER_T;
+                
+                if ( !empty($p['int-type']) ) {
+                	$type = $p['int-type'];
+                }
                 $pos = isset($p['pos']) ? $p['pos'] : '';
                 switch ($type)
                 {
