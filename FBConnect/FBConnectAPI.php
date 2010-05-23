@@ -120,7 +120,6 @@ class FBConnectAPI extends Facebook {
 		                'officer' => false,
 		                'admin'   => false);
 		
-		
 		$gid = !empty($fbUserRightsFromGroup) ? $fbUserRightsFromGroup : false;
 		if (// If no group ID is specified, then there's no group to belong to
 			!$gid ||
@@ -134,7 +133,7 @@ class FBConnectAPI extends Facebook {
 		
 		// If a User object was provided, translate it into a Facebook ID
 		if ($user instanceof User) {
-			// TODO: Does this need a special api call sans access_token?
+			// TODO: Does this call for a special api call without access_token?
 			$users = FBConnectDB::getFacebookIDs($user);
 			if (count($users)) {
 				$user = $users[0];
@@ -162,7 +161,6 @@ class FBConnectAPI extends Facebook {
 						'gid' => $gid
 				));
 			} catch (FacebookApiException $e) {
-			#} catch (FacebookRestClientException $e) {
 				// Invalid session; we're not going to be able to get the rights
 				error_log($e);
 				$rights_cache[$user] = $rights;
@@ -207,4 +205,50 @@ class FBConnectAPI extends Facebook {
 		$rights_cache[$user] = $rights;
 		return $rights;
 	}
+	
+	/*
+	 * Publish message on Facebook wall.
+	 */
+	public function publishStream($message, $link = "", $link_title ) {
+		/*
+		$attachment = array(
+			'name' => $message,
+			'href' => $link,
+			'caption' => $caption,
+			'description' => $description
+		);
+		
+		if( count($media) > 0 ) {
+			foreach ( $media as $value ) {
+				$attachment[ 'media' ][] = $value;
+			}
+		}
+		/**/
+		// $api_error_descriptions
+		$attachment = array();
+		
+		$query = array(
+			'method' => 'stream.publish',
+			'attachment' => json_encode($attachment),
+			'action_links' => json_encode(array(
+				'text' => $link_title,
+				'href' => $link
+			)),
+		);
+		
+		$result = json_decode( $this->api( $query ) );
+		
+		if ( is_array( $result ) ) {
+			// Error
+			#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
+			error_log("stream.publish returned error code $result->error_code");
+			return false;
+		} else if ( is_string( $result ) ) {
+			// Success! Return value is "$UserId_$PostId"
+			return true;
+		} else {
+			error_log("stream.publish: Unknown return type: " . gettype($result));
+			return false;
+		}
+	} 
 }
