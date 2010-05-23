@@ -63,6 +63,7 @@ class FBConnectHooks {
 	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		global $fbUserRightsFromGroup;
+		
 		// Probably a redundant check, but with PHP you can never be too sure...
 		if (!$fbUserRightsFromGroup) {
 			// No group to pull rights from, so the user can't be a member
@@ -79,9 +80,10 @@ class FBConnectHooks {
 			case 'admin':
 				global $facebook;
 				// Connect to the Facebook API and ask if the user is in the group
-				$rights = $facebook->getGroupRights();
+				$rights = $facebook->getGroupRights($user);
 				$result = $rights[$type];
 		}
+		
 		return true;
 	}
 	
@@ -186,7 +188,7 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $fbAppId, $facebook, $fbUseMarkup, $fbLogo, $wgTitle;
+		global $fbAppId, $facebook, $fbUseMarkup, $fbLogo, $wgTitle, $wgRequest;
 		$vars['fbAppId'] = $fbAppId;
 		$vars['fbSession'] = $facebook->getSession();
 		$vars['fbUseMarkup'] = $fbUseMarkup;
@@ -194,6 +196,8 @@ STYLE;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' :
 		                       "returnto={$wgTitle->getPrefixedURL()}");
+		$query = $wgRequest->getValues();
+		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $query ) );
 		return true;
 	}
 	
@@ -263,11 +267,12 @@ STYLE;
 				// Ask Facebook for the real name
 				if (!$name || $name == '') {
 					try {
+						// This might fail if we load a stale session from cookies
 						$fbUser = $facebook->api('/me');
+						$name = $fbUser['name'];
 					} catch (FacebookApiException $e) {
 						error_log($e);
 					}
-					$name = $fbUser['name'];
 				}
 				// Make sure we were able to get a name from the database or Facebook
 				if ($name && $name != '') {
@@ -561,10 +566,8 @@ STYLE;
 	 * 
 	 * 
 	 */
-	static function initPreferencesExtensionForm($self, $request, &$wgExtensionPreferences) {
-		global $wgUser;
-		
-		$id = FBConnectDB::getFacebookIDs($wgUser);
+	static function initPreferencesExtensionForm($user, &$wgExtensionPreferences) {
+		$id = FBConnectDB::getFacebookIDs($user); 
 		if( count($id) > 0 ) {
 			//action="/index.php?title=TechTeam_QA_8_Wiki&amp;action=submit" method="post"
 			$action = Title::makeTitle(NS_SPECIAL,"Connect");
@@ -574,11 +577,11 @@ STYLE;
 			$html .= Xml::element( "input", array("type" => "submit", "value" => "Disconent"), '', true );
 			$html .= Xml::closeElement( "form" );
  			$html .= Xml::closeElement( "div" );
-			$wgExtensionPreferences = array_merge( 
-				array( 
+			$wgExtensionPreferences = array_merge(
+				array(
 					array(
-						'name' => 'ssasasas', 
-						'section' => 'fbconnect-prefstext',				
+						'name' => 'ssasasas',
+						'section' => 'fbconnect-prefstext',
 						'html' => $html,
 						'type' => PREF_CUSTOM_HTML_T) ), $wgExtensionPreferences);
 		}
