@@ -36,7 +36,7 @@ class FBConnectAPI extends Facebook {
 		global $fbAppId, $fbSecret, $fbDomain;
 		// Check to make sure config.sample.php was renamed properly
 		if ( !$this->isConfigSetup() ) {
-			error_log('Could not create facebook client.');
+			exit( 'Please update $fbAppId and $fbSecret in config.php' );
 		}
 		$config = array(
 			'appId' => $fbAppId,
@@ -60,15 +60,16 @@ class FBConnectAPI extends Facebook {
 		$isSetup = isset($fbAppId) && $fbAppId != 'YOUR_APP_KEY' &&
 		           isset($fbSecret) && $fbSecret != 'YOUR_SECRET';
 		if(!$isSetup) {
-			// Check to see if they are using the old variables
+			// Check to see if they are still using the old variables
 			global $fbApiKey, $fbApiSecret;
-			if (isset($fbApiKey) && isset($fbApiSecret)) {
+			if ( isset($fbApiKey) ) {
 				$fbAppId = $fbApiKey;
-				$fbSecret= $fbApiSecret;
-				$isSetup = true;
-			} else {
-				exit( 'Please update the $fbAppId in config.php' );
 			}
+			if ( isset($fbApiSecret) ) {
+				$fbSecret= $fbApiSecret;
+			}
+			$isSetup = isset($fbAppId) && $fbAppId != 'YOUR_APP_KEY' &&
+		               isset($fbSecret) && $fbSecret != 'YOUR_SECRET';
 		}
 		return $isSetup;
 	}
