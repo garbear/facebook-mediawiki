@@ -88,7 +88,7 @@ class Facebook
     CURLOPT_CONNECTTIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 60,
-    CURLOPT_USERAGENT      => 'facebook-php-2.0',
+    CURLOPT_USERAGENT      => 'facebook-php-' . VERSION,
   );
 
   /**
