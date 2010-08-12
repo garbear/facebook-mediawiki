@@ -15,15 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * Not a valid entry point, skip unless MEDIAWIKI is defined.
- */
-if ( !defined( 'MEDIAWIKI' ) ) {
-	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
-}
-
-
 /**
  * Class FBConnectHooks
  * 
@@ -62,10 +53,10 @@ class FBConnectHooks {
 	 * Checks the autopromote condition for a user.
 	 */
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
-		global $fbUserRightsFromGroup;
+		global $wgFbUserRightsFromGroup;
 		
 		// Probably a redundant check, but with PHP you can never be too sure...
-		if (!$fbUserRightsFromGroup) {
+		if (!$wgFbUserRightsFromGroup) {
 			// No group to pull rights from, so the user can't be a member
 			$result = false;
 			return true;
@@ -91,16 +82,16 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $wgVersion, $fbLogo, $fbScript, $fbExtensionScript, $fbIncludeJquery,
+		global $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgFbIncludeJquery,
 		       $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
-		if(!empty($fbScript)){
+		if(!empty($wgFbScript)){
 			$out->prependHTML('
 				<div id="fb-root"></div>
 				<script>
 					(function(){var e=document.createElement("script");e.type="' .
-					$wgJsMimeType . '";e.src="' . $fbScript .
+					$wgJsMimeType . '";e.src="' . $wgFbScript .
 					'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
 				</script>' . "\n"
 			);
@@ -112,18 +103,18 @@ class FBConnectHooks {
 		}
 		
 		// Add a Facebook logo to the class .mw-fblink
-		$style = empty($fbLogo) ? '' : <<<STYLE
+		$style = empty($wgFbLogo) ? '' : <<<STYLE
 		/* Add a pretty logo to Facebook links */
 		.mw-fblink {
-			background: url($fbLogo) top left no-repeat !important;
+			background: url($wgFbLogo) top left no-repeat !important;
 			padding-left: 17px !important;
 		}
 STYLE;
 		
 		// Things get a little simpler in 1.16...
 		if (version_compare($wgVersion, '1.16', '>=')) {
-			// Add a pretty Facebook logo if $fbLogo is set
-			if ( !empty( $fbLogo) ) {
+			// Add a pretty Facebook logo if $wgFbLogo is set
+			if ( !empty( $wgFbLogo) ) {
 				$out->addInlineStyle($style);
 			}
 			
@@ -133,23 +124,23 @@ STYLE;
 			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
 			
 			// Add the script file specified by $url
-			if(!empty($fbExtensionScript)){
-				$out->addScriptFile($fbExtensionScript);
+			if(!empty($wgFbExtensionScript)){
+				$out->addScriptFile($wgFbExtensionScript);
 			}
 		} else {
-			// Add a pretty Facebook logo if $fbLogo is set
-			if ( !empty( $fbLogo) ) {
+			// Add a pretty Facebook logo if $wgFbLogo is set
+			if ( !empty( $wgFbLogo) ) {
 				$out->addScript('<style type="text/css">' . $style . '</style>');
 			}
 			
 			// Don't include jQuery if it's already in use on the site
-			if (!empty($fbIncludeJquery)){
+			if (!empty($wgFbIncludeJquery)){
 				$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
 			}
 			
 			// Add the script file specified by $url
-			if(!empty($fbExtensionScript)){
-				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n");
+			if(!empty($wgFbExtensionScript)){
+				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
 			}
 		}
 		return true;
@@ -176,10 +167,10 @@ STYLE;
 	/**
 	 * Adds several Facebook Connect variables to the page:
 	 * 
-	 * fbAppId		 The application ID (see $fbAppId in config.php)
+	 * fbAppId		 The application ID (see $wgFbAppId in config.php)
 	 * fbSession     Assist the JavaScript SDK with loading the session
-	 * fbUseMarkup   Should XFBML tags be rendered (see $fbUseMarkup in config.php)
-	 * fbLogo        Facebook logo (see $fbLogo in config.php)
+	 * fbUseMarkup   Should XFBML tags be rendered (see $wgFbUseMarkup in config.php)
+	 * fbLogo        Facebook logo (see $wgFbLogo in config.php)
 	 * fbLogoutURL   The URL to be redirected to on a disconnect
 	 * 
 	 * This hook was added in MediaWiki version 1.14. See:
@@ -188,11 +179,11 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $fbAppId, $facebook, $fbUseMarkup, $fbLogo, $wgTitle, $wgRequest;
-		$vars['fbAppId'] = $fbAppId;
+		global $wgFbAppId, $facebook, $wgFbUseMarkup, $wgFbLogo, $wgTitle, $wgRequest;
+		$vars['fbAppId'] = $wgFbAppId;
 		$vars['fbSession'] = $facebook->getSession();
-		$vars['fbUseMarkup'] = $fbUseMarkup;
-		$vars['fbLogo'] = $fbLogo ? true : false;
+		$vars['fbUseMarkup'] = $wgFbUseMarkup;
+		$vars['fbLogo'] = $wgFbLogo ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
 		                       $wgTitle->isSpecial('Preferences') ? '' :
 		                       "returnto={$wgTitle->getPrefixedURL()}");
@@ -245,13 +236,13 @@ STYLE;
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader;
-		global $fbPersonalUrls, $fbConnectOnly;
+		global $wgFbPersonalUrls, $wgFbConnectOnly;
 		wfLoadExtensionMessages('FBConnect');
 		
 		/*
 		 * Personal URLs option: remove_user_talk_link
 		 */
-		if ($fbPersonalUrls['remove_user_talk_link'] &&
+		if ($wgFbPersonalUrls['remove_user_talk_link'] &&
 				array_key_exists('mytalk', $personal_urls)) {
 			unset($personal_urls['mytalk']);
 		}
@@ -261,7 +252,7 @@ STYLE;
 			/*
 			 * Personal URLs option: use_real_name_from_fb
 			 */
-			if ( !empty( $fbPersonalUrls['use_real_name_from_fb'] ) ) {
+			if ( !empty( $wgFbPersonalUrls['use_real_name_from_fb'] ) ) {
 				// Start with the real name in the database
 				$name = $wgUser->getRealName();
 				// Ask Facebook for the real name
@@ -280,7 +271,7 @@ STYLE;
 				}
 			}
 			// Replace logout link with a button to disconnect from Facebook Connect
-			if( empty( $fbPersonalUrls['hide_logout_of_fb'] ) ){
+			if( empty( $wgFbPersonalUrls['hide_logout_of_fb'] ) ){
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
 					'text'   => wfMsg( 'fbconnect-logout' ),
@@ -291,7 +282,7 @@ STYLE;
 			/*
 			 * Personal URLs option: link_back_to_facebook
 			 */
-			if ($fbPersonalUrls['link_back_to_facebook']) {
+			if ($wgFbPersonalUrls['link_back_to_facebook']) {
 				try {
 					$fbUser = $facebook->api('/me');
 					$link = $fbUser['link'];
@@ -311,7 +302,7 @@ STYLE;
 			/*
 			 * Personal URLs option: hide_convert_button
 			 */
-			if (!$fbPersonalUrls['hide_convert_button']) {
+			if (!$wgFbPersonalUrls['hide_convert_button']) {
 				$personal_urls['fbconvert'] = array(
 					'text'   => wfMsg( 'fbconnect-convert' ),
 					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
@@ -325,7 +316,7 @@ STYLE;
 			/*
 			 * Personal URLs option: hide_connect_button
 			 */
-			if (!$fbPersonalUrls['hide_connect_button']) {
+			if (!$wgFbPersonalUrls['hide_connect_button']) {
 				// Add an option to connect via Facebook Connect
 				$personal_urls['fbconnect'] = array(
 					'text'   => wfMsg( 'fbconnect-connect' ),
@@ -336,7 +327,7 @@ STYLE;
 			}
 			
 			// Remove other personal toolbar links
-			if ( !empty( $fbConnectOnly ) ) {
+			if ( !empty( $wgFbConnectOnly ) ) {
 				foreach (array('login', 'anonlogin') as $k) {
 					if (array_key_exists($k, $personal_urls)) {
 						unset($personal_urls[$k]);
@@ -415,14 +406,14 @@ STYLE;
 	 * Special:ListUsers.
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
-		global $fbUserRightsFromGroup, $facebook, $fbLogo;
-		if ( empty($fbUserRightsFromGroup) ) {
+		global $wgFbUserRightsFromGroup, $facebook, $wgFbLogo;
+		if ( empty($wgFbUserRightsFromGroup) ) {
 			return true;
 		}
 		
 		// TODO: Do we need to verify the Facebook session here?
 		
-		$gid = $fbUserRightsFromGroup;
+		$gid = $wgFbUserRightsFromGroup;
 		// Connect to the API and get some info about the group
 		try {
 			$group = $facebook->api('/' . $gid);
@@ -449,11 +440,11 @@ STYLE;
 	
 	/**
 	 * Removes Special:UserLogin and Special:CreateAccount from the list of
-	 * special pages if $fbConnectOnly is set to true.
+	 * special pages if $wgFbConnectOnly is set to true.
 	 */
 	static function SpecialPage_initList( &$aSpecialPages ) {
-		global $fbConnectOnly;
-		if ( !empty( $fbConnectOnly) ) {
+		global $wgFbConnectOnly;
+		if ( !empty( $wgFbConnectOnly) ) {
 			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin',
 			                       'Connect', false, array('returnto', 'returntoquery'));
 			// Used in 1.12.x and above
@@ -486,11 +477,11 @@ STYLE;
 	}
 	
 	/**
-	 * Removes the 'createaccount' right from users if $fbConnectOnly is true.
+	 * Removes the 'createaccount' right from users if $wgFbConnectOnly is true.
 	 */
 	static function UserGetRights( &$user, &$aRights ) {
-		global $fbConnectOnly;
-		if ( !empty( $fbConnectOnly ) ) {
+		global $wgFbConnectOnly;
+		if ( !empty( $wgFbConnectOnly ) ) {
 			foreach ( $aRights as $i => $right ) {
 				if ( $right == 'createaccount' ) {
 					unset( $aRights[$i] );
@@ -575,7 +566,7 @@ STYLE;
 		$id = FBConnectDB::getFacebookIDs($user); 
 		if( count($id) > 0 ) {
 			//action="/index.php?title=TechTeam_QA_8_Wiki&amp;action=submit" method="post"
-			$action = Title::makeTitle(NS_SPECIAL,"Connect");
+			$action = SpecialPage::getTitleFor( 'Connect' );
 			$action  = $action->getFullURL("action=disconnect");
 			$html = Xml::openElement("div");
 			$html .= Xml::openElement( "form", array("submit" => "post", "action" => $action) );

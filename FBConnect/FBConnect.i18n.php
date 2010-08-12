@@ -48,7 +48,7 @@ fb.'desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http:
 'group-fb-user'           => 'Facebook Connect users',
 'group-fb-user-member'    => 'Facebook Connect user',
 'grouppage-fb-user'       => '{{ns:project}}:Facebook Connect users',
-// Group for Facebook Connect users beloning to the group specified by $fbUserRightsFromGroup
+// Group for Facebook Connect users beloning to the group specified by $wgFbUserRightsFromGroup
 'group-fb-groupie'        => 'Group members',
 'group-fb-groupie-member' => 'Group member',
 'grouppage-fb-groupie'    => '{{ns:project}}:Group members',

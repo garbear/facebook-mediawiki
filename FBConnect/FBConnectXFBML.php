@@ -41,7 +41,7 @@ class FBConnectXFBML {
 	 * $tag argument with the $tag provided to createParserHook.
 	 */
 	static function parserHook($innertext, $args, &$parser, $tag = '' ) {
-		global $fbAllowFacebookImages;
+		global $wgFbAllowFacebookImages;
 		
 		// Run hook to allow modifying the default behavior. If $override is
 		// set, it is used instead. Return false to disable the tag. 
@@ -63,17 +63,17 @@ class FBConnectXFBML {
 				// Disable these tags by returning an empty string
 				break;
 			case 'fb:serverfbml':
-				// TODO: Is this safe? Does it respect $fbAllowFacebookImages?
+				// TODO: Is this safe? Does it respect $wgFbAllowFacebookImages?
 				$attrs = self::implodeAttrs( $args );
 				// Don't recursively parse $innertext
 				return "<fb:serverfbml{$attrs}>$innertext</fb:serverfbml>";
 			case 'fb:profile-pic':
 			#case 'fb:photo': // Dropped in new JavaScript SDK
 			#case 'fb:video': // Dropped in new JavaScript SDK
-				if (!$fbAllowFacebookImages) {
+				if (!$wgFbAllowFacebookImages) {
 					break;
 				}
-				// Careful - no "break;" if $fbAllowFacebookImages is true
+				// Careful - no "break;" if $wgFbAllowFacebookImages is true
 			default:
 				// Allow other tags by default
 				$attrs = self::implodeAttrs( $args );
@@ -111,12 +111,12 @@ class FBConnectXFBML {
 	}
 	
 	/**
-	 * Returns true if XFBML is enabled (i.e. $fbUseMarkup is not false).
-	 * Defaults to true if $fbUseMarkup is not set.
+	 * Returns true if XFBML is enabled (i.e. $wgFbUseMarkup is not false).
+	 * Defaults to true if $wgFbUseMarkup is not set.
 	 */
 	static function isEnabled() {
-		global $fbUseMarkup;
-		return !isset($fbUseMarkup) || $fbUseMarkup;
+		global $wgFbUseMarkup;
+		return !isset($wgFbUseMarkup) || $wgFbUseMarkup;
 	}
 	
 	/**

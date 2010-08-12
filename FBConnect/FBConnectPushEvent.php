@@ -36,12 +36,12 @@ class FBConnectPushEvent {
 		wfProfileIn(__METHOD__);
 
 		// The push feature of the extension requires the publish_stream extended permission.
-		global $fbExtendedPermissions;
+		global $wgFbExtendedPermissions;
 		$PERMISSION_TO_PUBLISH = 'publish_stream';
-		if(empty($fbExtendedPermissions) || !is_array($fbExtendedPermissions)){
-			$fbExtendedPermissions = array($PERMISSION_TO_PUBLISH);
-		} else if(!in_array($PERMISSION_TO_PUBLISH, $fbExtendedPermissions)){
-			$fbExtendedPermissions[] = $PERMISSION_TO_PUBLISH;
+		if(empty($wgFbExtendedPermissions) || !is_array($wgFbExtendedPermissions)){
+			$wgFbExtendedPermissions = array($PERMISSION_TO_PUBLISH);
+		} else if(!in_array($PERMISSION_TO_PUBLISH, $wgFbExtendedPermissions)){
+			$wgFbExtendedPermissions[] = $PERMISSION_TO_PUBLISH;
 		}
 
 		// Make sure that all of the push events were configured correctly.

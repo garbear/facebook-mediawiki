@@ -47,7 +47,7 @@
 window.fbAsyncInit = function() {
 	// Initialize the library with the API key
 	FB.init({
-		appId : window.fbAppId, // See $fbAppId in config.php
+		appId : window.fbAppId, // See $wgFbAppId in config.php
 		session: window.fbSession, // Don't re-fetch the session if PHP provides it
 		status : true, // Check login status
 		cookie : true, // Enable cookies to allow the server to access the session

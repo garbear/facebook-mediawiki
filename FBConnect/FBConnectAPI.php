@@ -33,19 +33,19 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 class FBConnectAPI extends Facebook {
 	// Constructor
 	public function __construct() {
-		global $fbAppId, $fbSecret, $fbDomain;
+		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
 		// Check to make sure config.sample.php was renamed properly
 		if ( !$this->isConfigSetup() ) {
-			exit( 'Please update $fbAppId and $fbSecret in config.php' );
+			exit( 'Please update $wgFbAppId and $wgFbSecret in config.php' );
 		}
 		$config = array(
-			'appId' => $fbAppId,
-			'secret' => $fbSecret,
+			'appId' => $wgFbAppId,
+			'secret' => $wgFbSecret,
 			'cookie' => true,
 		);
 		// Include the optional domain parameter if it has been set
-		if ( !empty($fbDomain) && $fbDomain != 'BASE_DOMAIN' ) {
-			$config['domain'] = $fbDomain;
+		if ( !empty($wgFbDomain) && $wgFbDomain != 'BASE_DOMAIN' ) {
+			$config['domain'] = $wgFbDomain;
 		}
 		parent::__construct( $config );
 	}
@@ -56,20 +56,20 @@ class FBConnectAPI extends Facebook {
 	 * followed correctly.
 	 */
 	public function isConfigSetup() {
-		global $fbAppId, $fbSecret;
-		$isSetup = isset($fbAppId) && $fbAppId != 'YOUR_APP_KEY' &&
-		           isset($fbSecret) && $fbSecret != 'YOUR_SECRET';
+		global $wgFbAppId, $wgFbSecret;
+		$isSetup = isset($wgFbAppId) && $wgFbAppId != 'YOUR_APP_KEY' &&
+		           isset($wgFbSecret) && $wgFbSecret != 'YOUR_SECRET';
 		if(!$isSetup) {
 			// Check to see if they are still using the old variables
 			global $fbApiKey, $fbApiSecret;
 			if ( isset($fbApiKey) ) {
-				$fbAppId = $fbApiKey;
+				$wgFbAppId = $fbApiKey;
 			}
 			if ( isset($fbApiSecret) ) {
-				$fbSecret= $fbApiSecret;
+				$wgFbSecret= $fbApiSecret;
 			}
-			$isSetup = isset($fbAppId) && $fbAppId != 'YOUR_APP_KEY' &&
-		               isset($fbSecret) && $fbSecret != 'YOUR_SECRET';
+			$isSetup = isset($wgFbAppId) && $wgFbAppId != 'YOUR_APP_KEY' &&
+		               isset($wgFbSecret) && $wgFbSecret != 'YOUR_SECRET';
 		}
 		return $isSetup;
 	}
@@ -114,14 +114,14 @@ class FBConnectAPI extends Facebook {
 	 * Retrieves group membership data from Facebook.
 	 */
 	public function getGroupRights( $user = null ) {
-		global $fbUserRightsFromGroup;
+		global $wgFbUserRightsFromGroup;
 		
 		// Groupies can be members, officers or admins (the latter two infer the former)
 		$rights = array('member'  => false,
 		                'officer' => false,
 		                'admin'   => false);
 		
-		$gid = !empty($fbUserRightsFromGroup) ? $fbUserRightsFromGroup : false;
+		$gid = !empty($wgFbUserRightsFromGroup) ? $wgFbUserRightsFromGroup : false;
 		if (// If no group ID is specified, then there's no group to belong to
 			!$gid ||
 			// If $user wasn't specified, set it to the logged in user

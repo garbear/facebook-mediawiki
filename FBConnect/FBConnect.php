@@ -18,10 +18,8 @@
 /**
  * FBConnect plugin. Integrates Facebook Connect into MediaWiki.
  * 
- * Facebook Connect single sign on (SSO) experience and XFBML are currently available.
- * Please rename config.sample.php to config.php, follow the instructions inside and
- * customize variables as you like to set up your Facebook Connect extension.
- *
+ * Features include single sign on (SSO) experience and XFBML.
+ * 
  * Info is available at http://www.mediawiki.org/wiki/Extension:FBConnect
  * and at http://wiki.developers.facebook.com/index.php/MediaWiki
  * 
@@ -29,8 +27,8 @@
  * and at http://wiki.developers.facebook.com/index.php/Talk:MediaWiki
  * 
  * @file
- * @author Garrett Bruin
- * @copyright Copyright © 2008 Garrett Brown
+ * @author Garrett Brown, Sean Colombo
+ * @copyright Copyright © 2010 Garrett Brown, Sean Colombo
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  * @ingroup Extensions
  */
@@ -44,9 +42,9 @@ if ( !defined( 'MEDIAWIKI' )) {
 }
 
 /*
- * FBConnect version. Note: this is not necessarily the most recent SVN revision number.
+ * FBConnect version.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', 'r203, May 22, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.1.1, August 12, 2010' );
 
 /*
  * Add information about this extension to Special:Version.
@@ -63,15 +61,24 @@ $wgExtensionCredits['specialpage'][] = array(
  * Initialization of the autoloaders and special extension pages.
  */
 $dir = dirname(__FILE__) . '/';
-require_once $dir . 'config.php';
+// Load the default configuration
+// It's recommended that you override these in LocalSettings.php
+include_once $dir . 'config.default.php';
+// If config.php exists, import those settings over the default ones
+if (file_exists( $dir . 'config.php' )) {
+	require_once $dir . 'config.php';
+}
+// Load the PHP SDK
 require_once $dir . 'php-sdk/facebook.php';
-if (!empty( $fbIncludePreferencesExtension ) && version_compare($wgVersion, '1.16', '<')) {
+// If needed, load Extension:PreferencesExtension
+//   <http://www.mediawiki.org/wiki/Extension:PreferencesExtension>
+if (!empty( $wgFbIncludePreferencesExtension ) && version_compare($wgVersion, '1.16', '<')) {
 	require_once $dir . 'PreferencesExtension.php';
 }
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
-if( !empty( $fbEnablePushToFacebook ) ){
+if( !empty( $wgFbEnablePushToFacebook ) ){
 	// Need to include it explicitly instead of autoload since it has initialization code of its own.
 	// This should be done after FBConnect::init is added to wgExtensionFunctions so that FBConnect
 	// gets fully initialized first.
@@ -98,8 +105,9 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 // Create a new group for Facebook users
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 
+### THIS CODE NEEDS TO BE MOVED INTO THE INIT FUNCTION ###
 // If we are configured to pull group info from Facebook, then create the group permissions
-if ($fbUserRightsFromGroup) {
+if (!empty( $wgFbUserRightsFromGroup )) {
 	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
 	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
@@ -132,7 +140,7 @@ class FBConnect {
 	 */
 	public static function init() {
 		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks;
-		global $fbOnLoginJsOverride;
+		global $wgFbOnLoginJsOverride;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
@@ -150,17 +158,10 @@ class FBConnect {
 		}
 
 		// Allow configurable over-riding of the onLogin handler.
-		if(!empty($fbOnLoginJsOverride)){
-			self::$fbOnLoginJs = $fbOnLoginJsOverride;
+		if(!empty($wgFbOnLoginJsOverride)){
+			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;
 		} else {
 			self::$fbOnLoginJs = "window.location.reload(true);";
-		}
-
-		// ParserFirstCallInit was introduced in modern (1.12+) MW versions so as to
-		// avoid unstubbing $wgParser on setHook() too early, as per r35980
-		if (!defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' )) {
-			global $wgParser;
-			wfRunHooks( 'ParserFirstCallInit', $wgParser );
 		}
 	}
 
@@ -192,10 +193,10 @@ class FBConnect {
 	 * Return the code for the permissions attribute (with leading space) to use on all fb:login-buttons.
 	 */
 	public static function getPermissionsAttribute(){
-		global $fbExtendedPermissions;
+		global $wgFbExtendedPermissions;
 		$attr = "";
-		if(!empty($fbExtendedPermissions)){
-			$attr = " perms=\"".implode(",", $fbExtendedPermissions)."\"";
+		if(!empty($wgFbExtendedPermissions)){
+			$attr = " perms=\"".implode(",", $wgFbExtendedPermissions)."\"";
 		}
 		return $attr;
 	} // end getPermissionsAttribute()
