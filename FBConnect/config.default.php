@@ -1,11 +1,4 @@
 <?php
-/*
- * To install:
- *    1.  Copy this file to config.php (remove the .sample part).
- *    2.  Follow the instructions below to make the extension work.
- */
-
-
 ### FBCONNECT CONFIGURATION VARIABLES ###
 
 /**
@@ -24,22 +17,26 @@
  *    C.  Upload icon and logo images. The icon appears in Stream stories.
  *    D.  In the "Connect" section, set your Connect Logo and base domain
  *        (which should also be copied into this config file).
+ *
+ * It is recommended that, rather than changing the settings in this file, you
+ * instead override them in LocalSettings.php by adding new settings after
+ * require_once("$IP/extensions/FBConnect/FBConnect.php");
  */
-$fbAppId          = 'YOUR_APP_ID';    # Change this!
-$fbSecret         = 'YOUR_SECRET';    # Change this!
-#$fbDomain         = 'BASE_DOMAIN';    # Optional
+$wgFbAppId          = 'YOUR_APP_ID';    # Change this!
+$wgFbSecret         = 'YOUR_SECRET';    # Change this!
+#$wgFbDomain         = 'BASE_DOMAIN';    # Optional
 
 /**
  * Disables the creation of new accounts and prevents old accounts from being
  * used to log in if they aren't associated with a Facebook Connect account.
  */
-$fbConnectOnly = false;
+$wgFbConnectOnly = false;
 
 /**
  * Allow the use of XFBML in wiki text.
  * For more info, see http://wiki.developers.facebook.com/index.php/XFBML.
  */
-$fbUseMarkup = true;
+$wgFbUseMarkup = true;
 
 /**
  * If XFBML is enabled, then <fb:photo> maybe be used as a replacement for
@@ -49,7 +46,7 @@ $fbUseMarkup = true;
  * 
  * Disabled until the JavaScript SDK supports <fb:photo> tags.
  */
-#$fbAllowFacebookImages = true;
+#$wgFbAllowFacebookImages = true;
 
 /**
  * For easier wiki rights management, create a group on Facebook and place the
@@ -63,11 +60,11 @@ $fbUseMarkup = true;
  * Users will automatically be promoted or demoted when their membership, title
  * or admin status is modified from the group page within Facebook.
  */
-$fbUserRightsFromGroup = false;  # Or a group ID
+$wgFbUserRightsFromGroup = false;  # Or a group ID
 
 // Not used (yet...)
-#$fbRestrictToGroup = true;
-#$fbRestrictToNotReplied = false;
+#$wgFbRestrictToGroup = true;
+#$wgFbRestrictToNotReplied = false;
 
 /**
  * Options regarding the personal toolbar (in the upper right).
@@ -87,7 +84,7 @@ $fbUserRightsFromGroup = false;  # Or a group ID
  * Additionally, use $wgShowIPinHeader to hide the IP and its talk link.
  * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
  */
-$fbPersonalUrls = array(
+$wgFbPersonalUrls = array(
 	'hide_connect_button'   => false,
 	'hide_convert_button'   => false,
 	'hide_logout_of_fb'     => false,
@@ -101,7 +98,7 @@ $fbPersonalUrls = array(
  * The Facebook icon. You can copy this image to your server if you want, or
  * set to false to disable.
  */
-$fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
+$wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
  * URL of the Facebook Connect JavaScript SDK. Because this library is currently
@@ -111,22 +108,22 @@ $fbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * 
  * For more info, see <http://developers.facebook.com/docs/reference/javascript/>
  */
-$fbScript = 'http://connect.facebook.net/en_US/all.js';
-#$fbScript = 'https://connect.facebook.net/en_US/all.js';
+$wgFbScript = 'http://connect.facebook.net/en_US/all.js';
+#$wgFbScript = 'https://connect.facebook.net/en_US/all.js';
 
 /**
  * Path to the extension's client-side JavaScript
  */
 global $wgScriptPath;
-#$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for development
-$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
+#$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for development
+$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
 
 /**
  * Whether to include jQuery. This option is for backwards compatibility and is
  * ignored in version 1.16. Otherwise, if you already have jQuery included on
  * your site, you can safely set this to false.
  */
-$fbIncludeJquery = true;
+$wgFbIncludeJquery = true;
 
 /**
  * Optionally override the default javascript handling which occurs when a user logs in.
@@ -136,7 +133,7 @@ $fbIncludeJquery = true;
  * NOTE: This will be put inside of double-quotes, so any single-quotes should be used inside
  * of any JS in this variable.
  */
-//$fbOnLoginJsOverride = "sendToConnectOnLogin();";
+//$wgFbOnLoginJsOverride = "sendToConnectOnLogin();";
 
 /**
  * Optionally turn off the inclusion of the PreferencesExtension.  Since this
@@ -146,7 +143,7 @@ $fbIncludeJquery = true;
  *
  * When running on MediaWiki v1.16 and above, the extension won't be included anyway.
  */
-$fbIncludePreferencesExtension = true;
+$wgFbIncludePreferencesExtension = true;
 
 /**
  * An array of extended permissions to request from the user while they are
@@ -157,7 +154,7 @@ $fbIncludePreferencesExtension = true;
  *
  * For more details see: http://developers.facebook.com/docs/authentication/permissions
  */
-$fbExtendedPermissions = array(
+$wgFbExtendedPermissions = array(
 	//'publish_stream',
 	//'read_stream',
 	//'email',
@@ -175,8 +172,8 @@ $fbExtendedPermissions = array(
  * This section allows controlling of whether push events are enabled, and which
  * of the push events to use.
  */
-$fbEnablePushToFacebook = false;
-if(!empty($fbEnablePushToFacebook)){
+$wgFbEnablePushToFacebook = false;
+if(!empty($wgFbEnablePushToFacebook)){
 	$fbPushDir = dirname(__FILE__) . '/pushEvents/';
 	
 	// Convenience loop for push event classes in the fbPushDir directory
@@ -191,7 +188,7 @@ if(!empty($fbEnablePushToFacebook)){
 		$fbPushEventClasses[] = $pClassName;
 		$wgAutoloadClasses[$pClassName] = $fbPushDir . "$pClassName.php";
 	}
-
+	
 	// Example of explicitly adding a push event which doesn't meet the criteria above.
 	// $fbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
 	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $fbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
