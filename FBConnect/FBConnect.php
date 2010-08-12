@@ -28,10 +28,11 @@
  * Limited support is available at  http://www.mediawiki.org/wiki/Extension_talk:FBConnect
  * and at http://wiki.developers.facebook.com/index.php/Talk:MediaWiki
  * 
+ * @file
  * @author Garrett Bruin
  * @copyright Copyright © 2008 Garrett Brown
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
- * @addtogroup Extensions
+ * @ingroup Extensions
  */
 
 
