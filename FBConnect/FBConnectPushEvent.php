@@ -155,6 +155,7 @@ class FBConnectPushEvent {
 				}
 				
 				// The push event is valid, let it initialize itself if needed.
+				$pushObj->loadMsg();
 				if( $wgUser->getOption($prefName) ) {
 					$pushObj->init();
 				}
@@ -170,7 +171,11 @@ class FBConnectPushEvent {
 	 * This is only called if this particular push-event is enabled in config.php
 	 * and the getUserPreferenceName() call checks out (the result must be non-empty).
 	 */
-	public function init(){}
+	public function init() {}
+	
+	
+	public function loadMsg() {}
+	
 	
 	/** 
 	 * Put Facebook message. 

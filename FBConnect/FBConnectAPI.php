@@ -210,10 +210,34 @@ class FBConnectAPI extends Facebook {
 	/*
 	 * Publish message on Facebook wall.
 	 */
-	public function publishStream($message, $link = "", $link_title ) {
+	public function publishStream( $message_name, $params = array() /* ,
+		                           $link = '', $link_title = '' */ ) {
+		// Retrieve the message and substitute the params for the actual values
+		$msg = wfMsg( $message_name ) ;
+		foreach ($params as $key => $value) {
+		 	$msg = str_replace($key, $value, $msg);
+		}
+		// If $FB_NAME isn't provided, simply blank it out
+		$msg = str_replace('$FB_NAME', '', $msg);
+		
+		/*
+		try {
+			$result = $this->Facebook()->api_client->stream_publish( $msg );
+		} catch ( FacebookRestClientException $e ) {
+		/*
+		 * 
+		 *
+			try {
+				$result = $this->Facebook()->api_client->stream_publish( $msg );
+			} catch ( FacebookRestClientException $e ) {			
+				var_dump($e->getMessage());
+				exit; 
+			}
+		}
+		
 		/*
 		$attachment = array(
-			'name' => $message,
+			'name' => $msg,
 			'href' => $link,
 			'caption' => $caption,
 			'description' => $description
@@ -230,21 +254,28 @@ class FBConnectAPI extends Facebook {
 		
 		$query = array(
 			'method' => 'stream.publish',
+			'message' => $msg,
+			/*
 			'attachment' => json_encode($attachment),
 			'action_links' => json_encode(array(
 				'text' => $link_title,
 				'href' => $link
 			)),
+			*/
 		);
 		
 		$result = json_decode( $this->api( $query ) );
 		
 		if ( is_array( $result ) ) {
-			// Error
-			#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
-			error_log("stream.publish returned error code $result->error_code");
-			return false;
-		} else if ( is_string( $result ) ) {
+			// Error! Try a second time, sometimes there is a session problem
+			$result = json_decode( $this->api( $query ) );
+			if ( is_array( $result ) ) {
+				#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
+				error_log("stream.publish returned error code $result->error_code");
+				return false;
+			}
+		}
+		if ( is_string( $result ) ) {
 			// Success! Return value is "$UserId_$PostId"
 			return true;
 		} else {
