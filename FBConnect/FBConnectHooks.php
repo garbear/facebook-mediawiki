@@ -180,15 +180,14 @@ STYLE;
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
 		global $wgFbAppId, $facebook, $wgFbUseMarkup, $wgFbLogo, $wgTitle, $wgRequest;
-		$vars['fbAppId'] = $wgFbAppId;
-		$vars['fbSession'] = $facebook->getSession();
+		$vars['fbAppId']     = $wgFbAppId;
+		$vars['fbSession']   = $facebook->getSession();
 		$vars['fbUseMarkup'] = $wgFbUseMarkup;
-		$vars['fbLogo'] = $wgFbLogo ? true : false;
-		$vars['fbLogoutURL'] = Skin::makeSpecialUrl('Userlogout',
-		                       $wgTitle->isSpecial('Preferences') ? '' :
-		                       "returnto={$wgTitle->getPrefixedURL()}");
-		$query = $wgRequest->getValues();
-		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $query ) );
+		$vars['fbLogo']      = $wgFbLogo ? true : false;
+		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
+		                           $wgTitle->isSpecial('Preferences') ? '' :
+		                           'returnto=' . $wgTitle->getPrefixedURL() );
+		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $wgRequest->getValues() ) );
 		return true;
 	}
 	
