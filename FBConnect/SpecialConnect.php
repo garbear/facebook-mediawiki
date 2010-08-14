@@ -74,22 +74,7 @@ class SpecialConnect extends SpecialPage {
 			self::disconnectReclamationAction(); 
 		}
 		
-		// Check to see if the user is already logged in
-		if ( $wgUser->getID() ) {
-			$this->sendPage('alreadyLoggedIn');
-			return;
-		}
-		
-		$fbid = $facebook->getUser();
-		/*
-		// Connect to the Facebook API
-		try {
-			$me = $facebook->api('/me');
-			
-		} catch (FacebookApiException $e) {
-			error_log($e);
-		}
-		*/
+		$fbid = $facebook->getUser(); # Facebook ID or 0 if none is found
 		
 		// Look at the subpage name to discover where we are in the login process
 		switch ( $par ) {
@@ -105,15 +90,14 @@ class SpecialConnect extends SpecialPage {
 				// Check to see if the user opted to connect an existing account
 				case 'existing':
 					$this->attachUser($fbid, $wgRequest->getText('wpExistingName'),
-							$wgRequest->getText('wpExistingPassword'));
+					                         $wgRequest->getText('wpExistingPassword'));
 					break;
 				// Check to see if the user selected another valid option
 				case 'nick':
 				case 'first':
 				case 'full':
 					// Get the username from Facebook (Note: not from the form)
-					$username = FBConnectUser::getOptionFromInfo($choice . 'name',
-					                                             $facebook->getUserInfo());
+					$username = FBConnectUser::getOptionFromInfo($choice . 'name', $facebook->getUserInfo());
 				case 'manual':
 					if (!isset($username) || !$this->userNameOK($username)) {
 						// Use manual name if no username is set, even if manual wasn't chosen
@@ -145,10 +129,10 @@ class SpecialConnect extends SpecialPage {
 					// If the user has previously connected, log them in.  If they have not, then complete the connection process.
 					$fb_ids = FBConnectDB::getFacebookIDs($wgUser);
 					if (count($fb_ids) == 0) {
-						connectExisting();
+						self::connectExisting();
 					} else {
 						// Will display a message that they're already logged in and connected.
-						$this->sendPage('connectForm');
+						$this->sendPage('alreadyLoggedIn');
 					}
 				} else {
 					// If the user isn't Connected, then show a form with the Connect button (regardless of whether they are logged in or not).
@@ -170,24 +154,40 @@ class SpecialConnect extends SpecialPage {
 	 *
 	 * This function will connect them in the database, save default preferences and present them with "Congratulations"
 	 * message and a link to modify their User Preferences. TODO: SHOULD WE JUST SHOW THE CHECKBOXES AGAIN?
+	 * 
+	 * This is different from attachUser because that is made to synchronously test a login at the same time as creating
+	 * the account via the ChooseName form.  This function, however, is designed for when the existing user is already logged in
+	 * and wants to quickly connect their facebook account.  The main difference, therefore, is that this function usese default
+	 * preferences while the other form should have already shown the preferences form to the user.
 	 */
 	public function connectExisting() {
-		// This subpage is for posting a quick-connection from a login form. This means that the user wanted to "login and connect"
-		// as a single option.  This should connect the user, save default user-preferences, and show them a form to change their
-		// prefs, with an option to return to where they came from.
+		global $wgUser, $wgRequest, $facebook;
+		wfProfileIn(__METHOD__);
 
-		print "When implemented, this will connect an FBID to an existing Wikia user";exit;
-		// TODO: RESTORE
-		//$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
-		//		$wgRequest->getText('wpExistingPassword'));
-		
-		// TODO: SAVE DEFAULT USER PREFS
-		// TODO: SAVE DEFAULT USER PREFS
-		
-		// TODO: SHOW A FORM TO CHANGE USER-PREFS WITH THE OPTION TO GO BACK TO WHERE THEY CAME FROM.
-		// TODO: SHOW A FORM TO CHANGE USER-PREFS WITH THE OPTION TO GO BACK TO WHERE THEY CAME FROM.
-		
-		
+		// Store the facebook-id <=> mediawiki-id mapping.
+		// TODO: FIXME: What sould we do if this fb_id is already connected to a DIFFERENT mediawiki account.
+		$fb_id = $facebook->getUser();
+		FBConnectDB::addFacebookID($wgUser, $fb_id);
+
+		// Save the default user preferences.
+		global $wgFbEnablePushToFacebook;
+		if (!empty( $wgFbEnablePushToFacebook )) {
+			global $wgFbPushEventClasses;
+			if (!empty( $wgFbPushEventClasses )) {
+				$DEFAULT_ENABLE_ALL_PUSHES = true;
+				foreach($wgFbPushEventClasses as $pushEventClassName) {
+					$pushObj = new $pushEventClassName;
+					$className = get_class();
+					$prefName = $pushObj->getUserPreferenceName();
+
+					$wgUser->setOption($prefName, ($DEFAULT_ENABLE_ALL_PUSHES?"1":"0"));
+				}
+			}
+		}
+
+		$this->sendPage('displaySuccessAttaching');
+
+		wfProfileOut(__METHOD__);
 	} // end connectExisting
 	
 	/**
@@ -486,6 +486,9 @@ class SpecialConnect extends SpecialPage {
 	 * not exist, or the supplied password does not match, then an error page
 	 * is sent. Otherwise, the accounts are matched in the database and the new
 	 * user object is logged in.
+	 *
+	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
+	 * code. Does it handle setting push-preferences correctly?
 	 */
 	protected function attachUser($fbid, $name, $password) {
 		global $wgOut, $wgUser;
@@ -509,7 +512,8 @@ class SpecialConnect extends SpecialPage {
 		$user->updateFromFacebook();
 		// Store the user in the global user object
 		$wgUser = $user;
-		$this->sendPage('displaySuccessLogin');
+		
+		$this->sendPage('displaySuccessAttaching');
 		
 		wfProfileOut(__METHOD__);
 	}
@@ -570,7 +574,7 @@ class SpecialConnect extends SpecialPage {
 	
 	private function alreadyLoggedIn() {
 		global $wgOut, $wgUser, $wgRequest, $wgSitename;
-		$wgOut->setPageTitle(wfMsg('fbconnect-error'));
+		$wgOut->setPageTitle(wfMsg('fbconnect-alreadyloggedin-title'));
 		$wgOut->addWikiMsg('fbconnect-alreadyloggedin', $wgUser->getName());
 		$wgOut->addWikiMsg('fbconnect-click-to-connect-existing', $wgSitename);
 		$wgOut->addHTML('<fb:login-button'.FBConnect::getPermissionsAttribute().FBConnect::getOnLoginAttribute().'></fb:login-button>');
@@ -579,7 +583,7 @@ class SpecialConnect extends SpecialPage {
 	}
 
 	private function displaySuccessLogin() {
-		global $wgOut, $wgRequest;
+		global $wgOut, $wgUser, $wgRequest;
 		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
 		$wgOut->addWikiMsg('fbconnect-successtext');
 		// Run any hooks for UserLoginComplete
@@ -590,6 +594,30 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
 	}
 
+	/**
+	 * Success page for attaching fb account to a pre-existing MediaWiki account.
+	 * Shows a link to preferences and a link back to where the user came from.
+	 */
+	private function displaySuccessAttaching() {
+		global $wgOut, $wgUser, $wgRequest;
+		wfProfileIn(__METHOD__);
+		
+		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
+		
+		$prefsLink = SpecialPage::getTitleFor('Preferences')->getLinkUrl();
+		$wgOut->addHTML(wfMsg('fbconnect-success-connecting-existing-account', $prefsLink));
+		
+		// Run any hooks for UserLoginComplete
+		$inject_html = '';
+		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
+		$wgOut->addHtml( $inject_html );
+		
+		// Render the "return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
+		
+		wfProfileOut(__METHOD__);
+	}
+	
 	/**
 	 * TODO: Add an option to disallow this extension to access your Facebook
 	 * information. This option could simply point you to your Facebook privacy

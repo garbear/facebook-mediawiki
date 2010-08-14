@@ -103,6 +103,7 @@ $messages['en'] = array(
 	'fbconnect-invalidtext' => 'The selection made on the previous page was invalid.',
 	'fbconnect-success' => 'Facebook verification succeeded',
 	'fbconnect-successtext' => 'You have been successfully logged in with Facebook Connect.',
+	'fbconnect-success-connecting-existing-account' => 'Your facebook account has been connected. To change which events get pushed to your facebook news feed, please visit your <a href="$1">preferences</a> page.',
 #	'fbconnect-optional' => 'Optional',
 #	'fbconnect-required' => 'Required',
 	'fbconnect-nickname' => 'Nickname',
@@ -122,13 +123,11 @@ $messages['en'] = array(
 	'fbconnect-chooseusername' => 'Username:',
 	'fbconnect-choosepassword' => 'Password:',
 	'fbconnect-updateuserinfo' => 'Update the following personal information:',
-	'fbconnect-alreadyloggedin' => "'''You are already logged in, $1!'''\n\nIf you want to use Facebook " .
-                        'Connect to log in in the future, you can [[Special:Connect/Convert|' .
-                        'convert your account to use Facebook Connect]].',
+	'fbconnect-alreadyloggedin-title' => 'Already connected',
+	'fbconnect-alreadyloggedin' => "'''You are already logged in and facebook-connected, $1!'''",
 
 	'fbconnect-error-creating-user' => "Error creating the user in the local database.",
 	'fbconnect-error-user-creation-hook-aborted' => "A hook (extension) aborted the account creation with the message: $1",
-
 
 	'fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Facebook profile',
