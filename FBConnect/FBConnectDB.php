@@ -43,10 +43,18 @@ class FBConnectDB {
 	 * Find the Facebook IDs of the given user, if any, using the database connection provided.
 	 *
 	 */
-	public static function getFacebookIDs( $user ) {
-		$dbr = wfGetDB( DB_SLAVE, array(), self::sharedDB() );
+	public static function getFacebookIDs( $user, $db = DB_SLAVE  ) {
+		global $wgMemc;
+		
+		$dbr = wfGetDB( $db, array(), self::sharedDB() );
 		$fbid = array();
 		if ( $user instanceof User && $user->getId() != 0 ) {
+			$memkey = wfMemcKey( "fb_user_id", $user->getId() );
+			$val = $wgMemc->get($memkey);
+			if ( ( is_array($val) ) &&  ( $db == DB_SLAVE ) ){
+				return $val;
+			}
+			
 			$prefix = self::getPrefix();
 			$res = $dbr->select(
 				array( "{$prefix}user_fbconnect" ),
@@ -58,6 +66,7 @@ class FBConnectDB {
 				$fbid[] = $row->user_fbid;
 			}
 			$res->free();
+			$wgMemc->set($memkey,$fbid);
 		}
 		return $fbid;
 	}
@@ -112,7 +121,11 @@ class FBConnectDB {
 	 */
 	public static function addFacebookID( $user, $fbid ) {
 		wfProfileIn(__METHOD__);
-
+		
+		global $wgMemc;
+		$memkey = wfMemcKey( "fb_user_id", $user->getId() );
+		
+			
 		if($user->getId() == 0){
 			wfDebug("FBConnect: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
 		} else {
@@ -128,6 +141,11 @@ class FBConnectDB {
 			);
 		}
 
+		
+		$dbw->commit();
+		
+		$wgMemc->set($memkey, self::getFacebookIDs($user, DB_MASTER )  );
+		
 		wfProfileOut(__METHOD__);
 	}
 	
@@ -135,9 +153,11 @@ class FBConnectDB {
 	 * Remove a User <-> Facebook ID association from the database.
 	 */
 	public static function removeFacebookID( $user ) {
+		global $wgMemc; 
 		$prefix = self::getPrefix();
 		if ( $user instanceof User && $user->getId() != 0 ) {
 			$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
+			$memkey = wfMemcKey( "fb_user_id", $user->getId() );
 			$dbw->delete(
 				"{$prefix}user_fbconnect",
 				array(
@@ -145,7 +165,10 @@ class FBConnectDB {
 				),
 				__METHOD__
 			); 
+			$dbw->commit();
+	 		$wgMemc->set($memkey, self::getFacebookIDs($user, DB_MASTER )  );
 		}
+
 		return (bool) $dbw->affectedRows();
 	}
 	

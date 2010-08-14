@@ -98,41 +98,45 @@ class FBConnectPushEvent {
 	 * 
 	 * There is also an option which will disable all push events.
 	 */
-	static public function createPreferencesToggles($firstTime = false){
+	static public function getPreferencesToggles($firstTime = false){
 		global $wgUser, $wgLang, $wgFbPushEventClasses;
 		wfProfileIn(__METHOD__);
 
-		$html = "";
+		$results = array();
 		if (!empty( $wgFbPushEventClasses )) {
 			foreach($wgFbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
-				$className = get_class();
 				$prefName = $pushObj->getUserPreferenceName();
-
+				
 				$prefText = $wgLang->getUserToggle( $prefName );
-				if($firstTime){
-					$checked = ' checked="checked"';
-				} else {
-					$checked = $wgUser->getOption( $prefName ) == 1 ? ' checked="checked"' : '';
-				}
-				$html .= "<div class='toggle'>";
-				$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"$prefName\"$checked />";
-				$html .= "<label for=\"$prefName\">$prefText</label>";
-				$html .= "</div>\n";
+				$prefTextShort = $wgLang->getUserToggle($prefName . '-short');
+				
+				$result = array(
+					'id' => $prefName,
+					'name' => $prefName,
+					'text' => $prefText,
+					'shortText' => $prefTextShort
+				);
+				
+				$results[] = $result;
 			}
 			
 			// Create an option to opt out of all current and future push-events.
 			$prefName = self::$PREF_TO_DISABLE_ALL;
 			$prefText = wfMsg('tog-' . self::$PREF_TO_DISABLE_ALL);
-			$html .= "<br/>";
-			$html .= "<div class='toggle'>";
-			$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"$prefName\"/>";
-			$html .= "<label for=\"$prefName\">$prefText</label>";
-			$html .= "</div>\n";
+			
+			$result = array(
+				'id' => $prefName,
+				'name' => $prefName,
+				'text' => $prefText,
+				'shortText' => $prefText,
+			);
+			
+			$results[] = $result;
 		}
 
 		wfProfileOut(__METHOD__);
-		return $html;
+		return $results;
 	} // end createPreferencesToggles()
 
 	/**

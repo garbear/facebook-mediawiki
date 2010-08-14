@@ -119,7 +119,23 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 		formName = "/" + formName;
 	}
 	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPagequery;
-	window.location.href = destUrl;
+	
+	if (formName == "/ConnectExisting") {
+		window.location.href = destUrl;
+		return;
+	}
+	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount', function(data) {
+		if(data.status == "ok") {
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + '&returntoquery=' + wgPagequery, "#fbConnectModal", {
+				id: "fbConnectModalWrapper",
+				width: "600px",
+				callback: function() {}
+			});
+		} else {
+			window.location.href = destUrl;
+		}
+	});
+	return;
 }
 
 

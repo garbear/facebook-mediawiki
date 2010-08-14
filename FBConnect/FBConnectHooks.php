@@ -187,7 +187,11 @@ STYLE;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
 		                           $wgTitle->isSpecial('Preferences') ? '' :
 		                           'returnto=' . $wgTitle->getPrefixedURL() );
-		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $wgRequest->getValues() ) );
+		$query = $wgRequest->getValues();
+		if (isset($query['title'])) {
+			unset($query['title']);
+		}
+		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $query ) );
 		return true;
 	}
 	
@@ -234,8 +238,8 @@ STYLE;
 	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader, $wgBlankImgUrl;
-		global $wgFbPersonalUrls, $wgFbConnectOnly;
+		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader, $wgBlankImgUrl,
+		       $wgFbPersonalUrls, $wgFbConnectOnly;
 		$skinName = get_class($wgUser->getSkin());
 		
 		wfLoadExtensionMessages('FBConnect');
@@ -249,7 +253,8 @@ STYLE;
 		}
 		
 		// If the user is logged in and connected
-		if ( $wgUser->isLoggedIn() && $facebook->getSession() ) {
+		$ids = FBConnectDB::getFacebookIDs($wgUser);
+		if ( $wgUser->isLoggedIn() && $facebook->getSession() && count($ids) > 0 ) {
 			/*
 			 * Personal URLs option: use_real_name_from_fb
 			 */

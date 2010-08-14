@@ -102,7 +102,7 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 // Create a new group for Facebook users
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 
-### THIS CODE NEEDS TO BE MOVED INTO THE INIT FUNCTION ###
+### THIS CODE NEEDS TO BE MOVED INTO THE INIT FUNCTION, AFTER localsettings.php HAS FINISHED ###
 // If we are configured to pull group info from Facebook, then create the group permissions
 if (!empty( $wgFbUserRightsFromGroup )) {
 	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
@@ -116,13 +116,15 @@ if (!empty( $wgFbUserRightsFromGroup )) {
 	$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 }
 
-$wgAjaxExportList[] = "FBConnect::disconnectFromFB";
 /**
 $wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoConfirmCount ),
                                   array( APCOND_AGE, &$wgAutoConfirmAge ),
                                   array( APCOND_FB_INGROUP ));
 /**/
 
+$wgAjaxExportList[] = "FBConnect::disconnectFromFB";
+$wgAjaxExportList[] = "SpecialConnect::ajaxModalChooseName"; 
+$wgAjaxExportList[] = "SpecialConnect::checkCreateAccount";
 
 /**
  * Class FBConnect

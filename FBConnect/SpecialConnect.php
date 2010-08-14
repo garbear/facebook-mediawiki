@@ -71,7 +71,21 @@ class SpecialConnect extends SpecialPage {
 		global $wgUser, $wgRequest, $facebook;
 		
 		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
-			self::disconnectReclamationAction(); 
+			self::disconnectReclamationAction();
+			return;
+		}
+		
+		$this->mReturnTo = $wgRequest->getVal( 'returnto' );
+		$this->mReturnToQuery = $wgRequest->getVal( 'returntoquery' );
+		
+		$title = Title::newFromText($this->mReturnTo);
+		if (!empty( $title )) {
+			$this->mResolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
+			if (in_array( $this->mResolvedReturnTo, array('userlogout', 'signup', 'connect') )) {
+				$titleObj = Title::newMainPage();
+				$this->mReturnTo = $titleObj->getText();
+				$this->mReturnToQuery = '';
+			}
 		}
 		
 		$fbid = $facebook->getUser(); # Facebook ID or 0 if none is found
@@ -85,6 +99,7 @@ class SpecialConnect extends SpecialPage {
 		// Look at the subpage name to discover where we are in the login process
 		wfDebug("FBConnect: Executing Special:Connect with the parameter of \"$par\".\n");
 		wfDebug("FBConnect: User is".($wgUser->isLoggedIn()?"":" NOT")." logged in.\n");
+		
 		switch ( $par ) {
 		case 'ChooseName':
 			$choice = $wgRequest->getText('wpNameChoice');
@@ -602,7 +617,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addWikiMsg('fbconnect-click-to-connect-existing', $wgSitename);
 		$wgOut->addHTML('<fb:login-button'.FBConnect::getPermissionsAttribute().FBConnect::getOnLoginAttribute().'></fb:login-button>');
 		// Render the "Return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
 
 	private function displaySuccessLogin() {
@@ -614,7 +629,7 @@ class SpecialConnect extends SpecialPage {
 		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
 		$wgOut->addHtml( $inject_html );
 		// Render the "return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $wgRequest->getText('returnto'), $wgRequest->getVal('returntoquery'));
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
 
 	/**
@@ -657,23 +672,23 @@ class SpecialConnect extends SpecialPage {
 		if ( wfReadOnly() ) {
 			// The wiki is in read-only mode
 			$wgOut->readOnlyPage();
-			return;
+			return false;
 		} elseif ( !isset($wgFbConnectOnly) || !$wgFbConnectOnly ) {
 			// These two permissions don't apply in $wgFbConnectOnly mode
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
-				return;
+				return false;
 			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
 				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-				return;
+				return false;
 			}
 		}
 			
 
 		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
 		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){
-			return;
+			return false;
 		}
 		
 		// Connect to the Facebook API
@@ -814,58 +829,66 @@ class SpecialConnect extends SpecialPage {
 		return true;
 	}
 	
-	/**
-	 * Creates a Login Form template object and propogates it with parameters.
-	 *
-	private function createLoginForm() {
-		global $wgUser, $wgEnableEmail, $wgEmailConfirmToEdit,
-		       $wgCookiePrefix, $wgCookieExpiration, $wgAuth;
+	function checkCreateAccount() {
+		global $wgUser;
 		
-		$template = new UserloginTemplate();
+		$response = new AjaxResponse();
 		
-		// Pull the name from $wgUser or cookies
-		if( $wgUser->isLoggedIn() )
-			$name =  $wgUser->getName();
-		else if( isset( $_COOKIE[$wgCookiePrefix . 'UserName'] ))
-			$name =  $_COOKIE[$wgCookiePrefix . 'UserName'];
-		else
-			$name = null;
-		// Alias some common URLs for $action and $link
-		$loginTitle = self::getTitleFor( 'Userlogin' );
-		$this_href = wfUrlencode( $this->getTitle() );
-		// Action URL that gets posted to
-		$action = $loginTitle->getLocalUrl('action=submitlogin&type=login&returnto=' . $this_href);
-		// Don't show a "create account" link if the user is not allowed to create an account
-		if ($wgUser->isAllowed( 'createaccount' )) {
-			$link_href = htmlspecialchars($loginTitle->getLocalUrl('type=signup&returnto=' . $this_href));
-			$link_text = wfMsgHtml( 'nologinlink' );
-			$link = wfMsgWikiHtml( 'nologin', "<a href=\"$link_href\">$link_text</a>" );
-		} else {
-			$link = '';
+		$fb = new FBConnectAPI();
+		$fb_user = $fb->user();
+		
+		$error =  json_encode(array("status" => "error") );
+		if (empty($fb_user)) {
+			$response->addText($error);
+			return $response;	
+		}
+
+		if( ((int) $wgUser->getId()) != 0){
+			$response->addText($error);
+			return $response;			
+		} 
+		
+		if( FBConnectDB::getUser($fb_user) != null) {
+			$response->addText($error);
+			return $response;			
 		}
 		
-		// Set the appropriate options for this template
-		$template->set( 'header', '' );
-		$template->set( 'name', $name );
-		$template->set( 'action', $action );
-		$template->set( 'link', $link );
-		$template->set( 'message', '' );
-		$template->set( 'messagetype', 'none' );
-		$template->set( 'useemail', $wgEnableEmail );
-		$template->set( 'emailrequired', $wgEmailConfirmToEdit );
-		$template->set( 'canreset', $wgAuth->allowPasswordChange() );
-		$template->set( 'canremember', ( $wgCookieExpiration > 0 ) );
-		$template->set( 'remember', $wgUser->getOption( 'rememberpassword' ) );
-		// Look this setting up in SpecialUserLogin.php
-		$template->set( 'usedomain', false );
-		// Give authentication and captcha plugins a chance to modify the form
-		$type = 'login';
-		$wgAuth->modifyUITemplate( $template, $type );
-		wfRunHooks( 'UserLoginForm', array( &$template ));
+		$titleObj = SpecialPage::getTitleFor( 'Connect' );		
 		
+		if ( wfReadOnly() ) {
+			$response->addText($error);
+			return $response;	
+		}
 		
-		// Spit out the form we just made
-		return $template;
+		if ( $wgUser->isBlockedFromCreateAccount() ) {
+			$response->addText($error);
+			return $response;	
+		}
+		
+		if ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+			$response->addText($error);
+			return $response;	
+		}
+		
+		$response->addText( json_encode(array("status" => "ok") ));
+		return $response;	
 	}
-	/**/
+	
+	function ajaxModalChooseName() {
+		global $wgRequest;
+		wfLoadExtensionMessages('FBConnect');
+		$response = new AjaxResponse();
+
+		$specialConnect = new SpecialConnect();
+		$form = new ChooseNameForm($wgRequest,'signup');
+		$form->mainLoginForm( $specialConnect, '' );
+		$tmpl = $form->getAjaxTemplate();
+		$tmpl->set('isajax',true);
+		ob_start();
+		$tmpl->execute();
+		$html = ob_get_clean();
+			
+		$response->addText( $html );
+		return $response;	
+	}
 }
