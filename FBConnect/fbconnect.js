@@ -147,13 +147,24 @@ function loginByFBConnect() {
  * it to a Facebook account at the same time.
  */
 function loginAndConnectExistingUser() {
-	AjaxLogin.action = 'login';
+	AjaxLogin.action = 'loginAndConnect'; // for clicktracking
 	AjaxLogin.form = $('#userajaxconnectform');
-	AjaxLogin.form.bind('submit', this.formSubmitHandler);
+	AjaxLogin.form.unbind('submit');
+	AjaxLogin.form.bind('submit', AjaxLogin.formSubmitHandler);
 	AjaxLogin.action = 'loginAndConnect'; // for clicktracking
 	
-	window.wgAjaxLoginOnSuccess = sendToConnectOnLogin();
+	window.wgAjaxLoginOnSuccess = loggedInNowNeedToConnect();
 	
 	AjaxLogin.form.submit();
 	return false;
+}
+
+/**
+ * Called after the AJAX has logged the user in on a request to login and connect.
+ * Now that they are logged in, we will prompt them to FBConnect, then drop them on
+ * the Special:Connect page to finish the process.
+ */
+function loggedInNowNeedToConnect() {
+	loginByFBConnect();
+	sendToConnectOnLoginForSpecificForm("ConnectExisting");
 }
