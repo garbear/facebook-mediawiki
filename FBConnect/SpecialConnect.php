@@ -201,6 +201,9 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 			}
+			
+			$wgUser->saveSettings();
+			
 			$this->sendPage('displaySuccessAttaching');
 		}
 		wfProfileOut(__METHOD__);

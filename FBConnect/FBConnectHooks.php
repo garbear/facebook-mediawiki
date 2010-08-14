@@ -589,7 +589,7 @@ STYLE;
 		$prefsection = 'fbconnect-prefstext';
 		
 		$id = FBConnectDB::getFacebookIDs($user);
-		if( count($id) > 0 ) {		
+		if( count($id) > 0 ) {
 			$html = Xml::openElement("div",array("id" => "fbDisconnectLink" ));
 				$html .= '<br/>'.wfMsg('fbconnect-disconnect-link');
 			$html .= Xml::closeElement( "div" );
@@ -625,6 +625,7 @@ STYLE;
 			$loginButton = '<fb:login-button' . FBConnect::getPermissionsAttribute() .
 			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
 			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
+			$html .= "<!-- Convert button -->\n";
 			$wgExtensionPreferences[] = array(	
 				'html' => $html,
 				'type' => PREF_USER_T,

@@ -61,6 +61,7 @@ class FBConnectPushEvent {
 	 */
 	static public function addPreferencesToggles( $user, &$preferences ){
 		global $wgFbPushEventClasses, $wgUser;
+		wfLoadExtensionMessages('FBConnect');
 		$id = FBConnectDB::getFacebookIDs($wgUser);
 		if( count($id) > 0 ) {			
 			if(!empty($wgFbPushEventClasses)){
@@ -82,17 +83,6 @@ class FBConnectPushEvent {
 					}	
 				}
 			}
-		} else {
-			// User is a MediaWiki user but isn't connected yet
-			// Display a message and button to connect
-			$loginButton = '<fb:login-button' . FBConnect::getPermissionsAttribute() .
-			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
-			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
-			$wgExtensionPreferences[] = array(	
-				'html' => $html,
-				'type' => PREF_USER_T,
-				'section' => self::$PREFERENCES_TAB_NAME
-			);
 		}
 		return true;
 	} // end addPreferencesToggles()
@@ -113,7 +103,7 @@ class FBConnectPushEvent {
 		wfProfileIn(__METHOD__);
 
 		$html = "";
-		if(!empty($wgFbPushEventClasses)){
+		if (!empty( $wgFbPushEventClasses )) {
 			foreach($wgFbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
 				$className = get_class();
@@ -153,7 +143,7 @@ class FBConnectPushEvent {
 		global $wgFbPushEventClasses, $wgUser;
 		wfProfileIn(__METHOD__);
 		
-		if( !empty( $wgFbPushEventClasses ) ) {
+		if (!empty( $wgFbPushEventClasses )) {
 			// Fail fast (and hard) if a push event was coded incorrectly.
 			foreach($wgFbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
