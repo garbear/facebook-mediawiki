@@ -218,6 +218,7 @@ class SpecialConnect extends SpecialPage {
 			}
 			
 			$wgUser->saveSettings();
+			wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 			
 			$this->sendPage('displaySuccessAttaching');
 		}
@@ -550,6 +551,8 @@ class SpecialConnect extends SpecialPage {
 		$user->updateFromFacebook();
 		// Store the user in the global user object
 		$wgUser = $user;
+		
+		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 		
 		$this->sendPage('displaySuccessAttaching');
 		
