@@ -100,6 +100,19 @@ class SpecialConnect extends SpecialPage {
 		wfDebug("FBConnect: Executing Special:Connect with the parameter of \"$par\".\n");
 		wfDebug("FBConnect: User is".($wgUser->isLoggedIn()?"":" NOT")." logged in.\n");
 		
+		/*
+		 * If the user is logged in to Wikia on an unconnected account, and
+		 * trying to connect a Facebook ID, but the ID is already connected to
+		 * a DIFFERENT Wikia account... display an error message.
+		 */
+		if ($wgUser->isLoggedIn() && $fbid) {
+			$foundUser = FBConnectDB::getUser( $fbid );
+			if ($foundUser && ($foundUser->getId() != $wgUser->getId())) {
+				$this->sendPage( 'fbIdAlreadyConnected' );
+				return;
+			}
+		}
+		
 		switch ( $par ) {
 		case 'ChooseName':
 			$choice = $wgRequest->getText('wpNameChoice');
@@ -140,7 +153,6 @@ class SpecialConnect extends SpecialPage {
 			break;
 		case 'ConnectExisting':
 			// If not logged in, slide down to the default
-			global $wgUser;
 			if ($wgUser->isLoggedIn()) {
 				self::connectExisting();
 				break;
@@ -613,7 +625,7 @@ class SpecialConnect extends SpecialPage {
 		}
 	}
 	
-	// NOTE: Actually for when you're both already logged in AND connected.
+	// NOTE: Actually for when you're both already logged in AND connected (consider renaming to alreadyLoggedInAndConnected())
 	private function alreadyLoggedIn() {
 		global $wgOut, $wgUser, $wgRequest, $wgSitename;
 		$wgOut->setPageTitle(wfMsg('fbconnect-alreadyloggedin-title'));
@@ -625,7 +637,31 @@ class SpecialConnect extends SpecialPage {
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
+	
+	/**
+	 * This error-page is shown when the user is attempting to connect a Wikia account with a Facebook ID which is
+	 * already connected to a different Wikia account.
+	 */
+	private function fbIdAlreadyConnected() {
+		global $wgOut, $wgUser, $wgRequest, $wgSitename, $facebook;
+		$wgOut->setPageTitle(wfMsg('fbconnect-fbid-is-already-connected-title'));
+		
+		$wgOut->addWikiMsg('fbconnect-fbid-is-already-connected');
+		
+		// Find out the username that this facebook id is already connected to.
+		$fb_user = $facebook->getUser(); // fb id or 0 if none is found.
+		if($fb_user){
+			$foundUser = FBConnectDB::getUser( $fb_user );
+			if($foundUser){
+				$connectedToUser = $foundUser->getName();
+				$wgOut->addWikiMsg('fbconnect-fbid-connected-to', $connectedToUser);
+			}
+		}
 
+		// Render the "Return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+	}
+	
 	private function displaySuccessLogin() {
 		global $wgOut, $wgUser, $wgRequest;
 		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
