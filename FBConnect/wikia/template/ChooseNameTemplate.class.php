@@ -25,7 +25,6 @@ class ChooseNameTemplate extends QuickTemplate {
 ?> 
 <div id="fbConnectModal" title="<?php $this->msg('fbconnect-modal-title') ?>" >
 
-<?php if(empty($this->data['isajax'])): ?>
 <?php if( $this->data['message'] && !$this->data['ajax'] ) { ?>
 	<div class="<?php $this->text('messagetype') ?>box">
 		<?php if ( $this->data['messagetype'] == 'error' ) { ?>
@@ -33,10 +32,9 @@ class ChooseNameTemplate extends QuickTemplate {
 		<?php } ?>
 		<?php $this->html('message') ?>
 	</div>
-	
-	<div class="visualClear"></div>
-<?php	} ?>
-<div id="userloginErrorBox">
+<?php } ?>
+<div class="visualClear"></div>
+<div id="userloginErrorBox" style="margin-bottom:0;" >
 	<table>
 	<tr>
 		<td style="vertical-align:top;">
@@ -47,12 +45,12 @@ class ChooseNameTemplate extends QuickTemplate {
 	</td>
 	</table>
 </div>
-<?php endif; ?>
+
 <table id="userloginSpecial" style='margin-top:0px;cell-spacing:0px' width="100%">
 <tr>
 <td width="55%" style="border:none; vertical-align: top;">
 <div id="userRegisterAjax">
-<form id="fb_userajaxregisterform" method="post" action="<?php $this->text('actioncreate') ?>" onsubmit="return UserRegistration.checkForm()">
+<form id="fb_userajaxregisterform" method="post" action="<?php $this->text('actioncreate') ?>" onsubmit="return false;">
 	<input type='hidden' name='wpNameChoice' value='manual' />
 <?php		if( $this->data['message'] && $this->data['ajax'] ) { ?>
 	<div class="<?php $this->text('messagetype') ?>box" style="margin:0px">
@@ -270,6 +268,12 @@ class ChooseNameTemplate extends QuickTemplate {
 		//override submitForm
 		UserRegistration = {};
 
+		UserRegistration.errorMessages = {
+				main: '<?= addslashes(wfMsg('userlogin-form-error')) ?>',
+				username: '<?= addslashes(wfMsg('noname')) ?>',
+				email: '<?= addslashes(wfMsg('userlogin-bad-email')) ?>',
+			};
+		
 		UserRegistration.checkEmail = function() {
 			var email = $('#wpFBEmail').val();
 
@@ -316,14 +320,40 @@ class ChooseNameTemplate extends QuickTemplate {
 		}
 		
 		UserRegistration.submitForm_fb = function() {
+			var errors = [];
+			var errorsHTML = '';
+			
 			UserRegistration.checkUsername(
-				function(username_status) {
-					if( username_status && UserRegistration.checkEmail() ) {
-						$("#fb_userajaxregisterform").submit();
-						return true;
+			function(username_status) {
+				if( username_status && UserRegistration.checkEmail() ) {
+					$("#fb_userajaxregisterform").submit();
+					return true;
+				} else {
+					var errors = [];
+					var errorsHTML = '';
+					if ( !username_status )
+						errors.push(UserRegistration.errorMessages['username']);
+					if ( !UserRegistration.checkEmail() )
+						errors.push(UserRegistration.errorMessages['email']);
+					if (errors.length == 0) {
+						//hide
+						$('#userloginErrorBox').hide();
+					} else if (errors.length == 1) {
+						//one
+						errorsHTML = errors[0];
+						$('#userloginInnerErrorBox').html(errorsHTML);
+						$('#userloginErrorBox').show();
+					} else {
+						//more
+						errorsHTML = '<strong>' + UserRegistration.errorMessages['main'] + '</strong><ul>';
+						for (err in errors) errorsHTML += '<li>' + errors[err] + '</li>';
+						errorsHTML += '</ul>';
+						$('#userloginInnerErrorBox').html(errorsHTML);
+						$('#userloginErrorBox').show();
 					}
-					WET.byStr(UserRegistration.WET_str + '/createaccount/failure');
 				}
+				WET.byStr(UserRegistration.WET_str + '/createaccount/failure');
+			}
 			); 
 		}
 		UserRegistration.checkUsername(function() {});
