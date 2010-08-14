@@ -20,7 +20,7 @@
  */
 function wikia_fbconnect_init(){
 	// This is used on the login box, so initialize it all the time.
-	wfLoadExtensionMessages( 'FBConnect_wikia' );
+	wfLoadExtensionMessages('FBConnect');
 } // end wikia_fbconnect_init()
 
 /**
@@ -34,7 +34,7 @@ function wikia_fbconnect_chooseNameForm(&$specialConnect, &$messageKey){
 	if (!$wgUser->isAllowed( 'createaccount' )) {
 		// TODO: Some sort of error/warning message.  Can probably re-use an existing message.
 	} else {
-		wfLoadExtensionMessages( 'FBConnect_wikia' );
+		wfLoadExtensionMessages('FBConnect');
 
 		// If it is not the default message, highlight it because it probably indicates an error.
 		$style = ($messageKey=="fbconnect-chooseinstructions"?"":" style='background-color:#faa;padding:5px'");
@@ -102,8 +102,6 @@ function wikia_fbconnect_postProcessForm( &$specialConnect ){
 } // end wikia_fbconnect_postProcessForm()
 
 
-
-
 class ChooseNameForm extends LoginForm {
 	var $mActionType;
 	var $ajaxTemplate;
@@ -121,15 +119,23 @@ class ChooseNameForm extends LoginForm {
 	function mainLoginForm( &$specialConnect, $msg, $msgtype = 'error' ){
 		global $wgUser, $wgOut, $wgAllowRealName, $wgEnableEmail;
 		global $wgCookiePrefix, $wgLoginLanguageSelector;
-		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration;
+		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration,$wgRequest;
 
 		$this->msg = $msg;
 		$this->msgtype = $msgtype;
 
 		$tmpl = new ChooseNameTemplate();
 		$tmpl->addInputItem( 'wpMarketingOptIn', 1, 'checkbox', 'tog-marketingallowed');
+		
+		$returnto = "";
+		if ( !empty( $this->mReturnTo ) ) {
+			$returnto = '&returnto=' . wfUrlencode( $this->mReturnTo );
+			if ( !empty( $this->mReturnToQuery ) )
+				$returnto .= '&returntoquery=' .
+					wfUrlencode( $this->mReturnToQuery );
+		}
 
-		$tmpl->set( 'actioncreate', $specialConnect->getTitle('ChooseName')->getLocalUrl() );
+		$tmpl->set( 'actioncreate', $specialConnect->getTitle('ChooseName')->getLocalUrl($returnto) );
 		$tmpl->set( 'link', '' );
 
 		$tmpl->set( 'header', '' );

@@ -124,7 +124,9 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 		window.location.href = destUrl;
 		return;
 	}
-	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount', function(data) {
+	
+	$('#fbConnectModalWrapper').remove();
+	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb=' + wgStyleVersion, function(data) {
 		if(data.status == "ok") {
 			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + '&returntoquery=' + wgPagequery, "#fbConnectModal", {
 				id: "fbConnectModalWrapper",

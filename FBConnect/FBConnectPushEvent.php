@@ -115,7 +115,8 @@ class FBConnectPushEvent {
 					'id' => $prefName,
 					'name' => $prefName,
 					'text' => $prefText,
-					'shortText' => $prefTextShort
+					'shortText' => $prefTextShort,
+					'checked' => true,
 				);
 				
 				$results[] = $result;
@@ -126,6 +127,7 @@ class FBConnectPushEvent {
 			$prefText = wfMsg('tog-' . self::$PREF_TO_DISABLE_ALL);
 			
 			$result = array(
+				'fullLine' => true,
 				'id' => $prefName,
 				'name' => $prefName,
 				'text' => $prefText,
