@@ -136,3 +136,16 @@ function loginByFBConnect() {
 	openFbLogin();
 	return false;
 }
+
+/**
+ * When user wants to log in using a Wikia account and connect
+ * it to a Facebook account at the same time.
+ */
+function loginAndConnectExistingUser() {
+	AjaxLogin.action = 'login';
+	
+	window.wgAjaxLoginOnSuccess = sendToConnectOnLogin();
+	
+	AjaxLogin.form.submit();
+	return false;
+}
