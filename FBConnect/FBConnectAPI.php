@@ -221,21 +221,6 @@ class FBConnectAPI extends Facebook {
 		$msg = str_replace('$FB_NAME', '', $msg);
 		
 		/*
-		try {
-			$result = $this->Facebook()->api_client->stream_publish( $msg );
-		} catch ( FacebookRestClientException $e ) {
-		/*
-		 * 
-		 *
-			try {
-				$result = $this->Facebook()->api_client->stream_publish( $msg );
-			} catch ( FacebookRestClientException $e ) {			
-				var_dump($e->getMessage());
-				exit; 
-			}
-		}
-		
-		/*
 		$attachment = array(
 			'name' => $msg,
 			'href' => $link,
@@ -270,14 +255,30 @@ class FBConnectAPI extends Facebook {
 			// Error
 			#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
 			error_log("stream.publish returned error code $result->error_code");
-			return false; // error_code
+			return $result->error_code;
 		}
 		if ( is_string( $result ) ) {
 			// Success! Return value is "$UserId_$PostId"
-			return true; // 0
+			return 0;
 		} else {
 			error_log("stream.publish: Unknown return type: " . gettype($result));
-			return false; // -1
+			return -1;
 		}
+	}
+	
+	/**
+	 * Verify that the user ID matches the hash provided by the GET parameters
+	 * in the account reclaimation link. This algorithm comes from the function
+	 * Facebook::verify_account_reclamation($user, $hash) in the old Facebook
+	 * PHP Client Library (circa February 2010).
+	 * 
+	 * See also http://wiki.developers.facebook.com/index.php/Reclaiming_Accounts
+	 */
+	function verifyAccountReclamation($fb_user_id, $hash) {
+		if ($hash != md5($user . $this->apiSecret)) {
+			return false;
+		}
+		
+		return FBConnectDB::getUser($fb_user_id);
 	} 
 }

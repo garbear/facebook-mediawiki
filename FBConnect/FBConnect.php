@@ -70,11 +70,6 @@ if (file_exists( $dir . 'config.php' )) {
 }
 // Load the PHP SDK
 require_once $dir . 'php-sdk/facebook.php';
-// If needed, load Extension:PreferencesExtension
-//   <http://www.mediawiki.org/wiki/Extension:PreferencesExtension>
-if (!empty( $wgFbIncludePreferencesExtension ) && version_compare($wgVersion, '1.16', '<')) {
-	require_once $dir . 'PreferencesExtension.php';
-}
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
@@ -217,47 +212,58 @@ class FBConnect {
 		return $attr;
 	} // end getOnLoginAttribute()
 	
-	/*
+	/**
 	 * Ajax function to disconect from Facebook.
 	 */
-	public static function disconnectFromFB(){
+	public static function disconnectFromFB($user = null) {
+		$response = new AjaxResponse();
+		$response->addText(json_encode(self::coreDisconnectFromFB($user)));
+		return $response;
+	}
+	
+	/**
+	 * Fb disconect function and send mail with temp password 
+	 */
+	public static function coreDisconnectFromFB($user = null) {
 		global $wgRequest, $wgUser, $wgAuth;
 		
-		if($wgUser->getId() == 0) {
-			$response->addText(json_encode( array('status' => "error" )));
-			return $response;
-		}
+		wfLoadExtensionMessages('FBConnect');
 		
-		$response = new AjaxResponse();
+		if($user == null) {
+			$user = $wgUser;
+		}
+		$statusError = array('status' => "error", "msg" => wfMsg('fbconnect-unknown-error'));
+		
+		if ($user->getId() == 0) {
+			return $statusError;
+		}
 		
 		$dbw = wfGetDB( DB_MASTER, array(), FBConnectDB::sharedDB() );
 		$dbw->begin();
-		$rows = FBConnectDB::removeFacebookID($wgUser);
+		$rows = FBConnectDB::removeFacebookID($user);
 		if($rows == 1) {
 			// Remind password attemp
 			$params = new FauxRequest(array (
-				'wpName' => $wgUser->getName()
+				'wpName' => $user->getName()
 			));
 			
 			if( !$wgAuth->allowPasswordChange() ) {
-				$response->addText(json_encode( array('status' => "error" )));	
-				return $response;
+				return $statusError;
 			}
 			
-			$result = array ();
+			$result = array();
 			$loginForm = new LoginForm($params);
-			wfLoadExtensionMessages('FBConnect');
+			
 			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle', 'fbconnect-passwordremindertext' );
 			if( WikiError::isError( $res ) ) {
-				$response->addText(json_encode( array('status' => "error" )));
-				return $response;
+				return $statusError;
 			}
 					
-			$response->addText(json_encode( array('status' => "ok" )));
-			$dbw->commit();	
+			return array('status' => "ok" );
+			$dbw->commit();
+			return $response;
 		} else {
-			$response->addText(json_encode( array('status' => "error" )));
+			return $statusError;
 		}
-		return $response;
 	}
 }

@@ -70,8 +70,8 @@ class SpecialConnect extends SpecialPage {
 	function execute( $par ) {
 		global $wgUser, $facebook, $wgRequest;
 		
-		if ( $wgRequest->getVal("action", "") == "disconnect" ) {
-			self::disconnectAction(); 
+		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
+			self::disconnectReclamationAction(); 
 		}
 		
 		// Check to see if the user is already logged in
@@ -725,19 +725,40 @@ class SpecialConnect extends SpecialPage {
 	/** 
 	 * Disconnect from Facebook
 	 */ 
-	private function disconnectAction() {
-		global $wgRequest, $wgOut, $wgUser;
+	private function disconnectReclamationAction() {
+		global $wgRequest, $wgOut, $wgUser, $facebook;
 		
-		if( $wgRequest->wasPosted() ) {
-			$id = FBConnectDB::getFacebookIDs($wgUser);
-			if( count($id) > 0 ) {
-				FBConnectDB::removeFacebookID( $wgUser, $id['user_fbid'] );
-			}
+		$wgOut->setArticleRelated( false );
+		$wgOut->enableClientCache( false );
+		$wgOut->mRedirect = '';
+		$wgOut->mBodytext = '';
+		$wgOut->setRobotPolicy( 'noindex,nofollow' );
+		
+		$fb_user_id = $wgRequest->getVal('u', 0);
+		$hash = $wgRequest->getVal('h', '');
+		$user_id = $facebook->verifyAccountReclamation($fb_user_id, $hash);
+		
+		if (!($user_id === false)) {
+			$result = FBConnect::coreDisconnectFromFB($user_id);
 		}
 		
-		$title = SpecialPage::getTitleFor( 'Preferences' );
-		$url = $title->getFullUrl("#prefsection-10");
-		$wgOut->redirect($url);
+		$title = Title::makeTitle( NS_SPECIAL, 'Signup' );
+	
+		$html = Xml::openElement('a', array( 'href' => $title->getFullUrl() ));
+		$html .= $title->getPrefixedText();
+		$html .= Xml::closeElement( 'a' );
+			
+		
+		if ( (!($user_id === false)) && ($result['status'] == 'ok') ) {
+			$wgOut->setPageTitle( wfMsg('fbconnect-reclamation-title') );
+			$wgOut->setHTMLTitle( wfMsg('fbconnect-reclamation-title') );
+			$wgOut->addHTML( wfMsg('fbconnect-reclamation-body', array('$1' => $html) ));
+			
+		} else {
+			$wgOut->setPageTitle( wfMsg('fbconnect-reclamation-title-error') );
+			$wgOut->setHTMLTitle( wfMsg('fbconnect-reclamation-title-error') );
+			$wgOut->addHTML( wfMsg('fbconnect-reclamation-body-error', array('$1' => $html) ));
+		}
 		
 		return true;
 	}
