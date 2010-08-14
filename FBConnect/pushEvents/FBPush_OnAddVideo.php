@@ -12,6 +12,7 @@ $wgExtensionMessagesFiles['FBPush_OnAddVideo'] = $pushDir . "FBPush_OnAddVideo.i
 class FBPush_OnAddVideo extends FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAddVideo'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
 	static $messageName = 'fbconnect-msg-OnAddVideo';
+	static $eventImage = 'video.png';
 	public function init(){
 		global $wgHooks;
 		wfProfileIn(__METHOD__);
@@ -42,11 +43,12 @@ class FBPush_OnAddVideo extends FBConnectPushEvent {
 		$wOldCount = preg_match_all($expr,  $article->getRawText(), $matches);
 		
 		$countDiff = $wNewCount - $wOldCount; 			
-		if ($countDiff > 1) {
+		if ($countDiff > 0) {
 			$params = array(
 				'$ARTICLENAME' => $article->getTitle()->getText(),
 				'$WIKINAME' => $wgSitename,
-				'$ARTICLE_URL' => $article->getTitle()->getFullURL(),
+				'$ARTICLE_URL' => $article->getTitle()->getFullURL("ref=fbfeed&fbtype=addvideo"),
+				'$EVENTIMG' => self::$eventImage
 			);
 			
 			self::pushEvent(self::$messageName, $params, __CLASS__ );

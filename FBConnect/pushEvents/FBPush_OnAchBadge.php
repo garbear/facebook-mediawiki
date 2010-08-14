@@ -7,7 +7,7 @@
 
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
-$wgExtensionMessagesFiles['FBPush_OnWatchArticle'] = $pushDir . "FBPush_OnAchBadge.i18n.php";
+$wgExtensionMessagesFiles['FBPush_OnAchBadge'] = $pushDir . "FBPush_OnAchBadge.i18n.php";
 
 class FBPush_OnAchBadge extends FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAchBadge'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
@@ -16,7 +16,7 @@ class FBPush_OnAchBadge extends FBConnectPushEvent {
 	public function init(){
 		global $wgHooks;
 		wfProfileIn(__METHOD__);
-		$wgHooks['AchievementsBadgesGiven'][] = 'FBPush_OnAchBadge::onAchievementsBadgesGiven';
+		$wgHooks['AchievementsNotification'][] = 'FBPush_OnAchBadge::onAchievementsBadgesGiven';
 		
 		wfProfileOut(__METHOD__);
 	}
@@ -30,24 +30,30 @@ class FBPush_OnAchBadge extends FBConnectPushEvent {
 	}
 	
 	public static function onAchievementsBadgesGiven(&$user, &$badg ){
-		global $wgContentNamespaces, $wgSitename;
-		wfProfileIn(__METHOD__); 
+		global $wgContentNamespaces, $wgSitename, $wgUser, $wgServer;
+		wfProfileIn(__METHOD__);
+
+                if( $badg->getTypeId() == BADGE_WELCOME ) {
+                    wfProfileOut(__METHOD__);
+                    return true;
+                }
+
+
 		$name = $badg->getName();
 		$img =  $badg->getPictureUrl();
-		$desc =  $badg->getDetails();
+		$desc =  $badg->getPersonalGivenFor();
 		
-		$title = Title::makeTitle( NS_USER  , $row->challenge_username1  );
+		$title = Title::makeTitle( NS_USER  , $wgUser->getName() );
 		
 		$params = array(
-			'$NAME' => $name,
-			'$USERPAGE' => "http://no.no"
+			'$ACHIE_NAME' => $name,
+			'$ARTICLE_URL' => $title->getFullUrl("ref=fbfeed&fbtype=achbadge"),
 			'$WIKINAME' => $wgSitename,
-			'$IMAGE' => $img,
+			'$EVENTIMG' => $img,
 			'$DESC' => $desc
 		);
-		
 		self::pushEvent(self::$messageName, $params, __CLASS__ );
-	
+		
 		wfProfileOut(__METHOD__);
 		return true;
 	}
