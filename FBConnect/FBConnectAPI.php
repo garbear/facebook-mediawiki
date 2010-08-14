@@ -28,7 +28,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Class FBConnectAPI
  * 
  * This class contains the code used to interface with Facebook via the
- * Facebook Platform API. 
+ * Facebook Platform API.
  */
 class FBConnectAPI extends Facebook {
 	// Constructor
@@ -210,8 +210,8 @@ class FBConnectAPI extends Facebook {
 	/*
 	 * Publish message on Facebook wall.
 	 */
-	public function publishStream( $message_name, $params = array() /* ,
-		                           $link = '', $link_title = '' */ ) {
+	public function publishStream( $href, $description, $short, $link, $img ) {
+		/*
 		// Retrieve the message and substitute the params for the actual values
 		$msg = wfMsg( $message_name ) ;
 		foreach ($params as $key => $value) {
@@ -220,33 +220,35 @@ class FBConnectAPI extends Facebook {
 		// If $FB_NAME isn't provided, simply blank it out
 		$msg = str_replace('$FB_NAME', '', $msg);
 		
-		/*
+		/**/
 		$attachment = array(
-			'name' => $msg,
-			'href' => $link,
-			'caption' => $caption,
-			'description' => $description
+			'name' => $link,
+			'href' => $href,
+			'description' => $description,
+			'media' => array(array(
+				'type' => 'image',
+				'src' => $img,
+				'href' => $href,
+			)),
 		);
-		
+		/*
 		if( count($media) > 0 ) {
 			foreach ( $media as $value ) {
 				$attachment[ 'media' ][] = $value;
 			}
 		}
 		/**/
-		// $api_error_descriptions
-		$attachment = array();
 		
 		$query = array(
 			'method' => 'stream.publish',
-			'message' => $msg,
-			/*
+			'message' => $short,
 			'attachment' => json_encode($attachment),
+			/*
 			'action_links' => json_encode(array(
 				'text' => $link_title,
 				'href' => $link
 			)),
-			*/
+			/**/
 		);
 		
 		$result = json_decode( $this->api( $query ) );
