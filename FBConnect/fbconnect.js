@@ -101,7 +101,7 @@ $(document).ready(function() {
  * @return bool
  */
 function isFbApiInit() {
-	return !(FB._apiKey == 'undefined' ||  FB._apiKey == null);
+	return !(typeof FB._apiKey == 'undefined' ||  FB._apiKey == null);
 }
 
 
@@ -135,9 +135,9 @@ function openFbLogin() {
  * Only for user header button
  */
 function loginByFBConnect() {
-	if(typeof FB._apiKey == 'undefined' ||  FB._apiKey == null) {
+	if (!isFbApiInit()) {
 		window.fbAsyncInit();
-	}	
+	}
 	openFbLogin();
 	return false;
 }
@@ -148,15 +148,16 @@ function loginByFBConnect() {
  */
 function loginAndConnectExistingUser() {
 	AjaxLogin.action = 'loginAndConnect'; // for clicktracking
+	AjaxLogin.form.unbind('submit'); // unbind the hander for previous form
 	AjaxLogin.form = $('#userajaxconnectform');
-	AjaxLogin.form.unbind('submit');
-	AjaxLogin.form.bind('submit', AjaxLogin.formSubmitHandler);
-	AjaxLogin.action = 'loginAndConnect'; // for clicktracking
 	
-	window.wgAjaxLoginOnSuccess = loggedInNowNeedToConnect();
+	window.wgAjaxLoginOnSuccess = loggedInNowNeedToConnect;
 	
-	AjaxLogin.form.submit();
-	return false;
+	// Make sure the default even doesn't happen
+	AjaxLogin.form.submit(function(ev) {
+		AjaxLogin.formSubmitHandler(ev);
+		return false;
+	});
 }
 
 /**
@@ -167,4 +168,22 @@ function loginAndConnectExistingUser() {
 function loggedInNowNeedToConnect() {
 	loginByFBConnect();
 	sendToConnectOnLoginForSpecificForm("ConnectExisting");
+}
+
+/**
+ * When the page is loaded, always init the FB code if it has not been initialized.  This
+ * will allow FBML tags in content (if configured to do this).
+ */
+$(document).ready(function(){
+	initFbWhenReady();
+});
+
+function initFbWhenReady(){
+	if(typeof FB == 'undefined'){
+		// The fbsdk code hasn't been loaded yet. Give it more time.
+		setTimeout("initFbWhenReady()", 500);
+	} else if (!isFbApiInit()) {
+		// The fbsdk has loaded but didn't initialize. Force it to init. 
+		window.fbAsyncInit();
+	}
 }

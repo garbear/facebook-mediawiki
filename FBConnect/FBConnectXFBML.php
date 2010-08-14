@@ -125,6 +125,8 @@ class FBConnectXFBML {
 	 * 
 	 * If Facebook adds a new tag (or you create your own!) then this list can
 	 * be updated with the XFBMLAvailableTags hook.
+	 *
+	 * See also <http://developers.facebook.com/docs/reference/fbml>.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {

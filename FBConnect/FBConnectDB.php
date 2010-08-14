@@ -113,16 +113,21 @@ class FBConnectDB {
 	public static function addFacebookID( $user, $fbid ) {
 		wfProfileIn(__METHOD__);
 
-		$prefix = self::getPrefix();
-		$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
-		$dbw->insert(
-			"{$prefix}user_fbconnect",
-			array(
-				'user_id' => $user->getId(),
-				'user_fbid' => $fbid
-			),
-			__METHOD__
-		);
+		if($user->getId() == 0){
+			wfDebug("FBConnect: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
+		} else {
+			$prefix = self::getPrefix();
+			$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
+			$dbw->insert(
+				"{$prefix}user_fbconnect",
+				array(
+					'user_id' => $user->getId(),
+					'user_fbid' => $fbid
+				),
+				__METHOD__
+			);
+		}
+
 		wfProfileOut(__METHOD__);
 	}
 	

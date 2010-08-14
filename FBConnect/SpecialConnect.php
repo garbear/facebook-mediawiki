@@ -68,7 +68,7 @@ class SpecialConnect extends SpecialPage {
 	 * Performs any necessary execution and outputs the resulting Special page.
 	 */
 	function execute( $par ) {
-		global $wgUser, $facebook, $wgRequest;
+		global $wgUser, $wgRequest, $facebook;
 		
 		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
 			self::disconnectReclamationAction(); 
@@ -76,11 +76,16 @@ class SpecialConnect extends SpecialPage {
 		
 		$fbid = $facebook->getUser(); # Facebook ID or 0 if none is found
 		
+		// Setup the session
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+		
 		// Look at the subpage name to discover where we are in the login process
+		wfDebug("FBConnect: Executing Special:Connect with the parameter of \"$par\".\n");
+		wfDebug("FBConnect: User is".($wgUser->isLoggedIn()?"":" NOT")." logged in.\n");
 		switch ( $par ) {
-		case 'ConnectExisting':
-			self::connectExisting();
-			break;
 		case 'ChooseName':
 			$choice = $wgRequest->getText('wpNameChoice');
 			if ($wgRequest->getCheck('wpCancel')) {
@@ -118,6 +123,13 @@ class SpecialConnect extends SpecialPage {
 					$this->sendError('fbconnect-invalid', 'fbconnect-invalidtext');
 			}
 			break;
+		case 'ConnectExisting':
+			// If not logged in, slide down to the default
+			global $wgUser;
+			if ($wgUser->isLoggedIn()) {
+				self::connectExisting();
+				break;
+			}
 		default:
 			// Main entry point
 			#if ( $wgRequest->getText( 'returnto' ) ) {
