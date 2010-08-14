@@ -417,6 +417,10 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		
+		// Save the prefeference for letting user select to never send anything to their newsfeed
+		$prefName = FBConnectPushEvent::$PREF_TO_DISABLE_ALL; 
+		$user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0'); 
+ 		
 		// Unfortunately, performs a second database lookup
 		$fbUser = new FBConnectUser($user);
 		// Update the user with settings from Facebook

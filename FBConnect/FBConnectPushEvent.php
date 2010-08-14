@@ -16,10 +16,11 @@ $wgHooks['initPreferencesExtensionForm'][] = 'FBConnectPushEvent::addPreferences
 
 class FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = ''; // implementing classes MUST override this with their own value.
-
+	
 	// This must correspond to the name of the message for the text on the tab itself.
-	static protected $PREFERENCES_TAB_NAME = "fbconnect-prefstext";
-
+	static protected $PREFERENCES_TAB_NAME = 'fbconnect-prefstext';
+	static public $PREF_TO_DISABLE_ALL = 'fbconnect-push-allow-never'; 
+	
 	/**
 	 * Accessor for the user preference to which (if set to 1) allows this type of event
 	 * to be used.
@@ -27,7 +28,7 @@ class FBConnectPushEvent {
 	public function getUserPreferenceName(){
 		return $this->isAllowedUserPreferenceName;
 	}
-
+	
 	/**
 	 * Initialize the extension itself.  This includes creating the user-preferences for
 	 * the push events.
@@ -104,6 +105,8 @@ class FBConnectPushEvent {
 	 *
 	 * If firstTime is set to true, the checkboxes will default to being checked, otherwise
 	 * they will default to the current user-option setting for the user.
+	 * 
+	 * There is also an option which will disable all push events.
 	 */
 	static public function createPreferencesToggles($firstTime = false){
 		global $wgUser, $wgLang, $wgFbPushEventClasses;
@@ -127,6 +130,14 @@ class FBConnectPushEvent {
 				$html .= "<label for=\"$prefName\">$prefText</label>";
 				$html .= "</div>\n";
 			}
+			
+			// Create an option to opt out of all current and future push-events.
+			$prefName = self::$PREF_TO_DISABLE_ALL;
+			$prefText = wfMsg('tog-' . self::$PREF_TO_DISABLE_ALL);
+			$html .= "<div class='toggle'>";
+			$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"$prefName\"/>";
+			$html .= "<label for=\"$prefName\">$prefText</label>";
+			$html .= "</div>\n";
 		}
 
 		wfProfileOut(__METHOD__);
@@ -160,7 +171,7 @@ class FBConnectPushEvent {
 				
 				// The push event is valid, let it initialize itself if needed.
 				$pushObj->loadMsg();
-				if( !$wgUser->getOption('fbconnect-push-allow-never') ) {
+				if( !$wgUser->getOption(self::$PREF_TO_DISABLE_ALL) ) {
 					if( $wgUser->getOption($prefName) ) {
 						$pushObj->init();	
 					}
