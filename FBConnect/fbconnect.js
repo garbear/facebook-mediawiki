@@ -96,7 +96,11 @@ $(document).ready(function() {
 	});
 	
 	if ($.getUrlVal( "ref" ) == "fbfeed") {
-		WET.byStr( 'FBconnect/userfromfb' );
+		var suffix = "";
+		if ( $.getUrlVal( "fbtype" ) != "" ) {
+			suffix = "/" + $.getUrlVal("fbtype");
+		}
+		WET.byStr( 'FBconnect/userfromfb' + suffix );
 	}
 });
 
