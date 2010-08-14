@@ -148,8 +148,11 @@ function loginByFBConnect() {
  */
 function loginAndConnectExistingUser() {
 	AjaxLogin.action = 'login';
+	AjaxLogin.form = $('#userajaxconnectform');
+	AjaxLogin.form.bind('submit', this.formSubmitHandler);
+	AjaxLogin.action = 'loginAndConnect'; // for clicktracking
 	
-	window.wgAjaxLoginOnSuccess = sendToConnectOnLoginForSpecificForm("ConnectExisting");
+	window.wgAjaxLoginOnSuccess = sendToConnectOnLogin();
 	
 	AjaxLogin.form.submit();
 	return false;
