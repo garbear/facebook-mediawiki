@@ -174,7 +174,7 @@ $wgFbExtendedPermissions = array(
  */
 $wgFbEnablePushToFacebook = false;
 if(!empty($wgFbEnablePushToFacebook)){
-	$fbPushDir = dirname(__FILE__) . '/pushEvents/';
+	$wgFbPushDir = dirname(__FILE__) . '/pushEvents/';
 	
 	// Convenience loop for push event classes in the fbPushDir directory
 	// whose file-name corresponds to the class-name.  To add a push event
@@ -185,11 +185,11 @@ if(!empty($wgFbEnablePushToFacebook)){
 		'FBPush_OnWatchArticle',
 	);
 	foreach($pushEventClassNames as $pClassName){
-		$fbPushEventClasses[] = $pClassName;
-		$wgAutoloadClasses[$pClassName] = $fbPushDir . "$pClassName.php";
+		$wgFbPushEventClasses[] = $pClassName;
+		$wgAutoloadClasses[$pClassName] = $wgFbPushDir . "$pClassName.php";
 	}
 	
 	// Example of explicitly adding a push event which doesn't meet the criteria above.
-	// $fbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
-	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $fbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
+	// $wgFbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
+	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $wgFbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
 }

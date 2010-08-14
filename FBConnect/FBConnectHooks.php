@@ -558,27 +558,51 @@ STYLE;
 	}
 	
 	/**
-	 * 
-	 * 
+	 * Create disconect button and other thing in preferences.
 	 */
 	static function initPreferencesExtensionForm($user, &$wgExtensionPreferences) {
-		$id = FBConnectDB::getFacebookIDs($user); 
-		if( count($id) > 0 ) {
-			//action="/index.php?title=TechTeam_QA_8_Wiki&amp;action=submit" method="post"
-			$action = SpecialPage::getTitleFor( 'Connect' );
-			$action  = $action->getFullURL("action=disconnect");
-			$html = Xml::openElement("div");
-			$html .= Xml::openElement( "form", array("submit" => "post", "action" => $action) );
-			$html .= Xml::element( "input", array("type" => "submit", "value" => "Disconent"), '', true );
-			$html .= Xml::closeElement( "form" );
- 			$html .= Xml::closeElement( "div" );
-			$wgExtensionPreferences = array_merge(
-				array(
-					array(
-						'name' => 'ssasasas',
-						'section' => 'fbconnect-prefstext',
-						'html' => $html,
-						'type' => PREF_CUSTOM_HTML_T) ), $wgExtensionPreferences);
+	global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
+		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/FBConnect/prefs.js?{$wgStyleVersion}\"></script>\n");
+		wfLoadExtensionMessages('FBConnect');
+		$prefsection = 'fbconnect-prefstext';
+		
+		$id = FBConnectDB::getFacebookIDs($user);
+		if( count($id) > 0 ) {		
+			$html = Xml::openElement("div",array("id" => "fbDisconnectLink" ));
+				$html .= '<br/>'.wfMsg('fbconnect-disconnect-link');
+			$html .= Xml::closeElement( "div" );
+			
+			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectProgress" ));
+				$html .= '<br/>'.wfMsg('fbconnect-disconnect-done');
+				$html .= Xml::openElement("img",array("id" => "fbDisconnectProgressImg", 'src' => $wgBlankImgUrl, "class" => "sprite progress" ),true);
+			$html .= Xml::closeElement( "div" );
+			
+			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectDone" ));
+				$html .= '<br/>'.wfMsg('fbconnect-disconnect-info');
+			$html .= Xml::closeElement( "div" );
+			
+			$wgExtensionPreferences[] = array(
+					'html' => "<br>",
+					'type' => PREF_USER_T,
+					'section' => 'fbconnect-prefstext' );
+			
+			$wgExtensionPreferences[] = array(	
+					'name' => 'fbconnect-push-allow-never',
+					'type' => PREF_TOGGLE_T,
+					'section' => 'fbconnect-prefstext',
+					'default' => 1);
+			
+			$wgExtensionPreferences[] = array(	
+					'html' => $html,
+					'type' => PREF_USER_T,
+					'section' => 'fbconnect-prefstext' );
+		} else {
+			$wgExtensionPreferences[] = array(	
+					'html' => "CONNECT BUTTON",
+					'type' => PREF_USER_T,
+					'section' => 'fbconnect-prefstext' );
+
+			
 		}
 		
 		return true;

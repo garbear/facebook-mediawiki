@@ -50,7 +50,7 @@ class FBPush_OnArticleComment extends FBConnectPushEvent {
 				'$ARTICLE_URL' => $title->getFullURL(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 			
 		}
 		wfProfileOut(__METHOD__);

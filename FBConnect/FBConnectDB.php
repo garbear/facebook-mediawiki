@@ -107,17 +107,18 @@ class FBConnectDB {
 	/**
 	 * Remove a User <-> Facebook ID association from the database.
 	 */
-	public static function removeFacebookID( $user, $fbid ) {
+	public static function removeFacebookID( $user ) {
 		$prefix = self::getPrefix();
-		$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
-		$dbw->delete(
-			"{$prefix}user_fbconnect",
-			array(
-				'user_id' => $user->getId(),
-				'user_fbid' => $fbid
-			),
-			__METHOD__
-		);
+		if ( $user instanceof User && $user->getId() != 0 ) {
+			$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
+			$dbw->delete(
+				"{$prefix}user_fbconnect",
+				array(
+					'user_id' => $user->getId()
+				),
+				__METHOD__
+			); 
+		}
 		return (bool) $dbw->affectedRows();
 	}
 	
@@ -143,7 +144,7 @@ class FBConnectDB {
 	 * 
 	 * See also: <http://www.mediawiki.org/wiki/Manual:Shared_database>
 	 */
-	private static function sharedDB() {
+	public static function sharedDB() {
 		global $wgExternalSharedDB;
 		if (!empty($wgExternalSharedDB)) {
 			return $wgExternalSharedDB;	

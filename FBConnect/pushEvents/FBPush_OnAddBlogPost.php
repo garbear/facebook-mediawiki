@@ -40,8 +40,7 @@ class FBPush_OnAddBlogPost extends FBConnectPushEvent {
 				'$BLOG_POST_URL' => $article->getTitle()->getFullURL(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
-	
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 		}
 		
 		wfProfileOut(__METHOD__);

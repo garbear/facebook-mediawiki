@@ -119,6 +119,7 @@ if (!empty( $wgFbUserRightsFromGroup )) {
 	$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 }
 
+$wgAjaxExportList[] = "FBConnect::disconnectFromFB";
 /**
 $wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoConfirmCount ),
                                   array( APCOND_AGE, &$wgAutoConfirmAge ),
@@ -214,4 +215,48 @@ class FBConnect {
 		}
 		return $attr;
 	} // end getOnLoginAttribute()
+	
+	/*
+	 * Ajax function to disconect from Facebook.
+	 */
+	public static function disconnectFromFB(){
+		global $wgRequest, $wgUser, $wgAuth;
+		
+		if($wgUser->getId() == 0) {
+			$response->addText(json_encode( array('status' => "error" )));
+			return $response;
+		}
+		
+		$response = new AjaxResponse();
+		
+		$dbw = wfGetDB( DB_MASTER, array(), FBConnectDB::sharedDB() );
+		$dbw->begin();
+		$rows = FBConnectDB::removeFacebookID($wgUser);
+		if($rows == 1) {
+			// Remind password attemp
+			$params = new FauxRequest(array (
+				'wpName' => $wgUser->getName()
+			));
+			
+			if( !$wgAuth->allowPasswordChange() ) {
+				$response->addText(json_encode( array('status' => "error" )));	
+				return $response;
+			}
+			
+			$result = array ();
+			$loginForm = new LoginForm($params);
+			wfLoadExtensionMessages('FBConnect');
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle', 'fbconnect-passwordremindertext' );
+			if( WikiError::isError( $res ) ) {
+				$response->addText(json_encode( array('status' => "error" )));
+				return $response;
+			}
+					
+			$response->addText(json_encode( array('status' => "ok" )));
+			$dbw->commit();	
+		} else {
+			$response->addText(json_encode( array('status' => "error" )));
+		}
+		return $response;
+	}
 }

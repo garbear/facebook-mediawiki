@@ -48,7 +48,7 @@ class FBPush_OnBlogComment extends FBConnectPushEvent {
 				'$BLOG_POST_URL' => $title->getFullURL(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 		}
 		
 		wfProfileOut(__METHOD__);

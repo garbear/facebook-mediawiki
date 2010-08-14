@@ -33,7 +33,7 @@ class FBPush_OnAddVideo extends FBConnectPushEvent {
 		global $wgContentNamespaces, $wgSitename;
 		wfProfileIn(__METHOD__);
 		if( !in_array($article->getTitle()->getNamespace(), $wgContentNamespaces) ) {
-			return true;	
+			return true;
 		}
 
 		$matches = array();
@@ -49,7 +49,7 @@ class FBPush_OnAddVideo extends FBConnectPushEvent {
 				'$ARTICLE_URL' => $article->getTitle()->getFullURL(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 		}
 		wfProfileOut(__METHOD__);
 		return true;	

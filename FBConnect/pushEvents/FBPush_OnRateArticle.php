@@ -39,7 +39,7 @@ class FBPush_OnRateArticle extends FBConnectPushEvent {
 			'$RATING' => $vote
 		);
 		
-		self::pushEvent(self::$messageName, $params);
+		self::pushEvent(self::$messageName, $params, __CLASS__ );
 		
 		wfProfileOut(__METHOD__);
 		return true;

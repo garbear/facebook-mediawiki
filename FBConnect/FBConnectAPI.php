@@ -267,20 +267,17 @@ class FBConnectAPI extends Facebook {
 		$result = json_decode( $this->api( $query ) );
 		
 		if ( is_array( $result ) ) {
-			// Error! Try a second time, sometimes there is a session problem
-			$result = json_decode( $this->api( $query ) );
-			if ( is_array( $result ) ) {
-				#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
-				error_log("stream.publish returned error code $result->error_code");
-				return false;
-			}
+			// Error
+			#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
+			error_log("stream.publish returned error code $result->error_code");
+			return false; // error_code
 		}
 		if ( is_string( $result ) ) {
 			// Success! Return value is "$UserId_$PostId"
-			return true;
+			return true; // 0
 		} else {
 			error_log("stream.publish: Unknown return type: " . gettype($result));
-			return false;
+			return false; // -1
 		}
 	} 
 }

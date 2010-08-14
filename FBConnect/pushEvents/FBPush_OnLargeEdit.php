@@ -61,7 +61,7 @@ class FBPush_OnLargeEdit extends FBConnectPushEvent {
 				'$ARTICLE_URL' => $article->getTitle()->getFullURL(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 		}
 
 		wfProfileOut(__METHOD__);

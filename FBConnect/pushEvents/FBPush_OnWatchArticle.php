@@ -33,7 +33,7 @@ class FBPush_OnWatchArticle extends FBConnectPushEvent {
 	public static function onWatchArticleComplete(&$user, &$article ){
 		global $wgContentNamespaces, $wgSitename;
 		wfProfileIn(__METHOD__); 
-		
+
 		if( $article->getTitle()->getFirstRevision() == null ) {
 			return true;
 		}
@@ -44,8 +44,8 @@ class FBPush_OnWatchArticle extends FBConnectPushEvent {
 			'$ARTICLE_URL' => $article->getTitle()->getFullURL()
 		);
 		
-		self::pushEvent(self::$messageName, $params);
-		
+		self::pushEvent(self::$messageName, $params, __CLASS__ );
+	
 		wfProfileOut(__METHOD__);
 		return true;
 	}

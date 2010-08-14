@@ -59,36 +59,30 @@ class FBConnectPushEvent {
 	 *
 	 */
 	static public function addPreferencesToggles( $user, &$preferences ){
-		global $fbPushEventClasses;
-		
-		// TODO: PREF_TOGGLE_T is not defined in v1.16
-		/**
-		if( !defined('PREF_TOGGLE_T') ) {
-			return true;
-		}
-		/**/
-		
-		if( !empty($fbPushEventClasses) ){
-			foreach($fbPushEventClasses as $pushEventClassName){
-				$pushObj = new $pushEventClassName;
-				$className = get_class();
-				$prefName = $pushObj->getUserPreferenceName();
-
-				$preferences[$prefName] = array(
-					'type' => 'toggle',
-					'label-message' => $prefName,
-					'section' => self::$PREFERENCES_TAB_NAME,
-					'default' => '1',
-				);
-				
-				// Prior to v1.16
-				if( defined('PREF_TOGGLE_T') ) {
-					$preferences[$prefName]['int-type'] = PREF_TOGGLE_T;
-					$preferences[$prefName]['name'] = $prefName;
+		global $wgFbPushEventClasses, $wgUser;
+		$id = FBConnectDB::getFacebookIDs($wgUser);
+		if( count($id) > 0 ) {			
+			if(!empty($wgFbPushEventClasses)){
+				foreach($wgFbPushEventClasses as $pushEventClassName){
+					$pushObj = new $pushEventClassName;
+					$className = get_class();
+					$prefName = $pushObj->getUserPreferenceName();
+	
+					$preferences[$prefName] = array(
+						'type' => 'toggle',
+						'label-message' => $prefName,
+						'section' => self::$PREFERENCES_TAB_NAME,
+						"default" => "1",
+					);
+					
+					/* < v1.16 */ 
+					if( defined('PREF_TOGGLE_T') ) {
+						$preferences[$prefName]['int-type'] = PREF_TOGGLE_T;
+						$preferences[$prefName]['name'] = $prefName;
+					}	
 				}
 			}
 		}
-
 		return true;
 	} // end addPreferencesToggles()
 	
@@ -102,12 +96,12 @@ class FBConnectPushEvent {
 	 * they will default to the current user-option setting for the user.
 	 */
 	static public function createPreferencesToggles($firstTime = false){
-		global $wgUser, $wgLang, $fbPushEventClasses;
+		global $wgUser, $wgLang, $wgFbPushEventClasses;
 		wfProfileIn(__METHOD__);
 
 		$html = "";
-		if(!empty($fbPushEventClasses)){
-			foreach($fbPushEventClasses as $pushEventClassName){
+		if(!empty($wgFbPushEventClasses)){
+			foreach($wgFbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
 				$className = get_class();
 				$prefName = $pushObj->getUserPreferenceName();
@@ -134,12 +128,12 @@ class FBConnectPushEvent {
 	 * to make sure that the configured push-events are valid and then gives them each a chance to initialize.
 	 */
 	static public function initAll(){
-		global $fbPushEventClasses, $wgUser;
+		global $wgFbPushEventClasses, $wgUser;
 		wfProfileIn(__METHOD__);
 		
-		if( !empty( $fbPushEventClasses ) ) {
+		if( !empty( $wgFbPushEventClasses ) ) {
 			// Fail fast (and hard) if a push event was coded incorrectly.
-			foreach($fbPushEventClasses as $pushEventClassName){
+			foreach($wgFbPushEventClasses as $pushEventClassName){
 				$pushObj = new $pushEventClassName;
 				$className = get_class();
 				$prefName = $pushObj->getUserPreferenceName();
@@ -156,8 +150,10 @@ class FBConnectPushEvent {
 				
 				// The push event is valid, let it initialize itself if needed.
 				$pushObj->loadMsg();
-				if( $wgUser->getOption($prefName) ) {
-					$pushObj->init();
+				if( !$wgUser->getOption('fbconnect-push-allow-never') ) {
+					if( $wgUser->getOption($prefName) ) {
+						$pushObj->init();	
+					}
 				}
 			}
 		}
@@ -179,11 +175,34 @@ class FBConnectPushEvent {
 	
 	/** 
 	 * Put Facebook message. 
-	 */ 
+	 */
 	public function pushEvent($message, $link = null, $link_title = null) {
 		global $facebook;
-		
-		return $facebook->publishStream($message, $link, $link_title);
-	}	
+		// TODO: update FBConnectAPI::publishStream() to return a numeric status
+		$status = $facebook->publishStream($message, $params);
+		self::addEventStat($status, $class);
+		return $status;
+	}
+	
+	/**
+	 * Put stats for Facebook. 
+	 */
+	static public function addEventStat($status, $class){
+		global $wgStatsDB, $wgUser, $wgCityId;
+		$class = str_replace('FBPush_', '', $class);
+		$dbs = wfGetDB( DB_MASTER, array(), $wgStatsDB );
+		$dbs->begin();
+		$dbs->insert(
+			'fbconnect_event_stats',
+			array(
+				'user_id' => $wgUser->getId(),
+				'status' => $status,
+				'city_id' => $wgCityId,
+  				'event_type' =>  $class ,
+			),
+			__METHOD__
+		);
+		$dbs->commit();
+	}
 	
 } // end FBConnectPushEvent class

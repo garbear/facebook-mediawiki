@@ -39,7 +39,7 @@ class FBPush_OnAddImage extends FBConnectPushEvent {
 				'$IMG_URL' => $wgServer.'/'.$image->mLocalFile->getTitle(),
 			);
 			
-			self::pushEvent(self::$messageName, $params);
+			self::pushEvent(self::$messageName, $params, __CLASS__ );
 		}	
 		return true;
 	}
