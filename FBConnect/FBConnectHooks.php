@@ -383,7 +383,7 @@ STYLE;
 					$html = substr( $html, 0, $i ) .
 					        preg_replace("/$name/", "$name (<a href=\"$fbUser[link]\" " .
 					                     "class='mw-userlink mw-fbconnectuser'>" .
-					                     wfMsg('fbconnect-link-to-profile') . "</a>",
+					                     wfMsg('fbconnect-link-to-profile') . "</a>)",
 					                     substr( $html, $i ), 1);
 					$output->clearHTML();
 					$output->addHTML( $html );
@@ -580,7 +580,7 @@ STYLE;
 	}
 	
 	/**
-	 * Create disconect button and other thing in preferences.
+	 * Create a disconnect button and other things in preferences.
 	 */
 	static function initPreferencesExtensionForm($user, &$wgExtensionPreferences) {
 	global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
@@ -620,11 +620,16 @@ STYLE;
 					'section' => 'fbconnect-prefstext' );
 			
 		} else {
+			// User is a MediaWiki user but isn't connected yet
+			// Display a message and button to connect
+			$loginButton = '<fb:login-button' . FBConnect::getPermissionsAttribute() .
+			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
+			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
 			$wgExtensionPreferences[] = array(	
-					'html' => "CONNECT BUTTON",
-					'type' => PREF_USER_T,
-					'section' => 'fbconnect-prefstext' );
-			
+				'html' => $html,
+				'type' => PREF_USER_T,
+				'section' => 'fbconnect-prefstext'
+			);
 		}
 		return true;
 	}

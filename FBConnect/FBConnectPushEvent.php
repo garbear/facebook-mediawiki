@@ -67,7 +67,6 @@ class FBConnectPushEvent {
 					$pushObj = new $pushEventClassName;
 					$className = get_class();
 					$prefName = $pushObj->getUserPreferenceName();
-	
 					$preferences[$prefName] = array(
 						'type' => 'toggle',
 						'label-message' => $prefName,
@@ -75,13 +74,24 @@ class FBConnectPushEvent {
 						"default" => "1",
 					);
 					
-					/* < v1.16 */ 
+					/* Prior to v1.16 */ 
 					if( defined('PREF_TOGGLE_T') ) {
 						$preferences[$prefName]['int-type'] = PREF_TOGGLE_T;
 						$preferences[$prefName]['name'] = $prefName;
 					}	
 				}
 			}
+		} else {
+			// User is a MediaWiki user but isn't connected yet
+			// Display a message and button to connect
+			$loginButton = '<fb:login-button' . FBConnect::getPermissionsAttribute() .
+			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
+			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
+			$wgExtensionPreferences[] = array(	
+				'html' => $html,
+				'type' => PREF_USER_T,
+				'section' => self::$PREFERENCES_TAB_NAME
+			);
 		}
 		return true;
 	} // end addPreferencesToggles()
