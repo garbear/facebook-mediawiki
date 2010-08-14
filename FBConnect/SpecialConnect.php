@@ -163,30 +163,34 @@ class SpecialConnect extends SpecialPage {
 	public function connectExisting() {
 		global $wgUser, $wgRequest, $facebook;
 		wfProfileIn(__METHOD__);
-
-		// Store the facebook-id <=> mediawiki-id mapping.
-		// TODO: FIXME: What sould we do if this fb_id is already connected to a DIFFERENT mediawiki account.
-		$fb_id = $facebook->getUser();
-		FBConnectDB::addFacebookID($wgUser, $fb_id);
-
-		// Save the default user preferences.
-		global $wgFbEnablePushToFacebook;
-		if (!empty( $wgFbEnablePushToFacebook )) {
-			global $wgFbPushEventClasses;
-			if (!empty( $wgFbPushEventClasses )) {
-				$DEFAULT_ENABLE_ALL_PUSHES = true;
-				foreach($wgFbPushEventClasses as $pushEventClassName) {
-					$pushObj = new $pushEventClassName;
-					$className = get_class();
-					$prefName = $pushObj->getUserPreferenceName();
-
-					$wgUser->setOption($prefName, ($DEFAULT_ENABLE_ALL_PUSHES?"1":"0"));
+		
+		$fb_ids = FBConnectDB::getFacebookIDs($wgUser);
+		if (count( $fb_ids ) > 0) {
+			// Will display a message that they're already logged in and connected
+			$this->sendPage('alreadyLoggedIn');
+		} else {
+			// Store the facebook-id <=> mediawiki-id mapping.
+			// TODO: FIXME: What sould we do if this fb_id is already connected to a DIFFERENT mediawiki account.
+			$fb_id = $facebook->getUser();
+			FBConnectDB::addFacebookID($wgUser, $fb_id);
+			
+			// Save the default user preferences.
+			global $wgFbEnablePushToFacebook;
+			if (!empty( $wgFbEnablePushToFacebook )) {
+				global $wgFbPushEventClasses;
+				if (!empty( $wgFbPushEventClasses )) {
+					$DEFAULT_ENABLE_ALL_PUSHES = true;
+					foreach($wgFbPushEventClasses as $pushEventClassName) {
+						$pushObj = new $pushEventClassName;
+						$className = get_class();
+						$prefName = $pushObj->getUserPreferenceName();
+						
+						$wgUser->setOption($prefName, $DEFAULT_ENABLE_ALL_PUSHES ? '1' : '0');
+					}
 				}
 			}
+			$this->sendPage('displaySuccessAttaching');
 		}
-
-		$this->sendPage('displaySuccessAttaching');
-
 		wfProfileOut(__METHOD__);
 	} // end connectExisting
 	
