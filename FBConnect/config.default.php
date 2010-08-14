@@ -177,6 +177,7 @@ if(!empty($wgFbEnablePushToFacebook)){
 	// whose file-name corresponds to the class-name.  To add a push event
 	// which does not meet these criteria, just explicitly add it below.
 	$pushEventClassNames = array(
+		'FBPush_OnAchBadge',
 		'FBPush_OnAddBlogPost',
 		'FBPush_OnAddImage',
 		'FBPush_OnAddVideo',
