@@ -15,7 +15,7 @@
  */
 
 /**
- * fbconnect.js and fbconnect-min.js
+ * fbconnect.js and fbconnect.min.js
  * 
  * FBConnect relies on several different libraries and frameworks for its
  * JavaScript code. Each framework has its own method to verify that the proper
@@ -196,8 +196,36 @@ function loginAndConnectExistingUser() {
  * the Special:Connect page to finish the process.
  */
 function loggedInNowNeedToConnect() {
-	loginByFBConnect();
-	sendToConnectOnLoginForSpecificForm("ConnectExisting");
+	FB.getLoginStatus(function(response) {
+		if (response.session) {
+			// already logged-in/connected via facebook
+			sendToConnectOnLoginForSpecificForm("ConnectExisting");
+		} else {
+			// Not logged/connected w/Facebook. Show dialog w/a button (to get around popup blockers in IE/webkit).
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::getLoginButtonModal&uselang=' + window.wgUserLanguage + '&cb=' + wgMWrevId + '-' + wgStyleVersion,  false, {
+				callback: function() {
+					window.fbAsyncInit(); // need to init again so that the button that comes from the ajax request works
+					
+					var fb_loginAndConnect_WET_str = 'signupActions/fbloginandconnect';
+					
+					$('#fbNowConnectBox').makeModal({
+						width: 300,
+						persistent: false,
+						onClose: function() {
+							WET.byStr(fb_loginAndConnect_WET_str + '/close');
+							window.location.reload(true);
+						}
+					});
+					$('#fbNowConnectBoxWrapper').load(function() {
+						setTimeout(function() {
+							$('#fbNowConnectBoxWrapper').css({'top' : '130px'});
+						});
+					});
+					WET.byStr(fb_loginAndConnect_WET_str + '/open');
+				}
+			});
+		}
+	});
 }
 
 /**

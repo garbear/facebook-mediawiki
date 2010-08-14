@@ -41,10 +41,13 @@ if ( !defined( 'MEDIAWIKI' )) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+// Make it so that the code will survive the push until the config gets updated.
+$wgEnablePreferencesExt = true;
+
 /*
  * FBConnect version.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.1.1, August 12, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.1.2, August 14, 2010' );
 
 /*
  * Add information about this extension to Special:Version.
@@ -123,6 +126,7 @@ $wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoC
 /**/
 
 $wgAjaxExportList[] = "FBConnect::disconnectFromFB";
+$wgAjaxExportList[] = "SpecialConnect::getLoginButtonModal";
 $wgAjaxExportList[] = "SpecialConnect::ajaxModalChooseName"; 
 $wgAjaxExportList[] = "SpecialConnect::checkCreateAccount";
 
@@ -214,6 +218,13 @@ class FBConnect {
 		}
 		return $attr;
 	} // end getOnLoginAttribute()
+	
+	public static function getFBButton( $onload = '', $id = '' ) {
+		global $wgFbExtendedPermissions;
+		return '<fb:login-button onlogin="' . $onload . '" perms="' .
+		       implode(',', $wgFbExtendedPermissions) . '" id="' . $id .
+		       '"></fb:login-button>';
+	}
 	
 	/**
 	 * Ajax function to disconect from Facebook.
