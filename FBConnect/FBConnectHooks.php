@@ -83,7 +83,7 @@ class FBConnectHooks {
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
 		global $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgFbIncludeJquery,
-		       $wgFbScriptEnableLocales, $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
+		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
 		
 		// If the user's language is different from the default language, use the correctly localized facebook code.
 		// NOTE: Can't use wgLanguageCode here because the same FBConnect config can run for many wgLanguageCode's on one site (such as Wikia).
@@ -171,7 +171,12 @@ STYLE;
 	 * sure that fbconnect_table.sql is updated with the database prefix beforehand.
 	 */
 	static function LoadExtensionSchemaUpdates() {
-		global $wgDBtype, $wgDBprefix, $wgExtNewTables;
+		global $wgDBtype, $wgDBprefix, $wgExtNewTables, $wgSharedDB, $wgDBname;
+		
+		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
+			return true;
+		}
+		
 		$base = dirname( __FILE__ );
 		if ( $wgDBtype == 'mysql' ) {
 			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
@@ -202,13 +207,7 @@ STYLE;
 		$vars['fbUseMarkup'] = $wgFbUseMarkup;
 		$vars['fbLogo']      = $wgFbLogo ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
-		                           $wgTitle->isSpecial('Preferences') ? '' :
-		                           'returnto=' . $wgTitle->getPrefixedURL() );
-		$query = $wgRequest->getValues();
-		if (isset($query['title'])) {
-			unset($query['title']);
-		}
-		$vars['wgPagequery'] = wfUrlencode( wfArrayToCGI( $query ) );
+			$wgTitle->isSpecial('Preferences') ? '' : 'returnto=' . $wgTitle->getPrefixedURL() );
 		return true;
 	}
 	
@@ -256,7 +255,7 @@ STYLE;
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
 		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader, $wgBlankImgUrl,
-		       $wgFbPersonalUrls, $wgFbConnectOnly;
+		       $wgFbPersonalUrls, $wgFbConnectOnly, $wgSkin;
 		$skinName = get_class($wgUser->getSkin());
 		
 		wfLoadExtensionMessages('FBConnect');
@@ -303,7 +302,7 @@ STYLE;
 					'href'   => '#',
 					'active' => false,
 				);
-				/**/
+				/**
 				if( $skinName == "SkinMonaco" ) {
 					$personal_urls['fblogout'] = array(
 						'text'   => '&nbsp;',
@@ -312,6 +311,12 @@ STYLE;
 						'active' => false,
 					);
 				}
+				/**/
+				$html = Xml::openElement('span', array('id' => 'fbuser' ));
+					$html .= Xml::openElement('a', array('href' => $personal_urls['userpage']['href'], 'class' => 'fb_button fb_button_small fb_usermenu_button' ));
+					$html .= Xml::closeElement( 'a' );
+				$html .= Xml::closeElement( 'span' );
+				$personal_urls['fbuser']['html'] = $html;
 			}
 			
 			/*
@@ -356,7 +361,8 @@ STYLE;
 			if (!$wgFbPersonalUrls['hide_connect_button']) {
 				// Add an option to connect via Facebook Connect
 				// RT#57141 - only show the connect link on monaco and answers
-				if( $skinName == "SkinAnswers" ) {
+				// Answers skin might actually get caught under SkinMonaco below.  Regardless, all other skins shouldn't get this link.
+				if(( $skinName == "SkinMonaco" ) || ( $skinName == "SkinAnswers" )) {
 					$personal_urls['fbconnect'] = array(
 						'text'   => wfMsg( 'fbconnect-connect' ),
 						'class' => 'fb_button fb_button_small',
@@ -364,13 +370,17 @@ STYLE;
 						'active' => $wgTitle->isSpecial('Connect'),
 					);
 				}
-				if( $skinName == "SkinMonaco" ) { 
-					$html = Xml::openElement("span",array("class" => "fb_button_text" )); 
-					$html .= wfMsg( 'fbconnect-connect-simple' ); 
-					$html .= Xml::closeElement( "span" ); 
-					
-					$personal_urls['fbconnect']['text'] = $html; 
-				} 
+				
+				if( $skinName == "SkinMonaco" ) { 					
+					$html = Xml::openElement("span",array("id" => 'fbconnect' ));
+						$html .= Xml::openElement("a",array("href" => '#', 'class' => 'fb_button fb_button_small' ));
+							$html .= Xml::openElement("span",array("class" => "fb_button_text" ));
+								$html .= wfMsg( 'fbconnect-connect-simple' );
+							$html .= Xml::closeElement( "span" );
+						$html .= Xml::closeElement( "a" );
+					$html .= Xml::closeElement( "span" );
+					$personal_urls['fbconnect']['html'] = $html;
+				}
 			}
 			
 			// Remove other personal toolbar links
@@ -529,7 +539,7 @@ STYLE;
 	/**
 	 * Removes the 'createaccount' right from users if $wgFbConnectOnly is true.
 	 */
-	static function UserGetRights( &$user, &$aRights ) {
+	static function UserGetRights( $user, &$aRights ) {
 		global $wgFbConnectOnly;
 		if ( !empty( $wgFbConnectOnly ) ) {
 			foreach ( $aRights as $i => $right ) {
@@ -552,11 +562,12 @@ STYLE;
 		// Check to see if the user can be logged in from Facebook
 		$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
 		// Check to see if the user can be loaded from the session
-		$localId = isset($_COOKIE["{$wgCookiePrefix}UserID"]) ? 
+		$localId = isset($_COOKIE["{$wgCookiePrefix}UserID"]) ?
 				intval($_COOKIE["{$wgCookiePrefix}UserID"]) :
 				(isset($_SESSION['wsUserID']) ? $_SESSION['wsUserID'] : 0);
 		
 		// Case: Not logged into Facebook, but logged into the wiki
+		/*
 		if (!$fbId && $localId) {
 			$mwUser = User::newFromId($localId);
 			// If the user was Connected, the JS should have logged them out...
@@ -570,7 +581,7 @@ STYLE;
 			}
 		}
 		// Case: Logged into Facebook, not logged into the wiki
-		else if ($fbId && !$localId) {
+		else /**/ if ($fbId && !$localId) {
 			// Look up the MW ID of the Facebook user
 			$mwUser = FBConnectDB::getUser($fbId);
 			$id = $mwUser ? $mwUser->getId() : 0;
@@ -637,13 +648,13 @@ STYLE;
 					'type' => PREF_USER_T,
 					'section' => 'fbconnect-prefstext' );
 			
-			$wgExtensionPreferences[] = array(	
+			$wgExtensionPreferences[] = array(
 					'name' => 'fbconnect-push-allow-never',
 					'type' => PREF_TOGGLE_T,
 					'section' => 'fbconnect-prefstext',
 					'default' => 1);
 			
-			$wgExtensionPreferences[] = array(	
+			$wgExtensionPreferences[] = array(
 					'html' => $html,
 					'type' => PREF_USER_T,
 					'section' => 'fbconnect-prefstext' );
@@ -656,7 +667,7 @@ STYLE;
 			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
 			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
-			$wgExtensionPreferences[] = array(	
+			$wgExtensionPreferences[] = array(
 				'html' => $html,
 				'type' => PREF_USER_T,
 				'section' => 'fbconnect-prefstext'
@@ -665,8 +676,8 @@ STYLE;
 		return true;
 	}
 	
-	/*
-	 * Add facebook connect html to ajax script 
+	/**
+	 * Add facebook connect html to ajax script.
 	 */
 	public static function afterAjaxLoginHTML( &$html ) {
 		$tmpl = new EasyTemplate( dirname( __FILE__ ) . '/templates/' );
@@ -681,22 +692,21 @@ STYLE;
 	}
 	
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
-		global $wgRequest, $wgUser, $wgServer;
+		global $wgRequest, $wgUser, $wgServer, $facebook;
 		wfLoadExtensionMessages('FBConnect');
 		$pref = Title::newFromText('Preferences', NS_SPECIAL);
 		if ($wgRequest->getVal('fbconnected', '') == 1) {
 			$id = FBConnectDB::getFacebookIDs($wgUser, DB_MASTER);
 			if( count($id) > 0 ) {
-				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' )); 
+				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
 				$msg .= "<p>".wfMsg('fbconnect-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
 			}
 		}
-	
+		
 		if ($wgRequest->getVal('fbconnected', '') == 2) {
-			$fb = new FBConnectAPI();
-			if( strlen($fb->user()) < 1 ) {
-				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' )); 
-				$msg .= "<p>".wfMsg('fbconnect-connect-error-msg', array("$1" => $pref->getFullUrl() ))."</p>";				
+			if( strlen($facebook->getUser()) < 1 ) {
+				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
+				$msg .= "<p>".wfMsgExt('fbconnect-connect-error-msg', 'parse', array("$1" => $pref->getFullUrl() ))."</p>";
 			}
 		}
 		return true;
