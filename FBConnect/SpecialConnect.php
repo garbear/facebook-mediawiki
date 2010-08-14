@@ -667,11 +667,23 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->setPageTitle(wfMsg('fbconnect-success'));
 		$wgOut->addWikiMsg('fbconnect-successtext');
 		// Run any hooks for UserLoginComplete
-		$inject_html = '';
-		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
-		$wgOut->addHtml( $inject_html );
-		// Render the "return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		$injected_html = '';
+		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$injected_html ) );
+		
+		if( $injected_html !== '' ) {
+			$wgOut->addHtml( $injected_html );
+			// Render the "return to" text retrieved from the URL
+			$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		} else {
+			// Since there was no additional message for the user, we can just redirect them back to where they came from.
+			$titleObj = Title::newFromText( $this->mReturnTo );
+			if ( ( !$titleObj instanceof Title ) || ( $titleObj->isSpecial("Userlogout") ) || ( $titleObj->isSpecial("Signup") ) || ( $titleObj->isSpecial("Connect") )) {
+				$titleObj = Title::newMainPage();
+				$wgOut->redirect( $titleObj->getFullURL( "cb=" . rand(1,10000) ) );
+				return true;
+			}
+			$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery . "&cb=".rand(1,10000) ) );
+		}
 	}
 
 	/**
