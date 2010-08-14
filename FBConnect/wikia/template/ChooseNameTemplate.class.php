@@ -72,7 +72,11 @@ class ChooseNameTemplate extends QuickTemplate {
 			</td>
 			<td class="mw-input" rowspan="2" style='vertical-align:top;'>
 				<div id="msgToExistingUsers" style="width:240px;">
-					<?php $this->msgHtml('fbconnect-msg-for-existing-users'); ?>
+					<?php
+					// The login button should open the ajax login dialog and select the login-and-connect form.
+					$jsHref = "openLoginAndConnect();return false;";
+					print wfMsg('fbconnect-msg-for-existing-users', $jsHref);
+					?>
 				</div>
 			</td>
 		</tr>
@@ -195,6 +199,7 @@ class ChooseNameTemplate extends QuickTemplate {
 			print "<tr id='fbConnectPushEventBar' class='wpAjaxLoginLine' style=''>\n<td colspan='2'>\n";
 			print wfMsg( 'fbconnect-prefsheader' );
 			print "<em>\n";
+			print "<br/>\n";
 			print wfMsg( 'fbconnect-prefs-can-be-updated', wfMsg('fbconnect-prefstext'));
 			print "</em></td></tr>";
 

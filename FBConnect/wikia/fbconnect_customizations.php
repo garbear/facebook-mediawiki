@@ -14,7 +14,7 @@
  * that Wikia has its own accounts and currently has no reason to expect that it won't in the
  * forseeable future.
  */
- 
+
 /**
  * Extra initialization for Facebook Connect which is Wikia-specific.
  */
@@ -34,15 +34,6 @@ function wikia_fbconnect_chooseNameForm(&$specialConnect, &$messageKey){
 	if (!$wgUser->isAllowed( 'createaccount' )) {
 		// TODO: Some sort of error/warning message.  Can probably re-use an existing message.
 	} else {
-
-		// TODO: If they're already logged in, just connect them.
-		if($wgUser->isLoggedIn()){
-
-			// TODO: Perform the connection at the beginning since users might think they are done since these are just options that they can change at any time.
-
-			// TODO: Show them a form with the user-preferences checkboxes.
-		}
-
 		wfLoadExtensionMessages( 'FBConnect_wikia' );
 
 		// If it is not the default message, highlight it because it probably indicates an error.
