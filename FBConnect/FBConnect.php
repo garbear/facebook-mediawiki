@@ -48,13 +48,14 @@ $wgEnablePreferencesExt = true;
  * FBConnect version.
  */
 define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.1.2, August 14, 2010' );
+define( 'FBCONNECT_LOCALE', '%LOCALE%'); // magic-string to use in substitution (must be defined prior to including config.php).
 
 /*
  * Add information about this extension to Special:Version.
  */
 $wgExtensionCredits['specialpage'][] = array(
 	'name'           => 'Facebook Connect Plugin',
-	'author'         => 'Garrett Brown',
+	'author'         => 'Garrett Brown, Sean Colombo, Tomek Odrobny',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:FBConnect',
 	'descriptionmsg' => 'fbconnect-desc',
 	'version'        => MEDIAWIKI_FBCONNECT_VERSION,
@@ -84,12 +85,14 @@ if( !empty( $wgFbEnablePushToFacebook ) ){
 }
 
 $wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
+$wgExtensionMessagesFiles['FBConnectLanguage'] = $dir . 'FBConnectLanguage.i18n.php';
 $wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
 
 $wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
 $wgAutoloadClasses['FBConnectDB'] =			$dir . 'FBConnectDB.php';
 $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectProfilePic'] =	$dir . 'FBConnectProfilePic.php';
+$wgAutoloadClasses['FBConnectLanguage'] =   $dir . 'FBConnectLanguage.php';
 $wgAutoloadClasses['FBConnectUser'] =		$dir . 'FBConnectUser.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';

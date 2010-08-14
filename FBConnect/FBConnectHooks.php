@@ -83,7 +83,24 @@ class FBConnectHooks {
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
 		global $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgFbIncludeJquery,
-		       $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
+		       $wgFbScriptEnableLocales, $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
+		
+		// If the user's language is different from the default language, use the correctly localized facebook code.
+		// NOTE: Can't use wgLanguageCode here because the same FBConnect config can run for many wgLanguageCode's on one site (such as Wikia).
+		if($wgFbScriptEnableLocales){
+			global $wgFbScriptLangCode, $wgLang;
+			wfProfileIn(__METHOD__ . "::fb-locale-by-mediawiki-lang");
+			if($wgLang->getCode() !== $wgFbScriptLangCode){
+				// Attempt to find a matching facebook locale.
+				$defaultLocale = FBConnectLanguage::getFbLocaleForLangCode($wgFbScriptLangCode);
+				$locale = FBConnectLanguage::getFbLocaleForLangCode($wgLang->getCode());
+				if($defaultLocale != $locale){
+					global $wgFbScriptByLocale;
+					$fbScript = str_replace(FBCONNECT_LOCALE, $locale, $wgFbScriptByLocale);
+				}
+			}
+			wfProfileOut(__METHOD__ . "::fb-locale-by-mediawiki-lang");
+		}
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
 		if(!empty($wgFbScript)){

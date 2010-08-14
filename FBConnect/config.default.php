@@ -112,11 +112,39 @@ $wgFbScript = 'http://connect.facebook.net/en_US/all.js';
 #$wgFbScript = 'https://connect.facebook.net/en_US/all.js';
 
 /**
+ * If this is set to true, and the user's language is anything other than wgFbScriptLangCode, then
+ * the wgFbScriptLangCode URL will be used to load the correspondingly-localized version of the
+ * Facebook JS SDK.
+ */
+$wgFbScriptEnableLocales = true;
+
+/**
+ * The MEDIAWIKI language code which corresponds to the file in $wgFbScript.  If the user
+ * is in a language other than wgFbScriptLangCode, then the wgFbScriptByLocale will be used
+ * if wgFbScriptEnableLocales is set to true.
+ */
+$wgFbScriptLangCode = 'en';
+
+/**
+ * If wgFbScriptEnableLocales is true and the user's language is anything except for the
+ * wgFbScriptLangCode, we assume that instead of using the file in wgFbScript (which is quite likely a
+ * locally-cached version of the JS SDK), that we should instead take the risk and use the
+ * Facebook-hosted version for the corresponding language.
+ *
+ * NOTE: URL should include "%LOCALE%" which will be replaced with the correct Facebook Locale based
+ * on the user's configured language.
+ *
+ * WARNING: It is highly-unlikely that you'll need to change this fallback-URL. If you're not sure that
+ * you need to change it, it's best to leave it alone.
+ */
+$wgFbScriptByLocale = 'http://connect.facebook.net/%LOCALE%/all.js';
+
+/**
  * Path to the extension's client-side JavaScript
  */
 global $wgScriptPath;
-#$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for development
-$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
+$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for development
+#$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
 
 /**
  * Whether to include jQuery. This option is for backwards compatibility and is
