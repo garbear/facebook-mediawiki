@@ -134,6 +134,7 @@ class FBConnectPushEvent {
 			// Create an option to opt out of all current and future push-events.
 			$prefName = self::$PREF_TO_DISABLE_ALL;
 			$prefText = wfMsg('tog-' . self::$PREF_TO_DISABLE_ALL);
+			$html .= "<br/>";
 			$html .= "<div class='toggle'>";
 			$html .= "<input type='checkbox' value='1' id=\"$prefName\" name=\"$prefName\"/>";
 			$html .= "<label for=\"$prefName\">$prefText</label>";
