@@ -94,6 +94,7 @@ $wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
 $wgAutoloadClasses['FBConnectUser'] =		$dir . 'FBConnectUser.php';
 $wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
+$wgAutoloadClasses['ChooseNameTemplate'] =	$dir . 'wikia/template/ChooseNameTemplate.class.php';
 
 $wgSpecialPages['Connect'] = 'SpecialConnect';
 
