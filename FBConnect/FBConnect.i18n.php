@@ -140,7 +140,14 @@ $messages['en'] = array(
 	'fbconnect-disconnect-done' => "Disconnecting <span id='fbConnectDisconnectDone'>... done! </span>",
 	'fbconnect-disconnect-info' => "We have emailed a new password to use with you account - you can log in with the same username as before. Hooray !",
 	'tog-fbconnect-push-allow-never' => "Never send anything to my news feed",
-	'fbconnect-passwordremindertitle'      => 'Your Wikia account is now disconnected from Facebook!',
+	'fbconnect-reclamation-title' => 'Disconnecting from Facebook',
+	'fbconnect-reclamation-body' => 'Your account is now disconnected fron Facebook ! <br><br>  We have emailed a new password to use with you account - you can log in with the same username as before. Hooray !
+											<br><br> To login go to: $1',
+    'fbconnect-reclamation-title-error' => 'Disconnecting from Facebook',
+	'fbconnect-reclamation-body-error' => 'There was some error during disconnecting from Facebook or you account is already disconnected. 
+											<br><br> To login go to: $1',
+    'fbconnect-unknown-error' => 'Unknown error, try again or contact with us.',          
+	'fbconnect-passwordremindertitle'      => 'Your Wikia account is now disconnected from Facebook!', 
 	'fbconnect-passwordremindertext'       => 'Hi,
 It looks like you\'ve just disconnected your Wikia account from Facebook. We\'ve kept all of your history, edit points and achievements intact, so don\'t worry!
 
