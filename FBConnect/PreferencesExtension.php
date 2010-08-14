@@ -99,12 +99,12 @@ function wfSpecialPreferencesExtension()
             global $wgUser, $wgRequest;
             global $wgExtensionPreferences;
 			wfProfileIn(__METHOD__);
-			
+ 
             foreach ($wgExtensionPreferences as $p)
             {
                 $name = isset($p['name']) ? $p['name'] : "";
-                if ( !$name ) {
-                	continue;
+                if (! $name) {
+					continue;
                 }
  
                 $value = $wgRequest->getVal($name);
@@ -164,7 +164,7 @@ function wfSpecialPreferencesExtension()
             global $wgOut, $wgRequest, $wgUser;
             global $wgExtensionPreferences;
 			wfProfileIn(__METHOD__);
-			
+ 
             // first get original form, then hack into it new options
             parent::mainPrefsForm($status, $message);
             $html = $wgOut->getHTML();
@@ -213,13 +213,10 @@ function wfSpecialPreferencesExtension()
                 if ( !empty($p['int-type']) ) {
                 	$type = $p['int-type'];
                 }
+
                 $pos = isset($p['pos']) ? $p['pos'] : '';
                 switch ($type)
-                {
-                    case PREF_CUSTOM_HTML_T:
-                        $addhtml = $p['html'];
-                        break;
-                        
+                {                    
                 	case PREF_TOGGLE_T:
                         $addhtml = $this->getToggle($name);
                         break;

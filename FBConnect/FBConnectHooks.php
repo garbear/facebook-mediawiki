@@ -234,8 +234,10 @@ STYLE;
 	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader;
+		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader, $wgBlankImgUrl;
 		global $wgFbPersonalUrls, $wgFbConnectOnly;
+		$skinName = get_class($wgUser->getSkin());
+		
 		wfLoadExtensionMessages('FBConnect');
 		
 		/*
@@ -269,13 +271,25 @@ STYLE;
 					$personal_urls['userpage']['text'] = $name;
 				}
 			}
+			
 			// Replace logout link with a button to disconnect from Facebook Connect
-			if( empty( $wgFbPersonalUrls['hide_logout_of_fb'] ) ){
+			if( empty( $wgFbPersonalUrls['hide_logout_of_fb'] ) ) {
+				/*
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
 					'text'   => wfMsg( 'fbconnect-logout' ),
 					'href'   => '#',
-					'active' => false );
+					'active' => false,
+				);
+				/**/
+				if( $skinName == "SkinMonaco" ) {
+					$personal_urls['fblogout'] = array(
+						'text'   => '&nbsp;',
+						'href'   => $personal_urls['userpage']['href'],
+						'class' => 'fb_button fb_button_small fb_usermenu_button',
+						'active' => false,
+					);
+				}
 			}
 			
 			/*
@@ -319,10 +333,18 @@ STYLE;
 				// Add an option to connect via Facebook Connect
 				$personal_urls['fbconnect'] = array(
 					'text'   => wfMsg( 'fbconnect-connect' ),
+					'class' => 'fb_button fb_button_small',
 					'href'   => SpecialPage::getTitleFor( 'Connect' )->
 					              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
-					'active' => $wgTitle->isSpecial('Connect')
+					'active' => $wgTitle->isSpecial('Connect'),
 				);
+				if( $skinName == "SkinMonaco" ) { 
+					$html = Xml::openElement("span",array("class" => "fb_button_text" )); 
+					$html .= wfMsg( 'fbconnect-connect-simple' ); 
+					$html .= Xml::closeElement( "span" ); 
+					
+					$personal_urls['fbconnect']['text'] = $html; 
+				} 
 			}
 			
 			// Remove other personal toolbar links
@@ -596,15 +618,14 @@ STYLE;
 					'html' => $html,
 					'type' => PREF_USER_T,
 					'section' => 'fbconnect-prefstext' );
+			
 		} else {
 			$wgExtensionPreferences[] = array(	
 					'html' => "CONNECT BUTTON",
 					'type' => PREF_USER_T,
 					'section' => 'fbconnect-prefstext' );
-
 			
 		}
-		
 		return true;
 	}
 }

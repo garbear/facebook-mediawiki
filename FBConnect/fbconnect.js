@@ -87,7 +87,23 @@ $(document).ready(function() {
 			});
 		}
 	});
+	
+	//window.fbAsyncInit ();
+	$("#fbconnect a").click(function() {
+		loginByFBConnect();
+		return false;
+	});
+	
 });
+
+/**
+ * Check that the API has been initialized (FB.init)
+ * @return bool
+ */
+function isFbApiInit() {
+	return !(FB._apiKey == 'undefined' ||  FB._apiKey == null);
+}
+
 
 /**
  * An optional handler to use in fbOnLoginJsOverride for when a user logs in
@@ -99,4 +115,24 @@ $(document).ready(function() {
 function sendToConnectOnLogin(){
 	var destUrl = wgServer + wgScript + "?title=Special:Connect&returnto=" + wgPageName + "&returntoquery=" + wgPagequery;
 	window.location.href = destUrl;
+}
+
+
+function openFbLogin() {
+	if (!isFbApiInit()) {
+		setTimeout(openFbLogin, 300);
+		return true;
+	}
+	FB.login(FB.bind(sendToConnectOnLogin, null), {perms : "publish_stream"});
+}
+
+/**
+ * Only for user header button
+ */
+function loginByFBConnect() {
+	if(typeof FB._apiKey == 'undefined' ||  FB._apiKey == null) {
+		window.fbAsyncInit();
+	}	
+	openFbLogin();
+	return false;
 }

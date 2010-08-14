@@ -59,6 +59,7 @@ $messages['en'] = array(
 	'right-goodlooking'       => 'Really, really, ridiculously good looking',
 	// Personal toolbar
 	'fbconnect-connect'  => 'Log in with Facebook Connect',
+	'fbconnect-connect-simple'  => 'Connect',
 	'fbconnect-convert'  => 'Connect this account with Facebook',
 	'fbconnect-logout'   => 'Logout of Facebook',
 	'fbconnect-link'     => 'Back to facebook.com',
