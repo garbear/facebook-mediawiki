@@ -375,7 +375,10 @@ STYLE;
 		// This hook no longer seems to work...
 		return true;
 		
-		if( $facebook->getSession() ) {
+		$ids = FBConnectDB::getFacebookIDs($wgUser);
+		
+		$fb_user = $facebook->getUser();
+		if( $fb_user && count($ids) > 0 && in_array( $fb_user, $ids )) {
 			$html = $output->getHTML();
 			$name = $wgUser->getName();
 			$i = strpos( $html, $name );
