@@ -120,11 +120,10 @@ class FBConnectDB {
 	 * Add a User <-> Facebook ID association to the database.
 	 */
 	public static function addFacebookID( $user, $fbid ) {
+		global $wgMemc;
 		wfProfileIn(__METHOD__);
 		
-		global $wgMemc;
 		$memkey = wfMemcKey( "fb_user_id", $user->getId() );
-		
 			
 		if($user->getId() == 0){
 			wfDebug("FBConnect: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
@@ -140,10 +139,8 @@ class FBConnectDB {
 				__METHOD__
 			);
 		}
-
 		
 		$dbw->commit();
-		
 		$wgMemc->set($memkey, self::getFacebookIDs($user, DB_MASTER )  );
 		
 		wfProfileOut(__METHOD__);
