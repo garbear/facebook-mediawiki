@@ -93,6 +93,22 @@ class SpecialConnect extends SpecialPage {
 		
 		// Look at the subpage name to discover where we are in the login process
 		switch ( $par ) {
+			case 'ConnectExisting':
+			// This subpage is for posting a quick-connection from a login form. This means that the user wanted to "login and connect"
+			// as a single option.  This should connect the user, save default user-preferences, and show them a form to change their
+			// prefs, with an option to return to where they came from.
+
+			print "Landed in the correct spot.";exit;
+			// TODO: RESTORE
+			//$this->attachUser($fb_user, $wgRequest->getText('wpExistingName'),
+			//		$wgRequest->getText('wpExistingPassword'));
+			
+			// TODO: SAVE DEFAULT USER PREFS
+			// TODO: SAVE DEFAULT USER PREFS
+			
+			// TODO: SHOW A FORM TO CHANGE USER-PREFS WITH THE OPTION TO GO BACK TO WHERE THEY CAME FROM.
+			// TODO: SHOW A FORM TO CHANGE USER-PREFS WITH THE OPTION TO GO BACK TO WHERE THEY CAME FROM.
+			break;
 		case 'ChooseName':
 			$choice = $wgRequest->getText('wpNameChoice');
 			if ($wgRequest->getCheck('wpCancel')) {

@@ -109,11 +109,16 @@ function isFbApiInit() {
  * An optional handler to use in fbOnLoginJsOverride for when a user logs in
  * via Facebook Connect. This will redirect to Special:Connect with the
  * returnto variables configured properly.
- *
- * TODO: Also set the value for 'returntoquery'!!
  */
-function sendToConnectOnLogin(){
-	var destUrl = wgServer + wgScript + "?title=Special:Connect&returnto=" + wgPageName + "&returntoquery=" + wgPagequery;
+function sendToConnectOnLogin() {
+	sendToConnectOnLoginForSpecificForm("");
+}
+// Allows optional specification of a form to force on Special:Connect (such as ChooseName, ConnectExisting, or Convert)
+function sendToConnectOnLoginForSpecificForm(formName) {
+	if (formName != "") {
+		formName = "/" + formName;
+	}
+	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPagequery;
 	window.location.href = destUrl;
 }
 
@@ -144,7 +149,7 @@ function loginByFBConnect() {
 function loginAndConnectExistingUser() {
 	AjaxLogin.action = 'login';
 	
-	window.wgAjaxLoginOnSuccess = sendToConnectOnLogin();
+	window.wgAjaxLoginOnSuccess = sendToConnectOnLoginForSpecificForm("ConnectExisting");
 	
 	AjaxLogin.form.submit();
 	return false;
