@@ -229,8 +229,9 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 			}
-			
+			$wgUser->setOption('fbFromExist', '1');
 			$wgUser->saveSettings();
+			
 			wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 			
 			$this->sendPage('displaySuccessAttaching');
@@ -945,26 +946,5 @@ class SpecialConnect extends SpecialPage {
 			
 		$response->addText( $html );
 		return $response;	
-	}
-	
-	/**
-	 * Ajax function to return a modal dialog with a login button.  This is needed
-	 * after a login-and-connect because of popup blockers in IE and webkit.
-	 */
-	public static function getLoginButtonModal(){
-		wfProfileIn(__METHOD__);
-		$response = new AjaxResponse();
-		
-		wfLoadExtensionMessages('FBConnect');
-		$title = wfMsg('fbconnect-logged-in-now-connect-title');
-		$body = '<br/>' . wfMsg('fbconnect-logged-in-now-connect');
-		$body .= "<br/><br/>\n";
-		// special onlogin handler for this case.
-		$body .= FBConnect::getFBButton("sendToConnectOnLoginForSpecificForm('ConnectExisting');", 'fbPrefsConnect');
-		
-		$response->addText('<div id="fbNowConnectBox" title="' . $title . '"><div>' . $body . '</div></div>');
-		
-		wfProfileOut(__METHOD__);
-		return $response;
 	}
 }

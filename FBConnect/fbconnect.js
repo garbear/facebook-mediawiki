@@ -181,7 +181,7 @@ function loginAndConnectExistingUser() {
 	AjaxLogin.form.unbind('submit'); // unbind the hander for previous form
 	AjaxLogin.form = $('#userajaxconnectform');
 	
-	window.wgAjaxLoginOnSuccess = loggedInNowNeedToConnect;
+	//window.wgAjaxLoginOnSuccess = loggedInNowNeedToConnect;
 	
 	// Make sure the default even doesn't happen
 	AjaxLogin.form.submit(function(ev) {
@@ -190,11 +190,101 @@ function loginAndConnectExistingUser() {
 	});
 }
 
+
+/*
+ * expend ajax login to use slider login/merge switch 
+ */
+window.wgAjaxLoginOnInit = function() {
+	AjaxLogin.slideToNormalLogin = function(el){
+		$().log('AjaxLogin: slideToNormalLogin()');
+		var firstSliderCell = $("#AjaxLoginSliderNormal");
+		var slideto = 0;
+		
+		AjaxLogin.beforeDoSuccess = function() { 
+			return true;
+		};
+		$("#AjaxLoginConnectMarketing a.forward").show();
+		$("#AjaxLoginConnectMarketing a.back").hide();
+		firstSliderCell.animate({
+			marginLeft: slideto
+		}, function(){$('#fbLoginAndConnect').hide();});
+	};
+	AjaxLogin.slideToLoginAndConnect = function(el){
+		$().log('AjaxLogin: slideToLoginAndConnect()');
+		$('#fbLoginAndConnect').show();
+		var firstSliderCell = $("#AjaxLoginSliderNormal");
+		var slideto = -351;
+		$("#AjaxLoginConnectMarketing a.forward").hide();
+		$("#AjaxLoginConnectMarketing a.back").show();
+
+		AjaxLogin.beforeDoSuccess = function() {			
+			FB.getLoginStatus(function(response) {
+				if (response.session) {
+					// already logged-in/connected via facebook
+					sendToConnectOnLoginForSpecificForm("ConnectExisting");
+				} else {
+					var slideto = -354;
+					$('#userloginErrorBox3').hide();
+					$('#fbLoginLastStep').show();
+					$('#AjaxLoginConnectMarketing').animate({
+						marginLeft: slideto
+					}, function() {
+						$('#fbLoginAndConnect').animate({
+							marginLeft: slideto
+						});
+					});
+					$('#fbLoginAndConnect').hide();
+				}
+			});
+			return false;
+		}
+		
+		firstSliderCell.animate({
+			marginLeft: slideto
+		});
+	};
+
+	AjaxLogin.slider = function(e) {
+		if(typeof e != 'undefined'){
+			e.preventDefault();
+		}
+	
+		// Split into diff functions so that they can be called from elsewhere.
+		if ($(this).hasClass("forward")) {
+			AjaxLogin.slideToLoginAndConnect(this);
+		} else {
+			AjaxLogin.slideToNormalLogin(this);
+		}
+	};
+	
+	//setup slider
+	$("#AjaxLoginConnectMarketing a").click(AjaxLogin.slider);
+	
+	$('#fbAjaxLoginConnect').click(function() {
+		WET.byStr( 'FBconnect/login_dialog/connect' );	
+	});
+	
+	$("#AjaxLoginConnectMarketing .forward").click(function() {
+		WET.byStr( 'FBconnect/login_dialog/slider/forward' );	
+	});
+	
+	$("#AjaxLoginConnectMarketing .back").click(function() {
+		WET.byStr( 'FBconnect/login_dialog/slider/back' );	
+	});
+	
+	$("#wpLoginAndConnectCombo").click(function() {
+		WET.byStr( 'FBconnect/login_dialog/login_and_connect' );	
+	});
+	
+	$().log('Fbconnect: AjaxLogin expend');
+}
+
+
 /**
  * Called after the AJAX has logged the user in on a request to login and connect.
  * Now that they are logged in, we will prompt them to FBConnect, then drop them on
  * the Special:Connect page to finish the process.
- */
+ *
 function loggedInNowNeedToConnect() {
 	FB.getLoginStatus(function(response) {
 		if (response.session) {
