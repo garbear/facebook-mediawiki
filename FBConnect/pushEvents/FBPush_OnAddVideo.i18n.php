@@ -2,5 +2,5 @@
 
 $messages['en'] = array(
 	'tog-fbconnect-push-allow-OnAddVideo' => "Post to my Facebook News Feed when I add a video.",
-	'fbconnect-msg-OnAddVideo' => '$FB_NAME has added a video to the $ARTICLENAME article on $WIKINAME: $ARTICLE_URL'
+	'fbconnect-msg-OnAddVideo' => '$FB_NAME has added a video to the \"$ARTICLENAME\" article on $WIKINAME: $ARTICLE_URL'
 );
