@@ -339,8 +339,7 @@ STYLE;
 				$personal_urls['fbconnect'] = array(
 					'text'   => wfMsg( 'fbconnect-connect' ),
 					'class' => 'fb_button fb_button_small',
-					'href'   => SpecialPage::getTitleFor( 'Connect' )->
-					              getLocalUrl( 'returnto=' . $wgTitle->getPrefixedURL() ),
+					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
 					'active' => $wgTitle->isSpecial('Connect'),
 				);
 				if( $skinName == "SkinMonaco" ) { 
@@ -629,7 +628,7 @@ STYLE;
 			// Display a message and button to connect
 			$loginButton = '<fb:login-button' . FBConnect::getPermissionsAttribute() .
 			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
-			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
+			$html = wfMsg('fbconnect-convert') . ' ' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
 			$wgExtensionPreferences[] = array(	
 				'html' => $html,
