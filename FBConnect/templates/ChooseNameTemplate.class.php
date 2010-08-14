@@ -24,7 +24,6 @@ class ChooseNameTemplate extends QuickTemplate {
 		}
 ?> 
 <div id="fbConnectModal" title="<?php $this->msg('fbconnect-modal-title') ?>" >
-
 <?php if( $this->data['message'] && !$this->data['ajax'] ) { ?>
 	<div class="<?php $this->text('messagetype') ?>box">
 		<?php if ( $this->data['messagetype'] == 'error' ) { ?>
@@ -65,22 +64,21 @@ class ChooseNameTemplate extends QuickTemplate {
 	<?php /* LoginLanguageSelector used to be here, moved downward and modified as part of rt#16889 */ ?>
 	<table class="wpAjaxRegisterTable" style="width: 573px;" >
 		<colgroup>
-			<col width="350" />
+			<col width="275" />
 			<col width="330" />
 		</colgroup>
-		<?php if(!empty($this->data['isajax'])): ?>
-			<tr>
-				<td  colspan="2">
-					<br>
-					<?php $this->msg('fbconnect-modal-headmsg') ?>
-				</td>
-			</tr>
-		<?php endif;?>
-		<tr class="wpAjaxLoginPreLine">
+		<tr class="wpAjaxLoginPreLine" >
 			<td class="wpAjaxLoginInput" id="wpFBNameTD">
 				<label for='wpName2'><?php $this->msg('yourname') ?></label><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
 				<input type='text'  name="wpName2" id="wpFBName"	value="<?php $this->text('name') ?>" size='20' />
 			</td>
+			<td rowspan="3" id="wpFBLoginInfo" >
+				<div>
+					<?php echo wfMsg('fbconnect-msg-for-existing-users', array( "$1" => Title::makeTitle( NS_SPECIAL  , "Signup"  )->getFullUrl(array( "showLoginAndConnect" => "true")) ) ) ?>
+				</div>
+			</td>
+		</tr>
+		<tr class="wpAjaxLoginPreLine" >
 			<td class="wpAjaxLoginInput" id="wplangTD">
 			<?php
 				global $wgLanguageCode;
@@ -148,18 +146,14 @@ class ChooseNameTemplate extends QuickTemplate {
 			</td>
 		</tr>
 		<tr class="wpAjaxLoginPreLine" >
-			<td colspan="2">
-				<?php echo wfMsg('fbconnect-msg-for-existing-users', array( "$1" => Title::makeTitle( NS_SPECIAL  , "Signup"  )->getFullUrl() ) ) ?>
-			</td>
-		</tr>
-		<tr class="wpAjaxLoginPreLine" >
 			<td class="wpAjaxLoginInput" id="wpFBEmailTD">
 				<?php if( $this->data['useemail'] ) { ?>
 					<label for='wpEmail'><?php $this->msg('signup-mail') ?></label><a style='float:left' id="wpEmailInfo" href="#"><?php $this->msg( 'signup-moreinfo' ) ?></a><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
 					<input type='text'  name="wpEmail" id="wpFBEmail" value="<?php $this->text('email') ?>" size='20' />
 				<?php } ?>
-			
-			<td class="mw-input" style="padding-top:30px;" > 
+		</tr>
+		<tr class="wpAjaxLoginPreLine"  >	
+			<td class="mw-input" style="padding-top:5px;" colspan="2" > 
 				<?php
 				$tabIndex = 8;
 				if ( isset( $this->data['extraInput'] ) && is_array( $this->data['extraInput'] ) ) {
@@ -232,7 +226,7 @@ class ChooseNameTemplate extends QuickTemplate {
 				<?php endif;?>
 					<td <?php if( !empty( $value['fullLine'] )):?> colspan=2 <?php endif;?>>	
 						<input <?php if( !empty( $value['checked'] )):?>  checked="checked" <?php endif;?> type='checkbox' value='1' id="<?php echo $value['id']; ?>" name="<?php echo $value['name']; ?>"/> 
-						<label for="<?php echo $value['id']; ?>"><?php echo $value['shortText']; ?></label> <br>				
+						<label for="<?php echo $value['id']; ?>"><?php echo $value['shortText']; ?></label> 
 					</td>	
 			<?php if( ($key % 2) == 1 || ( (count($prefs) - 1) ==  $key )):?> 
 				</tr>
@@ -264,14 +258,23 @@ class ChooseNameTemplate extends QuickTemplate {
 </div>
 
 <script type='text/javascript'>
-	$(document).ready(function(){
+    var prefs_help_mailmesg = "<?php echo str_replace("\n", " ", wfMsg('prefs-help-mailmesg')) ?>"; 
+    var prefs_help_email = "<?php echo str_replace("\n", " ", wfMsg('prefs-help-email')) ?>"; 
+    $(document).ready(function(){
 		//override submitForm
 		UserRegistration = {};
-
+		$('#wpEmailInfo').bind('click', function(){
+			$.showModal(prefs_help_mailmesg, prefs_help_email, 
+				{	'id': 'wpEmailInfoModal', 
+					'onClose': function() {
+						WET.byStr( 'FBconnect/ChooseName/moreinfo/email/close' );
+				}});
+		 	WET.byStr( 'FBconnect/ChooseName/moreinfo/email/open' ); 
+		 });
 		UserRegistration.errorMessages = {
 				main: '<?= addslashes(wfMsg('userlogin-form-error')) ?>',
 				username: '<?= addslashes(wfMsg('noname')) ?>',
-				email: '<?= addslashes(wfMsg('userlogin-bad-email')) ?>',
+				email: '<?= addslashes(wfMsg('userlogin-bad-email')) ?>'
 			};
 		
 		UserRegistration.checkEmail = function() {
@@ -287,10 +290,6 @@ class ChooseNameTemplate extends QuickTemplate {
 
 		
 		UserRegistration.checkUsername = function(callback) {
-			if(( typeof UserRegistration.checkUsername.statusAjax != 'undefined' ) && UserRegistration.checkUsername.statusAjax)
-			{
-				return false;
-			}
 			UserRegistration.checkUsername.statusAjax = true;
 			UserRegistration.toggleError('wpFBNameTD', 'progress');
 			$.getJSON(wgScript + '?action=ajax&rs=cxValidateUserName', {uName: $('#wpFBName').val()}, function(json){
@@ -301,8 +300,9 @@ class ChooseNameTemplate extends QuickTemplate {
 					callback(true);
 				} else {
 					UserRegistration.toggleError('wpFBNameTD', 'err');
+					WET.byStr( 'FBconnect/ChooseName/exists' );
 					$("#wpFBNameError").show();
-					callback(false);
+					callback(false, json.msg);
 				}
 			});
 		}
@@ -322,37 +322,37 @@ class ChooseNameTemplate extends QuickTemplate {
 		UserRegistration.submitForm_fb = function() {
 			var errors = [];
 			var errorsHTML = '';
-			
+			WET.byStr( 'FBconnect/ChooseName/Create_account');
 			UserRegistration.checkUsername(
-			function(username_status) {
+			function(username_status, msg) {
 				if( username_status && UserRegistration.checkEmail() ) {
 					$("#fb_userajaxregisterform").submit();
 					return true;
 				} else {
+					$('#userloginErrorBox').show();
+
 					var errors = [];
 					var errorsHTML = '';
-					if ( !username_status )
-						errors.push(UserRegistration.errorMessages['username']);
+					if ( !username_status ) {
+                                            errors.push(msg);
+                                        }
+
 					if ( !UserRegistration.checkEmail() )
 						errors.push(UserRegistration.errorMessages['email']);
-					if (errors.length == 0) {
-						//hide
-						$('#userloginErrorBox').hide();
-					} else if (errors.length == 1) {
+					if (errors.length == 1) {
 						//one
 						errorsHTML = errors[0];
 						$('#userloginInnerErrorBox').html(errorsHTML);
-						$('#userloginErrorBox').show();
+						
 					} else {
 						//more
 						errorsHTML = '<strong>' + UserRegistration.errorMessages['main'] + '</strong><ul>';
 						for (err in errors) errorsHTML += '<li>' + errors[err] + '</li>';
 						errorsHTML += '</ul>';
 						$('#userloginInnerErrorBox').html(errorsHTML);
-						$('#userloginErrorBox').show();
 					}
 				}
-				WET.byStr(UserRegistration.WET_str + '/createaccount/failure');
+				WET.byStr( 'FBconnect/ChooseName/createaccount/failure');
 			}
 			); 
 		}
@@ -365,13 +365,23 @@ class ChooseNameTemplate extends QuickTemplate {
 			$('#fbConnectPushEventBar_show').hide();
 			$('.fbConnectPushEventToggles').show();
 			$('#fbConnectPushEventBar_hide').show();
+			WET.byStr( 'FBconnect/ChooseName/show_prefs' );
 			return false;
 		});
 		$('#fbConnectPushEventBar_hide').click(function(){
 			$('#fbConnectPushEventBar_hide').hide();
 			$('.fbConnectPushEventToggles').hide();
 			$('#fbConnectPushEventBar_show').show();
+			WET.byStr( 'FBconnect/ChooseName/hide_prefs' );
 			return false;
+		});
+		
+		$('#fbGoLogin').click(function(){
+			WET.byStr( 'FBconnect/ChooseName/login_first' );
+		});
+
+		$('#fbconnect-push-allow-never').click(function(){
+			WET.byStr( 'FBconnect/ChooseName/nofeed' );
 		});
 	});
 </script>
