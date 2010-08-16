@@ -248,37 +248,53 @@ STYLE;
 		return true;
 	}
 	
+	
+	private static function showButton( $which ) {
+		global $wgUser, $wgFbShowPersonalUrls, $wgFbHidePersonalUrlsBySkin;
+		// If the button isn't marked to be shown in the first place
+		if (!in_array($which, $wgFbShowPersonalUrls)) {
+			return false;
+		}
+		$skinName = get_class($wgUser->getSkin());
+		// If no blacklist rules exist for the skin
+		if (!array_key_exists($skinName, $wgFbHidePersonalUrlsBySkin)) {
+			return true;
+		}
+		// If the value is a string, it's a simple comparison
+		if (is_string($wgFbHidePersonalUrlsBySkin[$skinName])) {
+			return $wgFbHidePersonalUrlsBySkin[$skinName] != '*' &&
+			       $wgFbHidePersonalUrlsBySkin[$skinName] != $which;
+		} else {
+			return !in_array($which, $wgFbHidePersonalUrlsBySkin[$skinName]) &&
+			       !in_array('*', $wgFbHidePersonalUrlsBySkin[$skinName]);
+		}
+	}
+	
 	/**
 	 * Modify the user's persinal toolbar (in the upper right).
 	 * 
 	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $facebook, $wgUser, $wgLang, $wgShowIPinHeader, $wgBlankImgUrl,
-		       $wgFbPersonalUrls, $wgFbConnectOnly, $wgSkin;
-		$skinName = get_class($wgUser->getSkin());
+		global $wgUser, $wgFbUseRealName, $wgFbConnectOnly, $facebook;
 		
 		wfLoadExtensionMessages('FBConnect');
 		
-		/*
-		 * Personal URLs option: remove_user_talk_link
-		 */
-		if ($wgFbPersonalUrls['remove_user_talk_link'] &&
+		#global $wgShowIPinHeader;
+		// Always false, as 'alt-talk' isn't a valid option currently
+		if (self::showButton( 'alt-talk' ) &&
 				array_key_exists('mytalk', $personal_urls)) {
 			unset($personal_urls['mytalk']);
 		}
 		
 		// If the user is logged in and connected
-		$ids = FBConnectDB::getFacebookIDs($wgUser);
-		if ( $wgUser->isLoggedIn() && $facebook->getSession() && count($ids) > 0 ) {
-			/*
-			 * Personal URLs option: use_real_name_from_fb
-			 */
-			if ( !empty( $wgFbPersonalUrls['use_real_name_from_fb'] ) ) {
+		if ( $wgUser->isLoggedIn() && $facebook->getSession() &&
+				count( FBConnectDB::getFacebookIDs($wgUser) ) > 0 ) {
+			if ( !empty( $wgFbUseRealName ) ) {
 				// Start with the real name in the database
 				$name = $wgUser->getRealName();
-				// Ask Facebook for the real name
 				if (!$name || $name == '') {
+					// Ask Facebook for the real name
 					try {
 						// This might fail if we load a stale session from cookies
 						$fbUser = $facebook->api('/me');
@@ -293,36 +309,27 @@ STYLE;
 				}
 			}
 			
-			// Replace logout link with a button to disconnect from Facebook Connect
-			if( empty( $wgFbPersonalUrls['hide_logout_of_fb'] ) ) {
-				/*
+			if (self::showButton( 'logout' )) {
+				// Replace logout link with a button to disconnect from Facebook Connect
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
 					'text'   => wfMsg( 'fbconnect-logout' ),
 					'href'   => '#',
 					'active' => false,
 				);
-				/**
-				if( $skinName == "SkinMonaco" ) {
-					$personal_urls['fblogout'] = array(
-						'text'   => '&nbsp;',
-						'href'   => $personal_urls['userpage']['href'],
-						'class' => 'fb_button fb_button_small fb_usermenu_button',
-						'active' => false,
-					);
-				}
-				/**/
+				/*
 				$html = Xml::openElement('span', array('id' => 'fbuser' ));
 					$html .= Xml::openElement('a', array('href' => $personal_urls['userpage']['href'], 'class' => 'fb_button fb_button_small fb_usermenu_button' ));
 					$html .= Xml::closeElement( 'a' );
 				$html .= Xml::closeElement( 'span' );
 				$personal_urls['fbuser']['html'] = $html;
+				*/
 			}
 			
 			/*
 			 * Personal URLs option: link_back_to_facebook
 			 */
-			if ($wgFbPersonalUrls['link_back_to_facebook']) {
+			if (self::showButton( 'link' )) {
 				try {
 					$fbUser = $facebook->api('/me');
 					$link = $fbUser['link'];
@@ -339,52 +346,39 @@ STYLE;
 		}
 		// User is logged in but not Connected
 		else if ($wgUser->isLoggedIn()) {
-			/*
-			 * Personal URLs option: hide_convert_button
-			 */
-			if (!$wgFbPersonalUrls['hide_convert_button']) {
-				if( $skinName == "SkinMonaco" ) {
-					$personal_urls['fbconvert'] = array(
-						'text'   => wfMsg( 'fbconnect-convert' ),
-						'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
-						                          'returnto=' . $wgTitle->getPrefixedURL()),
-						'active' => $wgTitle->isSpecial( 'Connect' )
-					);
-				}
+			if (self::showButton( 'convert' )) {
+				$personal_urls['fbconvert'] = array(
+					'text'   => wfMsg( 'fbconnect-convert' ),
+					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
+					                          'returnto=' . $wgTitle->getPrefixedURL()),
+					'active' => $wgTitle->isSpecial( 'Connect' )
+				);
 			}
 		}
 		// User is not logged in
 		else {
-			/*
-			 * Personal URLs option: hide_connect_button
-			 */
-			if (!$wgFbPersonalUrls['hide_connect_button']) {
+			if (self::showButton( 'connect' ) || self::showButton( 'connect-simple' )) {
 				// Add an option to connect via Facebook Connect
-				// RT#57141 - only show the connect link on monaco and answers
-				// Answers skin might actually get caught under SkinMonaco below.  Regardless, all other skins shouldn't get this link.
-				if(( $skinName == "SkinMonaco" ) || ( $skinName == "SkinAnswers" )) {
-					$personal_urls['fbconnect'] = array(
-						'text'   => wfMsg( 'fbconnect-connect' ),
-						'class' => 'fb_button fb_button_small',
-						'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
-						'active' => $wgTitle->isSpecial('Connect'),
-					);
-				}
-				
-				if( $skinName == "SkinMonaco" ) { 					
-					$html = Xml::openElement("span",array("id" => 'fbconnect' ));
-						$html .= Xml::openElement("a",array("href" => '#', 'class' => 'fb_button fb_button_small' ));
-							$html .= Xml::openElement("span",array("class" => "fb_button_text" ));
-								$html .= wfMsg( 'fbconnect-connect-simple' );
-							$html .= Xml::closeElement( "span" );
-						$html .= Xml::closeElement( "a" );
-					$html .= Xml::closeElement( "span" );
-					$personal_urls['fbconnect']['html'] = $html;
-				}
+				$personal_urls['fbconnect'] = array(
+					'text'   => wfMsg( 'fbconnect-connect' ),
+					'class' => 'fb_button fb_button_small',
+					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+					'active' => $wgTitle->isSpecial('Connect'),
+				);
+			}
+			if (self::showButton( 'connect-simple' )) {
+				$html = Xml::openElement('span', array('id' => 'fbconnect' ));
+					$html .= Xml::openElement('a', array('href' => '#', 'class' => 'fb_button fb_button_small' ));
+						$html .= Xml::openElement('span', array('class' => 'fb_button_text' ));
+							$html .= wfMsg( 'fbconnect-connect-simple' );
+						$html .= Xml::closeElement( 'span' );
+					$html .= Xml::closeElement( 'a' );
+				$html .= Xml::closeElement( 'span' );
+				$personal_urls['fbconnect']['html'] = $html;
 			}
 			
-			// Remove other personal toolbar links
 			if ( !empty( $wgFbConnectOnly ) ) {
+				// Remove other personal toolbar links
 				foreach (array('login', 'anonlogin') as $k) {
 					if (array_key_exists($k, $personal_urls)) {
 						unset($personal_urls[$k]);
@@ -467,6 +461,7 @@ STYLE;
 	 */
 	static function SpecialListusersHeaderForm( &$pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook, $wgFbLogo;
+		
 		if ( empty($wgFbUserRightsFromGroup) ) {
 			return true;
 		}

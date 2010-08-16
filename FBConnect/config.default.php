@@ -68,30 +68,35 @@ $wgFbUserRightsFromGroup = false;  # Or a group ID
 
 /**
  * Options regarding the personal toolbar (in the upper right).
- * 
- * == Key ==              == Effect ==
- * hide_connect_button    Hides the "Log in with Facebook Connect" button.
- * hide_convert_button    Hides "Connect this account with Facebook" for non-
- *                        Connected users.
- * hide_logout_of_fb      Hides the "logout of facebook" button and leaves only
- *                        the button to log out of the current MediaWiki.
- * link_back_to_facebook  Shows a handy "Back to facebook.com" link for Connected
- *                        users. This helps enforce the idea that this wiki is
- *                        "in front" of Facebook.
- * remove_user_talk_link  Remove link to user's talk page
- * use_real_name_from_fb  Show the real name for all Connected users
- * 
- * Additionally, use $wgShowIPinHeader to hide the IP and its talk link.
+ */
+$wgFbShowPersonalUrls = array(
+	'connect',        // Show the "Log in with Facebook Connect" button
+#	'connect-simple', // Shorter "Connect" button 
+	'convert',        // Give logged-in users a link to Connect their accounts
+	'logout',         // Log the user out of Facebook when they log out of the wiki
+	'link',           // Show a handy "Back to facebook.com" link. This helps enforce
+                      // the idea that this wiki is "in front" of Facebook
+);
+
+/**
+ * The Personal Urls above can be blacklisted for specific skins. An asterisk
+ * acts to match all FBConnect-related buttons.
+ */
+$wgFbHidePersonalUrlsBySkin = array(
+	'SkinMonaco' => array( 'connect', 'convert', 'logout', 'link' ),
+	'SkinAnswers' => array( 'connect-simple', 'convert', 'logout', 'link' ),
+	'SkinCorporate' => '*',
+);
+
+/**
+ * Shows the real name for all Connected users instead of their wiki user name.
+ */
+$wgFbUseRealName = false;
+
+/**
+ * This MediaWiki variable can also be used to customized the Personal Urls.
  * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
  */
-$wgFbPersonalUrls = array(
-	'hide_connect_button'   => false,
-	'hide_convert_button'   => false,
-	'hide_logout_of_fb'     => false,
-	'link_back_to_facebook' => true,
-	'remove_user_talk_link' => false,
-	'use_real_name_from_fb' => false,
-);
 #$wgShowIPinHeader = false;
 
 /**
