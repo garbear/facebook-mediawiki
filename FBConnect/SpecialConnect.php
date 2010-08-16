@@ -435,33 +435,33 @@ class SpecialConnect extends SpecialPage {
 		$user->addGroup('fb-user');
 		
 		// Store which fields should be auto-updated from Facebook when the user logs in. 
-		$updateFormPrefix = "wpUpdateUserInfo";
+		$updateFormPrefix = 'wpUpdateUserInfo';
 		foreach (self::$availableUserUpdateOptions as $option) {
-			if($wgRequest->getVal($updateFormPrefix.$option, '') != ""){
+			if($wgRequest->getVal($updateFormPrefix . $option, '') != ''){
 				$user->setOption("fbconnect-update-on-login-$option", 1);
 			} else {
 				$user->setOption("fbconnect-update-on-login-$option", 0);
 			}
 		}
 		
-		// Process the FBConnectPushEvent preference checkboxes if fbConnectPushEvents are enabled.
+		// Process the FBConnectPushEvent preference checkboxes if wgFbConnectPushEvents are enabled.
 		global $wgFbEnablePushToFacebook;
-		if($wgFbEnablePushToFacebook){
-			global $fbPushEventClasses;
-			if(!empty($fbPushEventClasses)){
-				foreach($fbPushEventClasses as $pushEventClassName){
+		if( $wgFbEnablePushToFacebook ) {
+			global $wgFbPushEventClasses;
+			if (!empty( $wgFbPushEventClasses )) {
+				foreach( $wgFbPushEventClasses as $pushEventClassName ) {
 					$pushObj = new $pushEventClassName;
 					$className = get_class();
 					$prefName = $pushObj->getUserPreferenceName();
 					
-					$user->setOption($prefName, ($wgRequest->getCheck($prefName)?"1":"0"));
+					$user->setOption($prefName, ($wgRequest->getCheck($prefName) ? '1' : '0'));
 				}
 			}
+			
+			// Save the preference for letting user select to never send anything to their newsfeed
+			$prefName = FBConnectPushEvent::$PREF_TO_DISABLE_ALL;
+			$user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0');
 		}
-		
-		// Save the prefeference for letting user select to never send anything to their newsfeed
-		$prefName = FBConnectPushEvent::$PREF_TO_DISABLE_ALL; 
-		$user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0'); 
  		
 		// Unfortunately, performs a second database lookup
 		$fbUser = new FBConnectUser($user);
@@ -952,14 +952,14 @@ class SpecialConnect extends SpecialPage {
 		$response = new AjaxResponse();
 
 		$specialConnect = new SpecialConnect();
-		$form = new ChooseNameForm($wgRequest,'signup');
+		$form = new ChooseNameForm($wgRequest, 'signup');
 		$form->mainLoginForm( $specialConnect, '' );
 		$tmpl = $form->getAjaxTemplate();
-		$tmpl->set('isajax',true);
+		$tmpl->set('isajax', true);
 		ob_start();
 		$tmpl->execute();
 		$html = ob_get_clean();
-			
+		
 		$response->addText( $html );
 		return $response;	
 	}
