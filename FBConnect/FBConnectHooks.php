@@ -436,7 +436,7 @@ STYLE;
 		global $fbSpecialUsers;
 		
 		// Only modify Facebook Connect users
-		if (!$fbSpecialUsers ||
+		if (empty( $fbSpecialUsers ) ||
 				!count(FBConnectDB::getFacebookIDs(User::newFromName($row->user_name)))) {
 			return true;
 		}
@@ -459,7 +459,7 @@ STYLE;
 	 * Adds some info about the governing Facebook group to the header form of
 	 * Special:ListUsers.
 	 */
-	static function SpecialListusersHeaderForm( &$pager, &$out ) {
+	static function SpecialListusersHeaderForm( $pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook, $wgFbLogo;
 		
 		if ( empty($wgFbUserRightsFromGroup) ) {
