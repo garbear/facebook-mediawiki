@@ -160,7 +160,7 @@ class ChooseNameForm extends LoginForm {
 	function mainLoginForm( &$specialConnect, $msg, $msgtype = 'error' ){
 		global $wgUser, $wgOut, $wgAllowRealName, $wgEnableEmail;
 		global $wgCookiePrefix, $wgLoginLanguageSelector;
-		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration,$wgRequest;
+		global $wgAuth, $wgEmailConfirmToEdit, $wgCookieExpiration, $wgRequest;
 
 		$this->msg = $msg;
 		$this->msgtype = $msgtype;
@@ -210,11 +210,10 @@ class ChooseNameForm extends LoginForm {
 
 
 		// Facebook-specific customizations below.
-		global $fbConnectOnly;
+		global $facebook;
 		// Connect to the Facebook API
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
-		$userinfo = $fb->getUserInfo($fb_user);
+		$fb_user = $facebook->getUser();
+		$userinfo = $facebook->getUserInfo($fb_user);
 		
 		// If no email was set yet, then use the value from facebook (which is quite likely also empty, but probably not always).
 		if(!$this->mEmail){
