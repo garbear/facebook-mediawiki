@@ -28,14 +28,16 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Class FBConnectXFBML
  * 
  * This class allows FBML (Facebook Markup Language, an extension to HTML) to
- * be incorporated into the wiki through XFBML.
+ * be incorporated into the wiki through the use of XFBML.
  * 
- * See: <http://wiki.developers.facebook.com/index.php/XFBML>
+ * For help on including these social plugins in your site, please see
+ * <http://developers.facebook.com/plugins>. Additionally, for further FBML
+ * documentation, please visit <http://developers.facebook.com/docs/reference/fbml>.
  */
 class FBConnectXFBML {
 	/**
 	 * This function is the callback that the ParserFirstCallInit hook assigns
-	 * to the parser whenever a FBML tag is encountered (like <fb:name>).
+	 * to the parser whenever a FBML tag is encountered (such as <fb:like>).
 	 * Function createParserHook($tag) creates an anonymous (lambda-style)
 	 * function that simply redirects to parserHook(), filling in the missing
 	 * $tag argument with the $tag provided to createParserHook.
@@ -121,60 +123,43 @@ class FBConnectXFBML {
 	
 	/**
 	 * Returns the availabe XFBML tags. For help on including these in your
-	 * site, please see: <http://developers.facebook.com/plugins>.
+	 * site, please see <http://developers.facebook.com/plugins>. Additionally,
+	 * you may wish to check out <http://developers.facebook.com/docs/reference/fbml>.
 	 * 
-	 * If Facebook adds a new tag (or you create your own!) then this list can
-	 * be updated with the XFBMLAvailableTags hook.
-	 *
-	 * See also <http://developers.facebook.com/docs/reference/fbml>.
+	 * If Facebook adds a new tag or you create your own, this list can be
+	 * updated with the XFBMLAvailableTags hook.
+	 * 
+	 * This list was constructed from the XFBML documentation at
+	 * <http://developers.facebook.com/docs/reference/javascript/FB.XFBML.parse>
+	 * and from direct perusal of the JS SDK source code at
+	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L255>.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
 			// If XFBML isn't enabled, then don't report any tags
 			return array( );
 		}
-		// http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L237
 		$tags = array('fb:activity',
 		              'fb:add-profile-tab',
 		              'fb:bookmark',
 		              'fb:comments',
-		              'fb:connect-bar',
-		              'fb:fan',
+		              'fb:connect-bar', # Not in docs
+		              'fb:facepile',  # Clone of friendpile, not in docs
+		              'fb:fan', # Not in docs
+		              'fb:friendpile',
 		              'fb:like',
 		              'fb:like-box',
 		              'fb:live-stream',
-		              'fb:login',
+		              'fb:login', # Not in docs
 		              'fb:login-button',
-		              'fb:facepile',
-		              'fb:name',
-		              'fb:profile-pic',
+		              'fb:name', # Not in docs
+		              'fb:profile-pic', # Not in docs
+		              'fb:pronoun', # In docs but not in JS SDK (uh oh...)
 		              'fb:recommendations',
 		              'fb:serverfbml',
-		              'fb:share-button',
-		              'fb:social-bar',
-		              /*
-		               * From the Facebook Developer's Wiki under the old JS library.
-		               * These may still be possible with a <fb:serverFbml> tag.
-		               * <http://wiki.developers.facebook.com/index.php/XFBML>
-		               */
-		              #'fb:connect-form',
-		              #'fb:container',
-		              #'fb:eventlink',
-		              #'fb:grouplink',
-		              #'fb:photo',
-		              #'fb:prompt-permission',
-		              #'fb:pronoun',
-		              #'fb:unconnected-friends-count',
-		              #'fb:user-status'
-		              /*
-		               * In 2008 I found these in the deprecated Facebook Connect
-		               * JavaScript library, connect.js.pkg.php, though no documentation
-		               * was available for them on the Facebook dev wiki.
-		               */
-		              #'fb:add-section-button',
-		              #'fb:share-button',
-		              #'fb:userlink',
-		              #'fb:video',
+		              'fb:share-button', # Not in docs
+		              'fb:social-bar', # Not in docs
+		              'fb:user-status', # In docs but not in JS SDK (uh oh...)
 		);
 		
 		// Reject discarded tags (that return an empty string) from Special:Version

@@ -19,8 +19,8 @@ class FBConnectPushEvent {
 
 	// This must correspond to the name of the message for the text on the tab itself.
 	static private $eventCounter = 0;
-	static protected $PREFERENCES_TAB_NAME = "fbconnect-prefstext";
-	static public $PREF_TO_DISABLE_ALL = "fbconnect-push-allow-never";
+	static protected $PREFERENCES_TAB_NAME = 'fbconnect-prefstext';
+	static public $PREF_TO_DISABLE_ALL = 'fbconnect-push-allow-never';
 
 	/**
 	 * Accessor for the user preference to which (if set to 1) allows this type of event
@@ -50,9 +50,7 @@ class FBConnectPushEvent {
 		self::initAll();
 
 		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
-		// TODO: This initialization should only be run if the user is fb-connected.  Otherwise, the same Connect form as Special:Connect should be shown.
 
-		// TODO: Can we detect if this is Special:Preferences and only add the checkboxes if that is the case?  Can't think of anything else that would break.
 		// TODO: Can we detect if this is Special:Preferences and only add the checkboxes if that is the case?  Can't think of anything else that would break.
         
 		wfProfileOut(__METHOD__);

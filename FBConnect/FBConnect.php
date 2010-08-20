@@ -20,11 +20,9 @@
  * 
  * Features include single sign on (SSO) experience and XFBML.
  * 
- * Info is available at http://www.mediawiki.org/wiki/Extension:FBConnect
- * and at http://wiki.developers.facebook.com/index.php/MediaWiki
- * 
- * Limited support is available at  http://www.mediawiki.org/wiki/Extension_talk:FBConnect
- * and at http://wiki.developers.facebook.com/index.php/Talk:MediaWiki
+ * Info is available at <http://www.mediawiki.org/wiki/Extension:FBConnect>.
+ * Limited support is available at
+ * <http://www.mediawiki.org/wiki/Extension_talk:FBConnect>.
  * 
  * @file
  * @author Garrett Brown, Sean Colombo

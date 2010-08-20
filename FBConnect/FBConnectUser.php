@@ -114,8 +114,8 @@ class FBConnectUser extends User {
 			case 'language':
 				/**
 				 * Convert Facebook's locale into a MediaWiki language code.
-				 * For an up-to-date list of Facebook locales, see:
-				 * <http://wiki.developers.facebook.com/index.php/Facebook_Locales>.
+				 * For an up-to-date list of Facebook locales, see
+				 * <http://www.facebook.com/translations/FacebookLocales.xml>.
 				 * For an up-to-date list of MediaWiki languages, see:
 				 * <http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/languages/Names.php>.
 				 */

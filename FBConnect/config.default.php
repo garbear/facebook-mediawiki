@@ -34,7 +34,9 @@ $wgFbConnectOnly = false;
 
 /**
  * Allow the use of XFBML in wiki text.
- * For more info, see http://wiki.developers.facebook.com/index.php/XFBML.
+ * 
+ * To learn more about Facebook Markup Language, please see
+ * <http://developers.facebook.com/docs/reference/fbml/>.
  */
 $wgFbUseMarkup = true;
 

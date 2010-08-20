@@ -272,15 +272,14 @@ class FBConnectAPI extends Facebook {
 	 * Verify that the user ID matches the hash provided by the GET parameters
 	 * in the account reclaimation link. This algorithm comes from the function
 	 * Facebook::verify_account_reclamation($user, $hash) in the old Facebook
-	 * PHP Client Library (circa February 2010).
+	 * PHP Client Library (replaced by the PHP SDK in 2010).
 	 * 
-	 * See also http://wiki.developers.facebook.com/index.php/Reclaiming_Accounts
+	 * See also <http://wiki.developers.facebook.com/index.php/Reclaiming_Accounts>.
 	 */
 	function verifyAccountReclamation($fb_user_id, $hash) {
-		if ($hash != md5($user . $this->apiSecret)) {
+		if ($hash != md5( $user . $this->apiSecret )) {
 			return false;
 		}
-		
 		return FBConnectDB::getUser($fb_user_id);
 	} 
 }
