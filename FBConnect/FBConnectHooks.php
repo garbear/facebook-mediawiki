@@ -180,8 +180,10 @@ STYLE;
 		$base = dirname( __FILE__ );
 		if ( $wgDBtype == 'mysql' ) {
 			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
+			$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
 		} else if ( $wgDBtype == 'postgres' ) {
 			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.pg.sql");
+			$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.pg.sql");
 		}
 		return true;
 	}
