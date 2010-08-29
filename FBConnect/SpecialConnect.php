@@ -405,7 +405,7 @@ class SpecialConnect extends SpecialPage {
 				$wgMemc->set( $key, 0, 86400 );
 			}
 			if ( $value >= $wgAccountCreationThrottle ) {
-				$wgOut->showErrorPage(wfMsgExt( 'acct_creation_throttle_hit', array( 'parseinline' ), $wgAccountCreationThrottle ) );
+				$wgOut->showErrorPage(wfMsg( 'permissionserrors' ), wfMsgExt( 'acct_creation_throttle_hit', array( 'parseinline' ), $wgAccountCreationThrottle ) );
 				return false;
 			}
 			$wgMemc->incr( $key );
@@ -492,9 +492,8 @@ class SpecialConnect extends SpecialPage {
 		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
 		
-		// TODO: Which MediaWiki versions can we call this function in?
 		$user->addNewUserLogEntryAutoCreate();
-		#$user->addNewUserLogEntry();
+		
 		$this->isNewUser = true;
 		$this->sendPage('displaySuccessLogin');
 		
