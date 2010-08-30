@@ -19,8 +19,9 @@
  * 
  * FBConnect relies on several different libraries and frameworks for its
  * JavaScript code. Each framework has its own method to verify that the proper
- * code won't be called before it's ready. (Below, lambda represents a named or
- * anonymous function.)
+ * code won't be called before it's ready. Be mindful of race conditions; the
+ * methods for each component are listed below (lambda represents a named or
+ * anonymous function).
  * 
  * MediaWiki:                addOnloadHook(lambda);
  *     This function manages an array of window.onLoad event handlers to be
@@ -67,6 +68,36 @@ window.fbAsyncInit = function() {
 			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
 		}
 	});
+	
+	// Events involving Facebook code should only be attached once Facebook and
+	// jQuery have both been loaded
+	$(document).ready(function() {
+		// Add the logout behavior to the "Logout of Facebook" button
+		$('#pt-fblogout').click(function() {
+			// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
+			// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
+			var logout = confirm("You are logging out of both this site and Facebook.");
+			if (logout) {
+				FB.logout(function(response) {
+					window.location = window.fbLogoutURL;
+				});
+			}
+		});
+		
+		// Attach event to the Connect button
+		$("#pt-fbconnect a").click(function(ev) {
+			loginByFBConnect();
+			ev.preventDefault();
+		});
+		
+		// Wikia uses the fbconnect ID for their connect button
+		$("#fbconnect a").click(function(ev) {
+			// Wikia Event Tracker
+			WET.byStr( 'FBconnect/userlinks/connect' );
+			loginByFBConnect();
+			ev.preventDefault();
+		});
+	});
 };
 
 /**
@@ -76,26 +107,9 @@ $(document).ready(function() {
 	// Add a pretty logo to Facebook links
 	$('#pt-fbconnect,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
 	
-	// Add the logout behavior to the "Logout of Facebook" button
-	$('#pt-fblogout').click(function() {
-		// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
-		// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
-		var logout = confirm("You are logging out of both this site and Facebook.");
-		if (logout) {
-			FB.logout(function(response) {
-				window.location = window.fbLogoutURL;
-			});
-		}
-	});
-	
-	//window.fbAsyncInit ();
-	$("#fbconnect a").click(function(ev) {
-		WET.byStr( 'FBconnect/userlinks/connect' );
-		loginByFBConnect();
-		ev.preventDefault();
-	});
-	
-	if ($.getUrlVal( "ref" ) == "fbfeed") {
+	// Wikia click tracking code (hopefully this doesn't get called)
+	// TODO: where is getUrlVal defined?
+	if ($.getUrlVal && $.getUrlVal( "ref" ) == "fbfeed") {
 		var suffix = "";
 		if ( $.getUrlVal( "fbtype" ) != "" ) {
 			suffix = "/" + $.getUrlVal("fbtype");
@@ -121,13 +135,18 @@ function isFbApiInit() {
 function sendToConnectOnLogin() {
 	sendToConnectOnLoginForSpecificForm("");
 }
-// Allows optional specification of a form to force on Special:Connect (such as ChooseName, ConnectExisting, or Convert)
+
+/**
+ * Allows optional specification of a form to force on Special:Connect (such as
+ * ChooseName, ConnectExisting, or Convert)
+ */
 function sendToConnectOnLoginForSpecificForm(formName) {
 	FB.getLoginStatus(function(response) {
 		if(formName != "") {
 	        formName = "/"+formName;
 	    }
-		var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPageQuery;
+		// Code for wgPageQuery was removed from FBConnectHooks.php (TODO: when?)
+		var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + (wgPageQuery ? "&returntoquery=" + wgPageQuery : "");
 		
 		if (formName == "/ConnectExisting") {
 			window.location.href = destUrl;
@@ -153,21 +172,29 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 	return;
 }
 
+/**
+ * Precondition: FB.init() has been called from window.fbAsyncInit.
+ * Don't attach this function to an event if the precondition hasn't been met.
+ */
 function openFbLogin() {
-	if (!isFbApiInit()) {
-		setTimeout(openFbLogin, 300);
-		return true;
-	}
-	FB.login(FB.bind(sendToConnectOnLogin, null), {perms : "publish_stream"});
+	// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
+	fn = FB.bind(sendToConnectOnLogin, null);
+	// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
+	//fn = sendToConnectOnLogin;
+	FB.login(fn, {perms : "publish_stream"});
+}
+
+FB.bind = function(c, b) {
+	return c.apply(b,[c, b].concat(Array.prototype.slice.call(arguments)));
 }
 
 /**
- * Only for user header button
+ * Only for user header button. (What does Wikia mean by this?)
+ * 
+ * Precondition: FB.init() has been called from window.fbAsyncInit.
+ * Don't attach this function to an event if the precondition hasn't been met.
  */
 function loginByFBConnect() {
-	if (!isFbApiInit()) {
-		window.fbAsyncInit();
-	}
 	openFbLogin();
 	return false;
 }
