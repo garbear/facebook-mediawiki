@@ -103,7 +103,7 @@ class FBConnectHooks {
 		}
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
-		if(!empty($wgFbScript)){
+		if (!empty($wgFbScript)) {
 			$out->prependHTML('
 				<div id="fb-root"></div>
 				<script>
@@ -226,19 +226,14 @@ STYLE;
 	 */
 	private static function MGVS_hack( &$script ) {
 		global $wgVersion, $IP;
-		if (version_compare($wgVersion, '1.14', '<')) {
-			$svn = SpecialVersion::getSvnRevision($IP);
-			// if !$svn, then we must be using 1.13.x (as opposed to 1.14alpha+)
-			if (!$svn || $svn < 38397)
-			{
-				$script = "";
-				$vars = array();
-				wfRunHooks('MakeGlobalVariablesScript', array(&$vars));
-				foreach( $vars as $name => $value ) {
-					$script .= "\t\tvar $name = " . json_encode($value) . ";\n";
-	    		}
-	    		return true;
-			}
+		if (version_compare($wgVersion, '1.14.0', '<')) {
+			$script = "";
+			$vars = array();
+			wfRunHooks('MakeGlobalVariablesScript', array(&$vars));
+			foreach( $vars as $name => $value ) {
+				$script .= "\t\tvar $name = " . json_encode($value) . ";\n";
+    		}
+    		return true;
 		}
 		return false;
 	}
