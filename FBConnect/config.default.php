@@ -88,6 +88,7 @@ $wgFbHidePersonalUrlsBySkin = array(
 	'SkinMonaco' => array( 'connect', 'convert', 'logout', 'link' ),
 	'SkinAnswers' => array( 'connect-simple', 'convert', 'logout', 'link' ),
 	'SkinCorporate' => '*',
+	'SkinOasis' => array( 'connect', 'convert', 'logout', 'link' ),
 );
 
 /**

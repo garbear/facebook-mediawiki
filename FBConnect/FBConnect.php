@@ -245,7 +245,7 @@ class FBConnect {
 	}
 	
 	/**
-	 * Fb disconect function and send mail with temp password 
+	 * Fb disconect function and send mail with temp password.
 	 */
 	public static function coreDisconnectFromFB($user = null) {
 		global $wgRequest, $wgUser, $wgAuth;
@@ -280,7 +280,7 @@ class FBConnect {
 		if ($wgUser->getOption('fbFromExist')) {
 			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle-exist', 'fbconnect-passwordremindertext-exist' );
 		} else {
-			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle', 'fbconnect-passwordremindertext' );	
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle', 'fbconnect-passwordremindertext' );
 		}
 		
 		if( WikiError::isError( $res ) ) {

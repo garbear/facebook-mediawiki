@@ -89,10 +89,10 @@ $(document).ready(function() {
 	});
 	
 	//window.fbAsyncInit ();
-	$("#fbconnect a").click(function() {
+	$("#fbconnect a").click(function(ev) {
 		WET.byStr( 'FBconnect/userlinks/connect' );
 		loginByFBConnect();
-		return false;
+		ev.preventDefault();
 	});
 	
 	if ($.getUrlVal( "ref" ) == "fbfeed") {
@@ -124,14 +124,14 @@ function sendToConnectOnLogin() {
 // Allows optional specification of a form to force on Special:Connect (such as ChooseName, ConnectExisting, or Convert)
 function sendToConnectOnLoginForSpecificForm(formName) {
 	FB.getLoginStatus(function(response) {
-		if(formName != ""){
+		if(formName != "") {
 	        formName = "/"+formName;
 	    }
 		var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPageQuery;
 		
 		if (formName == "/ConnectExisting") {
 			window.location.href = destUrl;
-			return 
+			return;
 		}
 		$('#fbConnectModalWrapper').remove();
 		$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb='+wgStyleVersion, function(data) {
@@ -144,13 +144,13 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 							WET.byStr( 'FBconnect/ChooseName/X' );
 						});
 					}
-				});    
+				});
 			} else {
 				window.location.href = destUrl;
-			}	
-		});	
+			}
+		});
 	});
-	return
+	return;
 }
 
 function openFbLogin() {
@@ -191,8 +191,8 @@ function loginAndConnectExistingUser() {
 }
 
 
-/*
- * expend ajax login to use slider login/merge switch 
+/**
+ * Expand ajax login to use slider login/merge switch
  */
 window.wgAjaxLoginOnInit = function() {
 	AjaxLogin.slideToNormalLogin = function(el){
@@ -200,16 +200,18 @@ window.wgAjaxLoginOnInit = function() {
 		var firstSliderCell = $("#AjaxLoginSliderNormal");
 		var slideto = 0;
 		
-		AjaxLogin.beforeDoSuccess = function() { 
+		AjaxLogin.beforeDoSuccess = function() {
 			return true;
 		};
 		$("#AjaxLoginConnectMarketing a.forward").show();
 		$("#AjaxLoginConnectMarketing a.back").hide();
 		firstSliderCell.animate({
 			marginLeft: slideto
-		}, function(){$('#fbLoginAndConnect').hide();});
+		}, function() {
+			$('#fbLoginAndConnect').hide();
+		});
 	};
-	AjaxLogin.slideToLoginAndConnect = function(el){
+	AjaxLogin.slideToLoginAndConnect = function(el) {
 		$().log('AjaxLogin: slideToLoginAndConnect()');
 		$('#fbLoginAndConnect').show();
 		var firstSliderCell = $("#AjaxLoginSliderNormal");
@@ -217,7 +219,7 @@ window.wgAjaxLoginOnInit = function() {
 		$("#AjaxLoginConnectMarketing a.forward").hide();
 		$("#AjaxLoginConnectMarketing a.back").show();
 
-		AjaxLogin.beforeDoSuccess = function() {			
+		AjaxLogin.beforeDoSuccess = function() {
 			FB.getLoginStatus(function(response) {
 				if (response.session) {
 					// already logged-in/connected via facebook
@@ -264,19 +266,19 @@ window.wgAjaxLoginOnInit = function() {
 	$("#AjaxLoginConnectMarketing a").click(AjaxLogin.slider);
 	
 	$('#fbAjaxLoginConnect').click(function() {
-		WET.byStr( 'FBconnect/login_dialog/connect' );	
+		WET.byStr( 'FBconnect/login_dialog/connect' );
 	});
 	
 	$("#AjaxLoginConnectMarketing .forward").click(function() {
-		WET.byStr( 'FBconnect/login_dialog/slider/forward' );	
+		WET.byStr( 'FBconnect/login_dialog/slider/forward' );
 	});
 	
 	$("#AjaxLoginConnectMarketing .back").click(function() {
-		WET.byStr( 'FBconnect/login_dialog/slider/back' );	
+		WET.byStr( 'FBconnect/login_dialog/slider/back' );
 	});
 	
 	$("#wpLoginAndConnectCombo").click(function() {
-		WET.byStr( 'FBconnect/login_dialog/login_and_connect' );	
+		WET.byStr( 'FBconnect/login_dialog/login_and_connect' );
 	});
 	
 	$().log('Fbconnect: AjaxLogin expend');
@@ -287,7 +289,8 @@ window.wgAjaxLoginOnInit = function() {
  * Called after the AJAX has logged the user in on a request to login and connect.
  * Now that they are logged in, we will prompt them to FBConnect, then drop them on
  * the Special:Connect page to finish the process.
- *
+ */
+/*
 function loggedInNowNeedToConnect() {
 	FB.getLoginStatus(function(response) {
 		if (response.session) {
@@ -320,6 +323,7 @@ function loggedInNowNeedToConnect() {
 		}
 	});
 }
+/**/
 
 /**
  * When the page is loaded, always init the FB code if it has not been initialized.  This
@@ -334,7 +338,7 @@ function initFbWhenReady(){
 		// The fbsdk code hasn't been loaded yet. Give it more time.
 		setTimeout("initFbWhenReady()", 500);
 	} else if (!isFbApiInit()) {
-		// The fbsdk has loaded but didn't initialize. Force it to init. 
+		// The fbsdk has loaded but didn't initialize. Force it to init.
 		window.fbAsyncInit();
 	}
 }
