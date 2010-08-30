@@ -129,7 +129,8 @@ class FBConnectHooks {
 STYLE;
 		
 		// If this is Oasis, then we're not using StaticChute at the moment, so add our fbconnect.js.
-		if (Wikia::isOasis()) {
+		// See also: <http://wikia-code.com/browser/wikia/trunk/includes/wikia/Wikia.php>
+		if (class_exists('Wikia') && Wikia::isOasis()) {
 			global $wgScriptPath;
 			$fbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // only recommended if you are changing this extension.
 		}
@@ -371,6 +372,7 @@ STYLE;
 					'active' => $wgTitle->isSpecial('Connect'),
 				);
 			}
+			
 			if (self::showButton( 'connect-simple' )) {
 				$html = Xml::openElement('span', array('id' => 'fbconnect' ));
 					$html .= Xml::openElement('a', array('href' => '#', 'class' => 'fb_button fb_button_small' ));
