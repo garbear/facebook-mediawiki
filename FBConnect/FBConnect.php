@@ -45,7 +45,7 @@ $wgEnablePreferencesExt = true;
 /*
  * FBConnect version.
  */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.1.2, August 14, 2010' );
+define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.2.0, August 30, 2010' );
 define( 'FBCONNECT_LOCALE', '%LOCALE%'); // magic-string to use in substitution (must be defined prior to including config.php).
 
 /*

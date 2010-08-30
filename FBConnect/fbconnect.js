@@ -42,6 +42,17 @@
  */
 
 /**
+ * Simple jQuery plugin: postJSON
+ */
+function() {
+	if (!jQuery.postJSON) {
+		jQuery.postJSON = function(url, data, callback) {
+			return jQuery.post(url, data, callback, "json");
+		}
+	}
+}();
+
+/**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
  * it looks for the global fbAsyncInit and executes the function when found.
  */
@@ -141,33 +152,50 @@ function sendToConnectOnLogin() {
  * ChooseName, ConnectExisting, or Convert)
  */
 function sendToConnectOnLoginForSpecificForm(formName) {
-	FB.getLoginStatus(function(response) {
-		if(formName != "") {
-	        formName = "/"+formName;
-	    }
-		// Code for wgPageQuery was removed from FBConnectHooks.php (TODO: when?)
-		var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + (wgPageQuery ? "&returntoquery=" + wgPageQuery : "");
-		
-		if (formName == "/ConnectExisting") {
-			window.location.href = destUrl;
-			return;
-		}
-		$('#fbConnectModalWrapper').remove();
-		$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb='+wgStyleVersion, function(data) {
-			if(data.status == "ok") {
-				$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + '&returntoquery=' + wgPageQuery,  "#fbConnectModal", {
-			        id: "fbConnectModalWrapper",
-			        width: "600px",
-			        callback: function() {
-						$('#fbConnectModalWrapper .close').click(function(){
-							WET.byStr( 'FBconnect/ChooseName/X' );
-						});
-					}
-				});
-			} else {
+	// I don't think we need to wrap this in FB.getLoginStatus(function(response) {...});
+	
+	// Format the form name
+	if(formName != "") {
+        formName = "/"+formName;
+    }
+	// If the AJAX methods fail, accomplish the same thing with a GET request
+	// by sending the user to destUrl (TODO: when was the code for wgPageQuery
+	// removed from FBConnectHooks.php?)
+	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + (wgPageQuery ? "&returntoquery=" + wgPageQuery : "");
+	
+	// No AJAX form for ConnectExisting, redirect the user now
+	if (formName == "/ConnectExisting") {
+		window.location.href = destUrl;
+		return;
+	}
+	
+	// At this point, formName is empty as no other forms are currently available
+	
+	// If a Wikia modal box is being displayed, nuke it
+	$('#fbConnectModalWrapper').remove();
+	
+	// Attempt the AJAX request
+	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb='+wgStyleVersion, function(data) {
+		// If all the checks in SpecialConnect::checkCreateAccount pass, continue
+		if(data.status == "ok") {
+			// jQuery.fn.getModal isn't defined (see jquery.wikia.js)
+			if (!jQuery.fn.getModal) {
+				alert("jQuery.fn.getModal isn't defined. Click OK to continue normally.");
 				window.location.href = destUrl;
+				return;
 			}
-		});
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + '&returntoquery=' + wgPageQuery,  "#fbConnectModal", {
+		        id: "fbConnectModalWrapper",
+		        width: "600px",
+		        callback: function() {
+					$('#fbConnectModalWrapper .close').click(function() {
+						WET.byStr( 'FBconnect/ChooseName/X' );
+					});
+				}
+			});
+		} else {
+			window.location.href = destUrl;
+		}
 	});
 	return;
 }
@@ -182,10 +210,6 @@ function openFbLogin() {
 	// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
 	//fn = sendToConnectOnLogin;
 	FB.login(fn, {perms : "publish_stream"});
-}
-
-FB.bind = function(c, b) {
-	return c.apply(b,[c, b].concat(Array.prototype.slice.call(arguments)));
 }
 
 /**
@@ -222,7 +246,7 @@ function loginAndConnectExistingUser() {
  * Expand ajax login to use slider login/merge switch
  */
 window.wgAjaxLoginOnInit = function() {
-	AjaxLogin.slideToNormalLogin = function(el){
+	AjaxLogin.slideToNormalLogin = function(el) {
 		$().log('AjaxLogin: slideToNormalLogin()');
 		var firstSliderCell = $("#AjaxLoginSliderNormal");
 		var slideto = 0;
@@ -309,7 +333,7 @@ window.wgAjaxLoginOnInit = function() {
 	});
 	
 	$().log('Fbconnect: AjaxLogin expend');
-}
+};
 
 
 /**

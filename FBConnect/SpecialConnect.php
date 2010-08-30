@@ -900,46 +900,49 @@ class SpecialConnect extends SpecialPage {
 		return true;
 	}
 	
+	/**
+	 * Check to see if the user can create a Facebook-linked account.
+	 */
 	function checkCreateAccount() {
 		global $wgUser, $facebook;
-		
+		// Response object to send return to the client
 		$response = new AjaxResponse();
-		
-		$fb_user = $facebook->getUser();
-		
+		// If a check doesn't pass, "error" is returned
 		$error =  json_encode(array("status" => "error") );
+		
+		// Required: User is logged into Facebook
+		$fb_user = $facebook->getUser();
 		if (empty($fb_user)) {
 			$response->addText($error);
 			return $response;
 		}
-		
+		// Required: User is logged into the wiki
 		if( ((int) $wgUser->getId()) != 0) {
 			$response->addText($error);
 			return $response;
 		}
-		
+		// Required: This Facebook account hasn't been connected to a different user
 		if( FBConnectDB::getUser($fb_user) != null) {
 			$response->addText($error);
 			return $response;
 		}
-		
-		$titleObj = SpecialPage::getTitleFor( 'Connect' );
-		
+		// Required: Wiki isn't in read-only mode
 		if ( wfReadOnly() ) {
 			$response->addText($error);
 			return $response;
 		}
-		
+		// Required: Logged-in user has permission to create an account
 		if ( $wgUser->isBlockedFromCreateAccount() ) {
 			$response->addText($error);
 			return $response;
 		}
-		
+		// Required: No account-creation permission errors when checked against Special:Connect
+		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) ) > 0 ) {
 			$response->addText($error);
 			return $response;
 		}
-		
+		// Success!
 		$response->addText( json_encode(array("status" => "ok") ));
 		return $response;
 	}
