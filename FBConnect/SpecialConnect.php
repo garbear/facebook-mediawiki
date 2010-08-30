@@ -907,43 +907,60 @@ class SpecialConnect extends SpecialPage {
 		global $wgUser, $facebook;
 		// Response object to send return to the client
 		$response = new AjaxResponse();
-		// If a check doesn't pass, "error" is returned
-		$error =  json_encode(array("status" => "error") );
 		
-		// Required: User is logged into Facebook
 		$fb_user = $facebook->getUser();
 		if (empty($fb_user)) {
-			$response->addText($error);
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 1,
+				'message' => 'User is not logged into Facebook',
+			)));
 			return $response;
 		}
-		// Required: User is logged into the wiki
-		if( ((int) $wgUser->getId()) != 0) {
-			$response->addText($error);
+		if(( (int)$wgUser->getId() ) != 0) {
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 2,
+				'message' => 'User is already logged into the wiki',
+			)));
 			return $response;
 		}
-		// Required: This Facebook account hasn't been connected to a different user
 		if( FBConnectDB::getUser($fb_user) != null) {
-			$response->addText($error);
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 3,
+				'message' => 'This Facebook account is connected to a different user',
+			)));
 			return $response;
 		}
-		// Required: Wiki isn't in read-only mode
 		if ( wfReadOnly() ) {
-			$response->addText($error);
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 4,
+				'message' => 'The wiki is in read-only mode',
+			)));
 			return $response;
 		}
-		// Required: Logged-in user has permission to create an account
 		if ( $wgUser->isBlockedFromCreateAccount() ) {
-			$response->addText($error);
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 5,
+				'message' => 'User does not have permission to create an account on this wiki',
+			)));
 			return $response;
 		}
-		// Required: No account-creation permission errors when checked against Special:Connect
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) ) > 0 ) {
-			$response->addText($error);
+			$response->addText(json_encode(array(
+				'status' => 'error',
+				'code' => 6,
+				'message' => 'User does not have permission to create an account on this wiki',
+			)));
 			return $response;
 		}
+		
 		// Success!
-		$response->addText( json_encode(array("status" => "ok") ));
+		$response->addText(json_encode(array('status' => 'ok')));
 		return $response;
 	}
 	

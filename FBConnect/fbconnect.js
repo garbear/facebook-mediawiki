@@ -44,13 +44,13 @@
 /**
  * Simple jQuery plugin: postJSON
  */
-function() {
+(function() {
 	if (!jQuery.postJSON) {
 		jQuery.postJSON = function(url, data, callback) {
 			return jQuery.post(url, data, callback, "json");
 		}
 	}
-}();
+})();
 
 /**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
@@ -60,6 +60,7 @@ window.fbAsyncInit = function() {
 	// Initialize the library with the API key
 	FB.init({
 		appId : window.fbAppId, // See $wgFbAppId in config.php
+		// TODO: Load the session from cookies, not the fbSession variable
 		session: window.fbSession, // Don't re-fetch the session if PHP provides it
 		status : true, // Check login status
 		cookie : true, // Enable cookies to allow the server to access the session
@@ -159,12 +160,12 @@ function sendToConnectOnLoginForSpecificForm(formName) {
         formName = "/"+formName;
     }
 	// If the AJAX methods fail, accomplish the same thing with a GET request
-	// by sending the user to destUrl (TODO: when was the code for wgPageQuery
-	// removed from FBConnectHooks.php?)
-	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + (wgPageQuery ? "&returntoquery=" + wgPageQuery : "");
+	// by sending the user to destUrl
+	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPageQuery;
 	
 	// No AJAX form for ConnectExisting, redirect the user now
 	if (formName == "/ConnectExisting") {
+		// alert("Redirecting to " + destUrl);
 		window.location.href = destUrl;
 		return;
 	}
@@ -180,11 +181,12 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 		if(data.status == "ok") {
 			// jQuery.fn.getModal isn't defined (see jquery.wikia.js)
 			if (!jQuery.fn.getModal) {
-				alert("jQuery.fn.getModal isn't defined. Click OK to continue normally.");
+				// alert("jQuery.fn.getModal isn't defined. Click OK to continue normally.");
+				// alert("Redirecting to " + destUrl);
 				window.location.href = destUrl;
 				return;
 			}
-			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + '&returntoquery=' + wgPageQuery,  "#fbConnectModal", {
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + "&returntoquery=" + wgPageQuery,  "#fbConnectModal", {
 		        id: "fbConnectModalWrapper",
 		        width: "600px",
 		        callback: function() {
@@ -194,6 +196,7 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 				}
 			});
 		} else {
+			// alert("Redirecting to " + destUrl);
 			window.location.href = destUrl;
 		}
 	});

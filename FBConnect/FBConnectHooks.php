@@ -212,8 +212,19 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgFbAppId, $facebook, $wgFbUseMarkup, $wgFbLogo, $wgTitle, $wgRequest;
+		global $wgFbAppId, $facebook, $wgFbUseMarkup, $wgFbLogo, $wgTitle, $wgRequest, $wgStyleVersion;
+		if (!isset($vars['wgPageQuery'])) {
+			$query = $wgRequest->getValues();
+			if (isset($query['title'])) {
+				unset($query['title']);
+			}
+			$vars['wgPageQuery'] = wfUrlencode( wfArrayToCGI( $query ) );
+		}
+		if (!isset($vars['wgStyleVersion'])) {
+			$vars['wgStyleVersion'] = $wgStyleVersion;
+		}
 		$vars['fbAppId']     = $wgFbAppId;
+		// TODO: For debugging purposes -- remove in production
 		$vars['fbSession']   = $facebook->getSession();
 		$vars['fbUseMarkup'] = $wgFbUseMarkup;
 		$vars['fbLogo']      = $wgFbLogo ? true : false;
