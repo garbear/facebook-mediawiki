@@ -87,16 +87,16 @@ class FBConnectHooks {
 		
 		// If the user's language is different from the default language, use the correctly localized facebook code.
 		// NOTE: Can't use wgLanguageCode here because the same FBConnect config can run for many wgLanguageCode's on one site (such as Wikia).
-		if($wgFbScriptEnableLocales){
+		if ($wgFbScriptEnableLocales) {
 			global $wgFbScriptLangCode, $wgLang;
 			wfProfileIn(__METHOD__ . "::fb-locale-by-mediawiki-lang");
-			if($wgLang->getCode() !== $wgFbScriptLangCode){
+			if ($wgLang->getCode() !== $wgFbScriptLangCode) {
 				// Attempt to find a matching facebook locale.
 				$defaultLocale = FBConnectLanguage::getFbLocaleForLangCode($wgFbScriptLangCode);
 				$locale = FBConnectLanguage::getFbLocaleForLangCode($wgLang->getCode());
 				if($defaultLocale != $locale){
 					global $wgFbScriptByLocale;
-					$fbScript = str_replace(FBCONNECT_LOCALE, $locale, $wgFbScriptByLocale);
+					$wgFbScript = str_replace(FBCONNECT_LOCALE, $locale, $wgFbScriptByLocale);
 				}
 			}
 			wfProfileOut(__METHOD__ . "::fb-locale-by-mediawiki-lang");
