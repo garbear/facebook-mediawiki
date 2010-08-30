@@ -143,8 +143,9 @@ STYLE;
 			
 			// Don't include jQuery if it's already in use on the site
 			#$out->includeJQuery();
-			// Temporary workaround until until MW is bundled with jQuery 1.4.2:
-			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
+			// Temporary workaround until until MW is bundled with jQuery 1.4.2
+			// (1.4 tells Google to load the most recent 1.4 vision)
+			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js');
 			
 			// Add the script file specified by $url
 			if(!empty($wgFbExtensionScript)){
@@ -158,7 +159,8 @@ STYLE;
 			
 			// Don't include jQuery if it's already in use on the site
 			if (!empty($wgFbIncludeJquery)){
-				$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js");
+				// 1.4 loads the most recent 1.4 revision (currently 1.4.2)
+				$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js");
 			}
 			
 			// Add the script file specified by $url
