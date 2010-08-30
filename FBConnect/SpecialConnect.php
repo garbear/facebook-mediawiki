@@ -842,7 +842,7 @@ class SpecialConnect extends SpecialPage {
 	 * Displays the main connect form.
 	 */
 	private function connectForm() {
-		global $facebook, $wgOut, $wgUser, $wgSitename;
+		global $wgOut, $wgUser, $wgSitename;
 		
 		$titleObj = Title::newFromText( $this->mReturnTo );
 		if ($titleObj) {
@@ -901,55 +901,54 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	function checkCreateAccount() {
-		global $wgUser;
+		global $wgUser, $facebook;
 		
 		$response = new AjaxResponse();
 		
-		$fb = new FBConnectAPI();
-		$fb_user = $fb->user();
+		$fb_user = $facebook->getUser();
 		
 		$error =  json_encode(array("status" => "error") );
 		if (empty($fb_user)) {
 			$response->addText($error);
-			return $response;	
+			return $response;
 		}
-
-		if( ((int) $wgUser->getId()) != 0){
+		
+		if( ((int) $wgUser->getId()) != 0) {
 			$response->addText($error);
-			return $response;			
-		} 
+			return $response;
+		}
 		
 		if( FBConnectDB::getUser($fb_user) != null) {
 			$response->addText($error);
-			return $response;			
+			return $response;
 		}
 		
-		$titleObj = SpecialPage::getTitleFor( 'Connect' );		
+		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		
 		if ( wfReadOnly() ) {
 			$response->addText($error);
-			return $response;	
+			return $response;
 		}
 		
 		if ( $wgUser->isBlockedFromCreateAccount() ) {
 			$response->addText($error);
-			return $response;	
+			return $response;
 		}
 		
-		if ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+		if ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) ) > 0 ) {
 			$response->addText($error);
-			return $response;	
+			return $response;
 		}
 		
 		$response->addText( json_encode(array("status" => "ok") ));
-		return $response;	
+		return $response;
 	}
 	
 	function ajaxModalChooseName() {
 		global $wgRequest;
 		wfLoadExtensionMessages('FBConnect');
 		$response = new AjaxResponse();
-
+		
 		$specialConnect = new SpecialConnect();
 		$form = new ChooseNameForm($wgRequest, 'signup');
 		$form->mainLoginForm( $specialConnect, '' );
@@ -960,6 +959,6 @@ class SpecialConnect extends SpecialPage {
 		$html = ob_get_clean();
 		
 		$response->addText( $html );
-		return $response;	
+		return $response;
 	}
 }
