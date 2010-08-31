@@ -51,6 +51,7 @@ class FBConnectUser extends User {
 		
 		// Keep track of whether any settings were modified
 		$mod = false;
+
 		// Connect to the Facebook API and retrieve the user's info 
 		$userinfo = $facebook->getUserInfo();
 		// Update the following options if the user's settings allow it
@@ -107,7 +108,7 @@ class FBConnectUser extends User {
 				break;
 			case 'gender':
 				// Unfortunately, Facebook genders are localized (but this might change)
-				if ($value != 'male' || $value != 'female') {
+				if ($value != 'male' && $value != 'female') {
 					$value = '';
 				}
 				break;
@@ -146,11 +147,11 @@ class FBConnectUser extends User {
 				$value = '';
 				break;
 			case 'email':
+				// For information on emails, see <http://www.facebook.com/help/?page=1028>
 				// If a contact email isn't available, then use a proxied email
 				if ($value == '') {
-					// TODO: update the user's email from $userinfo['proxied_email']
-					// instead (the address must stay hidden from the user)
-					$value = '';
+					// Keep in mind, this address must stay hidden from the user
+					$value = $userinfo['proxied_email'];
 				}
 				// TODO: if the user's email is updated from Facebook, then
 				// automatically authenticate the email address

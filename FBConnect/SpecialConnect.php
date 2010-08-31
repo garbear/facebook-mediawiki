@@ -27,7 +27,7 @@ class SpecialConnect extends SpecialPage {
 	private $userNamePrefix;
 	private $isNewUser = false;
 	static private $fbOnLoginJs;
-	static private $availableUserUpdateOptions = array('fullname', 'nickname', 'email', 'language', 'timecorrection');
+	static private $availableUserUpdateOptions = array('fullname', 'gender', 'nickname', 'email', 'language', 'timecorrection');
 	
 	/**
 	 * Constructor.
@@ -47,14 +47,14 @@ class SpecialConnect extends SpecialPage {
 	 * Allows the prefix to be changed at runtime.  This is useful, for example,
 	 * to generate a username based off of a facebook name.
 	 */
-	public function setUserNamePrefix( $prefix ){
+	public function setUserNamePrefix( $prefix ) {
 		$this->userNamePrefix = $prefix;
 	}
 	
 	/**
 	 * Returns the list of user options that can be updated by facebook on each login.
 	 */
-	public function getAvailableUserUpdateOptions(){
+	public function getAvailableUserUpdateOptions() {
 		return self::$availableUserUpdateOptions;
 	}
 	
@@ -108,7 +108,7 @@ class SpecialConnect extends SpecialPage {
 		
 		// Look at the subpage name to discover where we are in the login process
 		wfDebug("FBConnect: Executing Special:Connect with the parameter of \"$par\".\n");
-		wfDebug("FBConnect: User is".($wgUser->isLoggedIn()?"":" NOT")." logged in.\n");
+		wfDebug('FBConnect: User is' . ($wgUser->isLoggedIn() ? '' : ' NOT') . " logged in.\n");
 		
 		/*
 		 * If the user is logged in to Wikia on an unconnected account, and
@@ -736,12 +736,18 @@ class SpecialConnect extends SpecialPage {
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
 		// Permissions restrictions.
 		global $wgUser, $facebook, $wgOut, $wgFbConnectOnly;
+		// $wgFbConnectOnly default to false
+		if (!isset($wgFbConnectOnly)) {
+			$wgFbConnectOnly = false;
+		}
+		
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			// The wiki is in read-only mode
 			$wgOut->readOnlyPage();
 			return false;
-		} elseif ( !isset($wgFbConnectOnly) || !$wgFbConnectOnly ) {
+		}
+		if ( !$wgFbConnectOnly ) {
 			// These two permissions don't apply in $wgFbConnectOnly mode
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
@@ -752,8 +758,7 @@ class SpecialConnect extends SpecialPage {
 				return false;
 			}
 		}
-			
-
+		
 		// Allow other code to have a custom form here (so that this extension can be integrated with existing custom login screens).
 		if( !wfRunHooks( 'SpecialConnect::chooseNameForm', array( &$this, &$messagekey ) ) ){
 			return false;
@@ -761,10 +766,10 @@ class SpecialConnect extends SpecialPage {
 		
 		// Connect to the Facebook API
 		$userinfo = $facebook->getUserInfo();
-
+		
 		// Keep track of when the first option visible to the user is checked
 		$checked = false;
-
+		
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
@@ -790,9 +795,15 @@ class SpecialConnect extends SpecialPage {
 				if (!$value) {
 					continue;
 				}
+				// Important: do not reveal an email ending in "@proxymail.facebook.com"
+				if ($option == 'email' && strrpos($value, '@proxymail.facebook.com') ===
+						strlen($value) - strlen('@proxymail.facebook.com')) {
+					$value = 'xxx@proxymail.facebook.com';
+				}
+				
 				// Build the list item for the update option
 				$updateOptions[] = "<li><input name=\"wpUpdateUserInfo$option\" type=\"checkbox\" " .
-					"value=\"1\" id=\"wpUpdateUserInfo$option\" /><label for=\"wpUpdateUserInfo$option\">" .
+					"value=\"1\" id=\"wpUpdateUserInfo$option\" checked=\"checked\" /><label for=\"wpUpdateUserInfo$option\">" .
 					wfMsgHtml("fbconnect-$option") . wfMsgExt('colon-separator', array('escapenoentities')) .
 					" <i>$value</i></label></li>";
 			}
@@ -860,7 +871,7 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/** 
-	 * Disconnect from Facebook
+	 * Disconnect from Facebook.
 	 */ 
 	private function disconnectReclamationAction() {
 		global $wgRequest, $wgOut, $wgUser, $facebook;
