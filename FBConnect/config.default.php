@@ -74,7 +74,7 @@ $wgFbUserRightsFromGroup = false;  # Or a group ID
 $wgFbShowPersonalUrls = array(
 	'connect',        // Show the "Log in with Facebook Connect" button
 #	'connect-simple', // Shorter "Connect" button 
-	'convert',        // Give logged-in users a link to Connect their accounts
+#	'convert',        // Give logged-in users a link to Connect their accounts (not available)
 	'logout',         // Log the user out of Facebook when they log out of the wiki
 	'link',           // Show a handy "Back to facebook.com" link. This helps enforce
                       // the idea that this wiki is "in front" of Facebook
