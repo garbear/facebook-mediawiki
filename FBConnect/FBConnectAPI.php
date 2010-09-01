@@ -36,7 +36,7 @@ class FBConnectAPI extends Facebook {
 		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
 		// Check to make sure config.sample.php was renamed properly
 		if ( !$this->isConfigSetup() ) {
-			exit( 'Please update $wgFbAppId and $wgFbSecret in config.php' );
+			exit( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
 		}
 		$config = array(
 			'appId' => $wgFbAppId,
