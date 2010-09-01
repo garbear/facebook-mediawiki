@@ -285,6 +285,7 @@ class SpecialConnect extends SpecialPage {
 				wfSetupSession();
 			}
 			
+			// Log the user in and store the new user as the global user object
 			$user->setCookies();
 			$wgUser = $user;
 			
@@ -483,9 +484,8 @@ class SpecialConnect extends SpecialPage {
 			wfSetupSession();
 		}
 		
-		// Log the user in
+		// Log the user in and store the new user as the global user object
 		$user->setCookies();
-		// Store the new user as the global user object
 		$wgUser = $user;
 		
 		/*
@@ -588,15 +588,13 @@ class SpecialConnect extends SpecialPage {
 		}
 		$user->updateFromFacebook();
 		
-		/*
 		// Setup the session
 		global $wgSessionStarted;
 		if (!$wgSessionStarted) {
 			wfSetupSession();
 		}
-		/**/
 		
-		// Store the user in the global user object
+		// Log the user in and store the new user as the global user object
 		$user->setCookies();
 		$wgUser = $user;
 		
@@ -607,19 +605,9 @@ class SpecialConnect extends SpecialPage {
 		$sessionUser = User::newFromSession();
 		$sessionUser->load();
 		
-		$this->sendPage('displaySuccessLogin');
-		
-		
-		
-		
-		
-		
-		
-		
+		// User has been successfully attached and logged in
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
-		
 		$this->sendPage('displaySuccessAttaching');
-		
 		wfProfileOut(__METHOD__);
 		return true;
 	}
