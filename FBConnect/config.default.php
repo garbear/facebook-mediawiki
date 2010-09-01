@@ -177,6 +177,8 @@ $wgFbIncludeJquery = true;
  * This section allows controlling of whether push events are enabled, and which
  * of the push events to use.
  */
+
+// NOTE: THIS FEATURE IS NOT COMPLETELY IMPLEMENTED. TEST AT YOUR OWN RISK.
 $wgFbEnablePushToFacebook = false;
 if(!empty($wgFbEnablePushToFacebook)){
 	$wgFbPushDir = dirname(__FILE__) . '/pushEvents/';
