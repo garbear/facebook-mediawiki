@@ -70,9 +70,7 @@ class FBConnectXFBML {
 				// Don't recursively parse $innertext
 				return "<fb:serverfbml{$attrs}>$innertext</fb:serverfbml>";
 			case 'fb:profile-pic':
-			#case 'fb:photo': // Dropped in new JavaScript SDK
-			#case 'fb:video': // Dropped in new JavaScript SDK
-				if (!$wgFbAllowFacebookImages) {
+				if (empty($wgFbAllowFacebookImages)) {
 					break;
 				}
 				// Careful - no "break;" if $wgFbAllowFacebookImages is true
