@@ -30,6 +30,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Extends the User class.
  */
 class FBConnectUser extends User {
+	
+	static public $availableUserUpdateOptions = array('fullname', 'gender', 'nickname', 'email', 'language', 'timecorrection');
+	
 	/**
 	 * Constructor: Create this object from an existing User. Bonus points if
 	 * the existing User was created form an ID and has not yet been loaded! 
@@ -51,19 +54,24 @@ class FBConnectUser extends User {
 		
 		// Keep track of whether any settings were modified
 		$mod = false;
-
+		
 		// Connect to the Facebook API and retrieve the user's info 
 		$userinfo = $facebook->getUserInfo();
 		// Update the following options if the user's settings allow it
-		$updateOptions = array('nickname', 'fullname', 'language',
-		                       'timecorrection', 'email');
-		foreach ($updateOptions as $option) {
+		foreach (self::$availableUserUpdateOptions as $option) {
 			// Translate Facebook parameters into MediaWiki parameters
-			$value = self::getOptionFromInfo($option, $userinfo); 
-			if ($value && ($this->getOption("fbconnect-update-on-login-$option", "0") == "1")) {
+			$value = self::getOptionFromInfo($option, $userinfo);
+			if ($value && ($this->getOption("fbconnect-update-on-login-$option", '0') == '1')) {
 				switch ($option) {
 					case 'fullname':
 						$this->setRealName($value);
+						break;
+					case 'email':
+						if (is_null($this->mEmailAuthenticated) || $value != $this->getEmail()) {
+							$this->setEmail($value);
+							// Auto-authenticate email address if it was changed
+							$this->mEmailAuthenticated = wfTimestampNow();
+						}
 						break;
 					default:
 						$this->setOption($option, $value);
@@ -102,7 +110,7 @@ class FBConnectUser extends User {
 			case 'firstname':
 				// If real names aren't allowed, then simply ignore the parameter from Facebook
 				global $wgAllowRealName;
-				if (!$wgAllowRealName) {
+				if ( empty($wgAllowRealName) ) {
 					$value = '';
 				}
 				break;

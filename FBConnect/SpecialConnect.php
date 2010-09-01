@@ -27,7 +27,6 @@ class SpecialConnect extends SpecialPage {
 	private $userNamePrefix;
 	private $isNewUser = false;
 	static private $fbOnLoginJs;
-	static private $availableUserUpdateOptions = array('fullname', 'gender', 'nickname', 'email', 'language', 'timecorrection');
 	
 	/**
 	 * Constructor.
@@ -55,7 +54,7 @@ class SpecialConnect extends SpecialPage {
 	 * Returns the list of user options that can be updated by facebook on each login.
 	 */
 	public function getAvailableUserUpdateOptions() {
-		return self::$availableUserUpdateOptions;
+		return FBConnectUser::$availableUserUpdateOptions;
 	}
 	
 	/**
@@ -89,7 +88,7 @@ class SpecialConnect extends SpecialPage {
 		$this->mReturnToQuery = urlencode($this->mReturnToQuery);
 		
 		$title = Title::newFromText($this->mReturnTo);
-		if (!empty( $title )) {
+		if ($title instanceof Title) {
 			$this->mResolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
 			if (in_array( $this->mResolvedReturnTo, array('userlogout', 'signup', 'connect') )) {
 				$titleObj = Title::newMainPage();
@@ -132,8 +131,15 @@ class SpecialConnect extends SpecialPage {
 			else switch ($choice) {
 				// Check to see if the user opted to connect an existing account
 				case 'existing':
+					$updatePrefs = array();
+					foreach ($this->getAvailableUserUpdateOptions() as $option) {
+						if ($wgRequest->getText("wpUpdateUserInfo$option", '0') == '1') {
+							$updatePrefs[] = $option;
+						}
+					}
 					$this->attachUser($fbid, $wgRequest->getText('wpExistingName'),
-					                         $wgRequest->getText('wpExistingPassword'));
+					                         $wgRequest->getText('wpExistingPassword'),
+					                         $updatePrefs);
 					break;
 				// Check to see if the user selected another valid option
 				case 'nick':
@@ -206,7 +212,7 @@ class SpecialConnect extends SpecialPage {
 	 * 
 	 * This is different from attachUser because that is made to synchronously test a login at the same time as creating
 	 * the account via the ChooseName form.  This function, however, is designed for when the existing user is already logged in
-	 * and wants to quickly connect their facebook account.  The main difference, therefore, is that this function usese default
+	 * and wants to quickly connect their Facebook account.  The main difference, therefore, is that this function uses default
 	 * preferences while the other form should have already shown the preferences form to the user.
 	 */
 	public function connectExisting() {
@@ -261,15 +267,16 @@ class SpecialConnect extends SpecialPage {
 			$user = FBConnectDB::getUser($fb_id);
 		}
 		
-		// If the user doesn't exist yet locally, allow hooks to check to see if this is a clustered set up
-		if ( !(isset($user) && $user instanceof User ) &&
-				!wfRunHooks('SpecialConnect::login::notFoundLocally', array(&$this, &$user, $fb_id))) {
-			return;
+		if ( !(isset($user) && $user instanceof User) ) {
+			$redemption = wfRunHooks('SpecialConnect::login::notFoundLocally', array(&$this, &$user, $fb_id));
+			if (!$redemption) {
+				return false;
+			}
 		}
 		
 		if ( isset($user) && $user instanceof User ) {
 			$fbUser = new FBConnectUser($user);
-			// Update user from facebook (see class FBConnectUser)
+			// Update user from Facebook (see FBConnectUser::updateFromFacebook)
 			$fbUser->updateFromFacebook();
 			
 			// Setup the session
@@ -289,6 +296,7 @@ class SpecialConnect extends SpecialPage {
 			$sessionUser->load();
 			
 			$this->sendPage('displaySuccessLogin');
+			return true;
 		} else if ($fb_id) {
 			$this->sendPage('chooseNameForm');
 		} else {
@@ -296,6 +304,7 @@ class SpecialConnect extends SpecialPage {
 			// or ask them to Connect.
 			$this->sendError('fbconnect-cancel', 'fbconnect-canceltext');
 		}
+		return false;
 	}
 
 	protected function createUser($fb_id, $name) {
@@ -436,7 +445,7 @@ class SpecialConnect extends SpecialPage {
 		
 		// Store which fields should be auto-updated from Facebook when the user logs in. 
 		$updateFormPrefix = 'wpUpdateUserInfo';
-		foreach (self::$availableUserUpdateOptions as $option) {
+		foreach ($this->getAvailableUserUpdateOptions() as $option) {
 			if($wgRequest->getVal($updateFormPrefix . $option, '') != ''){
 				$user->setOption("fbconnect-update-on-login-$option", 1);
 			} else {
@@ -551,34 +560,68 @@ class SpecialConnect extends SpecialPage {
 	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
 	 * code. Does it handle setting push-preferences correctly?
 	 */
-	protected function attachUser($fbid, $name, $password) {
+	protected function attachUser($fbid, $name, $password, $updatePrefs) {
 		global $wgOut, $wgUser;
 		wfProfileIn(__METHOD__);
-
+		
 		// The user must be logged into Facebook before choosing a wiki username
 		if ( !$fbid ) {
 			wfDebug("FBConnect: aborting in attachUser(): no Facebook ID was reported.\n");
 			$wgOut->showErrorPage( 'fbconnect-error', 'fbconnect-errortext' );
-			return;
+			return false;
 		}
 		// Look up the user by their name
 		$user = new FBConnectUser(User::newFromName($name));
 		if (!$user || !$user->checkPassword($password)) {
 			$this->sendPage('chooseNameForm', 'wrongpassword');
-			return;
+			return false;
 		}
+		
 		// Attach the user to their Facebook account in the database
 		FBConnectDB::addFacebookID($user, $fbid);
+		
 		// Update the user with settings from Facebook
+		if (count($updatePrefs)) {
+			foreach ($updatePrefs as $option) {
+				$user->setOption("fbconnect-update-on-login-$option", '1');
+			}
+		}
 		$user->updateFromFacebook();
+		
+		/*
+		// Setup the session
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+		/**/
+		
 		// Store the user in the global user object
+		$user->setCookies();
 		$wgUser = $user;
+		
+		// Similar to what's done in LoginForm::authenticateUserData().
+		// Load $wgUser now. This is necessary because loading $wgUser (say
+		// by calling getName()) calls the UserLoadFromSession hook, which
+		// potentially creates the user in the local database.
+		$sessionUser = User::newFromSession();
+		$sessionUser->load();
+		
+		$this->sendPage('displaySuccessLogin');
+		
+		
+		
+		
+		
+		
+		
 		
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 		
 		$this->sendPage('displaySuccessAttaching');
 		
 		wfProfileOut(__METHOD__);
+		return true;
 	}
 
 	/**
@@ -689,20 +732,26 @@ class SpecialConnect extends SpecialPage {
 			if ($this->isNewUser) {
 				$addParam = '&fbconnected=1';
 			}
-			// Since there was no additional message for the user, we can just redirect them back to where they came from.
+			// Since there was no additional message for the user, we can just
+			// redirect them back to where they came from
 			$titleObj = Title::newFromText( $this->mReturnTo );
-			if ( ( !$titleObj instanceof Title ) || ( $titleObj->isSpecial('Userlogout') ) || ( $titleObj->isSpecial('Signup') ) || ( $titleObj->isSpecial('Connect') )) {
+			if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
+			     !$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
+				$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery .
+				                  (!empty($this->mReturnToQuery) ? '&' : '') .
+				                  'cb=' . rand(1, 10000) . $addParam )
+				);
+			} else {
 				$titleObj = Title::newMainPage();
-				$wgOut->redirect( $titleObj->getFullURL( 'cb=' . rand(1,10000) . $addParam ) );
-				return true;
+				$wgOut->redirect( $titleObj->getFullURL( 'cb=' . rand(1, 10000) . $addParam ) );
 			}
-			$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery . '&cb=' . rand(1,10000) . $addParam ) );
 		}
 	}
 
 	/**
-	 * Success page for attaching fb account to a pre-existing MediaWiki account.
-	 * Shows a link to preferences and a link back to where the user came from.
+	 * Success page for attaching Facebook account to a pre-existing MediaWiki
+	 * account. Shows a link to preferences and a link back to where the user
+	 * came from.
 	 */
 	private function displaySuccessAttaching() {
 		global $wgOut, $wgUser, $wgRequest;
@@ -718,8 +767,25 @@ class SpecialConnect extends SpecialPage {
 		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
 		$wgOut->addHtml( $inject_html );
 		
+		// Since there was no additional message for the user, we can just
+		// redirect them back to where they came from
 		$titleObj = Title::newFromText( $this->mReturnTo );
-		$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery . '&fbconnected=1&cb=' . rand(1,10000) ) );
+		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
+			 !$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
+		    $wgOut->redirect( $titleObj->getFullURL($this->mReturnToQuery .
+			                  (!empty($this->mReturnToQuery) ? '&' : '') .
+			                  'fbconnected=1&cb=' . rand(1, 10000) )
+			);
+		} else {
+			/*
+		    // Render a "return to" link retrieved from the URL
+			 $wgOut->returnToMain( false, $this->mReturnTo, $this->mReturnToQuery .
+			                       (!empty($this->mReturnToQuery) ? '&' : '') .
+			                       'fbconnected=1&cb=' . rand(1, 10000) );
+			/**/
+			$titleObj = Title::newMainPage();
+			$wgOut->redirect( $titleObj->getFullURL('fbconnected=1&cb=' . rand(1, 10000)) );
+		}
 		
 		wfProfileOut(__METHOD__);
 	}
@@ -788,7 +854,7 @@ class SpecialConnect extends SpecialPage {
 						trim($_COOKIE[$wgCookiePrefix . 'UserName']) : '';
 			// Build an array of attributes to update
 			$updateOptions = array();
-			foreach (self::$availableUserUpdateOptions as $option) {
+			foreach ($this->getAvailableUserUpdateOptions() as $option) {
 				// Translate the MW parameter into a FB parameter
 				$value = FBConnectUser::getOptionFromInfo($option, $userinfo);
 				// If no corresponding value was received from Facebook, then continue
@@ -842,11 +908,21 @@ class SpecialConnect extends SpecialPage {
 			'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
 			'value="manual" id="wpNameChoiceManual"/></td><td class="mw-input"><label ' .
 			'for="wpNameChoiceManual">' . wfMsg('fbconnect-choosemanual') . '</label>&nbsp;' .
-			'<input name="wpName2" size="16" value="" id="wpName2"/></td></tr>' .
-			// Finish with two options, "Log in" or "Cancel"
-			'<tr><td></td><td class="mw-submit"><input type="submit" value="Log in" name="wpOK"/>' .
-			'<input type="submit" value="Cancel" name="wpCancel"/></td></tr></table></fieldset></form>'
-		);
+			'<input name="wpName2" size="16" value="" id="wpName2"/></td></tr>');
+		// Finish with two options, "Log in" or "Cancel"
+		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
+			'<input type="submit" value="Log in" name="wpOK" />' .
+			'<input type="submit" value="Cancel" name="wpCancel" />');
+		// Include returnto and returntoquery parameters if they are set
+		if (!empty($this->mReturnTo)) {
+			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
+			                $this->mReturnTo . '">');
+		}
+		if (!empty($this->mReturnToQuery)) {
+			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
+			                $this->mReturnToQuery . '">');
+		}
+		$wgOut->addHTML("</td></tr></table></fieldset></form>\n\n");
 	}
 
 	/**
@@ -855,9 +931,14 @@ class SpecialConnect extends SpecialPage {
 	private function connectForm() {
 		global $wgOut, $wgUser, $wgSitename;
 		
+		// Redirect the user back to where they came from
 		$titleObj = Title::newFromText( $this->mReturnTo );
-		if ($titleObj) {
-			$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery . '&fbconnected=2&cb=' . rand(1, 10000) ) );
+		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
+		     !$titleObj->isSpecial('Signup') || !$titleObj->isSpecial('Connect') ) {
+		    $wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery .
+			                  (!empty($this->mReturnToQuery) ? '&' : '') .
+			                  'fbconnected=2&cb=' . rand(1, 10000) )
+			);
 		} else {
 			// Outputs the canonical name of the special page at the top of the page
 			$this->outputHeader();
