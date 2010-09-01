@@ -922,7 +922,7 @@ class SpecialConnect extends SpecialPage {
 		// Redirect the user back to where they came from
 		$titleObj = Title::newFromText( $this->mReturnTo );
 		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
-		     !$titleObj->isSpecial('Signup') || !$titleObj->isSpecial('Connect') ) {
+		     !$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
 		    $wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery .
 			                  (!empty($this->mReturnToQuery) ? '&' : '') .
 			                  'fbconnected=2&cb=' . rand(1, 10000) )
