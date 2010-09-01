@@ -849,10 +849,10 @@ class SpecialConnect extends SpecialPage {
 				if (!$value) {
 					continue;
 				}
-				// Important: do not reveal an email ending in "@proxymail.facebook.com"
-				if ($option == 'email' && strrpos($value, '@proxymail.facebook.com') ===
-						strlen($value) - strlen('@proxymail.facebook.com')) {
-					$value = 'xxx@proxymail.facebook.com';
+				
+				// Do not reveal proxied email addresses
+				if ($option == 'email') {
+					$value = FBConnectUser::getCleanEmail($value);
 				}
 				
 				// Build the list item for the update option

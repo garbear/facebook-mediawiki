@@ -43,6 +43,19 @@ class FBConnectUser extends User {
 	}
 	
 	/**
+	 * It's important that Facebook-proxied emails are not revealed to users.
+	 * If the user has an email address at the domain proxymail.facebook.com,
+	 * then the name is stripped and xxx@proxymail.facebook.com is returned.
+	 */
+	static function getCleanEmail($email) {
+		$proxy = '@proxymail.facebook.com';
+		if (strrpos($email, $proxy) === strlen($email) - strlen($proxy)) {
+			$email = 'xxx' . $proxy;
+		}
+		return $email;
+	}
+	
+	/**
 	 * Update a user's settings with the values retrieved from the current
 	 * logged-in Facebook user. Settings are only updated if a different value
 	 * is returned from Facebook and the user's settings allow an update on

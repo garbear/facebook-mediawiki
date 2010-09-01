@@ -150,8 +150,11 @@ STYLE;
 			
 			// Add the script file specified by $url
 			if(!empty($wgFbExtensionScript)){
-				$out->addScriptFile($wgFbExtensionScript);
-			}
+				// TODO: revert this
+				#$out->addScriptFile($wgFbExtensionScript);
+				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion&" .
+					rand(1,1000) . "\"></script>\n");
+							}
 		} else {
 			// Add a pretty Facebook logo if $wgFbLogo is set
 			if ( !empty( $wgFbLogo) ) {
@@ -407,6 +410,17 @@ STYLE;
 		return true;
 	}
 	
+	public static function GetPreferences( $user, &$preferences ) {
+		$email = FBConnectUser::getCleanEmail($preferences['emailaddress']['default']);
+		if ($email != $preferences['emailaddress']['default']) {
+			// User is using a Facebook proxy email address
+			#$preferences['emailaddress']['default'] = $email;
+			$preferences['enotifrevealaddr']['disabled'] = true;
+			// TODO: Inject some JS into the page to take of changing email addresses
+		}
+		return true;
+	}
+	
 	/**
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
@@ -416,9 +430,7 @@ STYLE;
 	public static function RenderPreferencesForm( $form, $output ) {
 		global $facebook, $wgUser;
 		
-		// This hook no longer seems to work...
-		return true;
-		
+		/*
 		$ids = FBConnectDB::getFacebookIDs($wgUser);
 		
 		$fb_user = $facebook->getUser();
@@ -443,6 +455,7 @@ STYLE;
 				}
 			}
 		}
+		/**/
 		return true;
 	}
 
