@@ -334,8 +334,11 @@ class SpecialConnect extends SpecialPage {
 		if ( wfReadOnly() ) {
 			$wgOut->readOnlyPage();
 			return;
-		} elseif ( !isset($wgFbConnectOnly) || !$wgFbConnectOnly ) {
-			// These two permissions don't apply in $wgFbConnectOnly mode
+		}
+		
+		if ( empty( $wgFbConnectOnly ) ) {
+			// These two permissions don't apply in $wgFbConnectOnly mode because
+			// then technically no users can create accounts
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
@@ -790,10 +793,6 @@ class SpecialConnect extends SpecialPage {
 	private function chooseNameForm($messagekey = 'fbconnect-chooseinstructions') {
 		// Permissions restrictions.
 		global $wgUser, $facebook, $wgOut, $wgFbConnectOnly;
-		// $wgFbConnectOnly default to false
-		if (!isset($wgFbConnectOnly)) {
-			$wgFbConnectOnly = false;
-		}
 		
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
@@ -801,8 +800,9 @@ class SpecialConnect extends SpecialPage {
 			$wgOut->readOnlyPage();
 			return false;
 		}
-		if ( !$wgFbConnectOnly ) {
-			// These two permissions don't apply in $wgFbConnectOnly mode
+		if ( empty( $wgFbConnectOnly ) ) {
+			// These two permissions don't apply in $wgFbConnectOnly mode because
+			// then technically no users can create accounts
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
 				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
@@ -834,8 +834,9 @@ class SpecialConnect extends SpecialPage {
 			<fieldset id="mw-fbconnect-choosename">
 				<legend>' . wfMsg('fbconnect-chooselegend') . '</legend>
 				<table>');
-		// Let them attach to an existing user if $wgFbConnectOnly allows it
-		if (!$wgFbConnectOnly) {
+		// Let them attach to an existing. If $wgFbConnectOnly is true, then
+		// stand-alone account aren't allowed in the first place
+		if (empty( $wgFbConnectOnly )) {
 			// Grab the UserName from the cookie if it exists
 			global $wgCookiePrefix;
 			$name = isset($_COOKIE[$wgCookiePrefix . 'UserName']) ?

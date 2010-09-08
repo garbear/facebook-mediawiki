@@ -531,11 +531,20 @@ STYLE;
 	static function SpecialPage_initList( &$aSpecialPages ) {
 		global $wgFbConnectOnly;
 		if ( !empty( $wgFbConnectOnly) ) {
-			$aSpecialPages['Userlogin'] = array('SpecialRedirectToSpecial', 'UserLogin',
-			                       'Connect', false, array('returnto', 'returntoquery'));
+			// U can't touch this
+			$aSpecialPages['Userlogin'] = array(
+				'SpecialRedirectToSpecial',
+				'UserLogin',
+				'Connect',
+				false,
+				array( 'returnto', 'returntoquery' ),
+			);
 			// Used in 1.12.x and above
-			$aSpecialPages['CreateAccount'] = array('SpecialRedirectToSpecial',
-			                                        'CreateAccount', 'Connect');
+			$aSpecialPages['CreateAccount'] = array(
+				'SpecialRedirectToSpecial',
+				'CreateAccount',
+				'Connect',
+			);
 		}
 		return true;
 	}
@@ -563,11 +572,17 @@ STYLE;
 	}
 	
 	/**
-	 * Removes the 'createaccount' right from users if $wgFbConnectOnly is true.
+	 * Removes the 'createaccount' right from all users if $wgFbConnectOnly is
+	 * enabled.
 	 */
 	static function UserGetRights( $user, &$aRights ) {
 		global $wgFbConnectOnly;
 		if ( !empty( $wgFbConnectOnly ) ) {
+			// If you would like sysops to still be able to create accounts
+			$whitelistSysops = false;
+			if ($whitelistSysops && in_array( 'sysop', $user->getGroups() )) {
+				return true;
+			}
 			foreach ( $aRights as $i => $right ) {
 				if ( $right == 'createaccount' ) {
 					unset( $aRights[$i] );

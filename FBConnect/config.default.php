@@ -27,8 +27,12 @@ $wgFbSecret         = 'YOUR_SECRET';    # Change this!
 #$wgFbDomain         = 'BASE_DOMAIN';    # Optional
 
 /**
- * Disables the creation of new accounts and prevents old accounts from being
- * used to log in if they aren't associated with a Facebook Connect account.
+ * Turns the wiki into a Facebook-only wiki. All users must authenticate using
+ * Facebook Connect. This setting has three side-effects:
+ * 1. All users are stripped of the 'createaccount' right. To override this
+ *    behaviour, see FBConnectHooks::UserGetRights.
+ * 2. Special:Userlogin and Special:CreateAccount redirect to Special:Connect
+ * 3. The "Log in / create account" links in the personal toolbar are removed.
  */
 $wgFbConnectOnly = false;
 
