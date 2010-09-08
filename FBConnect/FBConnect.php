@@ -46,7 +46,8 @@ $wgEnablePreferencesExt = true;
  * FBConnect version.
  */
 define( 'MEDIAWIKI_FBCONNECT_VERSION', '2.2.0, August 30, 2010' );
-define( 'FBCONNECT_LOCALE', '%LOCALE%'); // magic-string to use in substitution (must be defined prior to including config.php).
+// Magic string to use in substitution (must be defined prior to including config.php).
+define( 'FBCONNECT_LOCALE', '%LOCALE%');
 
 /*
  * Add information about this extension to Special:Version.
@@ -106,26 +107,6 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 // Create a new group for Facebook users
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 
-### THIS CODE NEEDS TO BE MOVED INTO THE INIT FUNCTION, AFTER localsettings.php HAS FINISHED ###
-// If we are configured to pull group info from Facebook, then create the group permissions
-if (!empty( $wgFbUserRightsFromGroup )) {
-	$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
-	$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
-	$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
-	$wgImplictGroups[] = 'fb-groupie';
-	$wgImplictGroups[] = 'fb-officer';
-	$wgImplictGroups[] = 'fb-admin';
-	$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
-	$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
-	$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
-}
-
-/**
-$wgAutopromote['autoconfirmed'] = array( '&', array( APCOND_EDITCOUNT, &$wgAutoConfirmCount ),
-                                  array( APCOND_AGE, &$wgAutoConfirmAge ),
-                                  array( APCOND_FB_INGROUP ));
-/**/
-
 $wgAjaxExportList[] = "FBConnect::disconnectFromFB";
 $wgAjaxExportList[] = "SpecialConnect::getLoginButtonModal";
 $wgAjaxExportList[] = "SpecialConnect::ajaxModalChooseName"; 
@@ -145,13 +126,13 @@ foreach( $wgFbHooksToAddImmediately as $hookName ) {
  */
 class FBConnect {
 	static private $fbOnLoginJs;
-
+	
 	/**
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
 		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks,
-		       $wgFbOnLoginJsOverride, $wgFbHooksToAddImmediately;
+		       $wgFbOnLoginJsOverride, $wgFbHooksToAddImmediately, $wgFbUserRightsFromGroup;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
@@ -176,8 +157,29 @@ class FBConnect {
 		} else {
 			self::$fbOnLoginJs = "window.location.reload(true);";
 		}
+		
+		// Default to pull new info from Facebook
+		global $wgDefaultUserOptions;
+		foreach (FBConnectUser::$availableUserUpdateOptions as $option) {
+			$wgDefaultUserOptions["fbconnect-update-on-login-$option"] = 1;
+		}
+		
+		// If we are configured to pull group info from Facebook, then set up
+		// the group permissions here
+		if (!empty( $wgFbUserRightsFromGroup )) {
+			global $wgGroupPermissions, $wgImplictGroups, $wgAutopromote;
+			$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+			$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
+			$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
+			$wgImplictGroups[] = 'fb-groupie';
+			$wgImplictGroups[] = 'fb-officer';
+			$wgImplictGroups[] = 'fb-admin';
+			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+			$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
+			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+		}
 	}
-
+	
 	/**
 	 * Returns an array with the names of all public static functions
 	 * in the specified class.
@@ -207,9 +209,9 @@ class FBConnect {
 	 */
 	public static function getPermissionsAttribute(){
 		global $wgFbExtendedPermissions;
-		$attr = "";
-		if(!empty($wgFbExtendedPermissions)){
-			$attr = " perms=\"".implode(",", $wgFbExtendedPermissions)."\"";
+		$attr = '';
+		if (!empty($wgFbExtendedPermissions)) {
+			$attr = ' perms="' . implode(',', $wgFbExtendedPermissions) . '"';
 		}
 		return $attr;
 	} // end getPermissionsAttribute()
@@ -221,9 +223,9 @@ class FBConnect {
 	 * TODO: Generate the entire fb:login-button in a function in this class.  We have numerous buttons now.
 	 */
 	public static function getOnLoginAttribute(){
-		$attr = "";
-		if(!empty(self::$fbOnLoginJs)){
-			$attr = " onlogin=\"".self::$fbOnLoginJs."\"";
+		$attr = '';
+		if (!empty(self::$fbOnLoginJs)) {
+			$attr = ' onlogin="' . self::$fbOnLoginJs . '"';
 		}
 		return $attr;
 	} // end getOnLoginAttribute()

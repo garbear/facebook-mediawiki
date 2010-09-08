@@ -56,7 +56,7 @@ class FBConnectHooks {
 		global $wgFbUserRightsFromGroup;
 		
 		// Probably a redundant check, but with PHP you can never be too sure...
-		if (!$wgFbUserRightsFromGroup) {
+		if (empty($wgFbUserRightsFromGroup)) {
 			// No group to pull rights from, so the user can't be a member
 			$result = false;
 			return true;
