@@ -513,8 +513,8 @@ STYLE;
 						' . wfMsgWikiHtml( 'fbconnect-listusers-header',
 						wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
 						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$group[name]</a>",
-						"<a href=\"http://www.facebook.com/profile.php?id={$group[owner][id]}\" " .
-						"class=\"mw-userlink\">{$group[owner][name]}</a>") . "
+						"<a href=\"http://www.facebook.com/profile.php?id={$group['owner']['id']}\" " .
+						"class=\"mw-userlink\">{$group['owner']['name']}</a>") . "
 					</td>
 	        		<td>
 	        			<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
