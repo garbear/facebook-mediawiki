@@ -178,9 +178,11 @@ STYLE;
 	/**
 	 * Fired when MediaWiki is updated to allow FBConnect to update the database.
 	 * If the database type is supported, then a new tabled named 'user_fbconnect'
-	 * is created. For the table's layout, see fbconnect_table.sql. If $wgDBprefix
-	 * is set, then the table 'user_fbconnect' will be prefixed accordingly. Make
-	 * sure that fbconnect_table.sql is updated with the database prefix beforehand.
+	 * is created. For the table's layout, see fbconnect_table.sql.
+	 * 
+	 * MYSQL ONLY: If $wgDBprefix is set, then the table 'user_fbconnect' will
+	 * be prefixed accordingly. Make sure that fbconnect_table.sql is updated
+	 * with the database prefix beforehand.
 	 */
 	static function LoadExtensionSchemaUpdates() {
 		global $wgDBtype, $wgDBprefix, $wgExtNewTables, $wgSharedDB, $wgDBname;
@@ -194,8 +196,8 @@ STYLE;
 			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
 			$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
 		} else if ( $wgDBtype == 'postgres' ) {
-			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.pg.sql");
-			$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.pg.sql");
+			$wgExtNewTables[] = array("user_fbconnect", "$base/sql/fbconnect_table.pg.sql");
+			$wgExtNewTables[] = array("fbconnect_event_stats", "$base/sql/fbconnect_event_stats.pg.sql");
 		}
 		return true;
 	}
