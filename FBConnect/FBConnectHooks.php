@@ -103,7 +103,8 @@ class FBConnectHooks {
 		}
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
-		if (!empty($wgFbScript)) {
+		global $wgNoExternals;
+		if ( !empty($wgFbScript) && empty($wgNoExternals) ) {
 			$out->prependHTML('
 				<div id="fb-root"></div>
 				<script>
