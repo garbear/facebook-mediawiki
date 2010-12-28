@@ -27,7 +27,8 @@ $messages = array();
 $messages['en'] = array(
 	// Extension name
 	'fbconnect'   => 'Facebook Connect',
-	'fbconnect-desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http://www.facebook.com Facebook] accounts. Offers authentification based on Facebook groups and the use of FBML in wiki text.',
+	'fbconnect-desc'     => 'Enables users to [[Special:Connect|Connect]] with their [http://www.facebook.com Facebook] accounts.
+Offers authentification based on Facebook groups and the use of FBML in wiki text',
 	// Group containing Facebook Connect users
 	'group-fb-user'           => 'Facebook Connect users',
 	'group-fb-user-member'    => 'Facebook Connect user',
