@@ -60,7 +60,7 @@ This means that when you are Connected, in addition to the normal [[Wikipedia:He
 	'fbconnect-click-to-login' => 'Click to login to this site via Facebook',
 	'fbconnect-click-to-connect-existing' => 'Click to connect your Facebook account to $1',
 	'fbconnect-conv'     => 'Convenience',
-	'fbconnect-convdesc' => 'Connected users are automatically logged you in.
+	'fbconnect-convdesc' => 'Connected users are automatically logged in.
 If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your e-mail address.',
 	'fbconnect-fbml'     => 'Facebook markup language',
 	'fbconnect-fbmldesc' => 'Facebook has provided a bunch of built-in tags that will render dynamic data.
