@@ -272,8 +272,47 @@ $messages['be-tarask'] = array(
  * @author Gwendal
  */
 $messages['br'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'group-fb-user' => 'Implijerien Facebook Connect',
+	'group-fb-user-member' => 'Implijer Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}: Implijerien Facebook Connect',
+	'group-fb-groupie' => 'Izili ar strollad',
+	'group-fb-groupie-member' => 'Ezel ar strollad',
+	'grouppage-fb-groupie' => '{{ns:project}}: Izili ar strollad',
+	'group-fb-admin' => 'Merourien ar strollad',
+	'group-fb-admin-member' => 'Merour ar strollad',
+	'grouppage-fb-admin' => '{{ns:project}}: Merourien ar strollad',
+	'fbconnect-connect' => 'Kevreañ gant Facebook Connect',
+	'fbconnect-convert' => "Kevreañ ar c'hont-mañ gant Facebook",
+	'fbconnect-logout' => 'Digrevreañ eus Facebook',
+	'fbconnect-link' => 'E facebook.com en-dro',
+	'fbconnect-title' => 'Kont kevreañ gant Facebook',
+	'fbconnect-click-to-login' => "Klikit evit kevreañ el lec'hienn-mañ dre Facebook",
+	'fbconnect-click-to-connect-existing' => 'Klikit evit kevreañ ho kont Facebook da $1',
+	'fbconnect-comm' => 'Daremprederezh',
+	'fbconnect-loginbox' => "Pe '''kevreañ''' gant Facebook:
+
+$1",
+	'fbconnect-error' => 'Fazi gwiriañ',
+	'fbconnect-invalid' => "N'haller ket dibab an dra-se",
+	'fbconnect-nickname' => 'Lesanv',
+	'fbconnect-fullname' => 'Anv klok',
+	'fbconnect-email' => "Chomlec'h postel",
+	'fbconnect-language' => 'Yezh',
+	'fbconnect-chooselegend' => 'Dibab an anv implijer',
+	'fbconnect-chooseinstructions' => "An holl implijerien o deus ezhomm ul lesanv; gallout a rit dibab unan eus ar c'hinnigoù a-is.",
+	'fbconnect-invalidname' => 'Al lezanv ho peus dibabet a zo direizh pe implijet dija.
+Trugarez da zibab unan all.',
+	'fbconnect-choosefull' => "Hoc'h anv klok ($1)",
+	'fbconnect-chooseauto' => 'Un anv krouet emgefre ($1)',
+	'fbconnect-choosemanual' => "Un anv dibabet ganeoc'h :",
+	'fbconnect-chooseexisting' => 'Ur gont zo anezhi war ar wiki-mañ',
 	'fbconnect-chooseusername' => 'Anv implijer :',
 	'fbconnect-choosepassword' => 'Ger-tremen :',
+	'fbconnect-alreadyloggedin' => "'''Kevreet oc'h dija, $1!'''
+
+Ma fell deoc'h implijout Facebook Connect da gevreañ diwezhatoc'h, e c'hallit [[Special:Connect/Convert|amdreiñ ho kont evit implijout Facebook Connect]].",
+	'fbconnect-prefstext' => 'Facebook Connect',
 );
 
 /** German (Deutsch)
@@ -318,13 +357,6 @@ Man kann sehen welche der eigenen Freunde das Wiki nutzen und, sofern gewünscht
 
 $1",
 	'fbconnect-merge' => 'Das Wikikonto mit der Facebook-ID verknüpfen',
-	'fbconnect-mergebox' => 'Diese Funktion ist noch nicht vorhanden.
-Konten können manuell über die Spezialseite [[Special:Renameuser|Benutzer umbenennen]] verknüpft werden, sofern sie auf diesem Wiki verfügbar ist.
-Für weitere Informationen kann man die Seite [[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]] aufsuchen.
-
-$1
-
-Hinweis: Dies kann durch einen Gruppenadministrator rückgängig gemacht werden.',
 	'fbconnect-logoutbox' => '$1
 
 Dies führt zu einer Abmeldung von Facebook und allen verknüpften Websites, einschließlich dieses Wikis.',
@@ -367,6 +399,15 @@ Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Sp
 	'fbconnect-link-to-profile' => 'Facebook-Profil',
 	'fbconnect-prefsheader' => "Einstellungen zu den Aktionen, die über den eigenen Facebook-Newsfeed ausgegeben werden sollen: <a id='fbConnectPushEventBar_show' href='#'>Einstellungen anzeigen</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>Einstellungen ausblenden</a>",
 	'fbconnect-prefs-can-be-updated' => 'Sie können jederzeit aktualisiert werden, indem man sie unter der Registerkarte „$1“ auf der Seite Einstellungen ändert.',
+);
+
+/** German (formal address) (Deutsch (Sie-Form))
+ * @author Kghbln
+ */
+$messages['de-formal'] = array(
+	'fbconnect-alreadyloggedin' => "'''Sie sind bereits angemeldet, $1!'''
+
+Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
 );
 
 /** Galician (Galego)
@@ -521,13 +562,6 @@ $messages['mk'] = array(
 
 $1",
 	'fbconnect-merge' => 'Спојте ја Вашата вики-сметка со Вашата назнака (ID) на Facebook',
-	'fbconnect-mergebox' => 'Оваа функција сè уште не е спроведена.
-Сметките може да се спојуваат и рачно, преку [[Special:Renameuser]] (ако е инсталирано).
-За повеќе информации, посетете ја страницата [[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]].
-
-$1
-
-Напомена: Ова може да го врати системски оператор.',
 	'fbconnect-logoutbox' => '$1
 
 Ова исто така ќе ве одјави од Facebook и сите поврзани мрежни места, вклучувајќи го ова вики.',
@@ -854,14 +888,6 @@ Tingnan kung sino sa inyong mga kaibigan ang gumagamit ng wiki, at opsyonal na i
 
 $1",
 	'fbconnect-merge' => 'Isanib ang iyong akawnt na pangwiki sa iyong ID na pang-Facebook',
-	'fbconnect-mergebox' => 'Hindi pa napapatupad ang tampok na ito.
-Ang mga akawnt ay kinakamay na maisasanib sa pamamagitan ng [[Special:Renameuser]] kung nakaluklok ito.
-Para sa mas maraming kabatiran, paki dalaw ang 
-[[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]].
-
-$1
-
-Paunawa: Maaaring ibalik ito sa dati ng isang tagapagpaandar ng sistema.',
 	'fbconnect-logoutbox' => '$1
 
 Ilalabas ka rin nito mula sa Facebook at lahat ng nakaugnay na mga sityo, kabilang ang wiking ito.',
