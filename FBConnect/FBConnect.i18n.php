@@ -257,6 +257,15 @@ $messages['be-tarask'] = array(
 	'grouppage-fb-groupie' => '{{ns:project}}:Удзельнікі групы',
 	'group-fb-officer' => 'Кіраўнікі групы',
 	'group-fb-officer-member' => 'Кіраўнік групы',
+	'grouppage-fb-officer' => '{{ns:project}}:Кіраўнікі групы',
+	'group-fb-admin' => 'Адміністратары групы',
+	'group-fb-admin-member' => 'Адміністратар групы',
+	'grouppage-fb-admin' => '{{ns:project}}:Адміністратары групы',
+	'fbconnect-connect' => 'Увайсьці ў сыстэму праз злучэньне Facebook',
+	'fbconnect-convert' => 'Злучыць гэты рахунак і Facebook',
+	'fbconnect-logout' => 'Выйсьці з Facebook',
+	'fbconnect-link' => 'Вярнуцца на facebook.com',
+	'fbconnect-title' => 'Злучыць рахунак з Facebook',
 );
 
 /** Breton (Brezhoneg)
@@ -377,6 +386,7 @@ $messages['gl'] = array(
 	'fbconnect-logout' => 'Desconectarse do Facebook',
 	'fbconnect-link' => 'Volver a facebook.com',
 	'fbconnect-title' => 'Conectar a conta co Facebook',
+	'fbconnect-conv' => 'Comodidade',
 	'fbconnect-comm' => 'Comunicación',
 	'fbconnect-error' => 'Erro de verificación',
 	'fbconnect-cancel' => 'Acción cancelada',
@@ -408,6 +418,31 @@ Offere authentication a base de gruppos de Facebook e le uso de FBML in texto wi
 	'group-fb-user' => 'Usatores de Facebook Connect',
 	'group-fb-user-member' => 'Usator de Facebook Connect',
 	'grouppage-fb-user' => '{{ns:project}}:Usatores de Facebook Connect',
+	'group-fb-groupie' => 'Membros del gruppo',
+	'group-fb-groupie-member' => 'Membro del gruppo',
+	'grouppage-fb-groupie' => '{{ns:project}}:Membros del gruppo',
+	'group-fb-officer' => 'Directores del gruppo',
+	'group-fb-officer-member' => 'Director del gruppo',
+	'grouppage-fb-officer' => '{{ns:project}}:Directores del gruppo',
+	'group-fb-admin' => 'Administratores del gruppo',
+	'group-fb-admin-member' => 'Administrator del gruppo',
+	'grouppage-fb-admin' => '{{ns:project}}:Administratores del gruppo',
+	'fbconnect-connect' => 'Aperir session con Facebook Connect',
+	'fbconnect-convert' => 'Connecter iste conto con Facebook',
+	'fbconnect-logout' => 'Clauder session de Facebook',
+	'fbconnect-link' => 'Retornar a facebook.com',
+	'fbconnect-title' => 'Connecter le conto con Facebook',
+	'fbconnect-intro' => 'Iste wiki dispone de Facebook Connect, le proxime evolution del platteforma Facebook.
+Isto significa que, si tu es connectite, in addition al normal [[Wikipedia:Help:Logging in#Why log in?|beneficios]] que tu vide quando aperir un session, tu potera traher avantage de alcun functionalitate extra...',
+	'fbconnect-click-to-login' => 'Clicca pro authenticar te a iste sito via Facebook',
+	'fbconnect-click-to-connect-existing' => 'Clicca pro connecter tu conto de Facebook a $1',
+	'fbconnect-conv' => 'Commoditate',
+	'fbconnect-convdesc' => 'Le usatores connectite es automaticamente authenticate.
+Si permission es date, alora iste wiki pote mesmo usar Facebook como proxy de e-mail de sorta que tu pote continuar a reciper importante notificationes sin revelar tu adresse de e-mail.',
+	'fbconnect-fbml' => 'Linguage de marcation de Facebook',
+	'fbconnect-fbmldesc' => 'Facebook ha providite un collection de etiquettas integrate pro tractamento dynamic de datos.
+Multes de iste etiquettas pote esser includite in texto wiki, e essera tractate differentemente dependente de qual usator connectite los visualisa.',
+	'fbconnect-comm' => 'Communication',
 );
 
 /** Luxembourgish (Lëtzebuergesch)
@@ -420,6 +455,7 @@ $messages['lb'] = array(
 	'grouppage-fb-user' => '{{ns:project}}:Facebook-Connect-Benotzer',
 	'group-fb-groupie' => 'Membere vum Grupp',
 	'group-fb-groupie-member' => 'Member vum Grupp',
+	'grouppage-fb-groupie' => '{{ns:project}}: Gruppememberen',
 	'fbconnect-convert' => 'Dëse Kont mat Facebook verbannen',
 	'fbconnect-logout' => 'Ofmellen op Facebook',
 	'fbconnect-link' => 'Zréck op facebook.com',
@@ -563,8 +599,20 @@ Maakt het mogelijk om aan te melden met de Facebookgebruiker en FBML te gebruike
 	'fbconnect-click-to-login' => 'Klik om bij deze site aan te melden via Facebook',
 	'fbconnect-click-to-connect-existing' => 'Klik om uw Facebookgebruiker te verbinden met $1',
 	'fbconnect-conv' => 'Gemak',
+	'fbconnect-fbml' => 'Facebookopmaaktaal',
+	'fbconnect-fbmldesc' => 'Facebook heeft een aantal labels beschikbaar gemaakt die het mogelijk maken gegevens dynamisch weer te geven.
+Veel van deze labels kunnen opgenomen worden in wikitekst en worden anders weergegeven afhankelijk van door welke gebruiker ze worden bekeken.',
 	'fbconnect-comm' => 'Communicatie',
+	'fbconnect-welcome' => 'Welkom, Facebook Connectgebruiker!',
+	'fbconnect-loginbox' => "Of '''meld aan'''via Facebook:
+
+$1",
+	'fbconnect-merge' => 'Voeg uw wikigebruiker samen met uw Facebookgebruiker',
+	'fbconnect-logoutbox' => '$1
+
+Hierdoor wordt u ook afgemeld van Facebook en alle gekoppelde sites, inclusief deze wiki.',
 	'fbconnect-error' => 'Controlefout',
+	'fbconnect-errortext' => 'Er is een fout opgetreden tijdens de verificatie via Facebook Connect.',
 	'fbconnect-cancel' => 'Handeling geannuleerd',
 	'fbconnect-canceltext' => 'De vorige handeling is geannuleerd door de gebruiker.',
 	'fbconnect-invalid' => 'Ongeldige optie',
@@ -589,9 +637,14 @@ Kies een andere.',
 	'fbconnect-chooseusername' => 'Gebruikersnaam:',
 	'fbconnect-choosepassword' => 'Wachtwoord:',
 	'fbconnect-updateuserinfo' => 'De volgende persoonlijke informatie bijwerken:',
+	'fbconnect-alreadyloggedin' => "'''U bent al aangemeld, $1!'''
+
+Als u in de toekomst uw Facebook Connect wilt gebruiken om aan te melden, [[Special:Connect/Convert|zet uw gebruiker dan om naar Facebook Connect]].",
+	'fbconnect-error-creating-user' => 'Er is een fout opgetreden tijdens het aanmaken van de gebruiker in de lokale database.',
 	'fbconnect-error-user-creation-hook-aborted' => 'Een uitbreiding heeft het aanmaken van de gebruiker beëindigd met het volgende bericht: $1',
 	'fbconnect-prefstext' => 'Verbinden met Facebook',
 	'fbconnect-link-to-profile' => 'Facebookprofiel',
+	'fbconnect-prefs-can-be-updated' => 'U kunt deze te allen tijde bijwerken door naar het tabblad "$1" in uw voorkeuren te gaan.',
 );
 
 /** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
@@ -636,13 +689,6 @@ Se hvilke av dine venner som bruker denne wikien og eventuelt del handlingene di
 
 $1",
 	'fbconnect-merge' => 'Slå sammen wikikontoen din med din Facebook-ID',
-	'fbconnect-mergebox' => 'Denne funksjonen har ikke blitt implementert ennå.
-Kontoer kan slås sammen manuelt med [[Special:Renameuser]] om dette er installert.
-For mer informasjon, besøk [[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]].
-
-$1
-
-Merk: Dette kan gjøres om av en sysop.',
 	'fbconnect-logoutbox' => '$1
 
 Dette vil også logge deg ut av Facebook og alle tilkoblede nettsteder, inkludert denne wikien.',
