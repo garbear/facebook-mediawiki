@@ -57,8 +57,8 @@ Offers authentification based on Facebook groups and the use of FBML in wiki tex
 	'fbconnect-title'    => 'Connect account with Facebook',
 	'fbconnect-intro'    => 'This wiki is enabled with Facebook Connect, the next evolution of Facebook Platform.
 This means that when you are Connected, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
-	'fbconnect-click-to-login' => 'Click this button to login to this site via Facebook',
-	'fbconnect-click-to-connect-existing' => 'Click this button to connect your Facebook account to $1',
+	'fbconnect-click-to-login' => 'Click to login to this site via Facebook',
+	'fbconnect-click-to-connect-existing' => 'Click to connect your Facebook account to $1',
 	'fbconnect-conv'     => 'Convenience',
 	'fbconnect-convdesc' => 'Connected users are automatically logged you in.
 If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your e-mail address.',
