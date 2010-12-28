@@ -108,10 +108,10 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 // Create a new group for Facebook users
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 
-$wgAjaxExportList[] = "FBConnect::disconnectFromFB";
-$wgAjaxExportList[] = "SpecialConnect::getLoginButtonModal";
-$wgAjaxExportList[] = "SpecialConnect::ajaxModalChooseName"; 
-$wgAjaxExportList[] = "SpecialConnect::checkCreateAccount";
+$wgAjaxExportList[] = 'FBConnect::disconnectFromFB';
+$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
+$wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
+$wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
 $wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
@@ -156,7 +156,7 @@ class FBConnect {
 		if(!empty($wgFbOnLoginJsOverride)){
 			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;
 		} else {
-			self::$fbOnLoginJs = "window.location.reload(true);";
+			self::$fbOnLoginJs = 'window.location.reload(true);';
 		}
 		
 		// Default to pull new info from Facebook
@@ -258,7 +258,7 @@ class FBConnect {
 		if($user == null) {
 			$user = $wgUser;
 		}
-		$statusError = array('status' => "error", "msg" => wfMsg('fbconnect-unknown-error'));
+		$statusError = array('status' => 'error', 'msg' => wfMsg('fbconnect-unknown-error'));
 		
 		if ($user->getId() == 0) {
 			return $statusError;
@@ -290,7 +290,7 @@ class FBConnect {
 			return $statusError;
 		}
 				
-		return array('status' => "ok" );
+		return array('status' => 'ok' );
 		$dbw->commit();
 		return $response;
 	}
