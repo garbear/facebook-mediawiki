@@ -62,7 +62,7 @@ This means that when you are Connected, in addition to the normal [[Wikipedia:He
 	'fbconnect-conv'     => 'Convenience',
 	'fbconnect-convdesc' => 'Connected users are automatically logged you in.
 If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your e-mail address.',
-	'fbconnect-fbml'     => 'Facebook Markup Language',
+	'fbconnect-fbml'     => 'Facebook markup language',
 	'fbconnect-fbmldesc' => 'Facebook has provided a bunch of built-in tags that will render dynamic data.
 Many of these tags can be included in wiki text, and will be rendered differently depending on which Connected user they are being viewed by.',
 	'fbconnect-comm'     => 'Communication',
