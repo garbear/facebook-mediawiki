@@ -1,0 +1,2 @@
+svn:externals
+extensions_commit svn+ssh://gbruin@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions
