@@ -73,13 +73,14 @@ See which of your friends are using the wiki, and optionally share your actions 
 
 $1",
 	'fbconnect-merge'    => 'Merge your wiki account with your Facebook ID',
+/*
 	'fbconnect-mergebox' => 'This feature has not yet been implemented.
-Accounts can be merged manually with [[Special:Renameuser]] if it is installed.
-For more information, please visit [[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]].
+Accounts can be [[Special:Renameuser|merged manually]] if the [http://mediawiki.org/wiki/Extension:Renameuser|Rename user extension] has been installed.
 
 $1
 
 Note: This can be undone by a sysop.',
+*/
 	'fbconnect-logoutbox' => '$1
 
 This will also log you out of Facebook and all connected sites, including this wiki.',
