@@ -1,13 +1,19 @@
 <?php
 /**
- * FBConnect.alias.php - FBConnect for MediaWiki
- * 
- * Special Page alias file... for when we actually define some special pages ;-)
+ * Aliases for special pages.
+ *
+ * @file
+ * @ingroup Extensions
  */
 
-$aliases = array();
+$specialPageAliases = array();
 
-/** English */
-$aliases['en'] = array(
-    'Connect'    => array( 'Connect', 'ConnectAccount' ),
+/** English (English) */
+$specialPageAliases['en'] = array(
+	'Connect' => array( 'Connect', 'ConnectAccount' ),
 );
+
+/**
+ * For backwards compatibility with MediaWiki 1.15 and earlier.
+ */
+$aliases =& $specialPageAliases;
