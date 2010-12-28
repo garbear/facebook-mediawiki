@@ -25,17 +25,17 @@
  * <http://www.mediawiki.org/wiki/Extension_talk:FBConnect>.
  * 
  * @file
+ * @ingroup Extensions
  * @author Garrett Brown, Sean Colombo
  * @copyright Copyright © 2010 Garrett Brown, Sean Colombo
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
- * @ingroup Extensions
  */
 
 
 /*
  * Not a valid entry point, skip unless MEDIAWIKI is defined.
  */
-if ( !defined( 'MEDIAWIKI' )) {
+if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
@@ -65,7 +65,7 @@ $wgExtensionCredits['specialpage'][] = array(
 /*
  * Initialization of the autoloaders and special extension pages.
  */
-$dir = dirname(__FILE__) . '/';
+$dir = dirname( __FILE__ ) . '/';
 // Load the default configuration
 // It's recommended that you override these in LocalSettings.php
 include_once $dir . 'config.default.php';
@@ -78,7 +78,7 @@ require_once $dir . 'php-sdk/facebook.php';
 
 $wgExtensionFunctions[] = 'FBConnect::init';
 
-if( !empty( $wgFbEnablePushToFacebook ) ){
+if( !empty( $wgFbEnablePushToFacebook ) ) {
 	// Need to include it explicitly instead of autoload since it has initialization code of its own.
 	// This should be done after FBConnect::init is added to wgExtensionFunctions so that FBConnect
 	// gets fully initialized first.
@@ -146,7 +146,7 @@ class FBConnect {
 		$facebook = new FBConnectAPI();
 		
 		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
-		$hooks = self::enumMethods('FBConnectHooks');
+		$hooks = self::enumMethods( 'FBConnectHooks' );
 		foreach( $hooks as $hookName ) {
 			if (!in_array( $hookName, $wgFbHooksToAddImmediately )) {
 				$wgHooks[$hookName][] = "FBConnectHooks::$hookName";
@@ -154,7 +154,7 @@ class FBConnect {
 		}
 
 		// Allow configurable over-riding of the onLogin handler.
-		if(!empty($wgFbOnLoginJsOverride)){
+		if( !empty( $wgFbOnLoginJsOverride ) ) {
 			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;
 		} else {
 			self::$fbOnLoginJs = 'window.location.reload(true);';
@@ -168,7 +168,7 @@ class FBConnect {
 		
 		// If we are configured to pull group info from Facebook, then set up
 		// the group permissions here
-		if (!empty( $wgFbUserRightsFromGroup )) {
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
 			global $wgGroupPermissions, $wgImplictGroups, $wgAutopromote;
 			$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 			$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
@@ -199,9 +199,11 @@ class FBConnect {
 			// If PHP's version doesn't support the Reflection API, then exit
 			die( 'PHP version (' . phpversion() . ') must be great enough to support the Reflection API' );
 			// Or list the extensions here manually...
-			$hooks = array('AuthPluginSetup', 'UserLoadFromSession',
-			               'RenderPreferencesForm', 'PersonalUrls',
-			               'ParserAfterTidy', 'BeforePageDisplay', /*...*/ );
+			$hooks = array(
+				'AuthPluginSetup', 'UserLoadFromSession',
+				'RenderPreferencesForm', 'PersonalUrls',
+				'ParserAfterTidy', 'BeforePageDisplay', /*...*/
+			);
 		}
 		return $hooks;
 	}
@@ -209,11 +211,11 @@ class FBConnect {
 	/**
 	 * Return the code for the permissions attribute (with leading space) to use on all fb:login-buttons.
 	 */
-	public static function getPermissionsAttribute(){
+	public static function getPermissionsAttribute() {
 		global $wgFbExtendedPermissions;
 		$attr = '';
 		if (!empty($wgFbExtendedPermissions)) {
-			$attr = ' perms="' . implode(',', $wgFbExtendedPermissions) . '"';
+			$attr = ' perms="' . implode( ',', $wgFbExtendedPermissions ) . '"';
 		}
 		return $attr;
 	} // end getPermissionsAttribute()
@@ -224,9 +226,9 @@ class FBConnect {
 	 *
 	 * TODO: Generate the entire fb:login-button in a function in this class.  We have numerous buttons now.
 	 */
-	public static function getOnLoginAttribute(){
+	public static function getOnLoginAttribute() {
 		$attr = '';
-		if (!empty(self::$fbOnLoginJs)) {
+		if ( !empty( self::$fbOnLoginJs ) ) {
 			$attr = ' onlogin="' . self::$fbOnLoginJs . '"';
 		}
 		return $attr;
@@ -242,21 +244,21 @@ class FBConnect {
 	/**
 	 * Ajax function to disconect from Facebook.
 	 */
-	public static function disconnectFromFB($user = null) {
+	public static function disconnectFromFB( $user = null ) {
 		$response = new AjaxResponse();
 		$response->addText(json_encode(self::coreDisconnectFromFB($user)));
 		return $response;
 	}
 	
 	/**
-	 * Fb disconect function and send mail with temp password.
+	 * Facebook disconnect function and send mail with temp password.
 	 */
-	public static function coreDisconnectFromFB($user = null) {
+	public static function coreDisconnectFromFB( $user = null ) {
 		global $wgRequest, $wgUser, $wgAuth;
 		
 		wfLoadExtensionMessages('FBConnect');
 		
-		if($user == null) {
+		if ($user == null) {
 			$user = $wgUser;
 		}
 		$statusError = array('status' => 'error', 'msg' => wfMsg('fbconnect-unknown-error'));
@@ -291,7 +293,7 @@ class FBConnect {
 			return $statusError;
 		}
 				
-		return array('status' => 'ok' );
+		return array( 'status' => 'ok' );
 		$dbw->commit();
 		return $response;
 	}

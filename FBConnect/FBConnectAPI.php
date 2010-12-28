@@ -44,7 +44,7 @@ class FBConnectAPI extends Facebook {
 			'cookie' => true,
 		);
 		// Include the optional domain parameter if it has been set
-		if ( !empty($wgFbDomain) && $wgFbDomain != 'BASE_DOMAIN' ) {
+		if ( !empty( $wgFbDomain ) && $wgFbDomain != 'BASE_DOMAIN' ) {
 			$config['domain'] = $wgFbDomain;
 		}
 		parent::__construct( $config );
@@ -57,19 +57,19 @@ class FBConnectAPI extends Facebook {
 	 */
 	public function isConfigSetup() {
 		global $wgFbAppId, $wgFbSecret;
-		$isSetup = isset($wgFbAppId) && $wgFbAppId != 'YOUR_APP_KEY' &&
-		           isset($wgFbSecret) && $wgFbSecret != 'YOUR_SECRET';
-		if(!$isSetup) {
+		$isSetup = isset( $wgFbAppId ) && $wgFbAppId != 'YOUR_APP_KEY' &&
+		           isset( $wgFbSecret ) && $wgFbSecret != 'YOUR_SECRET';
+		if( !$isSetup ) {
 			// Check to see if they are still using the old variables
 			global $fbApiKey, $fbApiSecret;
-			if ( isset($fbApiKey) ) {
+			if ( isset( $fbApiKey ) ) {
 				$wgFbAppId = $fbApiKey;
 			}
-			if ( isset($fbApiSecret) ) {
+			if ( isset( $fbApiSecret ) ) {
 				$wgFbSecret= $fbApiSecret;
 			}
-			$isSetup = isset($wgFbAppId) && $wgFbAppId != 'YOUR_APP_KEY' &&
-		               isset($wgFbSecret) && $wgFbSecret != 'YOUR_SECRET';
+			$isSetup = isset( $wgFbAppId ) && $wgFbAppId != 'YOUR_APP_KEY' &&
+		               isset( $wgFbSecret ) && $wgFbSecret != 'YOUR_SECRET';
 		}
 		return $isSetup;
 	}
@@ -87,25 +87,25 @@ class FBConnectAPI extends Facebook {
 			// Cache information about users to reduce the number of Facebook hits
 			static $userinfo = array();
 			
-			if ( !isset($userinfo[$user]) ) {
+			if ( !isset( $userinfo[$user] ) ) {
 				// Query the Facebook API with the users.getInfo method
 				$query = array(
-						'method' => 'users.getInfo',
-						'uids' => $user,
-						'fields' => join(',', array(
-							'first_name', 'name', 'sex', 'timezone', 'locale',
-							/*'profile_url',*/
-							'username', 'proxied_email', 'contact_email',
-						)),
+					'method' => 'users.getInfo',
+					'uids' => $user,
+					'fields' => join( ',', array(
+						'first_name', 'name', 'sex', 'timezone', 'locale',
+						/*'profile_url',*/
+						'username', 'proxied_email', 'contact_email',
+					)),
 				);
 				$user_details = $this->api( $query );
 				// Cache the data in the $userinfo array
 				$userinfo[$user] = $user_details[0];
 			}
-			return isset($userinfo[$user]) ? $userinfo[$user] : null;
-		} catch (FacebookApiException $e) {
+			return isset( $userinfo[$user] ) ? $userinfo[$user] : null;
+		} catch ( FacebookApiException $e ) {
 			error_log( 'Failure in the api when requesting users.getInfo ' .
-			           "on uid $user: " . $e->getMessage());
+			           "on uid $user: " . $e->getMessage() );
 		}
 		return null;
 	}
@@ -117,26 +117,29 @@ class FBConnectAPI extends Facebook {
 		global $wgFbUserRightsFromGroup;
 		
 		// Groupies can be members, officers or admins (the latter two infer the former)
-		$rights = array('member'  => false,
-		                'officer' => false,
-		                'admin'   => false);
+		$rights = array(
+			'member'  => false,
+			'officer' => false,
+			'admin'   => false
+		);
 		
-		$gid = !empty($wgFbUserRightsFromGroup) ? $wgFbUserRightsFromGroup : false;
-		if (// If no group ID is specified, then there's no group to belong to
+		$gid = !empty( $wgFbUserRightsFromGroup ) ? $wgFbUserRightsFromGroup : false;
+		// If no group ID is specified, then there's no group to belong to
+		if (
 			!$gid ||
 			// If $user wasn't specified, set it to the logged in user
 			!$user ||
 			// If there is no logged in user
-			!($user = $this->getUser())
+			!( $user = $this->getUser() )
 		) {
 			return $rights;
 		}
 		
 		// If a User object was provided, translate it into a Facebook ID
-		if ($user instanceof User) {
+		if ( $user instanceof User ) {
 			// TODO: Does this call for a special api call without access_token?
-			$users = FBConnectDB::getFacebookIDs($user);
-			if (count($users)) {
+			$users = FBConnectDB::getFacebookIDs( $user );
+			if ( count($users) ) {
 				$user = $users[0];
 			} else {
 				// Not a Connected user, can't be in a group
@@ -146,7 +149,7 @@ class FBConnectAPI extends Facebook {
 		
 		// Cache the rights for an individual user to prevent hitting Facebook for duplicate info
 		static $rights_cache = array();
-		if ( array_key_exists( $user, $rights_cache )) {
+		if ( array_key_exists( $user, $rights_cache ) ) {
 			// Retrieve the rights from the cache
 			return $rights_cache[$user];
 		}
@@ -154,16 +157,16 @@ class FBConnectAPI extends Facebook {
 		// This can contain up to 500 IDs, avoid requesting this info twice
 		static $members = false;
 		// Get a random 500 group members, along with officers, admins and not_replied's
-		if ($members === false) {
+		if ( $members === false ) {
 			try {
 				// Check to make sure our session is still valid
-				$members = $this->api(array(
-						'method' => 'groups.getMembers',
-						'gid' => $gid
+				$members = $this->api( array(
+					'method' => 'groups.getMembers',
+					'gid' => $gid
 				));
-			} catch (FacebookApiException $e) {
+			} catch ( FacebookApiException $e ) {
 				// Invalid session; we're not going to be able to get the rights
-				error_log($e);
+				error_log( $e );
 				$rights_cache[$user] = $rights;
 				return $rights;
 			}
@@ -171,32 +174,32 @@ class FBConnectAPI extends Facebook {
 		
 		if ( $members ) {
 			// Check to see if the user is an officer
-			if (array_key_exists('officers', $members) && in_array($user, $members['officers'])) {
+			if ( array_key_exists( 'officers', $members ) && in_array( $user, $members['officers'] ) ) {
 				$rights['member'] = $rights['officer'] = true;
 			}
 			// Check to see if the user is an admin of the group
-			if (array_key_exists('admins', $members) && in_array($user, $members['admins'])) {
+			if ( array_key_exists( 'admins', $members ) && in_array( $user, $members['admins'] ) ) {
 				$rights['member'] = $rights['admin'] = true;
 			}
 			// Because the latter two rights infer the former, this step isn't always necessary
 			if( !$rights['member'] ) {
 				// Check to see if we are one of the (up to 500) random users
-				if ((array_key_exists('not_replied', $members) && is_array($members['not_replied']) &&
-					in_array($user, $members['not_replied'])) || in_array($user, $members['members'])) {
+				if ( ( array_key_exists( 'not_replied', $members ) && is_array( $members['not_replied'] ) &&
+					in_array( $user, $members['not_replied'] ) ) || in_array( $user, $members['members'] ) ) {
 					$rights['member'] = true;
 				} else {
 					// For groups of over 500ish, we must use this extra API call
 					// Notice that it occurs last, because we can hopefully avoid having to call it
 					try {
-						$group = $this->api(array(
-								'method' => 'groups.get',
-								'uid' => $user,
-								'gids' => $gid
+						$group = $this->api( array(
+							'method' => 'groups.get',
+							'uid' => $user,
+							'gids' => $gid
 						));
-					} catch (FacebookApiException $e) {
-						error_log($e);
+					} catch ( FacebookApiException $e ) {
+						error_log( $e );
 					}
-					if (is_array($group) && is_array($group[0]) && $group[0]['gid'] == "$gid") {
+					if ( is_array( $group ) && is_array( $group[0] ) && $group[0]['gid'] == "$gid" ) {
 						$rights['member'] = true;
 					}
 				}
@@ -232,9 +235,9 @@ class FBConnectAPI extends Facebook {
 			)),
 		);
 		/*
-		if( count($media) > 0 ) {
+		if( count( $media ) > 0 ) {
 			foreach ( $media as $value ) {
-				$attachment[ 'media' ][] = $value;
+				$attachment['media'][] = $value;
 			}
 		}
 		/**/
@@ -242,9 +245,9 @@ class FBConnectAPI extends Facebook {
 		$query = array(
 			'method' => 'stream.publish',
 			'message' => $short,
-			'attachment' => json_encode($attachment),
+			'attachment' => json_encode( $attachment ),
 			/*
-			'action_links' => json_encode(array(
+			'action_links' => json_encode( array(
 				'text' => $link_title,
 				'href' => $link
 			)),
@@ -255,15 +258,15 @@ class FBConnectAPI extends Facebook {
 		
 		if ( is_array( $result ) ) {
 			// Error
-			#error_log(FacebookAPIErrorCodes::$api_error_descriptions[$result]);
-			error_log("stream.publish returned error code $result->error_code");
+			#error_log( FacebookAPIErrorCodes::$api_error_descriptions[$result] );
+			error_log( "stream.publish returned error code $result->error_code" );
 			return $result->error_code;
 		}
-		if ( is_string( $result ) ) {
+		else if ( is_string( $result ) ) {
 			// Success! Return value is "$UserId_$PostId"
 			return 0;
 		} else {
-			error_log("stream.publish: Unknown return type: " . gettype($result));
+			error_log( 'stream.publish: Unknown return type: ' . gettype( $result ) );
 			return -1;
 		}
 	}
@@ -276,10 +279,10 @@ class FBConnectAPI extends Facebook {
 	 * 
 	 * See also <http://wiki.developers.facebook.com/index.php/Reclaiming_Accounts>.
 	 */
-	function verifyAccountReclamation($fb_user_id, $hash) {
-		if ($hash != md5( $user . $this->apiSecret )) {
+	function verifyAccountReclamation( $fb_user_id, $hash ) {
+		if ( $hash != md5( $user . $this->apiSecret ) ) {
 			return false;
 		}
-		return FBConnectDB::getUser($fb_user_id);
-	} 
+		return FBConnectDB::getUser( $fb_user_id );
+	}
 }
