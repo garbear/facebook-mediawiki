@@ -15,15 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * Not a valid entry pointx, skip unless MEDIAWIKI is defined.
- */
-if ( !defined( 'MEDIAWIKI' ) ) {
-	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
-}
-
-
 /**
  * FBConnect.i18n.php
  * 
@@ -62,28 +53,44 @@ $messages['en'] = array(
 	'fbconnect-link'     => 'Back to facebook.com',
 	'fbconnect-or'       => 'OR',
 
-// Special:Connect
+	// Special:Connect
 	'fbconnect-title'    => 'Connect account with Facebook',
-	'fbconnect-intro'    => 'This wiki is enabled with Facebook Connect, the next evolution of Facebook Platform. This means that when you are Connected, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
-	'fbconnect-click-to-login' => 'Click this button to login to this site via facebook',
-	'fbconnect-click-to-connect-existing' => 'Click this button to connect your facebook account to $1',
+	'fbconnect-intro'    => 'This wiki is enabled with Facebook Connect, the next evolution of Facebook Platform.
+This means that when you are Connected, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
+	'fbconnect-click-to-login' => 'Click this button to login to this site via Facebook',
+	'fbconnect-click-to-connect-existing' => 'Click this button to connect your Facebook account to $1',
 	'fbconnect-conv'     => 'Convenience',
-	'fbconnect-convdesc' => 'Connected users are automatically logged you in. If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your email address.',
+	'fbconnect-convdesc' => 'Connected users are automatically logged you in.
+If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your e-mail address.',
 	'fbconnect-fbml'     => 'Facebook Markup Language',
-	'fbconnect-fbmldesc' => 'Facebook has provided a bunch of built-in tags that will render dynamic data. Many of these tags can be included in wiki text, and will be rendered differently depending on which Connected user they are being viewed by.',
+	'fbconnect-fbmldesc' => 'Facebook has provided a bunch of built-in tags that will render dynamic data.
+Many of these tags can be included in wiki text, and will be rendered differently depending on which Connected user they are being viewed by.',
 	'fbconnect-comm'     => 'Communication',
-	'fbconnect-commdesc' => 'Facebook Connect ushers in a whole new level of networking. See which of your friends are using the wiki, and optionally share your actions with your friends through the Facebook News Feed.',
+	'fbconnect-commdesc' => 'Facebook Connect ushers in a whole new level of networking.
+See which of your friends are using the wiki, and optionally share your actions with your friends through the Facebook news feed.',
 	'fbconnect-welcome'  => 'Welcome, Facebook Connect user!',
-	'fbconnect-loginbox' => "Or '''login''' with Facebook:\n\n$1",
+	'fbconnect-loginbox' => "Or '''login''' with Facebook:
+
+$1",
 	'fbconnect-merge'    => 'Merge your wiki account with your Facebook ID',
-	'fbconnect-logoutbox'=> "$1\n\nThis will also log you out of Facebook and all Connected sites, including this wiki.",
-	'fbconnect-listusers-header'
-              => '$1 and $2 privileges are automatically transfered from the Officer and Admin titles of the Facebook group $3.\n\nFor more info, please contact the group creator $4.',
-// Prefix to use for automatically-generated usernames
+	'fbconnect-mergebox' => 'This feature has not yet been implemented.
+Accounts can be merged manually with [[Special:Renameuser]] if it is installed.
+For more information, please visit [[MediaWikiWiki:Extension:Renameuser|Extension:Renameuser]].
+
+$1
+
+Note: This can be undone by a sysop.',
+	'fbconnect-logoutbox' => '$1
+
+This will also log you out of Facebook and all connected sites, including this wiki.',
+	'fbconnect-listusers-header' => '$1 and $2 privileges are automatically transfered from the officer and admin titles of the Facebook group $3.
+
+For more info, please contact the group creator $4.',
+	// Prefix to use for automatically-generated usernames
 	'fbconnect-usernameprefix' => 'FacebookUser',
-// Special:Connect
+	// Special:Connect
 	'fbconnect-error' => 'Verification error',
-	'fbconnect-errortext' => 'Yikes! It looks like that didn\'t work out. Please try again.',
+	'fbconnect-errortext' => 'An error occured during verification with Facebook Connect.',
 	'fbconnect-cancel' => 'Action cancelled',
 	'fbconnect-canceltext' => 'The previous action was cancelled by the user.',
 	'fbconnect-invalid' => 'Invalid option',
@@ -91,17 +98,18 @@ $messages['en'] = array(
 	'fbconnect-success' => 'Facebook verification succeeded',
 	'fbconnect-successtext' => 'You have been successfully logged in with Facebook Connect.',
 	'fbconnect-success-connecting-existing-account' => 'Your facebook account has been connected. To change which events get pushed to your facebook news feed, please visit your <a href="$1">preferences</a> page.',
-#	'fbconnect-optional' => 'Optional',
-#	'fbconnect-required' => 'Required',
+	#'fbconnect-optional' => 'Optional',
+	#'fbconnect-required' => 'Required',
 	'fbconnect-nickname' => 'Nickname',
-	'fbconnect-fullname' => 'Full name',
+	'fbconnect-fullname' => 'Fullname',
 	'fbconnect-gender' => 'Gender',
 	'fbconnect-email' => 'E-mail address',
 	'fbconnect-language' => 'Language',
 	'fbconnect-timecorrection' => 'Time zone correction (hours)',
 	'fbconnect-chooselegend' => 'Username choice',
 	'fbconnect-chooseinstructions' => 'All users need a nickname; you can choose one from the options below.',
-	'fbconnect-invalidname' => 'The nickname you chose is already taken or not a valid nickname. Please chose a different one.',
+	'fbconnect-invalidname' => 'The nickname you chose is already taken or not a valid nickname.
+Please chose a different one.',
 	'fbconnect-choosenick' => 'Your Facebook profile name ($1)',
 	'fbconnect-choosefirst' => 'Your first name ($1)',
 	'fbconnect-choosefull' => 'Your full name ($1)',
@@ -112,28 +120,38 @@ $messages['en'] = array(
 	'fbconnect-choosepassword' => 'Password:',
 	'fbconnect-updateuserinfo' => 'Update the following personal information:',
 	'fbconnect-alreadyloggedin-title' => 'Already connected',
-	'fbconnect-alreadyloggedin' => "'''You are already logged in and facebook-connected, $1!'''",
+	'fbconnect-alreadyloggedin' => "'''You are already logged in, $1!'''
+
+If you want to use Facebook Connect to log in in the future, you can [[Special:Connect/Convert|convert your account to use Facebook Connect]].",
+	/*
+	'fbconnect-convertinstructions' => 'This form lets you change your user account to use an OpenID URL or add more OpenID URLs',
+	'fbconnect-convertoraddmoreids' => 'Convert to OpenID or add another OpenID URL',
+	'fbconnect-convertsuccess' => 'Successfully converted to OpenID',
+	'fbconnect-convertsuccesstext' => 'You have successfully converted your OpenID to $1.',
+	'fbconnect-convertyourstext' => 'That is already your OpenID.',
+	'fbconnect-convertothertext' => 'That is someone else\'s OpenID.',
+	*/
 	'fbconnect-logged-in-now-connect' => "You have been logged in to your account, please click the login button to connect it with Facebook.",
 	'fbconnect-logged-in-now-connect-title' =>  "Almost done!",
 	'fbconnect-modal-title' => 'Finish your account setup',
     'fbconnect-modal-headmsg' => 'Almost done!',
-
-	'fbconnect-error-creating-user' => "Error creating the user in the local database.",
-	'fbconnect-error-user-creation-hook-aborted' => "A hook (extension) aborted the account creation with the message: $1",
-
+	'fbconnect-error-creating-user' => 'Error creating the user in the local database.',
+	'fbconnect-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
 	'fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Facebook profile',
-	'fbconnect-prefsheader' => "By default, some events will push items to your Facebook feed. You can customise these now, or later at any time in your preferences.",
-	'fbconnect-prefs-show' => "Show feed preferences >>",
-    'fbconnect-prefs-hide' => "Hide feed preferences >>",
+	'fbconnect-prefsheader' => 'By default, some events will push items to your Facebook feed. You can customise these now, or later at any time in your preferences.',
+	// From MediaWiki Translatewiki
+	#'fbconnect-prefsheader' => "To control which events will push an item to your Facebook news feed, <a id='fbConnectPushEventBar_show' href='#'>show preferences</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>hide preferences</a>",
+	'fbconnect-prefs-can-be-updated' => 'You can update these any time by visiting the "$1" tab of your preferences page.',
+	'fbconnect-prefs-show' => 'Show feed preferences >>',
+    'fbconnect-prefs-hide' => 'Hide feed preferences >>',
 	'fbconnect-prefs-post' => 'Post to my Facebook News Feed when I:',
     'fbconnect-connect-msg' => "Congratulations! Your Wikia and Facebook accounts are now connected. <br/> Check your <a href='$1'>preferences</a> to control which events appear in Facebook feed.",
     'fbconnect-connect-error-msg' => "We're sorry, we couldn't complete your connection without permission to post to your Facebook account. After setup you have [[w:c:help:Help:Facebook_Connect#Sharing_with_your_Facebook_activity_feed|full control]] of what's posted to your news feed. Please try again.",
-
 	'fbconnect-disconnect-link' => "You can also <a id='fbConnectDisconnect' href='#'> disconnect your Wikia account from Facebook.</a> You will able continue using your Wikia account as normal, with your history (edits, points, achievements ) intact.",
 	'fbconnect-disconnect-done' => "Disconnecting <span id='fbConnectDisconnectDone'>... done! </span>",
-	'fbconnect-disconnect-info' => "We have emailed a new password to use with your account - you can log in with the same username as before. Hooray!",
-	'tog-fbconnect-push-allow-never' => "Never send anything to my news feed (overrides other options)",
+	'fbconnect-disconnect-info' => 'We have emailed a new password to use with your account - you can log in with the same username as before.',
+	'tog-fbconnect-push-allow-never' => 'Never send anything to my news feed (overrides other options)',
 	'fbconnect-reclamation-title' => 'Disconnecting from Facebook',
 	'fbconnect-reclamation-body' => 'Your account is now disconnected from Facebook! <br/><br/>  We have emailed a new password to use with you account - you can log in with the same username as before. Hooray!
 											<br/><br/> To login go to: $1',
@@ -180,7 +198,7 @@ The Wikia Community Team',
 
 /**
  * Message documentation (Message documentation)
- * What is this used for? Answer: This is shown to translators to help them know what the string is for.
+ * This is shown to translators to help them know what the string is for.
  * @author Garrett Brown
  */
 $messages['qqq'] = array(
@@ -209,13 +227,3 @@ OpenID preferences tab title',
 										   to an existing account.',
 	'fbconnect-connect-next' => 'This text appears on the button in the login-and-connect dialog.  After a user enters their username/password, this will slide them over to the next screen which is the Facebook Connect button.'
 );
-/**/
-
-/*
-	'fbconnect-convertinstructions' => 'This form lets you change your user account to use an OpenID URL or add more OpenID URLs',
-	'fbconnect-convertoraddmoreids' => 'Convert to OpenID or add another OpenID URL',
-	'fbconnect-convertsuccess' => 'Successfully converted to OpenID',
-	'fbconnect-convertsuccesstext' => 'You have successfully converted your OpenID to $1.',
-	'fbconnect-convertyourstext' => 'That is already your OpenID.',
-	'fbconnect-convertothertext' => 'That is someone else\'s OpenID.',
-*/

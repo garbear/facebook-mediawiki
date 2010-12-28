@@ -54,6 +54,7 @@ define( 'FBCONNECT_LOCALE', '%LOCALE%');
  * Add information about this extension to Special:Version.
  */
 $wgExtensionCredits['specialpage'][] = array(
+	'path'           => __FILE__,
 	'name'           => 'Facebook Connect Plugin',
 	'author'         => 'Garrett Brown, Sean Colombo, Tomek Odrobny',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:FBConnect',
