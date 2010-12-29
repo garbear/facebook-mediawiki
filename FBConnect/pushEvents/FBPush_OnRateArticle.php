@@ -37,10 +37,11 @@ class FBPush_OnRateArticle extends FBConnectPushEvent {
 		$params = array(
 			'$ARTICLENAME' => $article->getTitle()->getText(),
 			'$WIKINAME' => $wgSitename,
-			'$ARTICLE_URL' => $article->getTitle()->getFullURL("ref=fbfeed&fbtype=ratearticle"),
+			'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=ratearticle'),
 			'$RATING' => $vote,
 			'$EVENTIMG' => self::$eventImage,
-			'$TEXT' => self::shortenText(self::parseArticle($article))
+			'$TEXT' => self::shortenText(self::parseArticle($article)),
+			'$ARTICLE_OBJ' => $article,
 		);
 		
 		self::pushEvent(self::$messageName, $params, __CLASS__ );
