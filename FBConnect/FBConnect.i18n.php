@@ -138,7 +138,8 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
     'fbconnect-modal-headmsg' => 'Almost done!',
 	'fbconnect-error-creating-user' => 'Error creating the user in the local database.',
 	'fbconnect-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
-	'fbconnect-prefstext' => 'Facebook Connect',
+	// fbconnect-prefstext
+	'prefs-fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Facebook profile',
 	'fbconnect-prefsheader' => 'By default, some events will push items to your Facebook feed. You can customise these now, or later at any time in your preferences.',
 	// From MediaWiki Translatewiki
@@ -160,9 +161,9 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
 	'fbconnect-reclamation-body-error' => 'There was some error during disconnecting from Facebook or you account is already disconnected. 
 											<br/><br/> To login go to: $1',
     'fbconnect-unknown-error' => 'Unknown error, try again or contact with us.',          
-	'fbconnect-passwordremindertitle'      	=> 'Your Wikia account is now disconnected from Facebook!',
+	'fbconnect-passwordremindertitle' => 'Your Wikia account is now disconnected from Facebook!',
     'fbconnect-passwordremindertitle-exist' => 'Your Wikia account is now disconnected from Facebook!',
-	'fbconnect-passwordremindertext'       => 'Hi,
+	'fbconnect-passwordremindertext' => 'Hi,
 It looks like you\'ve just disconnected your Wikia account from Facebook. We\'ve kept all of your history, edit points and achievements intact, so don\'t worry!
 
 You can use the same username as before, and we\'ve generated a new password for you to use. Here are your details:
@@ -194,7 +195,8 @@ The Wikia Community Team',
 	'fbconnect-fbid-is-already-connected-title' => 'Facebook account is already in use',
 	'fbconnect-fbid-is-already-connected' => 'The Facebook account you are attempting to connect to your Wikia account is already connected to a different Wikia account. If you would like to connect your current Wikia account to that Facebook id, please disconnect the Facebook account from your other username first by visiting the "Facebook Connect" tab of your Preferences page.',
 	'fbconnect-fbid-connected-to' => 'The Wikia username that is currently connected to this Facebook id is <strong>$1</strong>.',
-    'fbconnect-connect-next' => 'Next >>' ,
+	'fbconnect-connect-next' => 'Next >>',
+	'fbconnect-signup-mail' => 'E-mail:',
 );
 
 /**

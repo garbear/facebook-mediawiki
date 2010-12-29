@@ -49,7 +49,7 @@ class ChooseNameTemplate extends QuickTemplate {
 <tr>
 <td width="55%" style="border:none; vertical-align: top;">
 <div id="userRegisterAjax">
-<form id="fb_userajaxregisterform" method="post" action="<?php $this->text('actioncreate') ?>" onsubmit="return false;">
+<form id="fb_userajaxregisterform" method="post" action="<?php $this->text('actioncreate') ?>">
 	<input type='hidden' name='wpNameChoice' value='manual' />
 <?php		if( $this->data['message'] && $this->data['ajax'] ) { ?>
 	<div class="<?php $this->text('messagetype') ?>box" style="margin:0px">
@@ -148,7 +148,7 @@ class ChooseNameTemplate extends QuickTemplate {
 		<tr class="wpAjaxLoginPreLine" >
 			<td class="wpAjaxLoginInput" id="wpFBEmailTD">
 				<?php if( $this->data['useemail'] ) { ?>
-					<label for='wpEmail'><?php $this->msg('signup-mail') ?></label><a style='float:left' id="wpEmailInfo" href="#"><?php $this->msg( 'signup-moreinfo' ) ?></a><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
+					<label for='wpEmail'><?php echo wfMsg('fbconnect-signup-mail'); ?></label><a style='float:left' id="wpEmailInfo" href="#"><?php $this->msg( 'signup-moreinfo' ) ?></a><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
 					<input type='text'  name="wpEmail" id="wpFBEmail" value="<?php $this->text('email') ?>" size='20' />
 				<?php } ?>
 		</tr>
@@ -324,36 +324,36 @@ class ChooseNameTemplate extends QuickTemplate {
 			var errorsHTML = '';
 			WET.byStr( 'FBconnect/ChooseName/Create_account');
 			UserRegistration.checkUsername(
-			function(username_status, msg) {
-				if( username_status && UserRegistration.checkEmail() ) {
-					$("#fb_userajaxregisterform").submit();
-					return true;
-				} else {
-					$('#userloginErrorBox').show();
-
-					var errors = [];
-					var errorsHTML = '';
-					if ( !username_status ) {
-                                            errors.push(msg);
-                                        }
-
-					if ( !UserRegistration.checkEmail() )
-						errors.push(UserRegistration.errorMessages['email']);
-					if (errors.length == 1) {
-						//one
-						errorsHTML = errors[0];
-						$('#userloginInnerErrorBox').html(errorsHTML);
-						
+				function(username_status, msg) {
+					if( username_status && UserRegistration.checkEmail() ) {
+						$("#fb_userajaxregisterform").submit();
+						return true;
 					} else {
-						//more
-						errorsHTML = '<strong>' + UserRegistration.errorMessages['main'] + '</strong><ul>';
-						for (err in errors) errorsHTML += '<li>' + errors[err] + '</li>';
-						errorsHTML += '</ul>';
-						$('#userloginInnerErrorBox').html(errorsHTML);
+						$('#userloginErrorBox').show();
+
+						var errors = [];
+						var errorsHTML = '';
+						if ( !username_status ) {
+												errors.push(msg);
+											}
+
+						if ( !UserRegistration.checkEmail() )
+							errors.push(UserRegistration.errorMessages['email']);
+						if (errors.length == 1) {
+							//one
+							errorsHTML = errors[0];
+							$('#userloginInnerErrorBox').html(errorsHTML);
+							
+						} else {
+							//more
+							errorsHTML = '<strong>' + UserRegistration.errorMessages['main'] + '</strong><ul>';
+							for (err in errors) errorsHTML += '<li>' + errors[err] + '</li>';
+							errorsHTML += '</ul>';
+							$('#userloginInnerErrorBox').html(errorsHTML);
+						}
 					}
+					WET.byStr( 'FBconnect/ChooseName/createaccount/failure');
 				}
-				WET.byStr( 'FBconnect/ChooseName/createaccount/failure');
-			}
 			); 
 		}
 		UserRegistration.checkUsername(function() {});

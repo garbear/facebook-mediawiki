@@ -708,8 +708,8 @@ STYLE;
 	/**
 	 * Create a disconnect button and other things in preferences.
 	 */
-	static function initPreferencesExtensionForm($user, &$wgExtensionPreferences) {
-	global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
+	static function GetPreferences( $user, &$preferences ) {
+		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
 		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/FBConnect/prefs.js?{$wgStyleVersion}\"></script>\n");
 		wfLoadExtensionMessages('FBConnect');
 		$prefsection = 'fbconnect-prefstext';
@@ -729,21 +729,25 @@ STYLE;
 				$html .= '<br/>'.wfMsg('fbconnect-disconnect-info');
 			$html .= Xml::closeElement( "div" );
 			
-			$wgExtensionPreferences[] = array(
-					'html' => "<br>",
-					'type' => PREF_USER_T,
-					'section' => 'fbconnect-prefstext' );
+			$preferences['fbconnect-prefstext'] = array(
+				'label' => '',
+				'type' => 'info',
+				'section' => 'fbconnect-prefstext',
+			);
 			
-			$wgExtensionPreferences[] = array(
-					'name' => 'fbconnect-push-allow-never',
-					'type' => PREF_TOGGLE_T,
-					'section' => 'fbconnect-prefstext',
-					'default' => 1);
+			$preferences['tog-fbconnect-push-allow-never'] = array(
+				'name' => 'toggle',
+				'label-message' => 'fbconnect-push-allow-never',
+				'section' => 'fbconnect-prefstext',
+				'default' => 1,
+			);
 			
-			$wgExtensionPreferences[] = array(
-					'html' => $html,
-					'type' => PREF_USER_T,
-					'section' => 'fbconnect-prefstext' );
+			$preferences['fbconnect-connect'] = array(
+				'help' => $html,
+				'label' => '',
+				'type' => 'info',
+				'section' => 'fbconnect-prefstext',
+			);
 			
 		} else {
 			// User is a MediaWiki user but isn't connected yet
@@ -753,10 +757,11 @@ STYLE;
 			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
 			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
-			$wgExtensionPreferences[] = array(
-				'html' => $html,
-				'type' => PREF_USER_T,
-				'section' => 'fbconnect-prefstext'
+			$preferences['fbconnect-disconnect'] = array(
+				'help' => $html,
+				'label' => '',
+				'type' => 'info',
+				'section' => 'fbconnect-prefstext',
 			);
 		}
 		return true;
@@ -772,8 +777,8 @@ STYLE;
 			LoginForm::setLoginToken();
 		}
 		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
-		$tmpl->set( 'fbButtton', FBConnect::getFBButton("sendToConnectOnLoginForSpecificForm('ConnectExisting');", 'fbPrefsConnect'));
-		$html = $tmpl->execute('ajaxLoginMerge');
+		$tmpl->set( 'fbButtton', FBConnect::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
+		$html = $tmpl->execute( 'ajaxLoginMerge' );
 		return true;
 	}
 	
