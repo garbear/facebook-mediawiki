@@ -254,7 +254,7 @@ $messages['arc'] = array(
 	'fbconnect-language' => 'ܠܫܢܐ',
 	'fbconnect-choosefirst' => 'ܫܡܐ ܩܕܡܝܐ ܕܝܠܟ($1)',
 	'fbconnect-choosefull' => 'ܫܡܐ ܓܡܝܪܐ ܕܝܠܟ($1)',
-	'fbconnect-chooseusername' => 'ܫܡܐ ܕܡܬܚܫܚܢܐ:',
+	'fbconnect-chooseusername' => 'ܫܡܐ ܕܡܦܠܚܢܐ:',
 	'fbconnect-choosepassword' => 'ܡܠܬܐ ܕܥܠܠܐ:',
 );
 
@@ -590,6 +590,49 @@ $messages['de-formal'] = array(
 	'fbconnect-alreadyloggedin' => "'''Sie sind bereits angemeldet, $1!'''
 
 Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
+);
+
+/** Lower Sorbian (Dolnoserbski)
+ * @author Michawiki
+ */
+$messages['dsb'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'group-fb-user' => 'Wužywarje Facebook Connect',
+	'group-fb-user-member' => 'Wužywaŕ Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}:Wužywarje Facebook Connect',
+	'group-fb-groupie' => 'Kupkowe cłonki',
+	'group-fb-groupie-member' => 'Kupkowy cłonk',
+	'grouppage-fb-groupie' => '{{ns:project}}:Kupkowe cłonki',
+	'group-fb-officer' => 'Kupkowe zastojniki',
+	'group-fb-officer-member' => 'Kupkowy zastojnik',
+	'grouppage-fb-officer' => '{{ns:project}}:Kupkowe zastojniki',
+	'group-fb-admin' => 'Kupkowe administratory',
+	'group-fb-admin-member' => 'Kupkowy administrator',
+	'grouppage-fb-admin' => '{{ns:project}}:Kupkowe administratory',
+	'fbconnect-link' => 'Slědk k facebook.com',
+	'fbconnect-conv' => 'Komfortabelnosć',
+	'fbconnect-fbml' => 'Wobznamjeńska rěc Facebook',
+	'fbconnect-comm' => 'Komunikacija',
+	'fbconnect-welcome' => 'Wita, wužywaŕ Facebook Connect!',
+	'fbconnect-loginbox' => "Abo '''pśizjawjenje''' pśez Facebook:
+
+$1",
+	'fbconnect-cancel' => 'akcija pśetergnjona',
+	'fbconnect-invalid' => 'Njepłaśiwa akcija',
+	'fbconnect-nickname' => 'Pśimě',
+	'fbconnect-fullname' => 'Dopołne mě',
+	'fbconnect-email' => 'E-mailowa adresa',
+	'fbconnect-language' => 'Rěc',
+	'fbconnect-timecorrection' => 'Korektura casoweje cony (góźiny)',
+	'fbconnect-choosenick' => 'Mě profila na Facebooku ($1)',
+	'fbconnect-choosefirst' => 'Twójo pśedmě ($1)',
+	'fbconnect-choosefull' => 'Twójo dopołne mě ($1)',
+	'fbconnect-choosemanual' => 'Mě twójogo žycenja:',
+	'fbconnect-chooseexisting' => 'Eksistěrujuce konto w toś tom wikiju',
+	'fbconnect-chooseusername' => 'Wužywarske mě:',
+	'fbconnect-choosepassword' => 'Gronidło:',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Profil Facebook',
 );
 
 /** Esperanto (Esperanto)
@@ -1092,6 +1135,89 @@ $messages['he'] = array(
 	'fbconnect-link-to-profile' => 'Facebook פרופיל',
 );
 
+/** Upper Sorbian (Hornjoserbsce)
+ * @author Michawiki
+ */
+$messages['hsb'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Zmóžnja wužiwarjam so z jich kontami na [http://www,facebook.com Facebook] [[Special:Connect|zwjazać]].',
+	'group-fb-user' => 'Wužiwarjo Facebook Connect',
+	'group-fb-user-member' => 'Wužiwar Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}:Wužiwarjo Facebook Connect',
+	'group-fb-groupie' => 'Skupinscy čłonojo',
+	'group-fb-groupie-member' => 'Skupinski čłon',
+	'grouppage-fb-groupie' => '{{ns:project}}:Skupinscy čłonojo',
+	'group-fb-officer' => 'Skupinscy zarjadnicy',
+	'group-fb-officer-member' => 'Skupinski zarjadnik',
+	'grouppage-fb-officer' => '{{ns:project}}:Skupinscy zarjadnicy',
+	'group-fb-admin' => 'Skupinscy administratorojo',
+	'group-fb-admin-member' => 'Skupinski administrator',
+	'grouppage-fb-admin' => '{{ns:project}}:Skupinscy administratorojo',
+	'fbconnect-connect' => 'Přez Facebook Connect přizjewić',
+	'fbconnect-convert' => 'Tute konto z Facebookom zwjazać',
+	'fbconnect-logout' => 'Z Facebook wotzjewić',
+	'fbconnect-link' => 'Wróćo k facebook.com',
+	'fbconnect-title' => 'Konto z Facebookom zwjazać',
+	'fbconnect-intro' => 'Tutón wiki je z Facebook connect zmóžnjeny, přichodne wuwiće platformy Facebook.
+To woznamjenja, zo móžeš, hdyž sy zwjazany, někotre dalše funkcije wužiwać, přidatnje k normalnym [[Wikipedia:Help:Logging in#Why log in?|lěpšinam]], kotrež při přizjewjenju widźeš.',
+	'fbconnect-click-to-login' => 'Klikń, zo by so přez Facebook pola tutoho sydła přizjewił',
+	'fbconnect-click-to-connect-existing' => 'Klikń, zo by swoje konto Facebook z $1 zwjazał',
+	'fbconnect-conv' => 'Komfortabelnosć',
+	'fbconnect-convdesc' => 'Zwjzani wužiwarjo su awtomatisce přizjewjeni.
+Jeli prawo je date, da móže tutón wiki Facebook samo jako e-mejlowy proksy wužiwać. Přez to móžeš dale wažne zdźělenki dóstać, bjez toho zo dyrbiš swoju e-mejlowu adresu wotkryć.',
+	'fbconnect-fbml' => 'Woznamjenjenska rěč Facebook',
+	'fbconnect-fbmldesc' => 'Facebook je rjad zatwarjenych tafličkow k dispoziciji stajił, kotrež budu dynamiske daty rysować.
+Wjele z tutych tafličkow móže so do wikiteksta zasunyć a budźe so rozdźělnje rysować, wotwisujo wot toho, kotry wužiwar sej je wobhladuje.',
+	'fbconnect-comm' => 'Komunikacija',
+	'fbconnect-commdesc' => 'Facebook Connect připowěduje cyle nowu runinu dźěłanja w syći.
+Hlej, kotři z twojich přećelow tutón wiki wužiwaja, a wužij swoje akcije zhromadnje ze swojimi přećelemi na kanalu nowinkow we Facebooku.',
+	'fbconnect-welcome' => 'Witaj, wužiwarjo Facebook Connect!',
+	'fbconnect-loginbox' => "Abo '''přizjewjenje''' přez Facebook:
+
+$1",
+	'fbconnect-merge' => 'Twoje wikikonto z twojim Facebook-ID zwjazać',
+	'fbconnect-logoutbox' => '$1
+
+Přez to wotzjewiš so z Facebook a wšěch zwjazanych sydłow, inkluziwnje tutoho wikija.',
+	'fbconnect-listusers-header' => 'Prawa $1 a $2 přenošuja so awtomatisce wot titulow zarjadnika a administratora skupiny Facebook $3.
+Za dalše informacije staj so prošu z tworićel skupiny $4 do zwiska.',
+	'fbconnect-error' => 'Pruwowanski zmylk',
+	'fbconnect-errortext' => 'Při přepruwowanju přez Facebook Connect je zmylk wustupił.',
+	'fbconnect-cancel' => 'Akcija přetorhnjena',
+	'fbconnect-canceltext' => 'Předchadna akcija bu wot wužiwarja přetorhnjena.',
+	'fbconnect-invalid' => 'Njepłaćiwa opcija',
+	'fbconnect-invalidtext' => 'Wuběr na předchadnej stronje bě njepłaćiwy.',
+	'fbconnect-success' => 'Přepruwowanje Facebook je so poradźiło',
+	'fbconnect-successtext' => 'Sy so wuspěšnje přez Facebook Connect přizjewił.',
+	'fbconnect-nickname' => 'Přimjeno',
+	'fbconnect-fullname' => 'Dospołne mjeno',
+	'fbconnect-email' => 'E-mejlowa adresa',
+	'fbconnect-language' => 'Rěč',
+	'fbconnect-timecorrection' => 'Korektura časoweho pasma (hodźiny)',
+	'fbconnect-chooselegend' => 'Wuběranje wužiwarskeho mjena',
+	'fbconnect-chooseinstructions' => 'Wšitcy wužiwarjo trjebaja přimjeno; móžěs jedne z opcijow deleka wubrać.',
+	'fbconnect-invalidname' => 'Wubrane přimjeno so hižo wužiqwa abo njeje płaćiwe.
+Prošu wubjer druhe přimjeno.',
+	'fbconnect-choosenick' => 'Mjeno profila na Facebooku ($1)',
+	'fbconnect-choosefirst' => 'Twoje předmjeno ($1)',
+	'fbconnect-choosefull' => 'Twoje dospołne mjeno ($1)',
+	'fbconnect-chooseauto' => 'Awtomatisce wutworjene mjeno ($1)',
+	'fbconnect-choosemanual' => 'Mjeno twojeje wólby:',
+	'fbconnect-chooseexisting' => 'Eksistowace konto na tutym wikiju',
+	'fbconnect-chooseusername' => 'Wužiwarske mjeno:',
+	'fbconnect-choosepassword' => 'Hesło:',
+	'fbconnect-updateuserinfo' => 'Zaktualizuj slědowace wosobinske informacije:',
+	'fbconnect-alreadyloggedin' => "'''Sy hižo přizjewjeny, $1!'''
+
+Jeli chceš Facebook Connect wužiwać, hdyž so přichodnje přizjewiš, móžeš [[Special:Connect/Convert|swoje konto za wužiwanje Facebook Connect konwertować]].",
+	'fbconnect-error-creating-user' => 'Zmylk při wutworjenju wužiwarja w lokalnej datowej bance.',
+	'fbconnect-error-user-creation-hook-aborted' => 'Rozšěrjenje přetorhny załoženje konta ze slědowacej zdźělenku: $1',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Profil Facebook',
+	'fbconnect-prefsheader' => "Zo by wodźił, kotre podawki pósćelu element do kanala nowinkow Facebook, <a id='fbConnectPushEventBar_show' href='#'>nastajenja pokazać</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>nastajenja schować</a>",
+	'fbconnect-prefs-can-be-updated' => 'Móžeš je kóždy čas aktualizować, hdyž je na rajtarku "$1" na stronje twojich nastajenjow změniš.',
+);
+
 /** Hungarian (Magyar)
  * @author Dani
  * @author Glanthor Reviol
@@ -1237,6 +1363,91 @@ Si tu vole usar Facebook Connect pro aperir un session in le futuro, tu pote [[S
 	'fbconnect-link-to-profile' => 'Profilo de Facebook',
 	'fbconnect-prefsheader' => "Pro determinar le eventos que pote inserer un entrata in tu lista de novas a Facebook, <a id='fbConnectPushEventBar_show' href='#'>monstra preferentias</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>cela preferentias</a>",
 	'fbconnect-prefs-can-be-updated' => 'Tu pote sempre actualisar istes per visitar le scheda "$1" de tu pagina de preferentias.',
+);
+
+/** Indonesian (Bahasa Indonesia)
+ * @author IvanLanin
+ */
+$messages['id'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Memungkinkan pengguna untuk [[Special:Connect|tersambung]] dengan akun [http://www.facebook.com Facebook].
+Memberikan autentikasi berdasarkan grup Facebook dan penggunaan FBML dalam teks wiki.',
+	'group-fb-user' => 'Pengguna Facebook Connect',
+	'group-fb-user-member' => 'Pengguna Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}:Pengguna Facebook Connect',
+	'group-fb-groupie' => 'Anggota grup',
+	'group-fb-groupie-member' => 'Anggota grup',
+	'grouppage-fb-groupie' => '{{ns:project}}:Anggota grup',
+	'group-fb-officer' => 'Pejabat grup',
+	'group-fb-officer-member' => 'Pejabat grup',
+	'grouppage-fb-officer' => '{{ns:project}}:Pejabat grup',
+	'group-fb-admin' => 'Admin grup',
+	'group-fb-admin-member' => 'Administrator grup',
+	'grouppage-fb-admin' => '{{ns:project}}:Admin grup',
+	'fbconnect-connect' => 'Masuk dengan Facebook Connect',
+	'fbconnect-convert' => 'Hubungkan akun ini dengan Facebook',
+	'fbconnect-logout' => 'Keluar dari Facebook',
+	'fbconnect-link' => 'Kembali ke facebook.com',
+	'fbconnect-title' => 'Hubungkan akun dengan Facebook',
+	'fbconnect-intro' => 'Wiki ini diaktifkan dengan Facebook Connect, evolusi berikutnya dari platform Facebook. 
+Ini berarti bahwa ketika Anda terhubung, di samping [[Wikipedia:Help:Logging in#Why log in?|manfaat]] yang didapat saat masuk, Anda akan dapat mengambil manfaat dari beberapa fitur tambahan ...',
+	'fbconnect-click-to-login' => 'Klik untuk masuk ke situs ini melalui Facebook',
+	'fbconnect-click-to-connect-existing' => 'Klik untuk menghubungkan akun Facebook ke $1',
+	'fbconnect-conv' => 'Kenyamanan',
+	'fbconnect-convdesc' => 'Pengguna yang terhubung secara otomatis masuk.
+Jika izin diberikan, wiki ini bahkan dapat menggunakan Facebook sebagai proksi surel agar Anda dapat terus menerima pemberitahuan penting tanpa mengungkapkan alamat surel.',
+	'fbconnect-fbml' => 'Bahasa markah Facebook',
+	'fbconnect-fbmldesc' => 'Facebook memberikan banyak tag terpasang yang akan menampilkan data dinamis.
+Banyak di antara tag ini dapat dimasukkan dalam teks wiki dan akan ditampilkan berbeda tergantung di mana mereka sedang dilihat oleh pengguna yang terhubung.',
+	'fbconnect-comm' => 'Komunikasi',
+	'fbconnect-commdesc' => 'Facebook Connect mengantarkan ke tingkat jejaring baru.
+Lihat mana teman Anda yang telah menggunakan wiki, dan bagikan tindakan Anda dengan teman Anda melalui kabar berita Facebook.',
+	'fbconnect-welcome' => 'Selamat datang, pengguna Facebook Connect!',
+	'fbconnect-loginbox' => "Atau '''masuk''' dengan Facebook:
+
+$1",
+	'fbconnect-merge' => 'Gabungkan akun wiki dengan ID Facebook Anda',
+	'fbconnect-logoutbox' => '$1
+
+Ini juga akan mengeluarkan Anda dari Facebook dan semua situs terhubung, termasuk wiki ini.',
+	'fbconnect-listusers-header' => 'Hak $1 dan $2 otomatis dipindahkan dari pejabat dan admin grup Facebook $3.
+
+Untuk info lebih lanjut, hubungi pembuat grup $4.',
+	'fbconnect-error' => 'Kesalahan verifikasi',
+	'fbconnect-errortext' => 'Kesalahan terjadi sewaktu verifikasi dengan Facebook Connect.',
+	'fbconnect-cancel' => 'Tindakan dibatalkan',
+	'fbconnect-canceltext' => 'Tindakan sebelumnya dibatalkan oleh pengguna.',
+	'fbconnect-invalid' => 'Pilihan tidak sah',
+	'fbconnect-invalidtext' => 'Pilihan yang dibuat pada halaman sebelumnya tidak sah.',
+	'fbconnect-success' => 'Verifikasi Facebook berhasil',
+	'fbconnect-successtext' => 'Anda berhasil masuk dengan Facebook Connect.',
+	'fbconnect-nickname' => 'Nama panggilan',
+	'fbconnect-fullname' => 'Nama lengkap',
+	'fbconnect-email' => 'Alamat surel',
+	'fbconnect-language' => 'Bahasa',
+	'fbconnect-timecorrection' => 'Koreksi zona waktu (jam)',
+	'fbconnect-chooselegend' => 'Pilihan nama pengguna',
+	'fbconnect-chooseinstructions' => 'Semua pengguna memerlukan nama panggilan; Anda dapat memilih dari salah satu opsi berikut.',
+	'fbconnect-invalidname' => 'Nama panggilan yang Anda pilih sudah diambil atau tidak sah.
+Silakan memilih yang berbeda.',
+	'fbconnect-choosenick' => 'Nama profil Facebook Anda ($1)',
+	'fbconnect-choosefirst' => 'Nama depan Anda ($1)',
+	'fbconnect-choosefull' => 'Nama lengkap Anda ($1)',
+	'fbconnect-chooseauto' => 'Nama yang dibuat secara otomatis ($1)',
+	'fbconnect-choosemanual' => 'Nama pilihan Anda:',
+	'fbconnect-chooseexisting' => 'Akun yang telah ada di wiki ini',
+	'fbconnect-chooseusername' => 'Nama pengguna:',
+	'fbconnect-choosepassword' => 'Sandi:',
+	'fbconnect-updateuserinfo' => 'Perbarui informasi pribadi berikut:',
+	'fbconnect-alreadyloggedin' => "'''Anda telah masuk, $1!'''
+
+Jika Anda ingin menggunakan Facebook Connect untuk masuk log di masa datang, Anda dapat [[Special:Connect/Convert|mengubah akun Anda untuk menggunakan Facebook Connect]].",
+	'fbconnect-error-creating-user' => 'Kesalahan saat membuat pengguna dalam basis data lokal.',
+	'fbconnect-error-user-creation-hook-aborted' => 'Suatu pengait (ekstensi) menggagalkan pembuatan akun dengan pesan: $1',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Profil Facebook',
+	'fbconnect-prefsheader' => 'Untuk mengendalikan peristiwa yang akan mendorong butir ke kabar berita Facebook, <a id="fbConnectPushEventBar_show" href="#">tampilkan preferensi</a> untuk <a id="fbConnectPushEventBar_hide" href="#" style="display:none">sembunyikan preferensi</a>',
+	'fbconnect-prefs-can-be-updated' => 'Anda dapat memperbaruinya kapan saja dengan mengunjungi tab "$1" pada halaman preferensi Anda.',
 );
 
 /** Italian (Italiano)
@@ -2112,9 +2323,21 @@ $messages['ru'] = array(
 	'group-fb-groupie' => 'Члены группы',
 	'group-fb-groupie-member' => 'Член группы',
 	'grouppage-fb-groupie' => '{{ns:project}}:Члены группы',
+	'group-fb-officer' => 'Сотрудники группы',
+	'group-fb-officer-member' => 'Сотрудник группы',
+	'grouppage-fb-officer' => '{{ns:project}}:Сотрудники группы',
 	'group-fb-admin' => 'Группа администраторов',
 	'group-fb-admin-member' => 'Администратор группы',
+	'grouppage-fb-admin' => '{{ns:project}}:Администраторы группы',
+	'fbconnect-connect' => 'Войти с помощью Facebook Connect',
+	'fbconnect-convert' => 'Подключить эту учётную запись к Facebook',
+	'fbconnect-logout' => 'Выход из Facebook',
 	'fbconnect-link' => 'Вернуться на facebook.com',
+	'fbconnect-title' => 'Подключение учётной записи к Facebook',
+	'fbconnect-intro' => 'В этом вики-проекте включена возможность входа через Facebook Connect, следующее поколение платформы Facebook. 
+Это означает, что помимо обычных [[Wikipedia:Help:Logging in#Why log in?|преимуществ]] зарегистрированного участника, вы сможете воспользоваться некоторыми дополнительными функциями…',
+	'fbconnect-click-to-login' => 'Нажмите, чтобы войти на этот сайт с помощью Facebook',
+	'fbconnect-click-to-connect-existing' => 'Нажмите, чтобы подключить вашу учётную запись Facebook к $1',
 	'fbconnect-welcome' => 'Добро пожаловать, участник Facebook Connect!',
 	'fbconnect-cancel' => 'Действие отменено',
 	'fbconnect-invalid' => 'Неверный параметр',
