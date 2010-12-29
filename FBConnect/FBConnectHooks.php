@@ -30,7 +30,6 @@ class FBConnectHooks {
 	 * out the Facebook ID of the user that the userpage belongs to.
 	 */
 	public static function ArticleViewHeader( &$article, &$outputDone, &$pcache ) {
-		global $wgOut;
 		// Get the article title
 		$nt = $article->getTitle();
 		// If the page being viewed is a user page
@@ -296,7 +295,6 @@ STYLE;
 		
 		wfLoadExtensionMessages('FBConnect');
 		
-		#global $wgShowIPinHeader;
 		// Always false, as 'alt-talk' isn't a valid option currently
 		if (self::showButton( 'alt-talk' ) &&
 				array_key_exists('mytalk', $personal_urls)) {
@@ -424,7 +422,9 @@ STYLE;
 	 * TODO!
 	 */
 	public static function RenderPreferencesForm( $form, $output ) {
-		global $facebook, $wgUser;
+		//global $facebook, $wgUser;
+		
+		// This hook no longer seems to work...
 		
 		/*
 		$ids = FBConnectDB::getFacebookIDs($wgUser);
@@ -487,7 +487,7 @@ STYLE;
 	 * Special:ListUsers.
 	 */
 	static function SpecialListusersHeaderForm( $pager, &$out ) {
-		global $wgFbUserRightsFromGroup, $facebook, $wgFbLogo;
+		global $wgFbUserRightsFromGroup, $facebook;
 		
 		if ( empty($wgFbUserRightsFromGroup) ) {
 			return true;

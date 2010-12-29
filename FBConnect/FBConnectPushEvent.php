@@ -69,7 +69,6 @@ class FBConnectPushEvent {
 			if(!empty($wgFbPushEventClasses)){
 				foreach($wgFbPushEventClasses as $pushEventClassName){
 					$pushObj = new $pushEventClassName;
-					$className = get_class();
 					$prefName = $pushObj->getUserPreferenceName();
 
 					$preferences[$prefName] = array(

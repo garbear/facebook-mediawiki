@@ -68,11 +68,11 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Performs any necessary execution and outputs the resulting Special page.
 	 */
-	function execute( $par ) {
+	public function execute( $par ) {
 		global $wgUser, $wgRequest, $facebook;
 		
 		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
-			self::disconnectReclamationAction();
+			$this->disconnectReclamationAction();
 			return;
 		}
 		
@@ -237,7 +237,6 @@ class SpecialConnect extends SpecialPage {
 					$DEFAULT_ENABLE_ALL_PUSHES = true;
 					foreach($wgFbPushEventClasses as $pushEventClassName) {
 						$pushObj = new $pushEventClassName;
-						$className = get_class();
 						$prefName = $pushObj->getUserPreferenceName();
 						
 						$wgUser->setOption($prefName, $DEFAULT_ENABLE_ALL_PUSHES ? '1' : '0');
@@ -918,7 +917,7 @@ class SpecialConnect extends SpecialPage {
 	 * Displays the main connect form.
 	 */
 	private function connectForm() {
-		global $wgOut, $wgUser, $wgSitename;
+		global $wgOut, $wgSitename;
 		
 		// Redirect the user back to where they came from
 		$titleObj = Title::newFromText( $this->mReturnTo );
@@ -944,7 +943,7 @@ class SpecialConnect extends SpecialPage {
 	 * Disconnect from Facebook.
 	 */ 
 	private function disconnectReclamationAction() {
-		global $wgRequest, $wgOut, $wgUser, $facebook;
+		global $wgRequest, $wgOut, $facebook;
 		
 		$wgOut->setArticleRelated( false );
 		$wgOut->enableClientCache( false );

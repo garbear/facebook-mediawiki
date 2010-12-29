@@ -159,8 +159,7 @@ function wfSpecialPreferencesExtension() {
 		}
 
 		function mainPrefsForm( $status, $message = '' ) {
-			global $wgOut, $wgRequest, $wgUser;
-			global $wgExtensionPreferences;
+			global $wgOut, $wgUser, $wgExtensionPreferences;
 			wfProfileIn( __METHOD__ );
 
 			// first get original form, then hack into it new options

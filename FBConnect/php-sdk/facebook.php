@@ -690,7 +690,7 @@ class Facebook
     if (isset($READ_ONLY_CALLS[strtolower($method)])) {
       $name = 'api_read';
     }
-    return self::getUrl($name, 'restserver.php');
+    return $this->getUrl($name, 'restserver.php');
   }
 
   /**
