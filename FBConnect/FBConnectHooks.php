@@ -85,7 +85,7 @@ class FBConnectHooks {
 		global $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgFbIncludeJquery,
 		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
 		
-		if ( get_class( $wgUser->getSkin() ) === 'SkinMobile' )
+		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
 			return true;
 		
 		// If the user's language is different from the default language, use the correctly localized facebook code.
