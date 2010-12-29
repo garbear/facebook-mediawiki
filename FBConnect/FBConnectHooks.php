@@ -177,21 +177,50 @@ STYLE;
 	 * be prefixed accordingly. Make sure that fbconnect_table.sql is updated
 	 * with the database prefix beforehand.
 	 */
-	static function LoadExtensionSchemaUpdates() {
-		global $wgDBtype, $wgDBprefix, $wgExtNewTables, $wgSharedDB, $wgDBname;
-		
+	static function LoadExtensionSchemaUpdates( $updater = null ) {
+		global $wgSharedDB, $wgDBname;
 		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
 			return true;
 		}
-		
 		$base = dirname( __FILE__ );
-		if ( $wgDBtype == 'mysql' ) {
-			$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
-			$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
-		} else if ( $wgDBtype == 'postgres' ) {
-			$wgExtNewTables[] = array("user_fbconnect", "$base/sql/fbconnect_table.pg.sql");
-			$wgExtNewTables[] = array("fbconnect_event_stats", "$base/sql/fbconnect_event_stats.pg.sql");
-		}
+		if ( $updater === null ) {
+			global $wgDBtype, $wgDBprefix, $wgExtNewTables;
+			if ( $wgDBtype == 'mysql' ) {
+				$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
+				$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
+			} else if ( $wgDBtype == 'postgres' ) {
+				$wgExtNewTables[] = array('user_fbconnect', "$base/sql/fbconnect_table.pg.sql");
+				$wgExtNewTables[] = array('fbconnect_event_stats', "$base/sql/fbconnect_event_stats.pg.sql");
+			}
+		} else {
+			if ( $updater->getDB()->getType() == 'mysql' ) {
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'user_fbconnect',
+					"$base/sql/fbconnect_table.sql",
+					true
+				));
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'fbconnect_event_stats',
+					"$base/sql/fbconnect_event_stats.sql",
+					true
+				));
+			} elseif ( $updater->getDB()->getType() == 'postgres' ) {
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'user_fbconnect',
+					"$base/sql/fbconnect_table.pg.sql",
+					true
+				));
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'fbconnect_event_stats',
+					"$base/sql/fbconnect_event_stats.pg.sql",
+					true
+				));
+			}
+		}	
 		return true;
 	}
 	
