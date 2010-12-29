@@ -549,6 +549,7 @@ STYLE;
 			$group = $facebook->api('/' . $gid);
 		} catch (FacebookApiException $e) {
 			error_log($e);
+			return true;
 		}
 		$out .= '
 			<table style="border-collapse: collapse;">
