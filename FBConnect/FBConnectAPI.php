@@ -100,7 +100,8 @@ class FBConnectAPI extends Facebook {
 				);
 				$user_details = $this->api( $query );
 				// Cache the data in the $userinfo array
-				$userinfo[$user] = $user_details[0];
+				// Also avoid "Notice: Uninitialized string offset: 0"
+				$userinfo[$user] = !empty( $user_details[0] ) ? $user_details[0] : null;
 			}
 			return isset( $userinfo[$user] ) ? $userinfo[$user] : null;
 		} catch ( FacebookApiException $e ) {
