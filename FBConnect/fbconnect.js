@@ -157,11 +157,11 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 	
 	// Format the form name
 	if(formName != "") {
-        formName = "/"+formName;
+        formName = "/" + formName;
     }
 	// If the AJAX methods fail, accomplish the same thing with a GET request
 	// by sending the user to destUrl
-	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + wgPageName + "&returntoquery=" + wgPageQuery;
+	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + (fbReturnToTitle ? fbReturnToTitle : wgPageTitle) + "&returntoquery=" + wgPageQuery;
 	
 	// No AJAX form for ConnectExisting, redirect the user now
 	if (formName == "/ConnectExisting") {
