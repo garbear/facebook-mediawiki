@@ -13,19 +13,20 @@ class FBPush_OnAddImage extends FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAddImage'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
 	static $messageName = 'fbconnect-msg-OnAddImage';
 	static $eventImage = 'image.png';
-	public function init(){
+	
+	public function init() {
 		global $wgHooks;
 		wfProfileIn(__METHOD__);
-
+		
 		wfLoadExtensionMessages('FBPush_OnAddImage');
 		$wgHooks['ArticleSaveComplete'][] = 'FBPush_OnAddImage::onArticleSaveComplete'; 	
-		$wgHooks['UploadComplete'][] = 'FBPush_OnAddImage::onUploadComplet';   
+		$wgHooks['UploadComplete'][] = 'FBPush_OnAddImage::onUploadComplete';   
 		wfProfileOut(__METHOD__);
 	}
 
 	public function loadMsg() {
 		wfProfileIn(__METHOD__);
-				
+		
 		wfLoadExtensionMessages('FBPush_OnAddImage');
 		
 		wfProfileOut(__METHOD__);
@@ -35,34 +36,37 @@ class FBPush_OnAddImage extends FBConnectPushEvent {
 		if( $article->getTitle()->getNamespace() != NS_FILE ) {
 			return true;
 		}
-		$img = wfFindFile( $article->getTitle() );
-		if ($img->media_type == 'BITMAP' ) {
-			FBPush_OnAddImage::uploadNews($img->title->getText(), $img->title->getFullUrl("?ref=fbfeed&fbtype=addimage")) ;	
+		$img = wfFindFile( $article->getTitle()->getText() );
+		if (!empty($img) && ($img->media_type == 'BITMAP') ) {
+			FBPush_OnAddImage::uploadNews($img, $img->title->getText(), $img->title->getFullUrl("?ref=fbfeed&fbtype=addimage")) ;	
 		}
 		return true;
 	}
 	
-    public static function  onUploadComplet(&$image) {
-        global $wgServer, $wgSitename;
-       
-        if ($image->mLocalFile->media_type == 'BITMAP' ) {
-        	FBPush_OnAddImage::uploadNews( $image->mLocalFile->getTitle(), $image->mLocalFile->getTitle()->getFullUrl( "?ref=fbfeed&fbtype=addimage" ) );
-        }   
-        return true;
-    }
-    
-	
-	public static function uploadNews($name, $url) {
-		global $wgSitename;
-		$params = array(
-			'$IMGNAME' => $name,
-			'$ARTICLE_URL' =>$url, //inside use  
-			'$WIKINAME' => $wgSitename,
-			'$IMG_URL' => $url,
-			'$EVENTIMG' => self::$eventImage
-		);
+	public static function onUploadComplete(&$image) {
+		global $wgServer, $wgSitename;
 		
-		self::pushEvent(self::$messageName, $params, __CLASS__ );	
+		if ($image->mLocalFile->media_type == 'BITMAP' ) {
+			FBPush_OnAddImage::uploadNews( $image->mLocalFile, $image->mLocalFile->getTitle(), $image->mLocalFile->getTitle()->getFullUrl( "?ref=fbfeed&fbtype=addimage" ) );
+		}
+		return true;
 	}
 	
+	public static function uploadNews($image, $name, $url) {
+		global $wgSitename;
+		
+		$is = new imageServing(array(), 90);		
+		$thumb_url = $is->getThumbnails(array($image));
+		$thumb_url = array_pop($thumb_url); 
+		$thumb_url = $thumb_url['url'];
+		
+		$params = array(
+			'$IMGNAME' => $name,
+			'$ARTICLE_URL' => $url, //inside use  
+			'$WIKINAME' => $wgSitename,
+			'$IMG_URL' => $url,
+			'$EVENTIMG' => $thumb_url,
+		);
+		self::pushEvent(self::$messageName, $params, __CLASS__ );	
+	}
 }
