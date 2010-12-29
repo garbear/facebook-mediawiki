@@ -1,2 +1,4 @@
+// Add this to the SVN properties if you have write access to the MediaWiki repository
+
 svn:externals
 extensions_commit svn+ssh://gbruin@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions
