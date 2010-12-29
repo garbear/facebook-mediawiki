@@ -515,7 +515,8 @@ STYLE;
 	 * Adds some info about the governing Facebook group to the header form of
 	 * Special:ListUsers.
 	 */
-	static function SpecialListusersHeaderForm( $pager, &$out ) {
+	// r274: Fix error with PHP 5.3 involving parameter references (thanks, PChott)
+	static function SpecialListusersHeaderForm( /*&*/$pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook;
 		
 		if ( empty($wgFbUserRightsFromGroup) ) {
@@ -600,7 +601,8 @@ STYLE;
 	 * Removes the 'createaccount' right from all users if $wgFbConnectOnly is
 	 * enabled.
 	 */
-	static function UserGetRights( $user, &$aRights ) {
+	// r270: fix for php 5.3 (cherry picked from http://trac.wikia-code.com/changeset/24606)
+	static function UserGetRights( /*&*/$user, &$aRights ) {
 		global $wgFbConnectOnly;
 		if ( !empty( $wgFbConnectOnly ) ) {
 			// If you would like sysops to still be able to create accounts
