@@ -107,6 +107,8 @@ define( 'APCOND_FB_ISOFFICER', 'fb*o' );
 define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
 // Create a new group for Facebook users
+// rt#68127 - Giving basic permissions to other groups might open security holes,
+// see <http://trac.wikia-code.com/changeset/27160> 
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
 
 $wgAjaxExportList[] = 'FBConnect::disconnectFromFB';
