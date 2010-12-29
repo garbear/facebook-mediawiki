@@ -804,9 +804,10 @@ class SpecialConnect extends SpecialPage {
 			// then technically no users can create accounts
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("FBConnect: Blocked user was attempting to create account via Facebook Connect.\n");
-				$wgOut->showErrorPage('fbconnect-error', 'fbconnect-errortext');
+				// This is not an explicitly static method but doesn't use $this and can be called like static
+				LoginForm::userBlockedMessage();
 				return false;
-			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
+			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) ) > 0 ) {
 				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
 				return false;
 			}
