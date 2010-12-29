@@ -60,9 +60,11 @@ class FBConnectHooks {
 			$result = false;
 			return true;
 		}
-		$types = array(APCOND_FB_INGROUP   => 'member',
-		               APCOND_FB_ISOFFICER => 'officer',
-		               APCOND_FB_ISADMIN   => 'admin');
+		$types = array(
+			APCOND_FB_INGROUP   => 'member',
+			APCOND_FB_ISOFFICER => 'officer',
+			APCOND_FB_ISADMIN   => 'admin'
+		);
 		$type = $types[$cond_type];
 		switch( $type ) {
 			case 'member':
@@ -73,7 +75,6 @@ class FBConnectHooks {
 				$rights = $facebook->getGroupRights($user);
 				$result = $rights[$type];
 		}
-		
 		return true;
 	}
 	
