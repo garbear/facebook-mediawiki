@@ -241,6 +241,23 @@ $messages['af'] = array(
 	'fbconnect-link-to-profile' => 'Facebook-profiel',
 );
 
+/** Aramaic (ܐܪܡܝܐ)
+ * @author Basharh
+ */
+$messages['arc'] = array(
+	'group-fb-groupie' => 'ܗܕ̈ܡܐ ܕܟܢܘܫܬܐ',
+	'group-fb-groupie-member' => 'ܗܕܡܐ ܕܟܢܘܫܬܐ',
+	'grouppage-fb-groupie' => '{{ns:project}}:ܗܕ̈ܡܐ ܕܟܢܘܫܬܐ',
+	'fbconnect-invalid' => 'ܓܒܝܬܐ ܠܐ ܬܪܝܨܬܐ',
+	'fbconnect-fullname' => 'ܫܡܐ ܓܡܝܪܐ',
+	'fbconnect-email' => 'ܦܪܫܓܢܐ ܕܒܝܠܕܪܐ ܐܠܩܛܪܘܢܝܐ',
+	'fbconnect-language' => 'ܠܫܢܐ',
+	'fbconnect-choosefirst' => 'ܫܡܐ ܩܕܡܝܐ ܕܝܠܟ($1)',
+	'fbconnect-choosefull' => 'ܫܡܐ ܓܡܝܪܐ ܕܝܠܟ($1)',
+	'fbconnect-chooseusername' => 'ܫܡܐ ܕܡܬܚܫܚܢܐ:',
+	'fbconnect-choosepassword' => 'ܡܠܬܐ ܕܥܠܠܐ:',
+);
+
 /** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
  * @author EugeneZelenko
  * @author Jim-by
@@ -277,6 +294,8 @@ $messages['be-tarask'] = array(
 	'fbconnect-fbmldesc' => 'Facebook прадстаўляе ўбудаваныя тэгаў, якія візуалізуюць дынамічныя зьвесткі.
 Большасьць з гэтых тэгаў могуць утрымлівацца ў вікі-тэксьце, і будуць паказвацца па рознаму, у залежнасьці ад таго, які ўдзельнік іх праглядаць.',
 	'fbconnect-comm' => 'Сувязь',
+	'fbconnect-commdesc' => 'Злучэньне Facebook — новы ўзровень працы ў сетцы.
+Паглядзіце, хто з Вашых сяброў выкарыстоўвае вікі, і распавядзіце ім пра тое, што Вы робіце, праз стужку навінаў Facebook.',
 	'fbconnect-welcome' => 'Вітаем карыстальніка злучэньня Facebook!',
 	'fbconnect-loginbox' => "Ці '''увайдзіце ў сыстэму''' праз Facebook:
 	
@@ -322,10 +341,12 @@ $1",
 	'fbconnect-error-user-creation-hook-aborted' => 'Перахопнік (пашырэньне) адмяніў стварэньне рахунку з паведамленьнем: $1',
 	'fbconnect-prefstext' => 'Злучэньне Facebook',
 	'fbconnect-link-to-profile' => 'Профіль у Facebook',
+	'fbconnect-prefsheader' => "Для кантролю таго, якія падзеі будуць дадавацца у стужку навінаў Facebook, <a id='fbConnectPushEventBar_show' href='#'>паказаць устаноўкі</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>схаваць устаноўкі</a>",
 	'fbconnect-prefs-can-be-updated' => 'Вы можаце зьмяніць гэта ў любы момант, наведаўшы закладку «$1» на Вашай старонцы ўстановак.',
 );
 
 /** Breton (Brezhoneg)
+ * @author Fulup
  * @author Gwendal
  * @author Y-M D
  */
@@ -337,6 +358,9 @@ $messages['br'] = array(
 	'group-fb-groupie' => 'Izili ar strollad',
 	'group-fb-groupie-member' => 'Ezel ar strollad',
 	'grouppage-fb-groupie' => '{{ns:project}}: Izili ar strollad',
+	'group-fb-officer' => 'Tud karget a strolladoù',
+	'group-fb-officer-member' => 'Den karget a strolladoù',
+	'grouppage-fb-officer' => '{{ns:project}}:Tud karget a strolladoù',
 	'group-fb-admin' => 'Merourien ar strollad',
 	'group-fb-admin-member' => 'Merour ar strollad',
 	'grouppage-fb-admin' => '{{ns:project}}: Merourien ar strollad',
@@ -345,13 +369,17 @@ $messages['br'] = array(
 	'fbconnect-logout' => 'Digrevreañ eus Facebook',
 	'fbconnect-link' => 'E facebook.com en-dro',
 	'fbconnect-title' => 'Kont kevreañ gant Facebook',
+	'fbconnect-intro' => "Gweredekaet eo ar wiki-mañ gant Facebook Connect, anezhañ un emdroadur nevez eus savenn Facebook.
+Talvezout a ra kement-se e c'hallit ober ho mad eus arc'hwelioù ouzhpenn pa vezit kevreet, en tu all d'ar [[Wikipedia:Help:Logging in#Why log in?|spletoù]] normal hoc'h eus pa gevreit.",
 	'fbconnect-click-to-login' => "Klikit evit kevreañ el lec'hienn-mañ dre Facebook",
 	'fbconnect-click-to-connect-existing' => 'Klikit evit kevreañ ho kont Facebook da $1',
+	'fbconnect-conv' => 'Aezamant',
 	'fbconnect-comm' => 'Daremprederezh',
-	'fbconnect-loginbox' => "Pe '''kevreañ''' gant Facebook:
+	'fbconnect-loginbox' => "Pe '''kevreañ''' gant Facebook :
 
 $1",
 	'fbconnect-error' => 'Fazi gwiriañ',
+	'fbconnect-cancel' => 'Ober nullet',
 	'fbconnect-invalid' => "N'haller ket dibab an dra-se",
 	'fbconnect-nickname' => 'Lesanv',
 	'fbconnect-fullname' => 'Anv klok',
@@ -386,8 +414,16 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'group-fb-groupie-member' => 'Član grupe',
 	'group-fb-admin' => 'Administratori grupe',
 	'group-fb-admin-member' => 'Administrator grupe',
+	'fbconnect-connect' => 'Prijavite se sa Facebook Connect',
 	'fbconnect-link' => 'Nazad na facebook.com',
 	'fbconnect-title' => 'Spajanje računa sa Facebook',
+	'fbconnect-click-to-login' => 'Kliknite da se prijavite na ovu stranicu preko Facebooka',
+	'fbconnect-click-to-connect-existing' => 'Kliknite da spojite vaš Facebook račun na $1',
+	'fbconnect-comm' => 'Komunikacija',
+	'fbconnect-loginbox' => "Ili se '''prijavite''' preko Facebook:
+	
+$1",
+	'fbconnect-merge' => 'Spoji svoj wiki račun sa svojim Facebook ID',
 	'fbconnect-cancel' => 'Akcija obustavljena',
 	'fbconnect-invalid' => 'Nevaljana opcija',
 	'fbconnect-nickname' => 'Nadimak',
@@ -396,8 +432,45 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'fbconnect-language' => 'Jezik',
 );
 
+/** Czech (Česky)
+ * @author Jkjk
+ */
+$messages['cs'] = array(
+	'fbconnect-fbml' => 'Soubor značek Facebook',
+	'fbconnect-error' => 'Chyba ověření',
+	'fbconnect-errortext' => 'Vyskytla se chyba během ověření s Facebook Connect.',
+	'fbconnect-cancel' => 'Akce zrušena',
+	'fbconnect-canceltext' => 'Přechozí akce byla uživatelem zrušena.',
+	'fbconnect-invalid' => 'Nesprávná možnost',
+	'fbconnect-invalidtext' => 'Výběr na minulé stránce byl nesprávný.',
+	'fbconnect-success' => 'Ověření Facebooku bylo úspěšné',
+	'fbconnect-successtext' => 'Jste zalogován s Facebook Connect',
+	'fbconnect-nickname' => 'Přezdívka',
+	'fbconnect-fullname' => 'Plné jméno',
+	'fbconnect-email' => 'E-mailová adresa',
+	'fbconnect-language' => 'Jazyk',
+	'fbconnect-timecorrection' => 'Úprava časové zóny (hodiny)',
+	'fbconnect-chooselegend' => 'Výběr uživatelského jména',
+	'fbconnect-chooseinstructions' => 'Všichni uživatelé musí mít přezdívku; můžete si jí vybrat z možností níže.',
+	'fbconnect-choosenick' => 'Jméno vašeho Facebook profilu ($1)',
+	'fbconnect-choosefirst' => 'Vaše křestní jméno ($1)',
+	'fbconnect-choosefull' => 'Vaše plné jméno ($1)',
+	'fbconnect-chooseauto' => 'Automaticky generované jméno ($1)',
+	'fbconnect-choosemanual' => 'Jméno dle vašeho výběru:',
+	'fbconnect-chooseexisting' => 'Existující účet na této wiki',
+	'fbconnect-chooseusername' => 'Uživatelské jméno:',
+	'fbconnect-choosepassword' => 'Heslo:',
+	'fbconnect-updateuserinfo' => 'Aktualizovat následující osobní údaje:',
+	'fbconnect-error-creating-user' => 'Chyba při vytváření uživatele v lokální databázi',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook profil',
+	'fbconnect-prefs-can-be-updated' => 'Toto můžete aktualizovat kdykoliv navštívením "$1" tabu ve vaší stránce nastavení.',
+);
+
 /** German (Deutsch)
+ * @author Als-Holder
  * @author Kghbln
+ * @author The Evil IP address
  */
 $messages['de'] = array(
 	'fbconnect' => 'Facebook Connect',
@@ -454,7 +527,7 @@ Für weitere Informationen kann man den Gruppenersteller $4 kontaktieren.',
 	'fbconnect-success' => 'Facebook Connect-Überprüfung erfolgreich',
 	'fbconnect-successtext' => 'Die Anmeldung via Facebook Connect war erfolgreich.',
 	'fbconnect-nickname' => 'Benutzername',
-	'fbconnect-fullname' => 'Vollständiger Name',
+	'fbconnect-fullname' => 'Bürgerlicher Name',
 	'fbconnect-email' => 'E-Mail-Adresse',
 	'fbconnect-language' => 'Sprache',
 	'fbconnect-timecorrection' => 'Zeitzonenkorrektur (Stunden)',
@@ -464,7 +537,7 @@ Für weitere Informationen kann man den Gruppenersteller $4 kontaktieren.',
 Bitte einen anderen auswählen.',
 	'fbconnect-choosenick' => 'Der Profilname auf Facebook ($1)',
 	'fbconnect-choosefirst' => 'Vorname ($1)',
-	'fbconnect-choosefull' => 'Vollständiger Name ($1)',
+	'fbconnect-choosefull' => 'Dein bürgerlicher Name ($1)',
 	'fbconnect-chooseauto' => 'Ein automatisch erzeugter Name ($1)',
 	'fbconnect-choosemanual' => 'Ein Name der Wahl:',
 	'fbconnect-chooseexisting' => 'Ein bestehendes Benutzerkonto in diesem Wiki',
@@ -473,7 +546,7 @@ Bitte einen anderen auswählen.',
 	'fbconnect-updateuserinfo' => 'Die folgenden persönlichen Angaben müssen aktualisiert werden:',
 	'fbconnect-alreadyloggedin' => "'''Du bist bereits angemeldet, $1!'''
 
-Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
+Sofern Facebook Connect für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
 	'fbconnect-error-creating-user' => 'Fehler beim Erstellen des Benutzers in der lokalen Datenbank.',
 	'fbconnect-error-user-creation-hook-aborted' => 'Die Schnittstelle einer Softwareerweiterung hat die Benutzerkontoerstellung mit folgender Nachricht abgebrochen: $1',
 	'fbconnect-prefstext' => 'Facebook Connect',
@@ -489,6 +562,210 @@ $messages['de-formal'] = array(
 	'fbconnect-alreadyloggedin' => "'''Sie sind bereits angemeldet, $1!'''
 
 Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
+);
+
+/** Esperanto (Esperanto)
+ * @author Yekrats
+ */
+$messages['eo'] = array(
+	'fbconnect' => 'Facebook-Konekto',
+	'fbconnect-desc' => 'Ebligas al uzantoj [[Special:Connect|Konekti]] kun iliaj [http://www.facebook.com Facebook]-kontoj.',
+	'group-fb-user' => 'Uzantoj de Facebook-Konekto',
+	'group-fb-user-member' => 'Uzanto de Facebook-Konekto',
+	'grouppage-fb-user' => '{{ns:project}}:Uzantoj de Facebook-Konekto',
+	'group-fb-groupie' => 'Membroj de grupo',
+	'group-fb-groupie-member' => 'Membro de grupo',
+	'grouppage-fb-groupie' => '{{ns:project}}:Membroj de grupo',
+	'group-fb-officer' => 'Oficiroj de grupo',
+	'group-fb-officer-member' => 'Oficiro de grupo',
+	'grouppage-fb-officer' => '{{ns:project}}:Oficiroj de grupo',
+	'group-fb-admin' => 'Administrantoj de grupo',
+	'group-fb-admin-member' => 'Administranto de grupo',
+	'grouppage-fb-admin' => '{{ns:project}}:Administrantoj de grupo',
+	'fbconnect-connect' => 'Ensaluti kun Facebook-Konekto',
+	'fbconnect-convert' => 'Konekti ĉi tiun konton kun Facebook',
+	'fbconnect-logout' => 'Elsaluti Facebook',
+	'fbconnect-link' => 'Reveni al facebook.com',
+	'fbconnect-title' => 'Konekti konton kun Facebook',
+	'fbconnect-comm' => 'Komunikado',
+	'fbconnect-loginbox' => "Aŭ '''ensaluti''' ĉe Facebook:
+	
+$1",
+	'fbconnect-merge' => 'Kunigi vian vikikonton kun via Facebook-identigo',
+	'fbconnect-logoutbox' => '$1
+	
+Ĉi tiu ankaŭ elsaluti vin el Facebook kaj ĉiuj konektitaj retejoj, inkluzivante ĉi tiun vikion.',
+	'fbconnect-invalid' => 'Malvalida elekto',
+	'fbconnect-nickname' => 'Kromnomo',
+	'fbconnect-fullname' => 'Plena nomo',
+	'fbconnect-email' => 'Retadreso',
+	'fbconnect-language' => 'Lingvo',
+	'fbconnect-timecorrection' => 'Horzona diferenco (horoj)',
+	'fbconnect-chooselegend' => 'Elekto de salutnomo',
+	'fbconnect-chooseinstructions' => 'Ĉiuj uzantoj bezonas kromnomo; vi povas elekti unu el la jenaj elektoj.',
+	'fbconnect-invalidname' => 'La kromnomo elektita estas jam uzita aŭ estas malvalida kromnomo.
+Bonvolu elekti malsame.',
+	'fbconnect-choosenick' => 'Via profilnomo en Facebook ($1)',
+	'fbconnect-choosefirst' => 'Via unua nomo ($1)',
+	'fbconnect-choosefull' => 'Via plena nomo ($1)',
+	'fbconnect-chooseauto' => 'Aŭtomate generita nomo ($1)',
+	'fbconnect-choosemanual' => 'Nomo de via elekto:',
+	'fbconnect-chooseexisting' => 'Ekzistanta konto en ĉi tiu vikio',
+	'fbconnect-chooseusername' => 'Salutnomo:',
+	'fbconnect-choosepassword' => 'Pasvorto:',
+	'fbconnect-updateuserinfo' => 'Ĝisdatigi la jenan propran informon:',
+);
+
+/** Spanish (Español)
+ * @author Translationista
+ */
+$messages['es'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Permite a los usuarios [[Special:Connect|conectarse]] con sus cuentas [http://www.facebook.com Facebook].
+Ofrece autenticación basada en grupos de Facebook y usa FBML en texto wiki',
+	'group-fb-user' => 'Facebook Conecta usuarios',
+	'group-fb-user-member' => 'usuario de Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}:usuarios de Facebook Connect',
+	'group-fb-groupie' => 'Miembros del grupo',
+	'group-fb-groupie-member' => 'Miembro del grupo',
+	'grouppage-fb-groupie' => '{{ns:project}}:Miembros del grupo',
+	'group-fb-officer' => 'Agentes de grupo',
+	'group-fb-officer-member' => 'Agente de grupo',
+	'grouppage-fb-officer' => '{{ns:project}}:agentes de grupo',
+	'group-fb-admin' => 'Administradores de grupo',
+	'group-fb-admin-member' => 'Administrador de grupo',
+	'grouppage-fb-admin' => '{{ns:project}}:Administradores de grupo',
+	'fbconnect-connect' => 'Inicia sesión con Facebook Connect',
+	'fbconnect-convert' => 'Conectar esta cuenta con Facebook',
+	'fbconnect-logout' => 'Desconectarse de Facebook',
+	'fbconnect-link' => 'Volver a facebook.com',
+	'fbconnect-title' => 'Conectar esta cuenta con Facebook',
+	'fbconnect-intro' => 'Este wiki tiene Facebook Connect, ls próxima evolución de la plataforma Facebook, activado.
+Esto quiere decir que al estar conectado, además de los [[Wikipedia:Help:Logging in#Why log in?|beneficios]] normales que ves al iniciar sesión, podrás gozar de algunas características adicinales.',
+	'fbconnect-click-to-login' => 'Haz clic para acceder a este sitio a través de Facebook',
+	'fbconnect-click-to-connect-existing' => 'Haz clic para conectar tu cuenta  de Facebook  a $1',
+	'fbconnect-conv' => 'Comodidad',
+	'fbconnect-convdesc' => 'Los usuarios conectados inician sesión automáticamente.
+Si se otorga el permiso, este wiki puede inclusive utilizar Facebook como un proxy de correos electrónicos para que continúes recibiendo notificaciones importantes sin revelar tu dirección de correos electrónicos.',
+	'fbconnect-fbml' => 'Lenguaje de marcado de Facebook',
+	'fbconnect-fbmldesc' => 'Facebook ha ofrecido una cantidad de etiquetas integradas que procesará información dinámica.
+Muchas de estas etiquetas pueden ser incluidas en texto wiki y se procesarán de maneras diferenes dependiendo de qué usuario conectado esté viéndolas.',
+	'fbconnect-comm' => 'Comunicación',
+	'fbconnect-commdesc' => 'Facebook Connect marca el comienzo de un nuevo nivel de red. 
+ve cuales de tus amigos está usando el wiki, y, opcionalmente, comparte tus acciones con tus amigos a través de la fuente de noticias de Facebook.',
+	'fbconnect-welcome' => '¡Bienvenido, usuario de Facebook Connect!',
+	'fbconnect-loginbox' => "O '''accede al sistema''' con Facebook:
+	
+$1",
+	'fbconnect-merge' => 'Fusiona tu wiki cuenta con tu identificador de Facebook',
+	'fbconnect-logoutbox' => '$1
+	
+Estos también te desconectará de Facebook y de los sitios conectados, incluido este wiki.',
+	'fbconnect-listusers-header' => 'Los privilegios $1 y $2 son transferidos automáticamente de los títulos de agente y administrador del grupo $3 de Facebook.
+
+Para más información, contacta con el creador del grupo, $4.',
+	'fbconnect-error' => 'Error de verificación',
+	'fbconnect-errortext' => 'Se produjo un error durante la verificación con Facebook Connect.',
+	'fbconnect-cancel' => 'Acción cancelada',
+	'fbconnect-canceltext' => 'La acción anterior fue cancelada por el usuario.',
+	'fbconnect-invalid' => 'Opción no válida',
+	'fbconnect-invalidtext' => 'La selección hecha en la página anterior era inválida.',
+	'fbconnect-success' => 'Verificación de Facebook realizada con éxito',
+	'fbconnect-successtext' => 'Has iniciado sesión exitosamente con Facebook Connect.',
+	'fbconnect-nickname' => 'Usuario',
+	'fbconnect-fullname' => 'Nombre completo',
+	'fbconnect-email' => 'Dirección de correo electrónico',
+	'fbconnect-language' => 'Idioma',
+	'fbconnect-timecorrection' => 'Corrección de huso horario (horas)',
+	'fbconnect-chooselegend' => 'Elección del nombre de usuario',
+	'fbconnect-chooseinstructions' => 'Todos los usuarios necesitan un nombre de usuario;
+puedes escoger uno de entre las siguientes opciones.',
+	'fbconnect-invalidname' => 'El nombre de usuario que eligió ya está siendo usado o no es un nombre de usuario válido. 
+ Por favor elija uno diferente.',
+	'fbconnect-choosenick' => 'Tu nombre de perfil en Facebook ($1)',
+	'fbconnect-choosefirst' => 'Tu primer nombre ($1)',
+	'fbconnect-choosefull' => 'Tu nombre completo ($1)',
+	'fbconnect-chooseauto' => 'Un nombre generado automáticamente ($1)',
+	'fbconnect-choosemanual' => 'El nombre que elijas:',
+	'fbconnect-chooseexisting' => 'Una cuenta existente en este wiki',
+	'fbconnect-chooseusername' => 'Nombre de usuario:',
+	'fbconnect-choosepassword' => 'Contraseña:',
+	'fbconnect-updateuserinfo' => 'Actualiza la siguiente información personal:',
+	'fbconnect-alreadyloggedin' => "'''¡Ya has ingresado al sistema, $1!'''
+
+Si quieres usar Facebook Connect para ingresar en el futuro, puedes [[Special:Connect/Convert|modificar tu cuenta para utitilzar Facebook Connect]].",
+	'fbconnect-error-creating-user' => 'Ocurrió un error al crear el usuario en la base de datos local.',
+	'fbconnect-error-user-creation-hook-aborted' => 'Un gancho (extensión) abortó la creación de la cuenta con el mensaje: $1',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Perfil de Facebook',
+	'fbconnect-prefsheader' => "Para controlar qué eventos incluirán un elemento al canal de noticias, <a id='fbConnectPushEventBar_show' href='#'>mostrar preferencias</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>ocultar preferencias</a>",
+	'fbconnect-prefs-can-be-updated' => 'Puedes actualizar estos elementos en cualquier momento mediante la pestaña "$1" en tu página de preferencias.',
+);
+
+/** Basque (Euskara)
+ * @author An13sa
+ */
+$messages['eu'] = array(
+	'fbconnect' => 'Facebook Konexioa',
+	'fbconnect-connect' => 'Facebook Konexioarekin saioa hasi',
+	'fbconnect-convert' => 'Kontu hau Facebookekin lotu',
+	'fbconnect-logout' => 'Facebooketik irten',
+	'fbconnect-link' => 'facebook.com-era itzuli',
+	'fbconnect-title' => 'Kontua Facebookekin  lotu',
+	'fbconnect-comm' => 'Komunikazioa',
+	'fbconnect-nickname' => 'Ezizena',
+	'fbconnect-fullname' => 'Izen osoa',
+	'fbconnect-email' => 'E-posta helbidea',
+	'fbconnect-language' => 'Hizkuntza',
+	'fbconnect-chooseusername' => 'Erabiltzaile izena:',
+	'fbconnect-choosepassword' => 'Pasahitza:',
+	'fbconnect-prefstext' => 'Facebook Konexioa',
+	'fbconnect-link-to-profile' => 'Facebook profila',
+);
+
+/** Finnish (Suomi)
+ * @author Nike
+ * @author Olli
+ */
+$messages['fi'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Antaa käyttäjien [[Special:Connect|yhdistää]] [http://www.facebook.com Facebook]-tilinsä sivustolle.
+Tarjoaa tunnistautumisen Facebook-ryhmiin pohjautuen ja antaa käyttää FBML-koodia wikitekstissä.',
+	'group-fb-user' => 'Facebook Connect -käyttäjät',
+	'group-fb-user-member' => 'Facebook Connect -käyttäjä',
+	'grouppage-fb-user' => '{{ns:project}}:Facebook Connect -käyttäjät',
+	'group-fb-groupie' => 'ryhmän jäsenet',
+	'group-fb-groupie-member' => 'ryhmän jäsen',
+	'grouppage-fb-groupie' => '{{ns:project}}:Ryhmän jäsenet',
+	'group-fb-officer' => 'ryhmän virkailijat',
+	'group-fb-officer-member' => 'ryhmän virkailija',
+	'grouppage-fb-officer' => '{{ns:project}}:Ryhmän virkailijat',
+	'group-fb-admin' => 'ryhmän ylläpitäjät',
+	'group-fb-admin-member' => 'ryhmän ylläpitäjä',
+	'grouppage-fb-admin' => '{{ns:project}}:Ryhmän ylläpitäjät',
+	'fbconnect-connect' => 'Kirjaudu sisään Facebook Connectin avulla',
+	'fbconnect-convert' => 'Yhdistä tämä tili Facebookiin',
+	'fbconnect-logout' => 'Kirjaudu ulos Facebookista',
+	'fbconnect-link' => 'Takaisin facebook.comiin',
+	'fbconnect-title' => 'Yhdistä tili Facebookin kanssa',
+	'fbconnect-click-to-login' => 'Kirjaudu tälle sivustolle Facebookin avulla napsauttamalla',
+	'fbconnect-choosenick' => 'Facebook-profiilisi nimi ($1)',
+	'fbconnect-choosefirst' => 'Etunimesi ($1)',
+	'fbconnect-choosefull' => 'Koko nimesi ($1)',
+	'fbconnect-chooseauto' => 'Automaattisesti luotu nimi ($1)',
+	'fbconnect-choosemanual' => 'Omavalintainen nimi:',
+	'fbconnect-chooseexisting' => 'Olemassa oleva tunnus tässä wikissä',
+	'fbconnect-chooseusername' => 'Käyttäjätunnus',
+	'fbconnect-choosepassword' => 'Salasana:',
+	'fbconnect-updateuserinfo' => 'Päivitä seuraavat henkilökohtaiset tiedot:',
+	'fbconnect-alreadyloggedin' => "'''Olet jo kirjautunut sisään, $1!'''
+
+Jos haluat käyttää Facebook Connectia kirjautuaksesi sisään tulevaisuudessa, voit [[Special:Connect/Convert|muuttaa tilisi käyttämään Facebook Connectia]].",
+	'fbconnect-error-creating-user' => 'Virhe luotaessa käyttäjää paikalliseen tietokantaan.',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook-profiili',
+	'fbconnect-prefsheader' => "Hallitse, mitkä tapahtumat tulevat näkyviin Facebook-uutissyötteeseen: <a id='fbConnectPushEventBar_show' href='#'>näytä asetukset</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>piilota asetukset</a>",
+	'fbconnect-prefs-can-be-updated' => 'Voit päivittää näitä milloin tahansa siirtymällä välilehdelle »$1» asetussivullasi.',
 );
 
 /** French (Français)
@@ -580,6 +857,8 @@ Si vous souhaitez utiliser Facebook Connect pour vous connecter à l’avenir, v
  */
 $messages['gl'] = array(
 	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Permite aos usuarios [[Special:Connect|conectarse]] coas súas contas do [http://www.facebook.com Facebook].
+Ofrece unha autenticación baseada en grupos do Facebook e o uso de FBML no texto wiki',
 	'group-fb-user' => 'Usuarios do Facebook Connect',
 	'group-fb-user-member' => 'Usuario do Facebook Connect',
 	'grouppage-fb-user' => '{{ns:project}}:Usuarios do Facebook Connect',
@@ -597,16 +876,30 @@ $messages['gl'] = array(
 	'fbconnect-logout' => 'Desconectarse do Facebook',
 	'fbconnect-link' => 'Volver a facebook.com',
 	'fbconnect-title' => 'Conectar a conta co Facebook',
+	'fbconnect-intro' => 'Este wiki ten o Facebook Connect activado, a evolución máis recente da plataforma Facebook.
+Isto significa que cando estea conectado, ademais dos [[Wikipedia:Help:Logging in#Why log in?|beneficios]] habituais, será capaz de sacar proveito dalgúns recursos extra...',
 	'fbconnect-click-to-login' => 'Prema para acceder a este sitio mediante o Facebook',
 	'fbconnect-click-to-connect-existing' => 'Prema para conectar a súa conta no Facebook con $1',
 	'fbconnect-conv' => 'Comodidade',
+	'fbconnect-convdesc' => 'Os usuarios conectados acceden ao sistema automaticamente.
+Se dá permiso, entón este wiki mesmo pode usar o Facebook como un proxy de correo electrónico para que poida continuar recibindo notificacións importantes sen revelar o seu enderezo de correo electrónico.',
 	'fbconnect-fbml' => 'Lingua de formato do Facebook',
+	'fbconnect-fbmldesc' => 'O Facebook ofreceu unha morea de etiquetas integradas que van procesar os datos dinámicos.
+Moitas destas etiquetas poden incluírse no texto wiki e serán tratadas de xeito diferente dependendo do usuario conectado que as estea a ollar.',
 	'fbconnect-comm' => 'Comunicación',
+	'fbconnect-commdesc' => 'O Facebook Connect introduce un novo nivel en redes sociais.
+Olle cales dos seus amigos están a usar o wiki; de xeito opcional, pode compartir as súas accións cos seus amigos a través da fonte de novas do Facebook.',
 	'fbconnect-welcome' => 'Benvido, usuario do Facebook Connect!',
 	'fbconnect-loginbox' => "Ou '''acceda ao sistema''' co Facebook:
 	
 $1",
 	'fbconnect-merge' => 'Fusionar a súa conta wiki co ID do Facebook',
+	'fbconnect-logoutbox' => '$1
+	
+Isto fará que tamén saia do sistema do Facebook e de todos os sitios nos que estea conectado, incluído este wiki.',
+	'fbconnect-listusers-header' => 'Os privilexios $1 e $2 transfírense automaticamente desde os títulos de administradores e responsables do grupo $3 do Facebook.
+
+Para obter máis información, póñase en contacto co creador do grupo, $4.',
 	'fbconnect-error' => 'Erro de verificación',
 	'fbconnect-errortext' => 'Houbo un erro durante a comprobación co Facebook Connect.',
 	'fbconnect-cancel' => 'Acción cancelada',
@@ -633,10 +926,202 @@ Escolla un diferente.',
 	'fbconnect-chooseusername' => 'Nome de usuario:',
 	'fbconnect-choosepassword' => 'Contrasinal:',
 	'fbconnect-updateuserinfo' => 'Actualice a seguinte información persoal:',
+	'fbconnect-alreadyloggedin' => "'''Está dentro do sistema, $1!'''
+
+Se quere usar o Facebook Connect para acceder ao sistema no futuro, pode [[Special:Connect/Convert|converter a súa conta para usar o Facebook Connect]].",
 	'fbconnect-error-creating-user' => 'Erro ao crear o usuario na base de datos local.',
 	'fbconnect-error-user-creation-hook-aborted' => 'Un hook (extensión) abortou a creación da conta con esta mensaxe: $1',
 	'fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Perfil no Facebook',
+	'fbconnect-prefsheader' => "Para controlar aqueles acontecementos que xerarán un elemento na súa fonte de novas do Facebook, <a id='fbConnectPushEventBar_show' href='#'>mostrar as preferencias</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>agochar as preferencias</a>",
+	'fbconnect-prefs-can-be-updated' => 'Pode actualizar estes elementos en calquera momento visitando a lapela "$1" da súa páxina de preferencias.',
+);
+
+/** Swiss German (Alemannisch)
+ * @author Als-Holder
+ */
+$messages['gsw'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Stellt e [[Special:Connect|Spezialsyte]] z Verfiegig, wu Benutzer dermit e Verbindig mit ihre [http://de-de.facebook.com/ Facebook-Konte] chenne härstelle.
+Macht e Authentifizierig megli, wu uf Facebook-Gruppe basiert, un dr Yysatz vu FBML in Wikitext.',
+	'group-fb-user' => 'Facebook-Connect-Benutzer',
+	'group-fb-user-member' => 'Facebook-Connect-Benutzer',
+	'grouppage-fb-user' => '{{ns:project}}:Facebook-Connect-Benutzer',
+	'group-fb-groupie' => 'Gruppemitglider',
+	'group-fb-groupie-member' => 'Gruppemitglid',
+	'grouppage-fb-groupie' => '{{ns:project}}:Gruppemitglider',
+	'group-fb-officer' => 'Gruppeverwalter',
+	'group-fb-officer-member' => 'Gruppeverwalter',
+	'grouppage-fb-officer' => '{{ns:project}}:Gruppeverwalter',
+	'group-fb-admin' => 'Gruppeammanne',
+	'group-fb-admin-member' => 'Gruppeammann',
+	'grouppage-fb-admin' => '{{ns:project}}:Gruppeammanne',
+	'fbconnect-connect' => 'Aamälde iber Facebook Connect',
+	'fbconnect-convert' => 'Des Konto mit Facebook verbinde',
+	'fbconnect-logout' => 'Us Facebook abmälde',
+	'fbconnect-link' => 'Zruck zue facebook.com',
+	'fbconnect-title' => 'Konto mit Facebook verbinde',
+	'fbconnect-intro' => 'Des Wiki het Facebook Connect, di negscht Wyterentwicklig vu dr Plattform Facebook, aktiviert.
+Des bedytet, ass mer, wänn mer aagmäldet isch, zuesätzli zue dr normale [[Wikipedia:Help:Logging in#Why log in?|Vorteil]] vun ere Aamäldig, no wyteri Funktione cha nutze...',
+	'fbconnect-click-to-login' => 'Do druf klicke zum sich aamälde iber Facebook',
+	'fbconnect-click-to-connect-existing' => 'Do druf klicke zum Dyy Facebook-Konto verbinde mit $1',
+	'fbconnect-conv' => 'Chummligkeit',
+	'fbconnect-convdesc' => 'Verbundeni Benutzer wäre automatisch aagmäldet.
+Wänn d Erlaubnis vorlyt, cha des Wiki sogar Facebook as Kommunikationsschnittstell fir E-Mail nutze, ass mer wyter wichtigi Nochrichte cha iberchuu, ohni ass mer d E-Mail-Adräss mueß uffelege.',
+	'fbconnect-fbml' => 'Facebook-Uuszeichnigssproch',
+	'fbconnect-fbmldesc' => 'Facebook stellt e Bindel vu integrierte Tag z Verfiegig, wu dynamisch erzygti Date chenne verarbeite.
+Vil vu däne Tag chenne in Wikitext yybezoge wäre. Si wäre, je no uf em Wiki aagmäldete Benutzer, individuäll mit Date versäh un uusgee.',
+	'fbconnect-comm' => 'Kommunikation',
+	'fbconnect-commdesc' => 'Facebook Connect stellt e ganz nejartigi Megligkeit vum Netzwärche z Verfiegig.
+Mer cha säh, weli vu dr eigene Frynd s Wiki nutze, un mer cha, wänn gwinscht, ihne di eigene Aktione iber dr eige Facebook-Newsfeed uusgee loo.',
+	'fbconnect-welcome' => 'Willchuu, Facebook-Connect-Benutzer!',
+	'fbconnect-loginbox' => "Oder iber Facebook '''aamälde''':
+
+$1",
+	'fbconnect-merge' => 'S Wikikonto mit dr Facebook-ID zämmefiere',
+	'fbconnect-logoutbox' => '$1
+
+Des fiert zuen ere Abmäldig vu Facebook un allne verbundene Websites, mitsamt däm Wiki.',
+	'fbconnect-listusers-header' => 'D Privilegie $1 un $2 wäre automatisch vu däne vum Gruppeverwalter un Gruppeammann vu dr Facebook-Gruppe $3 ibertrait.
+
+Fir meh Informatione cha mer Kontakt ufnee zum Gruppenaaleger $4.',
+	'fbconnect-error' => 'Iberpriefigsfähler',
+	'fbconnect-errortext' => 'E Fähler isch bi dr Iberpriefig mit Facebook Connect ufträtte.',
+	'fbconnect-cancel' => 'Aktion abbroche',
+	'fbconnect-canceltext' => 'Di vorig Aktion isch vum Benutzer abbroche wore.',
+	'fbconnect-invalid' => 'Nit giltigi Option',
+	'fbconnect-invalidtext' => 'D Uuswahl, wu uf dr vorige Syte troffe woren isch, isch nit giltig.',
+	'fbconnect-success' => 'Facebook Connect-Iberpriefig erfolgryych',
+	'fbconnect-successtext' => 'D Aamäldig iber Facebook Connect isch erfolgryych gsi.',
+	'fbconnect-nickname' => 'Benutzername',
+	'fbconnect-fullname' => 'Vollständige Name',
+	'fbconnect-email' => 'E-Mail-Adräss',
+	'fbconnect-language' => 'Sproch',
+	'fbconnect-timecorrection' => 'Zytzonekorrektur (Stunde)',
+	'fbconnect-chooselegend' => 'Benutzernameuuswahl',
+	'fbconnect-chooseinstructions' => 'Alli Benutzer bruuche ne Benutzername; Du chasch us däre Lischt ein uussueche.',
+	'fbconnect-invalidname' => 'Dr uusgwehlt Benutzername isch scho vergee oder er isch nit zuelässig.
+Bitte wehl e andere.',
+	'fbconnect-choosenick' => 'Dr Profilname uf Facebook ($1)',
+	'fbconnect-choosefirst' => 'Dyy Vorname ($1)',
+	'fbconnect-choosefull' => 'Dyy vollständige Name ($1)',
+	'fbconnect-chooseauto' => 'E automatisch aagleite Name ($1)',
+	'fbconnect-choosemanual' => 'E vu Dir gwehlte Name:',
+	'fbconnect-chooseexisting' => 'E Benutzerkonto, wu s in däm Wiki git',
+	'fbconnect-chooseusername' => 'Benutzername:',
+	'fbconnect-choosepassword' => 'Passwort:',
+	'fbconnect-updateuserinfo' => 'Die persenlige Aagabe mien aktualisiert wäre:',
+	'fbconnect-alreadyloggedin' => "'''Du bisch scho aagmäldet, $1!'''
+
+Wänn Du Facebook Connect fir s Aamälde in Zuechumft wit nutze, no chasch [[Special:Connect/Convert|Dyy Benutzerkonto no Facebook Connect konvertiere]].",
+	'fbconnect-error-creating-user' => 'Fähler bim Aalege vum Benutzer in dr lokale Datebank.',
+	'fbconnect-error-user-creation-hook-aborted' => 'D Schnittstell vun ere Softwareerwyterig het s Aalege vum Benutzerkonto abbroche mit däre Nochricht: $1',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook-Profil',
+	'fbconnect-prefsheader' => "Yystellige zue dr Aktione, wu iber dr eige Facebook-Newsfeed uusgee wäre solle: <a id='fbConnectPushEventBar_show' href='#'>Yystellige aazeige</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>Yystellige uusblände</a>",
+	'fbconnect-prefs-can-be-updated' => 'Du chasch si jederzyt aktualisiere uf dr Regischtercharte „$1“ in Dyyne Yystellige.',
+);
+
+/** Hebrew (עברית)
+ * @author YaronSh
+ */
+$messages['he'] = array(
+	'group-fb-user' => 'משתמשי Facebook Connect',
+	'group-fb-user-member' => 'משתמש Facebook Connect',
+	'fbconnect-connect' => 'כניסה עם Facebook Connect',
+	'fbconnect-logout' => 'יציאה מ־Facebook',
+	'fbconnect-link' => 'חזרה ל־facebook.com',
+	'fbconnect-title' => 'קישור חשבון ל־Facebook',
+	'fbconnect-click-to-login' => 'נא ללחוץ כדי להיכנס לאתר זה דרך Facebook',
+	'fbconnect-conv' => 'נוחות',
+	'fbconnect-fbml' => 'שפת הסימון של Facebook',
+	'fbconnect-comm' => 'תקשורת',
+	'fbconnect-error' => 'שגיאת אימות',
+	'fbconnect-errortext' => 'אירעה שגיאה במהלך האימות מול Facebook Connect.',
+	'fbconnect-cancel' => 'הפעולה בוטלה',
+	'fbconnect-canceltext' => 'הפעולה הקודמת בוטלה על ידי המשתמש.',
+	'fbconnect-invalid' => 'אפשרות שגויה',
+	'fbconnect-successtext' => 'נכנסת בהצלחה באמצעות Facebook Connect.',
+	'fbconnect-nickname' => 'כינוי',
+	'fbconnect-fullname' => 'שם מלא',
+	'fbconnect-email' => 'כתובת דוא״ל',
+	'fbconnect-language' => 'שפה',
+	'fbconnect-timecorrection' => 'תיקון לאזור הזמן (שעות)',
+	'fbconnect-chooselegend' => 'בחירת שם המשתמש',
+	'fbconnect-chooseinstructions' => 'כל המשתמשים זקוקים לכינוי; ניתן לבחור באחד מהאפשרויות שלהלן.',
+	'fbconnect-invalidname' => 'הכינוי שבחרת כבר תפוס או שאינו תקני.
+נא לנסות לבחור באחד אחר.',
+	'fbconnect-choosefirst' => 'שמך הפרטי ($1)',
+	'fbconnect-choosefull' => 'שמך המלא ($1)',
+	'fbconnect-chooseauto' => 'שם שנוצר אוטומטית ($1)',
+	'fbconnect-choosemanual' => 'שם לבחירתך:',
+	'fbconnect-chooseexisting' => 'חשבון קיים בוויקי זה',
+	'fbconnect-chooseusername' => 'שם משתמש:',
+	'fbconnect-choosepassword' => 'ססמה:',
+	'fbconnect-updateuserinfo' => 'עדכון הפרטים האישיים הבאים:',
+	'fbconnect-error-creating-user' => 'שגיאה ביצירת המשתמש בבסיס הנתונים המקומי.',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook פרופיל',
+);
+
+/** Hungarian (Magyar)
+ * @author Dani
+ */
+$messages['hu'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'group-fb-user' => 'Facebook Connect felhasználók',
+	'group-fb-user-member' => 'Facebook Connect felhasználó',
+	'grouppage-fb-user' => '{{ns:project}}:Facebook Connect felhasználók',
+	'group-fb-groupie' => 'csoporttagok',
+	'group-fb-groupie-member' => 'csoporttag',
+	'grouppage-fb-groupie' => '{{ns:project}}:Csoporttagok',
+	'group-fb-officer' => 'csoporttisztek',
+	'group-fb-officer-member' => 'csoporttiszt',
+	'grouppage-fb-officer' => '{{ns:project}}:Csoporttisztek',
+	'group-fb-admin' => 'csoportadminisztrátorok',
+	'group-fb-admin-member' => 'csoportadminisztrátor',
+	'grouppage-fb-admin' => '{{ns:project}}:Csoportadminisztrátorok',
+	'fbconnect-connect' => 'Bejelentkezés a Facebook Connecttel',
+	'fbconnect-convert' => 'Fiók összekötése a Facebookkal',
+	'fbconnect-logout' => 'Kijelentkezés a Facebookról',
+	'fbconnect-link' => 'Vissza a facebook.com-ra',
+	'fbconnect-title' => 'Fiók összekötése a Facebookkal',
+	'fbconnect-click-to-login' => 'Bejelentkezés az oldalra Facebookon keresztül',
+	'fbconnect-conv' => 'Kényelem',
+	'fbconnect-fbml' => 'Facebook-jelölőnyelv',
+	'fbconnect-comm' => 'Kommunikáció',
+	'fbconnect-welcome' => 'Üdvözöllek, Facebook Connect felhasználó!',
+	'fbconnect-loginbox' => "Vagy '''jelentkezz be''' Facebookon keresztül:
+
+$1",
+	'fbconnect-merge' => 'Wikis fiók összekötése facebookos azonosítóval',
+	'fbconnect-error' => 'Hiba az ellenőrzés során',
+	'fbconnect-errortext' => 'Hiba történt a Facebook Connect ellenőrzése közben.',
+	'fbconnect-cancel' => 'Művelet megszakítva',
+	'fbconnect-canceltext' => 'A felhasználó megszakította az előző műveletet.',
+	'fbconnect-invalid' => 'Érvénytelen beállítás',
+	'fbconnect-invalidtext' => 'Az előző oldalon kiválasztott beállítás érvénytelen.',
+	'fbconnect-success' => 'Facebook-ellenőrzés sikerült',
+	'fbconnect-successtext' => 'Sikeresen bejelentkeztél a Facebook Connect használatával.',
+	'fbconnect-nickname' => 'Becenév',
+	'fbconnect-fullname' => 'Teljes név',
+	'fbconnect-email' => 'E-mail cím',
+	'fbconnect-language' => 'Nyelv',
+	'fbconnect-timecorrection' => 'Időzóna-korrekció (órában)',
+	'fbconnect-chooselegend' => 'Felhasználónév választása',
+	'fbconnect-chooseinstructions' => 'Minden felhasználónak kell egy becenév; válassz egyet az alábbi lehetőségek közül.',
+	'fbconnect-choosenick' => 'Facebook-profilod neve ($1)',
+	'fbconnect-choosefirst' => 'A keresztneved ($1)',
+	'fbconnect-choosefull' => 'A teljes neved ($1)',
+	'fbconnect-chooseauto' => 'Automatikusan generált név ($1)',
+	'fbconnect-choosemanual' => 'A választott név:',
+	'fbconnect-chooseexisting' => 'Már létező fiók',
+	'fbconnect-chooseusername' => 'Felhasználónév:',
+	'fbconnect-choosepassword' => 'Jelszó:',
+	'fbconnect-updateuserinfo' => 'A következő személyes adatok frissítése:',
+	'fbconnect-error-creating-user' => 'Nem sikerült létrehozni a felhasználót a helyi adatbázisban.',
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Facebook-profil',
 );
 
 /** Interlingua (Interlingua)
@@ -692,7 +1177,7 @@ Pro plus informationes, per favor contacta le creator del gruppo, $4.',
 	'fbconnect-cancel' => 'Action cancellate',
 	'fbconnect-canceltext' => 'Le previe action esseva cancellate per le usator.',
 	'fbconnect-invalid' => 'Option invalide',
-	'fbconnect-invalidtext' => 'Le modo de selection in le previe pagina esseva invalide.',
+	'fbconnect-invalidtext' => 'Le modo de selection in le previe pagina es invalide.',
 	'fbconnect-success' => 'Verification de Facebook succedite',
 	'fbconnect-successtext' => 'Le apertura de session con Facebook Connect ha succedite.',
 	'fbconnect-nickname' => 'Pseudonymo',
@@ -726,12 +1211,114 @@ Si tu vole usar Facebook Connect pro aperir un session in le futuro, tu pote [[S
 );
 
 /** Italian (Italiano)
+ * @author Beta16
  * @author Ric
  */
 $messages['it'] = array(
+	'group-fb-groupie' => 'Membri del gruppo',
+	'group-fb-groupie-member' => 'Membri del gruppo',
 	'fbconnect-link' => 'Torna a facebook.com',
 	'fbconnect-click-to-login' => 'Fare clic per accedere a questo sito tramite Facebook',
 	'fbconnect-click-to-connect-existing' => 'Clicca per collegare il tuo account Facebook a $1',
+	'fbconnect-comm' => 'Comunicazione',
+	'fbconnect-error' => 'Errore di verifica',
+	'fbconnect-nickname' => 'Nickname',
+	'fbconnect-fullname' => 'Nome completo',
+	'fbconnect-email' => 'Indirizzo e-mail',
+	'fbconnect-language' => 'Lingua',
+	'fbconnect-chooselegend' => 'Scelta del nome utente',
+	'fbconnect-chooseinstructions' => 'Tutti gli utenti hanno bisogno di un nickname; puoi sceglierne uno dalle opzioni seguenti.',
+	'fbconnect-choosefirst' => 'Il tuo nome ($1)',
+	'fbconnect-choosefull' => 'Il tuo nome completo ($1)',
+	'fbconnect-chooseauto' => 'Un nome auto-generato ($1)',
+	'fbconnect-choosemanual' => 'Un nome di tua scelta:',
+	'fbconnect-chooseusername' => 'Nome utente:',
+	'fbconnect-choosepassword' => 'Password:',
+);
+
+/** Japanese (日本語)
+ * @author 青子守歌
+ */
+$messages['ja'] = array(
+	'fbconnect' => 'Facebook接続',
+	'fbconnect-desc' => '利用者が、[http://www.facebook.com Facebook]アカウントで[[Special:Connect|接続]]できるようにする。
+ウィキ文中のFBMLとFacebookグループに基づく申し込み認証',
+	'group-fb-user' => 'Facebook接続利用者',
+	'group-fb-user-member' => 'Facebook接続利用者',
+	'grouppage-fb-user' => '{{ns:project}}:Facebook接続利用者',
+	'group-fb-groupie' => 'グループメンバー',
+	'group-fb-groupie-member' => 'グループメンバー',
+	'grouppage-fb-groupie' => '{{ns:project}}:グループメンバー',
+	'group-fb-officer' => 'グループの役員',
+	'group-fb-officer-member' => 'グループの役員',
+	'grouppage-fb-officer' => '{{ns:project}}:グループの役員',
+	'group-fb-admin' => 'グループの管理者',
+	'group-fb-admin-member' => 'グループの管理者',
+	'grouppage-fb-admin' => '{{ns:project}}:グループの管理者',
+	'fbconnect-connect' => 'Facebook接続でログイン',
+	'fbconnect-convert' => 'このアカウントにFacebookで接続',
+	'fbconnect-logout' => 'Facebookのログアウト',
+	'fbconnect-link' => 'facebook.comに戻る',
+	'fbconnect-title' => 'Facebookでアカウントに接続',
+	'fbconnect-intro' => 'このウィキは、次世代Facebookプラットフォームである、Facebook接続が有効になっています。
+つまり、接続した時、ログイン時に使える通常の[[Wikipedia:Help:Logging in#Why log in?|利点]]に加え、いくつかの追加機能を活用することができるようになります。',
+	'fbconnect-click-to-login' => 'クリックして、Facebook経由でこのサイトにログイン',
+	'fbconnect-click-to-connect-existing' => 'クリックして、Facebookアカウントを$1に接続',
+	'fbconnect-conv' => '利便性',
+	'fbconnect-convdesc' => '接続された利用者は、自動的にログインされます。
+許可が与えられていれば、このウィキは、Facebookを電子メールのプロキシとして利用し、重要な通知を、電子メールアドレスを開示することなく受け取り続けることができるようになります。',
+	'fbconnect-fbml' => 'Facebookマークアップ言語',
+	'fbconnect-fbmldesc' => 'Facebookは、動的データの描画を行なう組み込みタグ群を提供しています。
+それらのタグの多くは、ウィキ文の中に含めることができ、どの接続利用者がそれを閲覧しているかによって、異なる描画を行なうことができます。',
+	'fbconnect-comm' => '通信',
+	'fbconnect-commdesc' => 'Facebook接続は、ネットワーク活用のの全く新しいレベルの先駆けとなります。
+どんなフレンドがそのウィキを利用しているか探し、Facebookニュースフィードを介して、自分の行動をフレンドと共有することもできます。',
+	'fbconnect-welcome' => 'ようこそ、Facebook接続の利用者さん！',
+	'fbconnect-loginbox' => "もしくは、Facebookで'''ログイン'''：
+
+$1",
+	'fbconnect-merge' => 'FacebookのIDを使用して、ウィキ上の自分のアカウントを統合',
+	'fbconnect-logoutbox' => '$1
+
+これは、Facebookと、このウィキを含むすべての接続サイトからログアウトします。',
+	'fbconnect-listusers-header' => '$1と$2の権限は、Facebookグループ$3の役員と管理者から、自動的に転送されました。
+
+詳細情報については、グループの作成者$4に連絡してください。',
+	'fbconnect-error' => '検証エラー',
+	'fbconnect-errortext' => 'Facebook接続で認証中にエラーが発生しました。',
+	'fbconnect-cancel' => '操作がキャンセルされました',
+	'fbconnect-canceltext' => '1つまえの操作が利用者によって取り消されました。',
+	'fbconnect-invalid' => '不正なオプション',
+	'fbconnect-invalidtext' => '前のページで選択された形式は不正です。',
+	'fbconnect-success' => 'Facebook検証は成功しました',
+	'fbconnect-successtext' => 'Facebook接続でのログインに成功しました',
+	'fbconnect-nickname' => 'ニックネーム',
+	'fbconnect-fullname' => 'フルネーム',
+	'fbconnect-email' => '電子メールアドレス',
+	'fbconnect-language' => '言語',
+	'fbconnect-timecorrection' => 'タイムゾーンの補正（時間）',
+	'fbconnect-chooselegend' => '利用者名の選択',
+	'fbconnect-chooseinstructions' => 'すべての利用者はニックネームが必要です。以下の選択肢から1つを選ぶことができます。',
+	'fbconnect-invalidname' => '選択されたニックネームは既に使用されているか、有効でないニックネームです。
+別の選択肢を選んでください。',
+	'fbconnect-choosenick' => '自分のFacebookプロフィール名（$1）',
+	'fbconnect-choosefirst' => '名（$1）',
+	'fbconnect-choosefull' => '氏名（$1）',
+	'fbconnect-chooseauto' => '自動生成された名前（$1）',
+	'fbconnect-choosemanual' => '選択された名前：',
+	'fbconnect-chooseexisting' => 'このウィキに存在するアカウント',
+	'fbconnect-chooseusername' => '利用者名：',
+	'fbconnect-choosepassword' => 'パスワード：',
+	'fbconnect-updateuserinfo' => '以下の個人情報を更新する：',
+	'fbconnect-alreadyloggedin' => "'''既に$1としてログインしています！'''
+
+将来、Facebook接続を使用してログインしたい場合は、[[Special:Connect/Convert|アカウントをFacebook接続を使用するように変換する]]ことができます。",
+	'fbconnect-error-creating-user' => 'ローカルのデータベースに利用者を作成する時にエラーが発生しました。',
+	'fbconnect-error-user-creation-hook-aborted' => 'フック（拡張機能）は、次のメッセージと共にアカウントの作成を中断しました：$1',
+	'fbconnect-prefstext' => 'Facebook接続',
+	'fbconnect-link-to-profile' => 'Facebookのプロフィール',
+	'fbconnect-prefsheader' => "どのイベントがFacebookニュースフィードに項目を挿入するかを制御するために、<a id='fbConnectPushEventBar_show' href='#'>設定を表示</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>設定を非表示</a>",
+	'fbconnect-prefs-can-be-updated' => 'これらは、いつでも、設定ページの「$1」タブから更新することができます。',
 );
 
 /** Luxembourgish (Lëtzebuergesch)
@@ -739,30 +1326,53 @@ $messages['it'] = array(
  */
 $messages['lb'] = array(
 	'fbconnect' => 'Facebook Connect',
-	'group-fb-user' => 'Facebook Connect Benotzer',
+	'fbconnect-desc' => 'Erlaabt et Benotzer hir sech mat hire [http://www.facebook.com Facebook] Konten ze [[Special:Connect|connectéieren]].',
+	'group-fb-user' => 'Facebook-Connect-Benotzer',
 	'group-fb-user-member' => 'Facebook-Connect-Benotzer',
 	'grouppage-fb-user' => '{{ns:project}}:Facebook-Connect-Benotzer',
 	'group-fb-groupie' => 'Membere vum Grupp',
 	'group-fb-groupie-member' => 'Member vum Grupp',
 	'grouppage-fb-groupie' => '{{ns:project}}: Gruppememberen',
+	'group-fb-officer' => 'Responsabel vum Grupp',
+	'group-fb-officer-member' => 'Responsabel vum Grupp',
+	'grouppage-fb-officer' => '{{ns:project}}:Responsabel vum Grupp',
+	'group-fb-admin' => 'Administrateure vum Grupp',
+	'group-fb-admin-member' => 'Administrateur vum Grupp',
+	'grouppage-fb-admin' => '{{ns:project}}:Administrateure vum Grupp',
 	'fbconnect-connect' => 'Mat Facebook-Connect aloggen',
 	'fbconnect-convert' => 'Dëse Kont mat Facebook verbannen',
 	'fbconnect-logout' => 'Ofmellen op Facebook',
 	'fbconnect-link' => 'Zréck op facebook.com',
 	'fbconnect-title' => 'Kont mat Facebook verbannen',
+	'fbconnect-click-to-login' => 'Klickt fir Iech iwwer Facebook op dësem Site anzeloggen',
 	'fbconnect-click-to-connect-existing' => 'Klickt fir Äre Facebook-Kont mat $1 ze verbannen',
 	'fbconnect-conv' => 'Bequemlechkeet',
+	'fbconnect-convdesc' => "Verbonne Benotzer ginn automatesch ageloggt.
+Wann d'Autorisatioun virläit kann dës Wiki esouguer Facebook als E-Mail-Proxy benotzen esou datt Dir weiderhi wichteg Matdeelunge kréie kënnt ouni Är E-Mailadress präiszeginn.",
 	'fbconnect-fbml' => 'Facebook-Markup Sprooch',
 	'fbconnect-comm' => 'Kommunikatioun',
+	'fbconnect-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
+Kuckt wie vun Äre Frënn d'Wiki benotzt, a virun allem deelt Är Aktioune mat Äre Frënn iwwer d'Facebook-Newsfeed.",
 	'fbconnect-welcome' => 'Wëllkomm, Facebook-Connect-Benotzer!',
 	'fbconnect-loginbox' => "Oder op Facebook '''aloggen''':
 
 $1",
 	'fbconnect-merge' => 'Verbannt Äre Wiki-Kont mat Ärer Facebook-ID',
+	'fbconnect-logoutbox' => '$1
+
+Dëst loggt Iech och aus Facebook eraus an aus allen domat verbonnene Siten, inklusiv dës Wiki.',
+	'fbconnect-listusers-header' => "D'Rechter $1 a(n) $2 ginn automatesch vum Gestionnaire a vum Administrateur vum Facebook-Grupp $3 transferéiert.
+
+Fir méi Informatiounen, kontaktéiert w.e.g. deen den de Grupp $4 opgemaach huet.",
 	'fbconnect-usernameprefix' => 'Facebook-Benotzer',
 	'fbconnect-error' => 'Feeler bei der Iwwerpréifung',
+	'fbconnect-errortext' => 'Bäi der Iwwerpréifung mat Facebook Connect ass e Feeler geschitt.',
 	'fbconnect-cancel' => 'Aktioun ofgebrach',
+	'fbconnect-canceltext' => 'Déi Aktioun virdru gouf vum Benotzer ofgebrach.',
+	'fbconnect-invalid' => 'Net-valabel Optioun',
+	'fbconnect-invalidtext' => 'Dat wat Dir op der Säit virdrun erausgesicht hutt ass net valabel.',
 	'fbconnect-success' => 'Facebook Iwwerpréifung mat Succès',
+	'fbconnect-successtext' => 'Dir sidd elo mat Facebook Connect ageloggt.',
 	'fbconnect-nickname' => 'Spëtznumm',
 	'fbconnect-fullname' => 'Ganzen Numm',
 	'fbconnect-email' => 'E-Mailadress',
@@ -770,6 +1380,8 @@ $1",
 	'fbconnect-timecorrection' => "Verbesserung fir d'Zäitzon (Stonnen)",
 	'fbconnect-chooselegend' => 'Eraussiche vum Benotzernumm',
 	'fbconnect-chooseinstructions' => 'All Benotzer brauchen e Spëtznumm; Dir kënnt Iech een aus den Optiounen hei drënner eraussichen.',
+	'fbconnect-invalidname' => 'De Spëtznumm deen Dir erausgesicht hutt ass scho verginn oder et ass kee valabele Spëtznumm.
+Sicht Iech w.e.g. een Aneren.',
 	'fbconnect-choosenick' => 'Äre Facbook-Profilnumm ($1)',
 	'fbconnect-choosefirst' => 'Äre Virnumm ($1)',
 	'fbconnect-choosefull' => 'Äre ganzen Numm ($1)',
@@ -783,8 +1395,10 @@ $1",
 
 Wann Dir Facebook-Connect benotze wëllt fir Iech an Zukunft anzeloggen, da kënnt Dir [[Special:Connect/Convert|Äre Benotzerkont ëmwandelen Fir Facebook-Connect ze benotzen]].",
 	'fbconnect-error-creating-user' => 'Feeler beim Uleeë vum Benotzer an der lokaler Datebank.',
+	'fbconnect-error-user-creation-hook-aborted' => "Eng Erweiderung huet d'Uleeë vum Kont ofgebrach mam Message: $1",
 	'fbconnect-prefstext' => 'Facebook-Connect',
 	'fbconnect-link-to-profile' => 'Facebook-Profil',
+	'fbconnect-prefs-can-be-updated' => 'Dir kënnt dës zu all Moment aktualiséieren an deem Dir op den Tab "$1" op der Säit vun Ären Astellunge gitt.',
 );
 
 /** Macedonian (Македонски)
@@ -871,6 +1485,13 @@ $1",
 	'fbconnect-link-to-profile' => 'Профил на Facebook',
 	'fbconnect-prefsheader' => "Контролирање кои настани ќе истакнат некоја ставка на Вашето емитување на новости на Facebook: <a id='fbConnectPushEventBar_show' href='#'>прикажи нагодувања</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>сокриј нагодувања</a>",
 	'fbconnect-prefs-can-be-updated' => 'Овие можете да ги подновите во секое време во јазичето „$1“ во Вашата страница за нагодувања.',
+);
+
+/** Mongolian (Монгол)
+ * @author Chinneeb
+ */
+$messages['mn'] = array(
+	'fbconnect-language' => 'Хэл',
 );
 
 /** Erzya (Эрзянь)
@@ -964,6 +1585,17 @@ Als u in de toekomst uw Facebook Connect wilt gebruiken om aan te melden, [[Spec
 	'fbconnect-link-to-profile' => 'Facebookprofiel',
 	'fbconnect-prefsheader' => "Bepalen welke handelingen worden toegevoegd aan uw nieuwsfeed in Facebook. <a id='fbConnectPushEventBar_show' href='#'>Voorkeuren weergeven</a><a id='fbConnectPushEventBar_hide' href='#' style='display:none'>Voorkeuren verbergen</a>.",
 	'fbconnect-prefs-can-be-updated' => 'U kunt deze te allen tijde bijwerken door naar het tabblad "$1" in uw voorkeuren te gaan.',
+);
+
+/** Norwegian Nynorsk (‪Norsk (nynorsk)‬)
+ * @author Nghtwlkr
+ */
+$messages['nn'] = array(
+	'fbconnect-language' => 'Språk',
+	'fbconnect-choosefirst' => 'Førenamnet ditt ($1)',
+	'fbconnect-choosefull' => 'Det fulle namnet ditt ($1)',
+	'fbconnect-chooseusername' => 'Brukarnamn:',
+	'fbconnect-choosepassword' => 'Passord:',
 );
 
 /** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
@@ -1138,12 +1770,13 @@ Jeśli chcesz w przyszłości używać Facebook Connect do logowania się, może
 );
 
 /** Piedmontese (Piemontèis)
+ * @author Borichèt
  * @author Dragonòt
  */
 $messages['pms'] = array(
 	'fbconnect' => 'Conession Facebook',
-	'fbconnect-desc' => "A abìlita j'utent a [[Special:Connect|Conëttse]] con ij sò cont [http://www.facebook.com Facebook].
-A eufr autenticassion basà an sle partìe Facebook e ël dovragi ëd FBML an test wiki",
+	'fbconnect-desc' => "A abìlita j'utent a [[Special:Connect|intré]] ant ij sò cont [http://www.facebook.com Facebook].
+A eufr n'autenticassion basà an sle partìe Facebook e l'utilisassion ëd FBML ant ël test wiki",
 	'group-fb-user' => 'Utent ëd Facebook Connect',
 	'group-fb-user-member' => 'Utent ëd Facebook Connect',
 	'grouppage-fb-user' => '{{ns:project}}:Utent ëd Facebook Connect',
@@ -1153,77 +1786,78 @@ A eufr autenticassion basà an sle partìe Facebook e ël dovragi ëd FBML an te
 	'group-fb-officer' => 'Ufissiaj dla partìa',
 	'group-fb-officer-member' => 'Ufissiaj dla partìa',
 	'grouppage-fb-officer' => '{{ns:project}}:Ufissiaj dla partìa',
-	'group-fb-admin' => 'Aministrador ëd la partìa',
-	'group-fb-admin-member' => 'Aministrador ëd la partìa',
-	'grouppage-fb-admin' => '{{ns:project}}:Aministrador ëd la partìa',
-	'fbconnect-connect' => 'Intra con Facebook Connect',
+	'group-fb-admin' => 'Aministrator ëd la partìa',
+	'group-fb-admin-member' => 'Aministrator ëd la partìa',
+	'grouppage-fb-admin' => '{{ns:project}}:Aministrator ëd la partìa',
+	'fbconnect-connect' => 'Intré an Facebook Connect',
 	'fbconnect-convert' => 'Colega sto cont con Facebook',
 	'fbconnect-logout' => 'Seurt da Facebook',
 	'fbconnect-link' => 'André a Facebook.com',
-	'fbconnect-title' => 'Colega cont con Facebook',
+	'fbconnect-title' => 'Coleghé un cont con Facebook',
 	'fbconnect-intro' => "Sta wiki a l'é abilità con Facebook Connect, la pròssima evolussion dla piataforma Facebook.
-Sossì a veul dì che quand ch'it ses colegà, an gionta ai [[Wikipedia:Help:Logging in#Why log in?|benefissi]] normaj ch'it vëdde quand it intre, it podras pijé vantagi ëd quàich funsion extra...",
+Sossì a veul dì che quand ch'a l'é colegà, an dzorpì dij [[Wikipedia:Help:Logging in#Why log in?|benefissi]] normaj ch'a vëd quand ch'a intra ant ël sistema, a podrà benefissié ëd chèiche funsion suplementar...",
 	'fbconnect-click-to-login' => 'Sgnaca për intré ant sto sit via Facebook',
-	'fbconnect-click-to-connect-existing' => 'Sgnaca për celeghé a tò cont Facebook a $1',
+	'fbconnect-click-to-connect-existing' => "Ch'a sgnaca ambelessì për coleghé sò cont Facebook a $1",
 	'fbconnect-conv' => 'Conveniensa',
-	'fbconnect-convdesc' => "J'utent colegà a son intrà automaticament.
-Se a son dàit ij përmess, antlora sta wiki a peul ëdcò dovré Facebook con un proxy e-mail an manera ch'it peusse continué a arseive notìfiche amportante sensa arvelé toa adrëssa e-mail.",
+	'fbconnect-convdesc' => "J'utent colegà a automaticament intrà ant ël sistema.
+Se a son ësmonù ij përmess, antlora sta wiki a peul ëdcò dovré Facebook coma un mandatari ëd pòsta eletrònica an manera ch'a peula continué a arsèive le notìfiche amportante sensa arvelé soa adrëssa ëd pòsta eletrònica.",
 	'fbconnect-fbml' => 'Lenga dij marcador ëd Facebook',
-	'fbconnect-fbmldesc' => "Facebok a l'ha dàit un mucc ëd tag built-in che a presento data dinàmich.
-Motobin dë sti tag a peulo esse anserì an test wiki, e a saran presentà an manera diferenta an dipendensa on which connected user they are being viewed by.",
+	'fbconnect-fbmldesc' => "Facebok a l'ha dàit un mucc ëd tichëtte antëgrà che a presento dij dàit dinàmich.
+Vàire ëd se tichëtte a peulo esse anserìe ant ël test wiki, e a saran ësmonùe a sconda dl'utent colegà ch'a-j vëdd.",
 	'fbconnect-comm' => 'Comunicassion',
-	'fbconnect-commdesc' => "Facebook a colega j'utent ant n'anter level neuv ëd rej.
-Varda chi dij tò amis a stan dovrand la wiki, e opsionalment condivid toe assion con ij tò amis via ij feed ëd neuve ëd Facebook.",
+	'fbconnect-commdesc' => "Facebook a men-a j'utent an livel tut neuv ëd rej.
+Ch'a vëdda chi dij sò amis a son an camin ch'a deuvro la wiki, e miraco ch'a condivida soe assion con ij sò amis për mojen dël fil ëd neuve ëd Facebook.",
 	'fbconnect-welcome' => 'Bin ëvnù, utent ëd Facebook Connect!',
-	'fbconnect-loginbox' => "O '''intra''' con Facebook:
+	'fbconnect-loginbox' => "O '''intré ant ël sistema''' con Facebook:
 
 $1",
-	'fbconnect-merge' => 'Mës-cia tò cont wiki con tò ID Facebook',
+	'fbconnect-merge' => 'Mës-cé sò cont wiki con sò identificativ Facebook',
 	'fbconnect-logoutbox' => '$1
 
-Sossì at farà ëdcò seurte da Facebook e tùit ij sit colegà, compreis sta wiki.',
-	'fbconnect-listusers-header' => "Ij privilegi ëd $1 e $2 a son automaticament trasferì dai tìtoj d'uficial e d'aministrador ëd la partìa ëd Facebook $3.
+Sòn a lo farà ëdcò seurte da Facebook e da tùit ij sit colegà, comprèisa sta wiki.',
+	'fbconnect-listusers-header' => "Ij privilegi ëd $1 e $2 a son automaticament trasferì dai tìtoj d'ufissial e d'aministrator ëd la partìa ëd Facebook $3.
 
-Për savèjne ëd pi, për piasì contata ël creador dla partìa $4.",
+Për savèjne ëd pi, për piasì ch'a contata ël creator dla partìa $4.",
 	'fbconnect-error' => 'Eror ëd verìfica',
-	'fbconnect-errortext' => "A l'é capitaje n'eror an mente dla verìfica con Facebook Connect.",
-	'fbconnect-cancel' => 'Assion scanselà',
-	'fbconnect-canceltext' => "L'assion ëd prima a l'é stàita scanselà da l'utent.",
+	'fbconnect-errortext' => "A l'é capitaje n'eror durant la verìfica con Facebook Connect.",
+	'fbconnect-cancel' => 'Assion anulà',
+	'fbconnect-canceltext' => "L'assion ëd prima a l'é stàita anulà da l'utent.",
 	'fbconnect-invalid' => 'Opsion pa bon-a.',
 	'fbconnect-invalidtext' => "La selession fàita an sla pàgina ëd prima a l'era pa bon-a.",
 	'fbconnect-success' => "La verìfica ëd Facebook a l'é andàita bin",
-	'fbconnect-successtext' => 'It sen intrà da bin con Facebook Connect.',
+	'fbconnect-successtext' => "A l'é intrà ant ël sistema për da bin con Facebook Connect.",
 	'fbconnect-nickname' => 'Stranòm',
 	'fbconnect-fullname' => 'Nòm complet',
 	'fbconnect-email' => 'Adrëssa ëd pòsta eletrònica',
 	'fbconnect-language' => 'Lenga',
 	'fbconnect-timecorrection' => 'Coression dël fus orari (ore)',
-	'fbconnect-chooselegend' => 'Sërnùa dël nòm utent',
+	'fbconnect-chooselegend' => "Sernia ëd lë stranòm d'utent",
 	'fbconnect-chooseinstructions' => "Tùit j'utent a l'han dabzògn ëd në stranòm,
 a peul sern-ne un da j'opsion sì-sota.",
-	'fbconnect-invalidname' => "Lë stranòm ch'it l'has sërnù a l'é già pijà o a l'é pa në stranòm bon.
-Për piasì sern-ne un diferent.",
+	'fbconnect-invalidname' => "Lë stranòm ch'a l'ha sernù a l'é già pijà o a l'é pa në stranòm bon.
+Për piasì ch'a na serna n'àutr.",
 	'fbconnect-choosenick' => 'Tò nòm ëd profil Facebook ($1)',
 	'fbconnect-choosefirst' => 'Tò nòm ($1)',
 	'fbconnect-choosefull' => 'Tò nòm complet ($1)',
 	'fbconnect-chooseauto' => 'Un nòm generà da sol ($1)',
-	'fbconnect-choosemanual' => 'Un nòm sërnù da ti:',
+	'fbconnect-choosemanual' => "Në stranòm ch'a veul chiel:",
 	'fbconnect-chooseexisting' => 'Un cont esistent an sta wiki-sì',
-	'fbconnect-chooseusername' => 'Nòm utent:',
+	'fbconnect-chooseusername' => "Stranòm d'utent:",
 	'fbconnect-choosepassword' => 'Ciav:',
 	'fbconnect-updateuserinfo' => "Modìfica j'anformassion përsonaj ch'a ven-o:",
 	'fbconnect-alreadyloggedin' => "'''A l'é già intrà ant ël sistema, $1!'''
 
 S'a veul dovré Facebook Connect për intré ant l'avnì, a peul [[Special:Connect/Convert|convertì sò cont për dovré Facebook Connect]].",
-	'fbconnect-error-creating-user' => "Eror an creand l'utent ant ël database local.",
-	'fbconnect-error-user-creation-hook-aborted' => "n'hook (estension) a l'ha abortì la creassion dël cont con ël mëssagi:$1",
-	'fbconnect-prefstext' => 'Conession Facebook',
+	'fbconnect-error-creating-user' => "Eror ant la creassion ëd l'utent ant la base ëd dàit local.",
+	'fbconnect-error-user-creation-hook-aborted' => "Un gancio (estension) a l'ha fàit abortì la creassion dël cont con ël mëssagi:$1",
+	'fbconnect-prefstext' => 'Facebook Connect',
 	'fbconnect-link-to-profile' => 'Profil ëd Facebook',
-	'fbconnect-prefsheader' => "Për controlé che event a posserà un element a tò feed ëd neuve ëd Facebook, <a id='fbConnectPushEventBar_show' href='#'>mosta tò gust</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>stërma gust</a>",
-	'fbconnect-prefs-can-be-updated' => 'It peule modifiché sossì quand it veule an visitand ël tab "$1" ëd la pàgina dij tò gust.',
+	'fbconnect-prefsheader' => "Për controlé che event a mandran n'element a sò fluss ëd neuve ëd Facebook, <a id='fbConnectPushEventBar_show' href='#'>smon-e ij sò gust</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>stërmé ij sò gust</a>",
+	'fbconnect-prefs-can-be-updated' => 'A peul modifiché sòn quand ch\'a veul an visitand la tichëtta "$1" ëd la pàgina dij sò gust.',
 );
 
 /** Portuguese (Português)
+ * @author Giro720
  * @author Hamilton Abreu
  */
 $messages['pt'] = array(
@@ -1247,7 +1881,7 @@ $messages['pt'] = array(
 	'fbconnect-link' => 'Voltar ao facebook.com',
 	'fbconnect-title' => 'Ligar conta ao Facebook',
 	'fbconnect-intro' => 'Esta wiki tem o Facebook Connect, a evolução seguinte da plataforma Facebook.
-Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logging in#Why log in?|privilégios]] de que disfruta por estar autenticado, tem acesso a algumas funcionalidades adicionais...',
+Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logging in#Why log in?|privilégios]] de que desfruta por estar autenticado, tem acesso a algumas funcionalidades adicionais...',
 	'fbconnect-click-to-login' => 'Clique para se autenticar através do Facebook',
 	'fbconnect-click-to-connect-existing' => 'Clique para ligar a sua conta no Facebook a $1',
 	'fbconnect-conv' => 'Comodidade',
@@ -1255,7 +1889,7 @@ Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logg
 Se for permitido nesta wiki, é até possível usar o Facebook como proxy (representante) de correio electrónico, podendo continuar a receber notificações importantes sem revelar o seu endereço electrónico.',
 	'fbconnect-fbml' => 'Linguagem de formatação do Facebook',
 	'fbconnect-fbmldesc' => 'O Facebook fornece vários elementos predefinidos que apresentam dados dinâmicos.
-Muitos destes elementos podem ser incuídos no texto wiki e serão apresentados de formas diferentes, em função do utilizador que os vê.',
+Muitos destes elementos podem ser incluídos no texto wiki e serão apresentados de formas diferentes, em função do utilizador que os vê.',
 	'fbconnect-comm' => 'Comunicação',
 	'fbconnect-commdesc' => 'O Facebook Connect introduz um nível completamente novo de criar uma rede de amizades.
 Saiba quais dos seus amigos usam a wiki e, se quiser, partilhe as suas acções com os seus amigos através do feed de notícias do Facebook.',
@@ -1266,7 +1900,7 @@ $1",
 	'fbconnect-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
 	'fbconnect-logoutbox' => '$1
 
-Também sairá do Facebook e de todos os sites ligados, incluíndo esta wiki.',
+Também sairá do Facebook e de todos os sites ligados, incluindo esta wiki.',
 	'fbconnect-listusers-header' => 'Os privilégios $1 e $2 são transferidos automaticamente dos títulos de oficial e administrador do grupo $3 do Facebook.
 
 Para mais informações, contacte o criador do grupo, $4.',
@@ -1286,7 +1920,7 @@ Para mais informações, contacte o criador do grupo, $4.',
 	'fbconnect-chooselegend' => 'Escolha do nome de utilizador',
 	'fbconnect-chooseinstructions' => 'Todos os utilizadores precisam de um nick; pode escolher uma das opções abaixo.',
 	'fbconnect-invalidname' => 'O nick que escolheu já foi usado ou não é válido.
-Escolha um diferente.',
+Escolha um diferente, por favor.',
 	'fbconnect-choosenick' => 'O nome do seu perfil no Facebook ($1)',
 	'fbconnect-choosefirst' => 'O seu primeiro nome ($1)',
 	'fbconnect-choosefull' => 'O seu nome completo ($1)',
@@ -1308,32 +1942,151 @@ Se de futuro pretende usar o Facebook Connect para entrar, pode [[Special:Connec
 );
 
 /** Brazilian Portuguese (Português do Brasil)
+ * @author Giro720
  * @author Luckas Blade
  */
 $messages['pt-br'] = array(
+	'fbconnect' => 'Facebook Connect',
+	'fbconnect-desc' => 'Permite que os usuários se [[Special:Connect|autentiquem]] com as suas contas do [http://www.facebook.com Facebook]. Oferece autenticação baseada nos grupos do Facebook e o uso de FBML no texto wiki',
+	'group-fb-user' => 'Usuários do Facebook Connect',
+	'group-fb-user-member' => 'Usuários do Facebook Connect',
+	'grouppage-fb-user' => '{{ns:project}}:Usuários do Facebook Connect',
+	'group-fb-groupie' => 'Membros de grupos',
+	'group-fb-groupie-member' => 'Membro de grupos',
+	'grouppage-fb-groupie' => '{{ns:project}}:Membros de grupos',
+	'group-fb-officer' => 'Responsáveis de grupos',
+	'group-fb-officer-member' => 'Responsável de grupos',
+	'grouppage-fb-officer' => '{{ns:project}}:Responsáveis de grupos',
+	'group-fb-admin' => 'Administradores de grupos',
+	'group-fb-admin-member' => 'Administrador de grupos',
+	'grouppage-fb-admin' => '{{ns:project}}:Administradores de grupos',
+	'fbconnect-connect' => 'Autenticação com o Facebook Connect',
+	'fbconnect-convert' => 'Ligar esta conta ao Facebook',
+	'fbconnect-logout' => 'Sair do Facebook',
+	'fbconnect-link' => 'Voltar ao facebook.com',
+	'fbconnect-title' => 'Ligar conta ao Facebook',
+	'fbconnect-intro' => 'Esta wiki tem o Facebook Connect, a evolução seguinte da plataforma Facebook.
+Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logging in#Why log in?|privilégios]] de que desfruta por estar autenticado, tem acesso a algumas funcionalidades adicionais...',
+	'fbconnect-click-to-login' => 'Clique para se autenticar através do Facebook',
+	'fbconnect-click-to-connect-existing' => 'Clique para ligar a sua conta no Facebook a $1',
+	'fbconnect-conv' => 'Comodidade',
+	'fbconnect-convdesc' => 'Os usuários do Facebook Connect são automaticamente autenticados na wiki.
+Se for permitido nesta wiki, é até possível usar o Facebook como proxy de e-mail de modo que você possa continuar a receber notificações importantes sem revelar o seu endereço de e-mail.',
+	'fbconnect-fbml' => 'Linguagem de formatação do Facebook',
+	'fbconnect-fbmldesc' => 'O Facebook fornece vários elementos predefinidos que apresentam dados dinâmicos.
+Muitos destes elementos podem ser incluídos no texto wiki e serão apresentados de formas diferentes, em função do usuário que os vê.',
 	'fbconnect-comm' => 'Comunicação',
+	'fbconnect-commdesc' => 'O Facebook Connect introduz um nível completamente novo de criar uma rede de amizades.
+Saiba quais dos seus amigos usam a wiki e, se quiser, partilhe as suas ações com os seus amigos através do feed de notícias do Facebook.',
+	'fbconnect-welcome' => 'Bem-vindo, usuário do Facebook Connect!',
+	'fbconnect-loginbox' => "Ou '''entre''' com o Facebook:
+
+$1",
+	'fbconnect-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
+	'fbconnect-logoutbox' => '$1
+
+Também sairá do Facebook e de todos os sites ligados, incluindo esta wiki.',
+	'fbconnect-listusers-header' => 'Os privilégios $1 e $2 são transferidos automaticamente dos títulos de responsável e administrador do grupo $3 do Facebook.
+
+Para mais informações, contate o criador do grupo, $4.',
 	'fbconnect-error' => 'Erro de verificação',
+	'fbconnect-errortext' => 'Ocorreu um erro durante a verificação com o Facebook Connect.',
 	'fbconnect-cancel' => 'Operação cancelada',
 	'fbconnect-canceltext' => 'A operação anterior foi cencelada pelo usuário.',
 	'fbconnect-invalid' => 'Opção inválida',
+	'fbconnect-invalidtext' => 'A escolha feita na página anterior era inválida.',
+	'fbconnect-success' => 'A verificação Facebook ocorreu com sucesso',
+	'fbconnect-successtext' => 'Você foi autenticado com o Facebook Connect.',
 	'fbconnect-nickname' => 'Apelido',
 	'fbconnect-fullname' => 'Nome completo',
 	'fbconnect-email' => 'Endereço de e-mail',
 	'fbconnect-language' => 'Língua',
+	'fbconnect-timecorrection' => 'Correção do fuso horário (horas)',
+	'fbconnect-chooselegend' => 'Escolha do nome de usuário',
+	'fbconnect-chooseinstructions' => 'Todos os usuários precisam de um apelido; você pode escolher uma das opções abaixo.',
+	'fbconnect-invalidname' => 'O apelido que você escolheu já foi usado ou não é válido.
+Escolha um diferente, por favor.',
+	'fbconnect-choosenick' => 'O nome do seu perfil no Facebook ($1)',
 	'fbconnect-choosefirst' => 'Seu primeiro nome ($1)',
 	'fbconnect-choosefull' => 'Seu nome completo ($1)',
+	'fbconnect-chooseauto' => 'Um nome gerado automaticamente ($1)',
 	'fbconnect-choosemanual' => 'Um nome de sua escolha:',
+	'fbconnect-chooseexisting' => 'Uma conta existente nesta wiki',
 	'fbconnect-chooseusername' => 'Nome de usuário:',
 	'fbconnect-choosepassword' => 'Senha:',
+	'fbconnect-updateuserinfo' => 'Atualize as seguintes informações pessoais:',
+	'fbconnect-alreadyloggedin' => "'''Já está autenticado, $1!'''
+	
+Se de futuro pretende usar o Facebook Connect para entrar, pode [[Special:Connect/Convert|converter a sua conta para usar o Facebook Connect]].",
+	'fbconnect-error-creating-user' => 'Ocorreu um erro ao criar o usuário na base de dados local.',
+	'fbconnect-error-user-creation-hook-aborted' => "Um ''hook'' (extensão) abortou a criação da conta, com a mensagem: $1",
+	'fbconnect-prefstext' => 'Facebook Connect',
+	'fbconnect-link-to-profile' => 'Perfil no Facebook',
+	'fbconnect-prefsheader' => "Para controlar que operações geram uma entrada no feed de notícias do Facebook, <a id='fbConnectPushEventBar_show' href='#'>mostrar preferências</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>esconder preferências</a>",
+	'fbconnect-prefs-can-be-updated' => 'Você pode atualizar estes elementos quando quiser através da aba "$1" das suas preferências.',
+);
+
+/** Romanian (Română)
+ * @author Minisarm
+ * @author Stelistcristi
+ */
+$messages['ro'] = array(
+	'fbconnect' => 'Conectare Facebook',
+	'group-fb-user' => 'Utilizatori Facebook Connect',
+	'group-fb-user-member' => 'Utilizator Facebook Connect',
+	'group-fb-groupie' => 'Membrii grup',
+	'group-fb-admin' => 'Administratori de grup',
+	'group-fb-admin-member' => 'Administrator grup',
+	'fbconnect-connect' => 'Conectare cu Facebook Connect',
+	'fbconnect-logout' => 'Deconectare de pe Facebook',
+	'fbconnect-link' => 'Înapoi pe facebook.com',
+	'fbconnect-click-to-login' => 'Apasă pentru a vă autentifica pe acest site prin Facebook',
+	'fbconnect-click-to-connect-existing' => 'Apăsaţi pentru a vă conecta contul dvs. Facebook la $1',
+	'fbconnect-comm' => 'Comunicaţie',
+	'fbconnect-welcome' => 'Bun venit, utilizator Facebook Connect!',
+	'fbconnect-loginbox' => "Sau '''autentificaţi-vă''' cu Facebook:
+
+$1",
+	'fbconnect-error' => 'Eroare la verificare',
+	'fbconnect-cancel' => 'Acţiune anulată',
+	'fbconnect-invalid' => 'Opţiune invalidă',
+	'fbconnect-nickname' => 'Pseudonim',
+	'fbconnect-fullname' => 'Numele complet',
+	'fbconnect-email' => 'Adresa de e-mail',
+	'fbconnect-language' => 'Limba',
+	'fbconnect-chooselegend' => 'Alegerea utilizatorului',
+	'fbconnect-choosefirst' => 'Prenumele tău ($1)',
+	'fbconnect-choosefull' => 'Numele tău complet ($1)',
+	'fbconnect-chooseauto' => 'Un nume generat automat ($1)',
+	'fbconnect-choosemanual' => 'Un nume la alegere:',
+	'fbconnect-chooseexisting' => 'Un cont existent pe acest wiki',
+	'fbconnect-chooseusername' => 'Utilizator:',
+	'fbconnect-choosepassword' => 'Parolă:',
+	'fbconnect-updateuserinfo' => 'Actualiează următoarele informaţii personale:',
+	'fbconnect-error-creating-user' => 'Eroare la crearea utilizatorului în baza de date locală.',
+	'fbconnect-link-to-profile' => 'Profil Facebook',
 );
 
 /** Russian (Русский)
  * @author Eleferen
+ * @author MaxSem
+ * @author Sergey kudryavtsev
  * @author Александр Сигачёв
  */
 $messages['ru'] = array(
-	'group-fb-groupie-member' => 'Группа участников',
+	'fbconnect' => 'Подключение Facebook',
+	'fbconnect-desc' => 'Позволяет участникам [[Special:Connect|подключаться]] с помощью своих учётных записей на [http://www.facebook.com Facebook]. 
+Предлагает аутентификацию на основе групп Facebook и использование FBML в викитексте.',
+	'group-fb-user' => 'Участники, подключенные через Facebook',
+	'group-fb-user-member' => 'Участник, подключенный через Facebook',
+	'grouppage-fb-user' => '{{ns:project}}:Участники, подключенные через Facebook',
+	'group-fb-groupie' => 'Члены группы',
+	'group-fb-groupie-member' => 'Член группы',
+	'grouppage-fb-groupie' => '{{ns:project}}:Члены группы',
 	'group-fb-admin' => 'Группа администраторов',
+	'group-fb-admin-member' => 'Администратор группы',
+	'fbconnect-link' => 'Вернуться на facebook.com',
+	'fbconnect-welcome' => 'Добро пожаловать, участник Facebook Connect!',
 	'fbconnect-cancel' => 'Действие отменено',
 	'fbconnect-invalid' => 'Неверный параметр',
 	'fbconnect-success' => 'Проверка через Facebook закончилась успешно',
@@ -1345,6 +2098,7 @@ $messages['ru'] = array(
 	'fbconnect-chooselegend' => 'Выбор имени пользователя',
 	'fbconnect-chooseinstructions' => 'У каждого участника должен быть псевдоним. Вы можете выбрать один из представленных ниже.',
 	'fbconnect-choosenick' => 'Имя вашего профиля в Facebook ($1)',
+	'fbconnect-choosefirst' => 'Ваше имя ($1)',
 	'fbconnect-choosefull' => 'Ваше полное имя ($1)',
 	'fbconnect-chooseauto' => 'Автоматически созданное имя ($1)',
 	'fbconnect-choosemanual' => 'Имя на ваш выбор:',
@@ -1352,6 +2106,33 @@ $messages['ru'] = array(
 	'fbconnect-chooseusername' => 'Имя участника:',
 	'fbconnect-choosepassword' => 'Пароль:',
 	'fbconnect-updateuserinfo' => 'Обновите следующие личные сведения:',
+	'fbconnect-error-creating-user' => 'Ошибка при создании пользователя в локальной базе данных.',
+	'fbconnect-prefstext' => 'Facebook Connect',
+);
+
+/** Rusyn (Русиньскый)
+ * @author Gazeb
+ */
+$messages['rue'] = array(
+	'fbconnect-fullname' => 'Повне мено',
+	'fbconnect-email' => 'Адреса електронічной пошты',
+	'fbconnect-language' => 'Язык',
+);
+
+/** Telugu (తెలుగు)
+ * @author Veeven
+ */
+$messages['te'] = array(
+	'group-fb-groupie' => 'గుంపు సభ్యులు',
+	'group-fb-groupie-member' => 'గుంపు సభ్యుడు',
+	'grouppage-fb-groupie' => '{{ns:project}}:గుంపు సభ్యులు',
+	'fbconnect-fullname' => 'పూర్తిపేరు',
+	'fbconnect-email' => 'ఈ-మెయిల్ చిరునామా',
+	'fbconnect-language' => 'భాష',
+	'fbconnect-timecorrection' => 'కాల మండలపు సర్దుబాటు (గంటలు)',
+	'fbconnect-chooseexisting' => 'ఈ వికీలో ఇప్పటికే ఉన్న ఖాతా',
+	'fbconnect-chooseusername' => 'వాడుకరిపేరు:',
+	'fbconnect-choosepassword' => 'సంకేతపదం:',
 );
 
 /** Tagalog (Tagalog)
@@ -1437,4 +2218,13 @@ Kung nais mong gamitin ang Ugnay sa Facebook upang makalagda ka sa hinaharap, ma
 	'fbconnect-link-to-profile' => 'Balangkas sa Facebook',
 	'fbconnect-prefsheader' => "Upang matabanan ang kung aling mga kaganapan ang tutulak sa isang bagay papunta sa iyong pakain ng balita sa Facebook, <a id='fbConnectPushEventBar_show' href='#'>ipakita ang mga nais</a> <a id='fbConnectPushEventBar_hide' href='#' style='display:none'>itago ang mga nais</a>",
 	'fbconnect-prefs-can-be-updated' => 'Maisasapanahon mo ang mga ito anumang oras sa pamamagitan ng pagdalaw sa panglaylay na "$1" ng iyong pahina ng mga nais.',
+);
+
+/** Ukrainian (Українська)
+ * @author Тест
+ */
+$messages['uk'] = array(
+	'fbconnect-email' => 'Адреса електронної пошти',
+	'fbconnect-language' => 'Мова',
+	'fbconnect-choosepassword' => 'Пароль:',
 );
