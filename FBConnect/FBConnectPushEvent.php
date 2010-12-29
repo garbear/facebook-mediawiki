@@ -14,6 +14,8 @@ $wgExtensionFunctions[] = 'FBConnectPushEvent::initExtension';
 $wgHooks['GetPreferences'][] = 'FBConnectPushEvent::addPreferencesToggles';
 $wgHooks['initPreferencesExtensionForm'][] = 'FBConnectPushEvent::addPreferencesToggles';
 
+$wgAjaxExportList[] = 'FBConnectPushEvent::showImage';
+
 class FBConnectPushEvent {
 	protected $isAllowedUserPreferenceName = ''; // implementing classes MUST override this with their own value.
 
@@ -111,7 +113,7 @@ class FBConnectPushEvent {
 				$prefName = $pushObj->getUserPreferenceName();
 				
 				$prefText = $wgLang->getUserToggle( $prefName );
-				$prefTextShort = $wgLang->getUserToggle($prefName.'-short');
+				$prefTextShort = $wgLang->getUserToggle($prefName . '-short');
 				
 				$result = array(
 					'id' => $prefName,
@@ -216,15 +218,16 @@ class FBConnectPushEvent {
 		
 		$image = $params['$EVENTIMG'];
 		if( strpos( $params['$EVENTIMG'], 'http://' ) === false ) {
-			$image = $wgServer.'/skins/common/fbconnect/'.$params['$EVENTIMG'];	
+			$image = $wgServer . '/index.php?action=ajax&rs=FBConnectPushEvent::showImage&time=' . time() .
+						'&fb_id=' . $wgUser->getId() . '&event=' . $class . '&img=' . $params['$EVENTIMG'];	
 		}
 		
 		$href = $params['$ARTICLE_URL'];		
 		$description = wfMsg( $message ) ;
-		$link = wfMsg( $message.'-link' ) ;
-		$short = wfMsg( $message.'-short' ) ;
+		$link = wfMsg( $message . '-link' ) ;
+		$short = wfMsg( $message . '-short' ) ;
 		
-		$params['$FB_NAME'] = "";
+		$params['$FB_NAME'] = '';
 		foreach ($params as $key => $value) {
 		 	$description = str_replace($key, $value, $description);
 		 	$link = str_replace($key, $value, $link);
@@ -268,10 +271,10 @@ class FBConnectPushEvent {
 	{
 		$source_text = strip_tags($source_text);
 	    $source_text = trim($source_text); 
-	    $source_text_no_endline = str_replace("\n", " ", $source_text);
+	    $source_text_no_endline = str_replace("\n", ' ', $source_text);
     	
-	    if ($source_text == "" ){
-	    	return "";
+	    if ($source_text == '' ){
+	    	return '';
 	    }
 	    
 	    if (strlen($source_text) <= $char_count ) {
@@ -280,12 +283,12 @@ class FBConnectPushEvent {
 
             $source_text_out = substr($source_text, 0, strrpos(substr($source_text_no_endline, 0, $char_count), ' '));
 
-            if ($source_text_out == "" ){
+            if ($source_text_out == '' ){
                     $source_text_out = substr($source_text, 0, $char_count);
             }
 
             if ($source_text_out != $source_text) {
-                    $source_text = $source_text_out.'...';
+                    $source_text = $source_text_out . '...';
             }
 
             return $source_text;
@@ -311,6 +314,46 @@ class FBConnectPushEvent {
 		$tmpParserOptions = new ParserOptions();
 		$html = $tmpParser->parse( $articleText, $title, $tmpParserOptions)->getText();
 		return $html;
+	}
+	
+	/**
+	 * Put stats for Facebook events display
+	 * @author Tomasz Odrobny
+	 */
+	static public function addDisplayStat($fbuser_id, $time, $class) {
+		global $wgStatsDB, $wgUser, $wgCityId;
+		$class = str_replace( 'FBPush_', '', $class );
+		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB);
+		$dbs->begin();
+		$dbs->insert(
+			'fbconnect_event_show',
+			array(
+  				'event_type' => $class,
+				'user_id' => (int) $fbuser_id,
+				'post_time' => (int) $time,
+			),
+			__METHOD__
+		);
+		$dbs->commit();
+	}
+
+	/**
+	 * AJAX function to count number of feed display in FBConnect
+	 *
+	 * @author Tomasz Odrobny
+	 * @access public
+	 *
+	 */
+	static public function showImage() {
+		global $wgServer, $wgRequest;
+		FBConnectPushEvent::addDisplayStat(
+			$wgRequest->getVal('fb_id', '0'),
+			$wgRequest->getVal('time', '0'),
+			$wgRequest->getVal('class')
+		);
+		$redirect = $wgServer . '/skins/common/fbconnect/' . $wgRequest->getVal('img', '0');
+		header( "Location: $redirect" );
+		exit;
 	}
 	
 } // end FBConnectPushEvent class

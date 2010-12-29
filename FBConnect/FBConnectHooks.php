@@ -188,9 +188,11 @@ STYLE;
 			if ( $wgDBtype == 'mysql' ) {
 				$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
 				$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
+				$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_show", "$base/sql/fbconnect_event_show.sql");
 			} else if ( $wgDBtype == 'postgres' ) {
 				$wgExtNewTables[] = array('user_fbconnect', "$base/sql/fbconnect_table.pg.sql");
 				$wgExtNewTables[] = array('fbconnect_event_stats', "$base/sql/fbconnect_event_stats.pg.sql");
+				$wgExtNewTables[] = array('fbconnect_event_show', "$base/sql/fbconnect_event_show.pg.sql");
 			}
 		} else {
 			if ( $updater->getDB()->getType() == 'mysql' ) {
@@ -206,6 +208,12 @@ STYLE;
 					"$base/sql/fbconnect_event_stats.sql",
 					true
 				));
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'fbconnect_event_show',
+					"$base/sql/fbconnect_event_show.sql",
+					true
+				));
 			} elseif ( $updater->getDB()->getType() == 'postgres' ) {
 				$updater->addExtensionUpdate(array(
 					'addTable',
@@ -217,6 +225,12 @@ STYLE;
 					'addTable',
 					'fbconnect_event_stats',
 					"$base/sql/fbconnect_event_stats.pg.sql",
+					true
+				));
+				$updater->addExtensionUpdate(array(
+					'addTable',
+					'fbconnect_event_show',
+					"$base/sql/fbconnect_event_show.pg.sql",
 					true
 				));
 			}
