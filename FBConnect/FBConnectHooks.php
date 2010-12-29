@@ -133,36 +133,33 @@ class FBConnectHooks {
 STYLE;
 		
 		// Things get a little simpler in 1.16...
-		if (version_compare($wgVersion, '1.16', '>=')) {
+		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
 			// Add a pretty Facebook logo if $wgFbLogo is set
 			if ( !empty( $wgFbLogo) ) {
-				$out->addInlineStyle($style);
+				$out->addInlineStyle( $style );
 			}
 			
 			// Don't include jQuery if it's already in use on the site
 			$out->includeJQuery();
 			
 			// Add the script file specified by $url
-			if(!empty($wgFbExtensionScript)){
-				// TODO: revert this
-				#$out->addScriptFile($wgFbExtensionScript);
-				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion&" .
-					rand(1,1000) . "\"></script>\n");
-							}
+			if ( !empty( $wgFbExtensionScript ) ) {
+				$out->addScriptFile( $wgFbExtensionScript );
+			}
 		} else {
 			// Add a pretty Facebook logo if $wgFbLogo is set
 			if ( !empty( $wgFbLogo) ) {
-				$out->addScript('<style type="text/css">' . $style . '</style>');
+				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			}
 			
 			// Don't include jQuery if it's already in use on the site
-			if (!empty($wgFbIncludeJquery)){
-				// 1.4 loads the most recent 1.4 revision (currently 1.4.2)
-				$out->addScriptFile("http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js");
+			if ( !empty( $wgFbIncludeJquery ) ) {
+				// 1.4 loads the most recent 1.4 revision (currently 1.4.4)
+				$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js' );
 			}
 			
 			// Add the script file specified by $url
-			if(!empty($wgFbExtensionScript)){
+			if( !empty( $wgFbExtensionScript ) ) {
 				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
 			}
 		}
