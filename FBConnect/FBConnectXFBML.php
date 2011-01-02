@@ -127,10 +127,13 @@ class FBConnectXFBML {
 	 * If Facebook adds a new tag or you create your own, this list can be
 	 * updated with the XFBMLAvailableTags hook.
 	 * 
-	 * This list was constructed from the XFBML documentation at
-	 * <http://developers.facebook.com/docs/reference/javascript/FB.XFBML.parse>
-	 * and from direct perusal of the JS SDK source code at
-	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L255>.
+	 * This list was constructed from the very-outdated XFBML documentation at
+	 * <http://developers.facebook.com/docs/reference/javascript/FB.XFBML.parse>,
+	 * from direct perusal of the JS SDK source code at
+	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L255>
+	 * and, because the JS SDK on GitHub seems to have been abondoned by Facebook
+	 * in June 2010, from the live version of the JS code at
+	 * <http://connect.facebook.net/en_US/all.js>.
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
@@ -152,12 +155,14 @@ class FBConnectXFBML {
 		              'fb:login-button',
 		              'fb:name', # Not in docs
 		              'fb:profile-pic', # Not in docs
-		              'fb:pronoun', # In docs but not in JS SDK (uh oh...)
+		              //'fb:pronoun', # In docs but not in JS SDK (uh oh...)
 		              'fb:recommendations',
+					  'fb:registration', # Not in docs or GitHub source (really, Facebook?)
+					  'fb:send', # Not in docs or GitHub source (really, Facebook?)
 		              'fb:serverfbml',
 		              'fb:share-button', # Not in docs
 		              'fb:social-bar', # Not in docs
-		              'fb:user-status', # In docs but not in JS SDK (uh oh...)
+		              //'fb:user-status', # In docs but not in JS SDK (uh oh...)
 		);
 		
 		// Reject discarded tags (that return an empty string) from Special:Version
