@@ -34,10 +34,12 @@ class FBConnectAPI extends Facebook {
 	// Constructor
 	public function __construct() {
 		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
-		// Check to make sure config.sample.php was renamed properly
-		if ( !$this->isConfigSetup() ) {
+		// Check to make sure config.default.php was renamed properly, unless we
+		// are running update.php from the command line
+		if ( !defined( 'MW_CMDLINE_CALLBACK' ) && !$this->isConfigSetup() ) {
 			exit( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
 		}
+		
 		$config = array(
 			'appId' => $wgFbAppId,
 			'secret' => $wgFbSecret,
