@@ -28,7 +28,9 @@ $wgFbSecret         = 'YOUR_SECRET';    # Change this!
 
 /**
  * Turns the wiki into a Facebook-only wiki. All users must authenticate using
- * Facebook Connect. This setting has three side-effects:
+ * Facebook Connect (existing accounts will still be able to log in). To
+ * achieve more fine-grained controlls, see $wgFbUserRightsFromGroup. This
+ * setting has three side-effects:
  * 1. All users are stripped of the 'createaccount' right. To override this
  *    behaviour, see FBConnectHooks::UserGetRights.
  * 2. Special:Userlogin and Special:CreateAccount redirect to Special:Connect
@@ -37,10 +39,8 @@ $wgFbSecret         = 'YOUR_SECRET';    # Change this!
 $wgFbConnectOnly = false;
 
 /**
- * Allow the use of XFBML in wiki text.
- * 
- * To learn more about Facebook Markup Language, please see
- * <http://developers.facebook.com/docs/reference/fbml/>.
+ * Allow the use of XFBML in wiki text. To learn more about Facebook Markup
+ * Language, please see <http://developers.facebook.com/docs/reference/fbml>.
  */
 $wgFbUseMarkup = true;
 
@@ -54,13 +54,34 @@ $wgFbUseMarkup = true;
  * 
  * By default, they map to User, Bureaucrat and Sysop privileges, respectively.
  * Users will automatically be promoted or demoted when their membership, title
- * or admin status is modified from the group page within Facebook.
+ * or admin status is modified from the group page within Facebook. Unfortunately,
+ * this has a minor degredation on performance.
+ * 
+ * This setting can also be used in conjunction with $wgFbConnectOnly. To have
+ * this group exclusively control access to the wiki, set $wgFbConnectOnly = true
+ * and add the following settings to Localsettings.php:
+ * 
+ * # Disable reading and editing by anonymous users
+ * $wgGroupPermissions['*']['edit'] = false;
+ * $wgGroupPermissions['*']['read'] = false;
+ * # Reserve normal wiki browsing for only Facebook group members (and admins)
+ * $wgGroupPermissions['sysop'] = array_merge($wgGroupPermissions['sysop'], $wgGroupPermissions['user']);
+ * $wgGroupPermissions['user'] = $wgGroupPermissions['fb-user'] = $wgGroupPermissions['*'];
+ * # But allow all users to read these pages:
+ * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
  */
 $wgFbUserRightsFromGroup = false;  # Or a group ID
 
-// Not used (yet...)
-#$wgFbRestrictToGroup = true;
-#$wgFbRestrictToNotReplied = false;
+/**
+ * Shows the real name for all Connected users instead of their wiki user name.
+ */
+$wgFbUseRealName = false;
+
+/**
+ * This MediaWiki global variable can also be used to customized the Personal Urls.
+ * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>
+ */
+#$wgShowIPinHeader = false;
 
 /**
  * Options regarding the personal toolbar (in the upper right).
@@ -86,17 +107,6 @@ $wgFbHidePersonalUrlsBySkin = array(
 );
 
 /**
- * Shows the real name for all Connected users instead of their wiki user name.
- */
-$wgFbUseRealName = false;
-
-/**
- * This MediaWiki variable can also be used to customized the Personal Urls.
- * For more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
- */
-#$wgShowIPinHeader = false;
-
-/**
  * The Facebook icon. You can copy this image to your server if you want, or
  * set to false to disable.
  */
@@ -110,8 +120,7 @@ $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * 
  * For more info, see <http://developers.facebook.com/docs/reference/javascript/>
  */
-$wgFbScript = 'http://connect.facebook.net/en_US/all.js';
-#$wgFbScript = 'https://connect.facebook.net/en_US/all.js';
+$wgFbScript = 'http://connect.facebook.net/en_US/all.js';   # Can also be https://
 
 /**
  * If this is set to true, and the user's language is anything other than wgFbScriptLangCode, then
@@ -167,8 +176,8 @@ $wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for
 
 // NOTE: THIS FEATURE IS NOT COMPLETELY IMPLEMENTED. TEST AT YOUR OWN RISK.
 $wgFbEnablePushToFacebook = false;
-if(!empty($wgFbEnablePushToFacebook)){
-	$wgFbPushDir = dirname(__FILE__) . '/pushEvents/';
+if ( !empty( $wgFbEnablePushToFacebook ) ) {
+	$wgFbPushDir = dirname( __FILE__ ) . '/pushEvents/';
 	
 	// Convenience loop for push event classes in the fbPushDir directory
 	// whose file-name corresponds to the class-name.  To add a push event
@@ -184,7 +193,7 @@ if(!empty($wgFbEnablePushToFacebook)){
 		'FBPush_OnRateArticle',
 		'FBPush_OnWatchArticle',
 	);
-	foreach($pushEventClassNames as $pClassName){
+	foreach ( $pushEventClassNames as $pClassName ) {
 		$wgFbPushEventClasses[] = $pClassName;
 		$wgAutoloadClasses[$pClassName] = $wgFbPushDir . "$pClassName.php";
 	}
