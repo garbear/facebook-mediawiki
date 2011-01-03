@@ -692,7 +692,7 @@ STYLE;
 	/**
 	 * Create a disconnect button and other things in preferences.
 	 */
-	static function GetPreferences( $user, &$preferences ) {
+	static function initPreferencesExtensionForm( $user, &$preferences ) {
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
 		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/FBConnect/prefs.js?{$wgStyleVersion}\"></script>\n");
 		wfLoadExtensionMessages('FBConnect');
