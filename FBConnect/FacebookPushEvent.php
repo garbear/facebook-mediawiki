@@ -2,26 +2,26 @@
 /**
  * @author Sean Colombo
  *
- * This class is an extendable superclass for events to push to a facebook news-feed.
+ * This class is an extendable superclass for events to push to a Facebook news-feed.
  *
  * To create a push event, override this class, then add it to config.php in the way
  * defined in config.sample.php.
  */
 
-$wgExtensionFunctions[] = 'FBConnectPushEvent::initExtension';
+$wgExtensionFunctions[] = 'FacebookPushEvent::initExtension';
 
 // PreferencesExtension is needed up until 1.16, then the needed functionality is built in.
-$wgHooks['GetPreferences'][] = 'FBConnectPushEvent::addPreferencesToggles';
+$wgHooks['GetPreferences'][] = 'FacebookPushEvent::addPreferencesToggles';
 
-$wgAjaxExportList[] = 'FBConnectPushEvent::showImage';
+$wgAjaxExportList[] = 'FacebookPushEvent::showImage';
 
-class FBConnectPushEvent {
+class FacebookPushEvent {
 	protected $isAllowedUserPreferenceName = ''; // implementing classes MUST override this with their own value.
 
 	// This must correspond to the name of the message for the text on the tab itself.
 	static private $eventCounter = 0;
-	static protected $PREFERENCES_TAB_NAME = 'fbconnect-prefstext';
-	static public $PREF_TO_DISABLE_ALL = 'fbconnect-push-allow-never';
+	static protected $PREFERENCES_TAB_NAME = 'facebook-prefstext';
+	static public $PREF_TO_DISABLE_ALL = 'facebook-push-allow-never';
 
 	/**
 	 * Accessor for the user preference to which (if set to 1) allows this type of event
@@ -64,8 +64,8 @@ class FBConnectPushEvent {
 	static public function addPreferencesToggles( $user, &$preferences ){
 		wfProfileIn(__METHOD__);
 		global $wgFbPushEventClasses, $wgUser;
-		wfLoadExtensionMessages('FBConnect');
-		$id = FBConnectDB::getFacebookIDs($wgUser);
+		wfLoadExtensionMessages('Facebook');
+		$id = FacebookDB::getFacebookIDs($wgUser);
 		if( count($id) > 0 ) {			
 			if ( !empty( $wgFbPushEventClasses ) ) {
 				foreach( $wgFbPushEventClasses as $pushEventClassName ){
@@ -145,7 +145,7 @@ class FBConnectPushEvent {
 	} // end createPreferencesToggles()
 
 	/**
-	 * This static function is called by the FBConnect extension if push events are enabled.  It checks
+	 * This static function is called by the Facebook extension if push events are enabled.  It checks
 	 * to make sure that the configured push-events are valid and then gives them each a chance to initialize.
 	 */
 	static public function initAll(){
@@ -202,7 +202,7 @@ class FBConnectPushEvent {
 	static public function pushEvent($message, $params, $class){
 		global $wgServer, $wgUser;
 
-		$id = FBConnectDB::getFacebookIDs($wgUser);
+		$id = FacebookDB::getFacebookIDs($wgUser);
 		if( count($id) < 1 ) {
 			return 1001; //status for disconnected 
 		}
@@ -213,12 +213,12 @@ class FBConnectPushEvent {
 		
 		self::$eventCounter++;
 		
-		if( wfRunHooks( 'FBConnect::BeforePushEvent', array( $id, &$message, &$params, &$class ) ) ) {
-			$fb = new FBConnectAPI();
+		if( wfRunHooks( 'Facebook::BeforePushEvent', array( $id, &$message, &$params, &$class ) ) ) {
+			$fb = new FacebookAPI();
 
 			$image = $params['$EVENTIMG'];
 			if( strpos( $params['$EVENTIMG'], 'http://' ) === false ) {
-				$image = $wgServer . '/index.php?action=ajax&rs=FBConnectPushEvent::showImage&time=' . time() .
+				$image = $wgServer . '/index.php?action=ajax&rs=FacebookPushEvent::showImage&time=' . time() .
 							'&fb_id=' . $wgUser->getId() . '&event=' . $class . '&img=' . $params['$EVENTIMG'];
 			}
 
@@ -345,7 +345,7 @@ class FBConnectPushEvent {
 	}
 
 	/**
-	 * AJAX function to count number of feed display in FBConnect
+	 * AJAX function to count number of feed display in Facebook.
 	 *
 	 * @author Tomasz Odrobny
 	 * @access public
@@ -353,7 +353,7 @@ class FBConnectPushEvent {
 	 */
 	static public function showImage() {
 		global $wgServer, $wgRequest;
-		FBConnectPushEvent::addDisplayStat(
+		FacebookPushEvent::addDisplayStat(
 			$wgRequest->getVal('fb_id', '0'),
 			$wgRequest->getVal('time', '0'),
 			$wgRequest->getVal('class')
@@ -363,4 +363,4 @@ class FBConnectPushEvent {
 		exit;
 	}
 	
-} // end FBConnectPushEvent class
+} // end FacebookPushEvent class

@@ -8,10 +8,10 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnLargeEdit extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnLargeEdit'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+class FBPush_OnLargeEdit extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnLargeEdit'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
 	static private $MIN_CHARS_TO_PUSH = 300; // number of chars that need to be changed
-	static $messageName = 'fbconnect-msg-OnLargeEdit';
+	static $messageName = 'facebook-msg-OnLargeEdit';
 	static $eventImage = 'edits.png';
 	
 	static public function getMinCharsToPush(){

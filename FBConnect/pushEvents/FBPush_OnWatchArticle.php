@@ -8,9 +8,9 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnWatchArticle extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnWatchArticle'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
-	static $messageName = 'fbconnect-msg-OnWatchArticle';
+class FBPush_OnWatchArticle extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnWatchArticle'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+	static $messageName = 'facebook-msg-OnWatchArticle';
 	static $eventImage = 'following.png';
 	public function init(){
 		global $wgHooks;

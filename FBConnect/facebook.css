@@ -1,4 +1,4 @@
-/* Info about Facebook Connect on page Special:Connect */
+/* Info about Facebook on page Special:Connect */
 #specialconnect_info, #specialconnect_box {
 	font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
 }
@@ -16,7 +16,7 @@
 	padding: 0 10px 0 0;
 }
 
-/* Login and Connect boxes */
+/* Login and Login With Facebook boxes */
 #specialconnect_boxarea {
 	border-collapse: collapse;
 	width: 92%;

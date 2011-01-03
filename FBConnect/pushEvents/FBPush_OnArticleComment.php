@@ -8,9 +8,9 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnArticleComment extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnArticleComment'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
-	static $messageName = 'fbconnect-msg-OnArticleComment';
+class FBPush_OnArticleComment extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnArticleComment'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+	static $messageName = 'facebook-msg-OnArticleComment';
 	static $eventImage = 'comment.png';
 	public function init(){
 		global $wgHooks;

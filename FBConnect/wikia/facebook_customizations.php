@@ -2,7 +2,7 @@
 /**
  * @author Sean Colombo
  *
- * This file contains wikia-specific customizations to the FBConnect extension that are
+ * This file contains wikia-specific customizations to the Facebook extension that are
  * not core to the extension itself.
  *
  * Among other things, this includes the form for finishing registration after an anonymous
@@ -10,34 +10,34 @@
  *
  * This script depends on /extensions/wikia/AjaxFunctions.php for wfValidateUsername().
  *
- * NOTE: This script doesn't take into account $fbConnectOnly since it works off of the assumption
+ * NOTE: This script doesn't take into account $wgFbDisableLogin since it works off of the assumption
  * that Wikia has its own accounts and currently has no reason to expect that it won't in the
  * forseeable future.
  */
 
 /**
- * Extra initialization for Facebook Connect which is Wikia-specific.
+ * Extra initializations for the Facebook extension which are Wikia-specific.
  */
-function wikia_fbconnect_init(){
+function wikia_facebook_init(){
 	// This is used on the login box, so initialize it all the time.
-	wfLoadExtensionMessages('FBConnect');
-} // end wikia_fbconnect_init()
+	wfLoadExtensionMessages('Facebook');
+} // end wikia_facebook_init()
 
 /**
- * Overrides the default chooseNameForm for FBConnect extension so that
+ * Overrides the default chooseNameForm for the Facebook extension so that
  * we can use a custom one for Wikia.
  */
-function wikia_fbconnect_chooseNameForm(&$specialConnect, &$messageKey){
+function wikia_facebook_chooseNameForm(&$specialConnect, &$messageKey){
 	global $wgOut, $wgUser, $wgRequest;
 	wfProfileIn(__METHOD__);
 
 	if (!$wgUser->isAllowed( 'createaccount' )) {
 		// TODO: Some sort of error/warning message.  Can probably re-use an existing message.
 	} else {
-		wfLoadExtensionMessages('FBConnect');
+		wfLoadExtensionMessages('Facebook');
 
 		// If it is not the default message, highlight it because it probably indicates an error.
-		$style = ($messageKey=="fbconnect-chooseinstructions"?"":" style='background-color:#faa;padding:5px'");
+		$style = ($messageKey=="facebook-chooseinstructions"?"":" style='background-color:#faa;padding:5px'");
 
 		$wgOut->addHTML("<strong$style>" . wfMsg($messageKey) . "</strong>");
 
@@ -52,36 +52,36 @@ function wikia_fbconnect_chooseNameForm(&$specialConnect, &$messageKey){
 	}
 	wfProfileOut(__METHOD__);
 	return false; // prevent default form from showing.
-} // end wikia_fbconnect_chooseNameForm()
+} // end wikia_facebook_chooseNameForm()
 
 /**
  * Validate that the CUSTOM input of the ChooseName form is acceptable
  * and display an error page if it is not.
  */
-function wikia_fbconnect_validateChooseNameForm( &$specialConnect ){
+function wikia_facebook_validateChooseNameForm( &$specialConnect ){
 	wfProfileIn(__METHOD__);
 
 	$allowDefault = true;
 	global $wgRequest;
 	$email = $wgRequest->getVal('wpEmail');
 	if( ($email == "") || (!User::isValidEmailAddr( $email )) ) {
-		$specialConnect->sendPage('chooseNameForm', 'fbconnect-invalid-email');
+		$specialConnect->sendPage('chooseNameForm', 'facebook-invalid-email');
 		$allowDefault = false;
 	}
 
 	wfProfileOut(__METHOD__);
 	return $allowDefault;
-} // end wikia_fbconnect_validateChooseNameForm()
+} // end wikia_facebook_validateChooseNameForm()
 
 /**
  * Custom processing that is done after the rest of the chooseName form completes
- * successfully.  We assume that all input is valid since wikia_fbconnect_validateChooseNameForm
+ * successfully.  We assume that all input is valid since wikia_facebook_validateChooseNameForm
  * already had a chance to verify custom input and SpecialConnect::createUser got a chance
  * to verify the default requirements.
  *
  * In this specific case, we just save the email address and the marketing-opt-in preference.
  */
-function wikia_fbconnect_postProcessForm( &$specialConnect ){
+function wikia_facebook_postProcessForm( &$specialConnect ){
 	wfProfileIn(__METHOD__);
 
 	global $wgRequest, $wgUser;
@@ -99,7 +99,7 @@ function wikia_fbconnect_postProcessForm( &$specialConnect ){
 
 	wfProfileOut(__METHOD__);
 	return true;
-} // end wikia_fbconnect_postProcessForm()
+} // end wikia_facebook_postProcessForm()
 
 /**
  * Called when a user was just created or attached (safe to call at any time later as well).  This
@@ -108,12 +108,12 @@ function wikia_fbconnect_postProcessForm( &$specialConnect ){
  *
  * FIXME: Is there a way to make this fail gracefully if we ever un-include the Masthead extension?
  */
-function wikia_fbconnect_considerProfilePic( &$specialConnect ){
+function wikia_facebook_considerProfilePic( &$specialConnect ){
 	wfProfileIn(__METHOD__);
 	global $wgUser;
 
 	// We need the facebook id to have any chance of getting a profile pic.
-	$fb_ids = FBConnectDB::getFacebookIDs($wgUser);
+	$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 	if(count($fb_ids) > 0){
 		$fb_id = array_shift($fb_ids);
 		if ( class_exists( 'Masthead' ) ){
@@ -121,7 +121,7 @@ function wikia_fbconnect_considerProfilePic( &$specialConnect ){
 			$masthead = Masthead::newFromUser($wgUser);
 			if( ! $masthead->hasAvatar() ){
 				// Attempt to store the facebook profile pic as the Wikia avatar.
-				$picUrl = FBConnectProfilePic::getImgUrlById($fb_id, FB_PIC_SQUARE);
+				$picUrl = FacebookProfilePic::getImgUrlById($fb_id, FB_PIC_SQUARE);
 				if($picUrl != ""){
 					$errorNo = $masthead->uploadByUrl($picUrl);
 
@@ -141,7 +141,7 @@ function wikia_fbconnect_considerProfilePic( &$specialConnect ){
 
 	wfProfileOut(__METHOD__);
 	return true;
-} // end wikia_fbconnect_considerProfilePic()
+} // end wikia_facebook_considerProfilePic()
 
 class ChooseNameForm extends LoginForm {
 	var $mActionType;
@@ -217,13 +217,13 @@ class ChooseNameForm extends LoginForm {
 		
 		// If no email was set yet, then use the value from facebook (which is quite likely also empty, but probably not always).
 		if(!$this->mEmail){
-			$this->mEmail = FBConnectUser::getOptionFromInfo('email', $userinfo);
+			$this->mEmail = FacebookUser::getOptionFromInfo('email', $userinfo);
 		}
 		$tmpl->set( 'email', $this->mEmail );
 
 		// If the langue isn't set already and there is a setting for it from facebook, apply that.
 		if( !$this->mLanguage ){
-			$this->mLanguage = FBConnectUser::getOptionFromInfo('language', $userinfo);
+			$this->mLanguage = FacebookUser::getOptionFromInfo('language', $userinfo);
 		}
 		if($this->mLanguage){
 			$tmpl->set( 'uselang', $this->mLanguage );
@@ -234,11 +234,11 @@ class ChooseNameForm extends LoginForm {
 			if ( $wgUser->isLoggedIn() ) {
 				$this->mName = $wgUser->getName();
 			} else {
-				$nickname = FBConnectUser::getOptionFromInfo('nickname', $userinfo);
+				$nickname = FacebookUser::getOptionFromInfo('nickname', $userinfo);
 				if(self::userNameOK($nickname)){
 					$this->mName = $nickname;
 				} else {
-					$fullname = FBConnectUser::getOptionFromInfo('fullname', $userinfo);
+					$fullname = FacebookUser::getOptionFromInfo('fullname', $userinfo);
 					if(self::userNameOK($fullname)){
 						$this->mName = $fullname;
 					} else {
@@ -264,7 +264,7 @@ class ChooseNameForm extends LoginForm {
 		$updateOptions = array();
 		foreach ($specialConnect->getAvailableUserUpdateOptions() as $option) {
 			// Translate the MW parameter into a FB parameter
-			$value = FBConnectUser::getOptionFromInfo($option, $userinfo);
+			$value = FacebookUser::getOptionFromInfo($option, $userinfo);
 			// If no corresponding value was received from Facebook, then continue
 			if (!$value) {
 				continue;
@@ -272,18 +272,18 @@ class ChooseNameForm extends LoginForm {
 			// Build the list item for the update option
 			$updateOptions[] = "<li><input name=\"wpUpdateUserInfo$option\" type=\"checkbox\" " .
 				"value=\"1\" id=\"wpUpdateUserInfo$option\" /><label for=\"wpUpdateUserInfo$option\">" .
-				wfMsgHtml("fbconnect-$option") . wfMsgExt('colon-separator', array('escapenoentities')) .
+				wfMsgHtml("facebook-$option") . wfMsgExt('colon-separator', array('escapenoentities')) .
 				" <i>$value</i></label></li>";
 		}
 		// Implode the update options into an unordered list
-		$updateChoices = count($updateOptions) > 0 ? "\n" . wfMsgHtml('fbconnect-updateuserinfo') . "\n<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n" : '';
+		$updateChoices = count($updateOptions) > 0 ? "\n" . wfMsgHtml('facebook-updateuserinfo') . "\n<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n" : '';
 		$html = "<tr style='display:none'><td>$updateChoices</td></tr>";
 		$tmpl->set( 'updateOptions', $html);
 		*/
 		$tmpl->set( 'updateOptions', '');
 
 		// Give authentication and captcha plugins a chance to modify the form
-		// NOTE: We don't do this for fbconnect.
+		// NOTE: We don't do this for Facebook.
 		//$wgAuth->modifyUITemplate( $template );
 		//wfRunHooks( 'UserCreateForm', array( &$template ) );
 

@@ -34,14 +34,14 @@
 		</tr>
 		</table>
                 <input type="hidden" name="wpLoginToken" value="<?php echo $loginToken; ?>" />
-	<input tabindex="304" type="submit" id="wpLoginAndConnectCombo" value="<?php echo wfMsg("fbconnect-connect-next") ?>" onclick="loginAndConnectExistingUser();" />
+	<input tabindex="304" type="submit" id="wpLoginAndConnectCombo" value="<?php echo wfMsg("facebook-connect-next") ?>" onclick="loginAndConnectExistingUser();" />
 	</form>
 </div>
 
 <div class="ajax-login-slider-panel" id='fbLoginLastStep' style='display:none'>
 	<div id="fbNowConnectBox">
 		<br/>
-		<?php echo wfMsg('fbconnect-logged-in-now-connect'); ?>
+		<?php echo wfMsg('facebook-logged-in-now-connect'); ?>
 		<br/><br/>
 		<div><?php echo $fbButtton; ?></div>
 	</div>

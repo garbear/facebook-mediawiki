@@ -16,15 +16,15 @@
  */
 
 /**
- * Class FBConnectHooks
+ * Class FacebookHooks
  * 
  * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
  * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a public static function
  * with the same name as the hook that provokes it, place it inside this class
- * and let FBConnect::init() do its magic. Helper functions should be private,
+ * and let Facebook::init() do its magic. Helper functions should be private,
  * because only public static methods are added as hooks.
  */
-class FBConnectHooks {
+class FacebookHooks {
 	/**
 	 * Hook is called whenever an article is being viewed... Currently, figures
 	 * out the Facebook ID of the user that the userpage belongs to.
@@ -38,7 +38,7 @@ class FBConnectHooks {
 			if (!$user || $user->getID() == 0) {
 				return true;
 			}
-			$fb_id = FBConnectDB::getFacebookIDs($user->getId());
+			$fb_id = FacebookDB::getFacebookIDs($user->getId());
 			if (!count($fb_id) || !($fb_id = $fb_id[0])) {
 				return true;
 			}
@@ -85,25 +85,25 @@ class FBConnectHooks {
 		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
 		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
 		
-		// Wikiaphone mobile device skin doesn't need JS or CSS additions 
+		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
 			return true;
 		
-		// If the user's language is different from the default language, use the correctly localized facebook code.
-		// NOTE: Can't use wgLanguageCode here because the same FBConnect config can run for many wgLanguageCode's on one site (such as Wikia).
-		if ($wgFbScriptEnableLocales) {
+		// If the user's language is different from the default language, use the correctly localized Facebook code.
+		// NOTE: Can't use wgLanguageCode here because the same Facebook config can run for many wgLanguageCode's on one site (such as Wikia).
+		if ( $wgFbScriptEnableLocales ) {
 			global $wgFbScriptLangCode, $wgLang;
-			wfProfileIn(__METHOD__ . "::fb-locale-by-mediawiki-lang");
-			if ($wgLang->getCode() !== $wgFbScriptLangCode) {
+			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+			if ( $wgLang->getCode() !== $wgFbScriptLangCode ) {
 				// Attempt to find a matching facebook locale.
-				$defaultLocale = FBConnectLanguage::getFbLocaleForLangCode($wgFbScriptLangCode);
-				$locale = FBConnectLanguage::getFbLocaleForLangCode($wgLang->getCode());
-				if($defaultLocale != $locale){
+				$defaultLocale = FacebookLanguage::getFbLocaleForLangCode( $wgFbScriptLangCode );
+				$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
+				if ( $defaultLocale != $locale ) {
 					global $wgFbScriptByLocale;
-					$wgFbScript = str_replace(FBCONNECT_LOCALE, $locale, $wgFbScriptByLocale);
+					$wgFbScript = str_replace( FACEBOOK_LOCALE, $locale, $wgFbScriptByLocale );
 				}
 			}
-			wfProfileOut(__METHOD__ . "::fb-locale-by-mediawiki-lang");
+			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
 		
 		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
@@ -163,7 +163,7 @@ STYLE;
 	/**
 	 * Fired when MediaWiki is updated (from the command line updater utility or,
 	 * if using version 1.17+, from the initial installer). This hook allows
-	 * FBConnect to update the database with the required tables. Each table
+	 * Facebook to update the database with the required tables. Each table
 	 * listed below should have a corresponding schema file in the sql directory
 	 * for each supported database type.
 	 * 
@@ -275,14 +275,14 @@ STYLE;
 	}
 	
 	/**
-	 * Installs a parser hook for every tag reported by FBConnectXFBML::availableTags().
-	 * Accomplishes this by asking FBConnectXFBML to create a hook function that then
-	 * redirects to FBConnectXFBML::parserHook().
+	 * Installs a parser hook for every tag reported by FacebookXFBML::availableTags().
+	 * Accomplishes this by asking FacebookXFBML to create a hook function that then
+	 * redirects to FacebookXFBML::parserHook().
 	 */
 	public static function ParserFirstCallInit( &$parser ) {
-		$pHooks = FBConnectXFBML::availableTags();
+		$pHooks = FacebookXFBML::availableTags();
 		foreach( $pHooks as $tag ) {
-			$parser->setHook( $tag, FBConnectXFBML::createParserHook( $tag ));
+			$parser->setHook( $tag, FacebookXFBML::createParserHook( $tag ));
 		}
 		return true;
 	}
@@ -315,9 +315,9 @@ STYLE;
 	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $wgFbUseRealName, $wgFbConnectOnly, $facebook;
+		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin, $facebook;
 		
-		wfLoadExtensionMessages('FBConnect');
+		wfLoadExtensionMessages('Facebook');
 		
 		// Always false, as 'alt-talk' isn't a valid option currently
 		if (self::showButton( 'alt-talk' ) &&
@@ -327,7 +327,7 @@ STYLE;
 		
 		// If the user is logged in and connected
 		if ( $wgUser->isLoggedIn() && $facebook->getSession() &&
-				count( FBConnectDB::getFacebookIDs($wgUser) ) > 0 ) {
+				count( FacebookDB::getFacebookIDs($wgUser) ) > 0 ) {
 			if ( !empty( $wgFbUseRealName ) ) {
 				// Start with the real name in the database
 				$name = $wgUser->getRealName();
@@ -351,7 +351,7 @@ STYLE;
 				// Replace logout link with a button to disconnect from Facebook Connect
 				unset( $personal_urls['logout'] );
 				$personal_urls['fblogout'] = array(
-					'text'   => wfMsg( 'fbconnect-logout' ),
+					'text'   => wfMsg( 'facebook-logout' ),
 					'href'   => '#',
 					'active' => false,
 				);
@@ -376,7 +376,7 @@ STYLE;
 						    $facebook->getUser();
 				}
 				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'fbconnect-link' ),
+					'text'   => wfMsg( 'facebook-link' ),
 					'href'   => $link,
 					'active' => false
 				);
@@ -386,7 +386,7 @@ STYLE;
 		else if ($wgUser->isLoggedIn()) {
 			if (self::showButton( 'convert' )) {
 				$personal_urls['fbconvert'] = array(
-					'text'   => wfMsg( 'fbconnect-convert' ),
+					'text'   => wfMsg( 'facebook-convert' ),
 					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
 					                          'returnto=' . $wgTitle->getPrefixedURL()),
 					'active' => $wgTitle->isSpecial( 'Connect' )
@@ -397,8 +397,8 @@ STYLE;
 		else {
 			if (self::showButton( 'connect' ) || self::showButton( 'connect-simple' )) {
 				// Add an option to connect via Facebook Connect
-				$personal_urls['fbconnect'] = array(
-					'text'   => wfMsg( 'fbconnect-connect' ),
+				$personal_urls['facebook'] = array(
+					'text'   => wfMsg( 'facebook-connect' ),
 					'class' => 'fb_button fb_button_small',
 					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
 					'active' => $wgTitle->isSpecial('Connect'),
@@ -406,17 +406,17 @@ STYLE;
 			}
 			
 			if (self::showButton( 'connect-simple' )) {
-				$html = Xml::openElement('span', array('id' => 'fbconnect' ));
+				$html = Xml::openElement('span', array('id' => 'facebook' ));
 					$html .= Xml::openElement('a', array('href' => '#', 'class' => 'fb_button fb_button_small' ));
 						$html .= Xml::openElement('span', array('class' => 'fb_button_text' ));
-							$html .= wfMsg( 'fbconnect-connect-simple' );
+							$html .= wfMsg( 'facebook-connect-simple' );
 						$html .= Xml::closeElement( 'span' );
 					$html .= Xml::closeElement( 'a' );
 				$html .= Xml::closeElement( 'span' );
-				$personal_urls['fbconnect']['html'] = $html;
+				$personal_urls['facebook']['html'] = $html;
 			}
 			
-			if ( !empty( $wgFbConnectOnly ) ) {
+			if ( !empty( $wgFbDisableLogin ) ) {
 				// Remove other personal toolbar links
 				foreach (array('login', 'anonlogin') as $k) {
 					if (array_key_exists($k, $personal_urls)) {
@@ -429,7 +429,7 @@ STYLE;
 	}
 	
 	public static function GetPreferences( $user, &$preferences ) {
-		$email = FBConnectUser::getCleanEmail($preferences['emailaddress']['default']);
+		$email = FacebookUser::getCleanEmail($preferences['emailaddress']['default']);
 		if ($email != $preferences['emailaddress']['default']) {
 			// User is using a Facebook proxy email address
 			#$preferences['emailaddress']['default'] = $email;
@@ -451,7 +451,7 @@ STYLE;
 		// This hook no longer seems to work...
 		
 		/*
-		$ids = FBConnectDB::getFacebookIDs($wgUser);
+		$ids = FacebookDB::getFacebookIDs($wgUser);
 		
 		$fb_user = $facebook->getUser();
 		if( $fb_user && count($ids) > 0 && in_array( $fb_user, $ids )) {
@@ -465,8 +465,8 @@ STYLE;
 					// Replace the old output with the new output
 					$html = substr( $html, 0, $i ) .
 					        preg_replace("/$name/", "$name (<a href=\"$fbUser[link]\" " .
-					                     "class='mw-userlink mw-fbconnectuser'>" .
-					                     wfMsg('fbconnect-link-to-profile') . "</a>)",
+					                     "class='mw-userlink mw-facebookuser'>" .
+					                     wfMsg('facebook-link-to-profile') . "</a>)",
 					                     substr( $html, $i ), 1);
 					$output->clearHTML();
 					$output->addHTML( $html );
@@ -488,7 +488,7 @@ STYLE;
 		
 		// Only modify Facebook Connect users
 		if (empty( $fbSpecialUsers ) ||
-				!count(FBConnectDB::getFacebookIDs(User::newFromName($row->user_name)))) {
+				!count(FacebookDB::getFacebookIDs(User::newFromName($row->user_name)))) {
 			return true;
 		}
 		
@@ -532,7 +532,7 @@ STYLE;
 			<table style="border-collapse: collapse;">
 				<tr>
 					<td>
-						' . wfMsgWikiHtml( 'fbconnect-listusers-header',
+						' . wfMsgWikiHtml( 'facebook-listusers-header',
 						wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
 						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$group[name]</a>",
 						"<a href=\"http://www.facebook.com/profile.php?id={$group['owner']['id']}\" " .
@@ -548,11 +548,11 @@ STYLE;
 	
 	/**
 	 * Removes Special:UserLogin and Special:CreateAccount from the list of
-	 * special pages if $wgFbConnectOnly is set to true.
+	 * special pages if $wgFbDisableLogin is set to true.
 	 */
 	static function SpecialPage_initList( &$aSpecialPages ) {
-		global $wgFbConnectOnly;
-		if ( !empty( $wgFbConnectOnly) ) {
+		global $wgFbDisableLogin;
+		if ( !empty( $wgFbDisableLogin) ) {
 			// U can't touch this
 			$aSpecialPages['Userlogin'] = array(
 				'SpecialRedirectToSpecial',
@@ -594,13 +594,13 @@ STYLE;
 	}
 	
 	/**
-	 * Removes the 'createaccount' right from all users if $wgFbConnectOnly is
+	 * Removes the 'createaccount' right from all users if $wgFbDisableLogin is
 	 * enabled.
 	 */
 	// r270: fix for php 5.3 (cherry picked from http://trac.wikia-code.com/changeset/24606)
 	static function UserGetRights( /*&*/$user, &$aRights ) {
-		global $wgFbConnectOnly;
-		if ( !empty( $wgFbConnectOnly ) ) {
+		global $wgFbDisableLogin;
+		if ( !empty( $wgFbDisableLogin ) ) {
 			// If you would like sysops to still be able to create accounts
 			$whitelistSysops = false;
 			if ($whitelistSysops && in_array( 'sysop', $user->getGroups() )) {
@@ -618,7 +618,7 @@ STYLE;
 	
 	/**
 	 * If the user isn't logged in, try to auto-authenticate via Facebook
-	 * Connect. The Single Sign On magic of FBConnect happens in this function.
+	 * Connect. The Single Sign On magic of Facebook happens in this function.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
 		global $facebook, $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
@@ -636,8 +636,8 @@ STYLE;
 			$mwUser = User::newFromId($localId);
 			// If the user was Connected, the JS should have logged them out...
 			// TODO: test to see if they logged in normally (with a password)
-			#if (FBConnectDB::userLoggedInWithPassword($mwUser)) return true;
-			if (count(FBConnectDB::getFacebookIDs($mwUser))) {
+			#if (FacebookDB::userLoggedInWithPassword($mwUser)) return true;
+			if (count(FacebookDB::getFacebookIDs($mwUser))) {
 				// Oh well, they shouldn't be here anyways; silently log them out
 				$mwUser->logout();
 				// Defaults have just been loaded, so save some time
@@ -647,7 +647,7 @@ STYLE;
 		// Case: Logged into Facebook, not logged into the wiki
 		else /**/ if ($fbId && !$localId) {
 			// Look up the MW ID of the Facebook user
-			$mwUser = FBConnectDB::getUser($fbId);
+			$mwUser = FacebookDB::getUser($fbId);
 			$id = $mwUser ? $mwUser->getId() : 0;
 			// If the user doesn't exist, ask them to name their new account
 			if (!$id) {
@@ -671,7 +671,7 @@ STYLE;
 				$user->mFrom = 'id';
 				$user->load();
 				// Update user's info from Facebook
-				$fbUser = new FBConnectUser($mwUser);
+				$fbUser = new FacebookUser($mwUser);
 				$fbUser->updateFromFacebook();
 				// Authentification okay, no need to continue with User::loadFromSession()
 				$result = true;
@@ -688,94 +688,96 @@ STYLE;
 	 */
 	static function initPreferencesExtensionForm( $user, &$preferences ) {
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
-		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/FBConnect/prefs.js?{$wgStyleVersion}\"></script>\n");
-		wfLoadExtensionMessages('FBConnect');
-		$prefsection = 'fbconnect-prefstext';
+		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/Facebook/prefs.js?{$wgStyleVersion}\"></script>\n");
+		wfLoadExtensionMessages('Facebook');
+		$prefsection = 'facebook-prefstext';
 		
-		$id = FBConnectDB::getFacebookIDs($user, DB_MASTER);
+		$id = FacebookDB::getFacebookIDs($user, DB_MASTER);
 		if( count($id) > 0 ) {
 			$html = Xml::openElement("div",array("id" => "fbDisconnectLink" ));
-				$html .= '<br/>'.wfMsg('fbconnect-disconnect-link');
+				$html .= '<br/>'.wfMsg('facebook-disconnect-link');
 			$html .= Xml::closeElement( "div" );
 			
 			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectProgress" ));
-				$html .= '<br/>'.wfMsg('fbconnect-disconnect-done');
+				$html .= '<br/>'.wfMsg('facebook-disconnect-done');
 				$html .= Xml::openElement("img",array("id" => "fbDisconnectProgressImg", 'src' => $wgBlankImgUrl, "class" => "sprite progress" ),true);
 			$html .= Xml::closeElement( "div" );
 			
 			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectDone" ));
-				$html .= '<br/>'.wfMsg('fbconnect-disconnect-info');
+				$html .= '<br/>'.wfMsg('facebook-disconnect-info');
 			$html .= Xml::closeElement( "div" );
 			
-			$preferences['fbconnect-prefstext'] = array(
+			$preferences['facebook-prefstext'] = array(
 				'label' => '',
 				'type' => 'info',
-				'section' => 'fbconnect-prefstext',
+				'section' => 'facebook-prefstext',
 			);
 			
-			$preferences['tog-fbconnect-push-allow-never'] = array(
+			$preferences['tog-facebook-push-allow-never'] = array(
 				'name' => 'toggle',
-				'label-message' => 'fbconnect-push-allow-never',
-				'section' => 'fbconnect-prefstext',
+				'label-message' => 'facebook-push-allow-never',
+				'section' => 'facebook-prefstext',
 				'default' => 1,
 			);
 			
-			$preferences['fbconnect-connect'] = array(
+			$preferences['facebook-connect'] = array(
 				'help' => $html,
 				'label' => '',
 				'type' => 'info',
-				'section' => 'fbconnect-prefstext',
+				'section' => 'facebook-prefstext',
 			);
 			
 		} else {
 			// User is a MediaWiki user but isn't connected yet
 			// Display a message and button to connect
 			$loginButton = '<fb:login-button id="fbPrefsConnect" ' .
-			               FBConnect::getPermissionsAttribute() .
-			               FBConnect::getOnLoginAttribute() . '></fb:login-button>';
-			$html = wfMsg('fbconnect-convert') . '<br/>' . $loginButton;
+			               Facebook::getPermissionsAttribute() .
+			               Facebook::getOnLoginAttribute() . '></fb:login-button>';
+			$html = wfMsg('facebook-convert') . '<br/>' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
-			$preferences['fbconnect-disconnect'] = array(
+			$preferences['facebook-disconnect'] = array(
 				'help' => $html,
 				'label' => '',
 				'type' => 'info',
-				'section' => 'fbconnect-prefstext',
+				'section' => 'facebook-prefstext',
 			);
 		}
 		return true;
 	}
 	
 	/**
-	 * Add facebook connect html to ajax script.
+	 * Add Facebook HTML to AJAX script.
 	 */
 	public static function afterAjaxLoginHTML( &$html ) {
 		$tmpl = new EasyTemplate( dirname( __FILE__ ) . '/templates/' );
-		wfLoadExtensionMessages('FBConnect');
+		wfLoadExtensionMessages('Facebook');
 		if ( !LoginForm::getLoginToken() ) {
 			LoginForm::setLoginToken();
 		}
 		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
-		$tmpl->set( 'fbButtton', FBConnect::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
+		$tmpl->set( 'fbButtton', Facebook::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
 		$html = $tmpl->execute( 'ajaxLoginMerge' );
 		return true;
 	}
 	
+	// TODO
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
 		global $wgRequest, $wgUser, $wgServer, $facebook;
-		wfLoadExtensionMessages('FBConnect');
+		wfLoadExtensionMessages('Facebook');
 		$pref = Title::newFromText('Preferences', NS_SPECIAL);
 		if ($wgRequest->getVal('fbconnected', '') == 1) {
-			$id = FBConnectDB::getFacebookIDs($wgUser, DB_MASTER);
+			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
 			if( count($id) > 0 ) {
+				// TODO
 				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
-				$msg .= "<p>".wfMsg('fbconnect-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
+				$msg .= "<p>".wfMsg('facebook-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
 			}
 		}
-		
+		// TODO
 		if ($wgRequest->getVal('fbconnected', '') == 2) {
 			if( strlen($facebook->getUser()) < 1 ) {
 				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
-				$msg .= "<p>".wfMsgExt('fbconnect-connect-error-msg', 'parse', array("$1" => $pref->getFullUrl() ))."</p>";
+				$msg .= "<p>".wfMsgExt('facebook-connect-error-msg', 'parse', array("$1" => $pref->getFullUrl() ))."</p>";
 			}
 		}
 		return true;

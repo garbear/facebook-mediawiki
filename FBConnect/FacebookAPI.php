@@ -25,12 +25,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class FBConnectAPI
+ * Class FacebookAPI
  * 
  * This class contains the code used to interface with Facebook via the
  * Facebook Platform API.
  */
-class FBConnectAPI extends Facebook {
+class FacebookAPI extends Facebook {
 	// Constructor
 	public function __construct() {
 		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
@@ -141,7 +141,7 @@ class FBConnectAPI extends Facebook {
 		// If a User object was provided, translate it into a Facebook ID
 		if ( $user instanceof User ) {
 			// TODO: Does this call for a special api call without access_token?
-			$users = FBConnectDB::getFacebookIDs( $user );
+			$users = FacebookDB::getFacebookIDs( $user );
 			if ( count($users) ) {
 				$user = $users[0];
 			} else {
@@ -286,6 +286,6 @@ class FBConnectAPI extends Facebook {
 		if ( $hash != md5( $user . $this->apiSecret ) ) {
 			return false;
 		}
-		return FBConnectDB::getUser( $fb_user_id );
+		return FacebookDB::getUser( $fb_user_id );
 	}
 }

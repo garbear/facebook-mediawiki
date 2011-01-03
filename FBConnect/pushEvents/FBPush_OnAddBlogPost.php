@@ -8,9 +8,9 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnAddBlogPost extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAddBlogPost'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
-	static $messageName = 'fbconnect-msg-OnAddBlogPost';
+class FBPush_OnAddBlogPost extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnAddBlogPost'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+	static $messageName = 'facebook-msg-OnAddBlogPost';
 	static $eventImage = 'blogpost.png';
 	public function init(){
 		global $wgHooks;

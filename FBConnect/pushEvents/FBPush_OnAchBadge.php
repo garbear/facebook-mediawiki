@@ -8,9 +8,9 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnAchBadge extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAchBadge'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
-	static $messageName = 'fbconnect-msg-OnAchBadge';
+class FBPush_OnAchBadge extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnAchBadge'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+	static $messageName = 'facebook-msg-OnAchBadge';
 	
 	public function init(){
 		global $wgHooks;

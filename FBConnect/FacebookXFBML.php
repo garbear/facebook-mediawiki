@@ -25,7 +25,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class FBConnectXFBML
+ * Class FacebookXFBML
  * 
  * This class allows FBML (Facebook Markup Language, an extension to HTML) to
  * be incorporated into the wiki through the use of XFBML.
@@ -34,7 +34,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * <http://developers.facebook.com/plugins>. Additionally, for further FBML
  * documentation, please visit <http://developers.facebook.com/docs/reference/fbml>.
  */
-class FBConnectXFBML {
+class FacebookXFBML {
 	/**
 	 * This function is the callback that the ParserFirstCallInit hook assigns
 	 * to the parser whenever a FBML tag is encountered (such as <fb:like>).
@@ -98,7 +98,7 @@ class FBConnectXFBML {
 	 */
 	static function createParserHook($tag) {
 		$args = '$text,$args,&$parser';
-		$code = 'return FBConnectXFBML::parserHook($text,$args,$parser,\''.$tag.'\');';
+		$code = 'return FacebookXFBML::parserHook($text,$args,$parser,\''.$tag.'\');';
 		return create_function($args, $code);
 	}
 	
@@ -174,7 +174,7 @@ class FBConnectXFBML {
 /**
  * Class DummyParser
  * 
- * Allows FBConnectXML::availableTags() to pre-sanatize the list of tags reported to
+ * Allows FacebookXML::availableTags() to pre-sanatize the list of tags reported to
  * MediaWiki, excluding any tags that result in the tag being replaced by an empty
  * string. Sorry for the confusing summary here, its really late. =)
  */

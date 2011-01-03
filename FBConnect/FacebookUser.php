@@ -25,11 +25,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class FBConnectUser
+ * Class FacebookUser
  * 
  * Extends the User class.
  */
-class FBConnectUser extends User {
+class FacebookUser extends User {
 	
 	static public $availableUserUpdateOptions = array('fullname', 'gender', 'nickname', 'email', 'language', 'timecorrection');
 	
@@ -74,7 +74,7 @@ class FBConnectUser extends User {
 		foreach (self::$availableUserUpdateOptions as $option) {
 			// Translate Facebook parameters into MediaWiki parameters
 			$value = self::getOptionFromInfo($option, $userinfo);
-			if ($value && ($this->getOption("fbconnect-update-on-login-$option", '0') == '1')) {
+			if ($value && ($this->getOption("facebook-update-on-login-$option", '0') == '1')) {
 				switch ($option) {
 					case 'fullname':
 						$this->setRealName($value);

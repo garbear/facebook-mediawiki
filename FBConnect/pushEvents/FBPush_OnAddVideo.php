@@ -8,9 +8,9 @@
 global $wgExtensionMessagesFiles;
 $pushDir = dirname(__FILE__) . '/';
 
-class FBPush_OnAddVideo extends FBConnectPushEvent {
-	protected $isAllowedUserPreferenceName = 'fbconnect-push-allow-OnAddVideo'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
-	static $messageName = 'fbconnect-msg-OnAddVideo';
+class FBPush_OnAddVideo extends FacebookPushEvent {
+	protected $isAllowedUserPreferenceName = 'facebook-push-allow-OnAddVideo'; // must correspond to an i18n message that is 'tog-[the value of the string on this line]'.
+	static $messageName = 'facebook-msg-OnAddVideo';
 	static $eventImage = 'video.png';
 	public function init(){
 		global $wgHooks;

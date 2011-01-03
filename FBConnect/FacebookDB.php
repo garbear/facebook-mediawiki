@@ -25,20 +25,20 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class FBConnectDB
+ * Class FacebookDB
  * 
  * This class abstracts the manipulation of the custom table used by this
  * extension. If $wgDBprefix is set, this class will pull from the translated
  * tables. If the table 'users_fbconnect' does not exist in your database
  * you will receive errors like this:
  * 
- * Database error from within function "FBConnectDB::getUser". Database
+ * Database error from within function "FacebookDB::getUser". Database
  * returned error "Table 'user_fbconnect' doesn't exist".
  * 
  * In this case, you will need to fix this by running the MW updater:
  * >php maintenance/update.php
  */
-class FBConnectDB {
+class FacebookDB {
 	/**
 	 * Find the Facebook IDs of the given user, if any, using the database connection provided.
 	 *
@@ -126,7 +126,7 @@ class FBConnectDB {
 		$memkey = wfMemcKey( "fb_user_id", $user->getId() );
 			
 		if($user->getId() == 0){
-			wfDebug("FBConnect: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
+			wfDebug("Facebook: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
 		} else {
 			$prefix = self::getPrefix();
 			$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
@@ -185,7 +185,7 @@ class FBConnectDB {
 	/**
 	 * Returns the name of the shared database, if one is in use for the Facebook
 	 * Connect users table. Note that 'user_fbconnect' (without respecting
-	 * $wgSharedPrefix) is added to $wgSharedTables in FBConnect::init by default.
+	 * $wgSharedPrefix) is added to $wgSharedTables in Facebook::init by default.
 	 * This function can also be used as a test for whether a shared database for
 	 * Facebook Connect users is in use.
 	 * 

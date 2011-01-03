@@ -15,27 +15,27 @@
  */
 
 /**
- * fbconnect.js and fbconnect.min.js
+ * facebook.js and facebook.min.js
  * 
- * FBConnect relies on several different libraries and frameworks for its
- * JavaScript code. Each framework has its own method to verify that the proper
- * code won't be called before it's ready. Be mindful of race conditions; the
- * methods for each component are listed below (lambda represents a named or
- * anonymous function).
+ * The Facebook extension relies on several different libraries and frameworks
+ * for its JavaScript code. Each framework has its own method to verify that the
+ * proper code won't be called before it's ready. Be mindful of race conditions;
+ * the methods for each component are listed below ("lambda" represents a named
+ * or anonymous function).
  * 
- * MediaWiki:                addOnloadHook(lambda);
+ * MediaWiki:                  addOnloadHook(lambda);
  *     This function manages an array of window.onLoad event handlers to be
  *     called be called by a MediaWiki script when the window is fully loaded.
  *     Because the DOM may be ready before the window (due to large images to
  *     be downloaded), a faster alternative is JQuery's document-ready function.
  * 
- * Facebook JavaScript SDK:  window.fbAsyncInit = lambda;
+ * Facebook JavaScript SDK:    window.fbAsyncInit = lambda;
  *     This global variable is called when the JavaScript SDK is fully
  *     initialized asynchronously to the document's state. This might be long
  *     after the document is finished rendering the first time the script is
  *     downloaded. Subsequently, it may even be called before the DOM is ready.
  * 
- * jQuery:                   $(document).ready(lambda);
+ * jQuery:                     $(document).ready(lambda);
  *     Self-explanatory; to be called when the DOM is ready to be manipulated.
  *     Typically this should occur sooner than MediaWiki's addOnloadHook
  *     function is called.
@@ -52,7 +52,7 @@
 	}
 })();
 
-//Clone the jQuery reference from the MediaWiki's alias, $j
+//Clone the jQuery reference from the MediaWiki alias $j
 if ($j) $ = $j;
 
 /**
@@ -77,8 +77,8 @@ window.fbAsyncInit = function() {
 	FB.Event.subscribe('auth.logout', function(response) {
 		// TODO: Internationalize
 		var login = confirm("Not logged in.\n\nYou have been loggout out of " +
-                            "Facebook. Press OK to log in via Facebook Connect " +
-                            "again, or press Cancel to stay on the current page.");
+                            "Facebook. Press OK to log in with Facebook again, " +
+                            "or press Cancel to stay on the current page.");
 		if (login) {
 			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
 		}
@@ -99,17 +99,17 @@ window.fbAsyncInit = function() {
 			}
 		});
 		
-		// Attach event to the Connect button
-		$("#pt-fbconnect a").click(function(ev) {
-			loginByFBConnect();
+		// Attach event to the Login with Facebook button
+		$("#pt-facebook a").click(function(ev) {
+			loginByFacebook();
 			ev.preventDefault();
 		});
 		
-		// Wikia uses the fbconnect ID for their connect button
+		// Wikia uses the #fbconnect ID for their connect button
 		$("#fbconnect a").click(function(ev) {
 			// Wikia Event Tracker
 			WET.byStr( 'FBconnect/userlinks/connect' );
-			loginByFBConnect();
+			loginByFacebook();
 			ev.preventDefault();
 		});
 	});
@@ -120,7 +120,7 @@ window.fbAsyncInit = function() {
  */
 $(document).ready(function() {
 	// Add a pretty logo to Facebook links
-	$('#pt-fbconnect,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
+	$('#pt-facebook,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
 	
 	// Wikia click tracking code (hopefully this doesn't get called)
 	// TODO: where is getUrlVal defined?
@@ -144,8 +144,8 @@ function isFbApiInit() {
 
 /**
  * An optional handler to use in fbOnLoginJsOverride for when a user logs in
- * via Facebook Connect. This will redirect to Special:Connect with the
- * returnto variables configured properly.
+ * with Facebook. This will redirect to Special:Connect with the returnto
+ * variables configured properly.
  */
 function sendToConnectOnLogin() {
 	sendToConnectOnLoginForSpecificForm("");
@@ -176,10 +176,10 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 	// At this point, formName is empty as no other forms are currently available
 	
 	// If a Wikia modal box is being displayed, nuke it
-	$('#fbConnectModalWrapper').remove();
+	$('#facebookModalWrapper').remove();
 	
 	// Attempt the AJAX request
-	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb='+wgStyleVersion, function(data) {
+	$.postJSON(window.wgScript + '?action=ajax&rs=SpecialConnect::checkCreateAccount&cb=' + wgStyleVersion, function(data) {
 		// If all the checks in SpecialConnect::checkCreateAccount pass, continue
 		if(data.status == "ok") {
 			// jQuery.fn.getModal isn't defined (see jquery.wikia.js)
@@ -189,11 +189,11 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 				window.location.href = destUrl;
 				return;
 			}
-			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + "&returntoquery=" + wgPageQuery,  "#fbConnectModal", {
-				id: "fbConnectModalWrapper",
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + "&returntoquery=" + wgPageQuery,  "#facebookModal", {
+				id: "facebookModalWrapper",
 				width: 600,
 				callback: function() {
-					$('#fbConnectModalWrapper .close').click(function() {
+					$('#facebookModalWrapper .close').click(function() {
 						WET.byStr( 'FBconnect/ChooseName/X' );
 					});
 				}
@@ -224,7 +224,7 @@ function openFbLogin() {
  * Precondition: FB.init() has been called from window.fbAsyncInit.
  * Don't attach this function to an event if the precondition hasn't been met.
  */
-function loginByFBConnect() {
+function loginByFacebook() {
 	openFbLogin();
 	return false;
 }
@@ -249,7 +249,7 @@ function loginAndConnectExistingUser() {
 
 
 /**
- * Expand ajax login to use slider login/merge switch
+ * Expand ajax login to use slider login/merge switch.
  */
 window.wgAjaxLoginOnInit = function() {
 	AjaxLogin.slideToNormalLogin = function(el) {
@@ -279,7 +279,7 @@ window.wgAjaxLoginOnInit = function() {
 		AjaxLogin.beforeDoSuccess = function() {
 			FB.getLoginStatus(function(response) {
 				if (response.session) {
-					// already logged-in/connected via facebook
+					// already logged-in/connected via Facebook
 					sendToConnectOnLoginForSpecificForm("ConnectExisting");
 				} else {
 					var slideto = -354;
@@ -319,7 +319,7 @@ window.wgAjaxLoginOnInit = function() {
 		}
 	};
 	
-	//setup slider
+	// setup slider
 	$("#AjaxLoginConnectMarketing a").click(AjaxLogin.slider);
 	
 	$('#fbAjaxLoginConnect').click(function() {
@@ -338,14 +338,14 @@ window.wgAjaxLoginOnInit = function() {
 		WET.byStr( 'FBconnect/login_dialog/login_and_connect' );
 	});
 	
-	$().log('Fbconnect: AjaxLogin expend');
+	$().log('Facebook: AjaxLogin expend');
 };
 
 
 /**
  * Called after the AJAX has logged the user in on a request to login and connect.
- * Now that they are logged in, we will prompt them to FBConnect, then drop them on
- * the Special:Connect page to finish the process.
+ * Now that they are logged in, we will prompt them to connect with Facebook,
+ * then drop them on the Special:Connect page to finish the process.
  */
 /*
 function loggedInNowNeedToConnect() {
@@ -354,7 +354,7 @@ function loggedInNowNeedToConnect() {
 			// already logged-in/connected via facebook
 			sendToConnectOnLoginForSpecificForm("ConnectExisting");
 		} else {
-			// Not logged/connected w/Facebook. Show dialog w/a button (to get around popup blockers in IE/webkit).
+			// Not logged/connected w/ Facebook. Show dialog w/ a button (to get around popup blockers in IE/webkit).
 			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::getLoginButtonModal&uselang=' + window.wgUserLanguage + '&cb=' + wgMWrevId + '-' + wgStyleVersion,  false, {
 				callback: function() {
 					window.fbAsyncInit(); // need to init again so that the button that comes from the ajax request works
@@ -383,8 +383,8 @@ function loggedInNowNeedToConnect() {
 /**/
 
 /**
- * When the page is loaded, always init the FB code if it has not been initialized.  This
- * will allow FBML tags in content (if configured to do this).
+ * When the page is loaded, always init the FaceBook code if it has not been
+ * initialized. This will allow XFBML tags in content (if configured to do this).
  */
 $(document).ready(function(){
 	initFbWhenReady();

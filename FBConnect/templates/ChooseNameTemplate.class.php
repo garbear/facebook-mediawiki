@@ -23,7 +23,7 @@ class ChooseNameTemplate extends QuickTemplate {
 			$this->data['ajax'] = "";
 		}
 ?> 
-<div id="fbConnectModal" title="<?php $this->msg('fbconnect-modal-title') ?>" >
+<div id="facebookModal" title="<?php $this->msg('facebook-modal-title') ?>" >
 <?php if( $this->data['message'] && !$this->data['ajax'] ) { ?>
 	<div class="<?php $this->text('messagetype') ?>box">
 		<?php if ( $this->data['messagetype'] == 'error' ) { ?>
@@ -74,7 +74,7 @@ class ChooseNameTemplate extends QuickTemplate {
 			</td>
 			<td rowspan="3" id="wpFBLoginInfo" >
 				<div>
-					<?php echo wfMsg('fbconnect-msg-for-existing-users', array( "$1" => Title::makeTitle( NS_SPECIAL  , "Signup"  )->getFullUrl(array( "showLoginAndConnect" => "true")) ) ) ?>
+					<?php echo wfMsg('facebook-msg-for-existing-users', array( "$1" => Title::makeTitle( NS_SPECIAL  , "Signup"  )->getFullUrl(array( "showLoginAndConnect" => "true")) ) ) ?>
 				</div>
 			</td>
 		</tr>
@@ -139,7 +139,7 @@ class ChooseNameTemplate extends QuickTemplate {
 					<?php
 					// The login button should open the ajax login dialog and select the login-and-connect form.
 					$jsHref = "openLoginAndConnect();return false;";
-					print wfMsg('fbconnect-msg-for-existing-users', $jsHref);
+					print wfMsg('facebook-msg-for-existing-users', $jsHref);
 					?>
 				</div>
 */ ?>
@@ -148,7 +148,7 @@ class ChooseNameTemplate extends QuickTemplate {
 		<tr class="wpAjaxLoginPreLine" >
 			<td class="wpAjaxLoginInput" id="wpFBEmailTD">
 				<?php if( $this->data['useemail'] ) { ?>
-					<label for='wpEmail'><?php echo wfMsg('fbconnect-signup-mail'); ?></label><a style='float:left' id="wpEmailInfo" href="#"><?php $this->msg( 'signup-moreinfo' ) ?></a><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
+					<label for='wpEmail'><?php echo wfMsg('facebook-signup-mail'); ?></label><a style='float:left' id="wpEmailInfo" href="#"><?php $this->msg( 'signup-moreinfo' ) ?></a><span>&nbsp;<img alt="status" src="<?php print $wgBlankImgUrl; ?>"/></span>
 					<input type='text'  name="wpEmail" id="wpFBEmail" value="<?php $this->text('email') ?>" size='20' />
 				<?php } ?>
 		</tr>
@@ -179,7 +179,7 @@ class ChooseNameTemplate extends QuickTemplate {
 							?> /> <?php 
 							if ( $inputItem['type'] == 'checkbox' && !empty( $inputItem['msg'] ) ) {
 								?>
-							<span class="fbConnectCblable" ><?php $this->msgHtml( $inputItem['msg'] ) ?></span><?php
+							<span class="facebookCblable" ><?php $this->msgHtml( $inputItem['msg'] ) ?></span><?php
 							}
 						?>
 	
@@ -202,27 +202,27 @@ class ChooseNameTemplate extends QuickTemplate {
 		</tr>		
 					
 <?php global $fbEnablePushToFacebook; if(!empty($fbEnablePushToFacebook)){ ?>
-		<tr id='fbConnectPushEventBar'  >
-			<td colspan='2' class="fbConnectPushEventBar" >
-				<?php print wfMsg( 'fbconnect-prefsheader' ); ?>
+		<tr id='facebookPushEventBar'  >
+			<td colspan='2' class="facebookPushEventBar" >
+				<?php print wfMsg( 'facebook-prefsheader' ); ?>
 			</td>
 		</tr>
 		<tr>
-			<td colspan='2' id="fbConnectPushEventBarButton" class="fbConnectPushEventBarlink" >
-				<a id='fbConnectPushEventBar_show' href='#'><?php echo wfMsg("fbconnect-prefs-show"); ?></a>
-				<a id='fbConnectPushEventBar_hide' href='#' style='display:none'><?php echo wfMsg("fbconnect-prefs-hide"); ?></a>
+			<td colspan='2' id="facebookPushEventBarButton" class="facebookPushEventBarlink" >
+				<a id='facebookPushEventBar_show' href='#'><?php echo wfMsg("facebook-prefs-show"); ?></a>
+				<a id='facebookPushEventBar_hide' href='#' style='display:none'><?php echo wfMsg("facebook-prefs-hide"); ?></a>
 			</td>
 		</tr>			
 		<tr>
-			<td class="fbConnectPushEventToggles" style='display:none' >
-				<?php echo wfMsg('fbconnect-prefs-post'); ?>
+			<td class="facebookPushEventToggles" style='display:none' >
+				<?php echo wfMsg('facebook-prefs-post'); ?>
 				<br><br>
 			</td>
 		</tr>
-			<?php $prefs = FBConnectPushEvent::getPreferencesToggles(true); ?>
+			<?php $prefs = FacebookPushEvent::getPreferencesToggles(true); ?>
 			<?php foreach( $prefs as $key => $value ): ?>
 			<?php if( ($key % 2) == 0  ):?>
-				<tr class='wpAjaxLoginPreLine fbConnectPushEventToggles' style='display:none'>
+				<tr class='wpAjaxLoginPreLine facebookPushEventToggles' style='display:none'>
 				<?php endif;?>
 					<td <?php if( !empty( $value['fullLine'] )):?> colspan=2 <?php endif;?>>	
 						<input <?php if( !empty( $value['checked'] )):?>  checked="checked" <?php endif;?> type='checkbox' value='1' id="<?php echo $value['id']; ?>" name="<?php echo $value['name']; ?>"/> 
@@ -361,17 +361,17 @@ class ChooseNameTemplate extends QuickTemplate {
 		$('#wpFBEmail').change( UserRegistration.checkEmail );
 		
 		// Control show/hide of push-event preferences.
-		$('#fbConnectPushEventBar_show').click(function(){
-			$('#fbConnectPushEventBar_show').hide();
-			$('.fbConnectPushEventToggles').show();
-			$('#fbConnectPushEventBar_hide').show();
+		$('#facebookPushEventBar_show').click(function(){
+			$('#facebookPushEventBar_show').hide();
+			$('.facebookPushEventToggles').show();
+			$('#facebookPushEventBar_hide').show();
 			WET.byStr( 'FBconnect/ChooseName/show_prefs' );
 			return false;
 		});
-		$('#fbConnectPushEventBar_hide').click(function(){
-			$('#fbConnectPushEventBar_hide').hide();
-			$('.fbConnectPushEventToggles').hide();
-			$('#fbConnectPushEventBar_show').show();
+		$('#facebookPushEventBar_hide').click(function(){
+			$('#facebookPushEventBar_hide').hide();
+			$('.facebookPushEventToggles').hide();
+			$('#facebookPushEventBar_show').show();
 			WET.byStr( 'FBconnect/ChooseName/hide_prefs' );
 			return false;
 		});
@@ -380,7 +380,7 @@ class ChooseNameTemplate extends QuickTemplate {
 			WET.byStr( 'FBconnect/ChooseName/login_first' );
 		});
 
-		$('#fbconnect-push-allow-never').click(function(){
+		$('#facebook-push-allow-never').click(function(){
 			WET.byStr( 'FBconnect/ChooseName/nofeed' );
 		});
 	});

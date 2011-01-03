@@ -4,29 +4,29 @@
 	display: none;
 }
 
-.fbConnectPushEventBar {
+.facebookPushEventBar {
 	padding-right:30px;
 }
 
-.fbConnectPushEventBarlink{
+.facebookPushEventBarlink{
 	text-align:right;
 	padding-right:30px;
 }
 
-.fbConnectCblable {
+.facebookCblable {
 	margin-left:16px;
 }
 
-.fbConnectPushEventToggles td {
+.facebookPushEventToggles td {
 	padding-bottom:8px;
 	padding-top:0;
 }
 
-#fbConnectPushEventBar_show,#fbConnectPushEventBar_hide {
+#facebookPushEventBar_show,#facebookPushEventBar_hide {
 	font-size:80%;
 }
 
-#fbConnectModalWrapper #userloginErrorBox {
+#facebookModalWrapper #userloginErrorBox {
 	margin-bottom:0;
 	margin-left:10px;
 	width:565px;

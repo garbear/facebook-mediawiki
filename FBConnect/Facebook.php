@@ -16,13 +16,13 @@
  */
 
 /**
- * FBConnect plugin. Integrates Facebook Connect into MediaWiki.
+ * Facebook for MediaWiki.
  * 
- * Features include single sign on (SSO) experience and XFBML.
+ * Integrates Facebook authentication and features into MediaWiki.
  * 
- * Info is available at <http://www.mediawiki.org/wiki/Extension:FBConnect>.
+ * Info is available at <http://www.mediawiki.org/wiki/Extension:Facebook>.
  * Limited support is available at
- * <http://www.mediawiki.org/wiki/Extension_talk:FBConnect>.
+ * <http://www.mediawiki.org/wiki/Extension_talk:Facebook>.
  * 
  * @file
  * @ingroup Extensions
@@ -42,22 +42,22 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 // Make it so that the code will survive the push until the config gets updated.
 $wgEnablePreferencesExt = true;
 
-// FBConnect version
-define( 'MEDIAWIKI_FBCONNECT_VERSION', '3.0-beta, January 2, 2011' );
+// Facebook version
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '3.0.0 (r375), January 3, 2011' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
-define( 'FBCONNECT_LOCALE', '%LOCALE%');
+define( 'FACEBOOK_LOCALE', '%LOCALE%');
 
 /*
  * Add information about this extension to Special:Version.
  */
 $wgExtensionCredits['specialpage'][] = array(
 	'path'           => __FILE__,
-	'name'           => 'Facebook Connect Plugin',
+	'name'           => 'Facebook for MediaWiki',
 	'author'         => 'Garrett Brown, Sean Colombo, Tomek Odrobny',
-	'url'            => 'http://www.mediawiki.org/wiki/Extension:FBConnect',
-	'descriptionmsg' => 'fbconnect-desc',
-	'version'        => MEDIAWIKI_FBCONNECT_VERSION,
+	'url'            => 'http://www.mediawiki.org/wiki/Extension:Facebook',
+	'descriptionmsg' => 'facebook-desc',
+	'version'        => MEDIAWIKI_FACEBOOK_VERSION,
 );
 
 /*
@@ -74,27 +74,28 @@ if (file_exists( $dir . 'config.php' )) {
 // Load the PHP SDK
 require_once $dir . 'php-sdk/facebook.php';
 
-$wgExtensionFunctions[] = 'FBConnect::init';
+// Install the extension
+$wgExtensionFunctions[] = 'Facebook::init';
 
 if( !empty( $wgFbEnablePushToFacebook ) ) {
-	// Need to include it explicitly instead of autoload since it has initialization code of its own.
-	// This should be done after FBConnect::init is added to wgExtensionFunctions so that FBConnect
-	// gets fully initialized first.
-	require_once $dir . 'FBConnectPushEvent.php';
+	// Need to include it explicitly instead of autoload since it has initialization
+	// code of its own. This should be done after Facebook::init is added to
+	// $wgExtensionFunctions so that Facebook gets fully initialized first.
+	require_once $dir . 'FacebookPushEvent.php';
 }
 
-$wgExtensionMessagesFiles['FBConnect'] =	$dir . 'FBConnect.i18n.php';
+$wgExtensionMessagesFiles['Facebook'] =	$dir . 'Facebook.i18n.php';
 $wgExtensionMessagesFiles['FBPushEvents'] = $dir . 'pushEvents/FBPushEvents.i18n.php';
-$wgExtensionMessagesFiles['FBConnectLanguage'] = $dir . 'FBConnectLanguage.i18n.php';
-$wgExtensionAliasesFiles['FBConnect'] =		$dir . 'FBConnect.alias.php';
+$wgExtensionMessagesFiles['FacebookLanguage'] = $dir . 'FacebookLanguage.i18n.php';
+$wgExtensionAliasesFiles['Facebook'] =		$dir . 'Facebook.alias.php';
 
-$wgAutoloadClasses['FBConnectAPI'] =		$dir . 'FBConnectAPI.php';
-$wgAutoloadClasses['FBConnectDB'] =			$dir . 'FBConnectDB.php';
-$wgAutoloadClasses['FBConnectHooks'] =		$dir . 'FBConnectHooks.php';
-$wgAutoloadClasses['FBConnectProfilePic'] =	$dir . 'FBConnectProfilePic.php';
-$wgAutoloadClasses['FBConnectLanguage'] =   $dir . 'FBConnectLanguage.php';
-$wgAutoloadClasses['FBConnectUser'] =		$dir . 'FBConnectUser.php';
-$wgAutoloadClasses['FBConnectXFBML'] =		$dir . 'FBConnectXFBML.php';
+$wgAutoloadClasses['FacebookAPI'] =		$dir . 'FacebookAPI.php';
+$wgAutoloadClasses['FacebookDB'] =			$dir . 'FacebookDB.php';
+$wgAutoloadClasses['FacebookHooks'] =		$dir . 'FacebookHooks.php';
+$wgAutoloadClasses['FacebookProfilePic'] =	$dir . 'FacebookProfilePic.php';
+$wgAutoloadClasses['FacebookLanguage'] =   $dir . 'FacebookLanguage.php';
+$wgAutoloadClasses['FacebookUser'] =		$dir . 'FacebookUser.php';
+$wgAutoloadClasses['FacebookXFBML'] =		$dir . 'FacebookXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] =		$dir . 'SpecialConnect.php';
 $wgAutoloadClasses['ChooseNameTemplate'] =	$dir . 'templates/ChooseNameTemplate.class.php';
 
@@ -109,7 +110,7 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 // See <http://trac.wikia-code.com/changeset/27160> and <http://trac.wikia-code.com/changeset/27928> for fix
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user']; // Create a new group for Facebook users
 
-$wgAjaxExportList[] = 'FBConnect::disconnectFromFB';
+$wgAjaxExportList[] = 'Facebook::disconnectFromFB';
 $wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
 $wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
 $wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
@@ -117,16 +118,16 @@ $wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
 $wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
 foreach( $wgFbHooksToAddImmediately as $hookName ) {
-	$wgHooks[$hookName][] = "FBConnectHooks::$hookName";
+	$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 }
 
 /**
- * Class FBConnect
+ * Class Facebook
  * 
  * This class initializes the extension, and contains the core non-hook,
  * non-authentification code.
  */
-class FBConnect {
+class Facebook {
 	static private $fbOnLoginJs;
 	
 	/**
@@ -143,13 +144,13 @@ class FBConnect {
 		$wgSharedTables[] = 'user_fbconnect';
 		
 		// Create our Facebook instance and make it available through $facebook
-		$facebook = new FBConnectAPI();
+		$facebook = new FacebookAPI();
 		
-		// Install all public static functions in class FBConnectHooks as MediaWiki hooks
-		$hooks = self::enumMethods( 'FBConnectHooks' );
+		// Install all public static functions in class FacebookHooks as MediaWiki hooks
+		$hooks = self::enumMethods( 'FacebookHooks' );
 		foreach( $hooks as $hookName ) {
 			if (!in_array( $hookName, $wgFbHooksToAddImmediately )) {
-				$wgHooks[$hookName][] = "FBConnectHooks::$hookName";
+				$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 			}
 		}
 
@@ -162,8 +163,8 @@ class FBConnect {
 		
 		// Default to pull new info from Facebook
 		global $wgDefaultUserOptions;
-		foreach (FBConnectUser::$availableUserUpdateOptions as $option) {
-			$wgDefaultUserOptions["fbconnect-update-on-login-$option"] = 1;
+		foreach (FacebookUser::$availableUserUpdateOptions as $option) {
+			$wgDefaultUserOptions["facebook-update-on-login-$option"] = 1;
 		}
 		
 		// If we are configured to pull group info from Facebook, then set up
@@ -256,20 +257,20 @@ class FBConnect {
 	public static function coreDisconnectFromFB( $user = null ) {
 		global $wgRequest, $wgUser, $wgAuth;
 		
-		wfLoadExtensionMessages('FBConnect');
+		wfLoadExtensionMessages('Facebook');
 		
 		if ($user == null) {
 			$user = $wgUser;
 		}
-		$statusError = array('status' => 'error', 'msg' => wfMsg('fbconnect-unknown-error'));
+		$statusError = array('status' => 'error', 'msg' => wfMsg('facebook-unknown-error'));
 		
 		if ($user->getId() == 0) {
 			return $statusError;
 		}
 		
-		$dbw = wfGetDB( DB_MASTER, array(), FBConnectDB::sharedDB() );
+		$dbw = wfGetDB( DB_MASTER, array(), FacebookDB::sharedDB() );
 		$dbw->begin();
-		$rows = FBConnectDB::removeFacebookID($user);
+		$rows = FacebookDB::removeFacebookID($user);
 		
 		// Remind password attemp
 		$params = new FauxRequest(array (
@@ -284,9 +285,9 @@ class FBConnect {
 		$loginForm = new LoginForm($params);
 		
 		if ($wgUser->getOption('fbFromExist')) {
-			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle-exist', 'fbconnect-passwordremindertext-exist' );
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
 		} else {
-			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'fbconnect-passwordremindertitle', 'fbconnect-passwordremindertext' );
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
 		}
 		
 		if( WikiError::isError( $res ) ) {

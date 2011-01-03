@@ -11,7 +11,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 /**
- * FBConnectLanguage.i18n.php
+ * FacebookLanguage.i18n.php
  * 
  * Contains a message which represents a mapping of MediaWiki language codes to Facebook Locales.
  */
@@ -22,7 +22,7 @@ $messages = array();
 /** English */
 $messages['en'] = array(
 
-	'fbconnect-mediawiki-lang-to-fb-locale' => "
+	'facebook-mediawiki-lang-to-fb-locale' => "
 aa,          # Qafár af -  Afar
 ab,          # Аҧсуа -  Abkhaz, should possibly add ' бысжѡа'
 ace,          # Acèh -  Aceh
@@ -393,7 +393,7 @@ mu,          # Mirror Universe - Mirror Universe for Memory-Alpha, trac         
  * Message documentation.
  */
 $messages['qqq'] = array(
-	'fbconnect-mediawiki-lang-to-fb-locale' => 'Do not translate this message.  It is a representation of a mapping from MediaWiki language codes to corresponding Facebook locales.
+	'facebook-mediawiki-lang-to-fb-locale' => 'Do not translate this message.  It is a representation of a mapping from MediaWiki language codes to corresponding Facebook locales.
 		Visit http://www.facebook.com/translations/FacebookLocales.xml for a list of all available Facebook Locales.
 		The mapping is expected to be one mapping per line with commas separating the MediaWiki language code on the left and the best Facebook Locale mapping on the right (if available).
 		On each line, anything after the first hash (#) is considered a comment.  If no good match for a locale is found, the MediaWiki language code should still be left there (along with the comma) to indicate
