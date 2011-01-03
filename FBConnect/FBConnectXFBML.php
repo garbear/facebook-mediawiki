@@ -43,8 +43,6 @@ class FBConnectXFBML {
 	 * $tag argument with the $tag provided to createParserHook.
 	 */
 	static function parserHook($innertext, $args, &$parser, $tag = '' ) {
-		global $wgFbAllowFacebookImages;
-		
 		// Run hook to allow modifying the default behavior. If $override is
 		// set, it is used instead. Return false to disable the tag. 
 		$override = '';
@@ -65,15 +63,9 @@ class FBConnectXFBML {
 				// Disable these tags by returning an empty string
 				break;
 			case 'fb:serverfbml':
-				// TODO: Is this safe? Does it respect $wgFbAllowFacebookImages?
 				$attrs = self::implodeAttrs( $args );
 				// Don't recursively parse $innertext
 				return "<fb:serverfbml{$attrs}>$innertext</fb:serverfbml>";
-			case 'fb:profile-pic':
-				if (empty($wgFbAllowFacebookImages)) {
-					break;
-				}
-				// Careful - no "break;" if $wgFbAllowFacebookImages is true
 			default:
 				// Allow other tags by default
 				$attrs = self::implodeAttrs( $args );
@@ -145,7 +137,7 @@ class FBConnectXFBML {
 		              'fb:bookmark',
 		              'fb:comments',
 		              'fb:connect-bar', # Not in docs
-		              'fb:facepile',  # Clone of friendpile, not in docs
+		              'fb:facepile',  # Clone of fb:friendpile, not in docs
 		              'fb:fan', # Not in docs
 		              'fb:friendpile',
 		              'fb:like',
