@@ -149,13 +149,6 @@ $wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.js"; // for
 #$wgFbExtensionScript = "$wgScriptPath/extensions/FBConnect/fbconnect.min.js";
 
 /**
- * Whether to include jQuery. This option is for backwards compatibility and is
- * ignored in version 1.16. Otherwise, if you already have jQuery included on
- * your site, you can safely set this to false.
- */
-$wgFbIncludeJquery = true;
-
-/**
  * Optionally override the default javascript handling which occurs when a user logs in.
  *
  * This will generally not be needed unless you are doing heavy customization of this extension.
