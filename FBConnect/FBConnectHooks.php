@@ -82,9 +82,10 @@ class FBConnectHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgFbIncludeJquery,
-		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
+		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
+		       $wgFbIncludeJquery, $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
 		
+		// Wikiaphone mobile device skin doesn't need JS or CSS additions 
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
 			return true;
 		
