@@ -42,10 +42,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 // Make it so that the code will survive the push until the config gets updated.
 $wgEnablePreferencesExt = true;
 
-/*
- * FBConnect version.
- */
-define( 'MEDIAWIKI_FBCONNECT_VERSION', '3.0-beta, December 28, 2010' );
+// FBConnect version
+define( 'MEDIAWIKI_FBCONNECT_VERSION', '3.0-beta, January 2, 2011' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FBCONNECT_LOCALE', '%LOCALE%');

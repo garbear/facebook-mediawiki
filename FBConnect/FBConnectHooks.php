@@ -139,10 +139,8 @@ STYLE;
 			if ( !empty( $wgFbLogo) ) {
 				$out->addInlineStyle( $style );
 			}
-			
 			// Don't include jQuery if it's already in use on the site
 			$out->includeJQuery();
-			
 			// Add the script file specified by $url
 			if ( !empty( $wgFbExtensionScript ) ) {
 				$out->addScriptFile( $wgFbExtensionScript );
@@ -152,13 +150,11 @@ STYLE;
 			if ( !empty( $wgFbLogo) ) {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			}
-			
 			// Don't include jQuery if it's already in use on the site
 			if ( !empty( $wgFbIncludeJquery ) ) {
 				// 1.4 loads the most recent 1.4 revision (currently 1.4.4)
 				$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js' );
 			}
-			
 			// Add the script file specified by $url
 			if( !empty( $wgFbExtensionScript ) ) {
 				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");

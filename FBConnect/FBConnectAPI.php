@@ -36,10 +36,10 @@ class FBConnectAPI extends Facebook {
 		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
 		// Check to make sure config.default.php was renamed properly, unless we
 		// are running update.php from the command line
+		// TODO: use $wgCommandLineMode, if it is propper to do so
 		if ( !defined( 'MW_CMDLINE_CALLBACK' ) && !$this->isConfigSetup() ) {
-			exit( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
+			die ( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
 		}
-		
 		$config = array(
 			'appId' => $wgFbAppId,
 			'secret' => $wgFbSecret,
