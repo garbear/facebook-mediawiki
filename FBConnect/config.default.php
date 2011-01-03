@@ -39,12 +39,6 @@ $wgFbSecret         = 'YOUR_SECRET';    # Change this!
 $wgFbConnectOnly = false;
 
 /**
- * Allow the use of XFBML in wiki text. To learn more about Facebook Markup
- * Language, please see <http://developers.facebook.com/docs/reference/fbml>.
- */
-$wgFbUseMarkup = true;
-
-/**
  * For easier wiki rights management, create a group on Facebook and place the
  * group ID here. Three new implicit groups will be created:
  * 
@@ -71,6 +65,12 @@ $wgFbUseMarkup = true;
  * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
  */
 $wgFbUserRightsFromGroup = false;  # Or a group ID
+
+/**
+ * Allow the use of XFBML in wiki text. To learn more about Facebook Markup
+ * Language, please see <http://developers.facebook.com/docs/reference/fbml>.
+ */
+$wgFbUseMarkup = true;
 
 /**
  * Shows the real name for all Connected users instead of their wiki user name.
