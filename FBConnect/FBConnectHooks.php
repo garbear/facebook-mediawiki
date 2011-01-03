@@ -167,72 +167,55 @@ STYLE;
 	}
 	
 	/**
-	 * Fired when MediaWiki is updated to allow FBConnect to update the database.
-	 * If the database type is supported, then a new tabled named 'user_fbconnect'
-	 * is created. For the table's layout, see fbconnect_table.sql.
+	 * Fired when MediaWiki is updated (from the command line updater utility or,
+	 * if using version 1.17+, from the initial installer). This hook allows
+	 * FBConnect to update the database with the required tables. Each table
+	 * listed below should have a corresponding schema file in the sql directory
+	 * for each supported database type.
 	 * 
 	 * MYSQL ONLY: If $wgDBprefix is set, then the table 'user_fbconnect' will
-	 * be prefixed accordingly. Make sure that fbconnect_table.sql is updated
-	 * with the database prefix beforehand.
+	 * be prefixed accordingly. Make sure that the .sql files are modified with
+	 * the database prefix beforehand.
+	 * 
+	 * The $updater parameter added in r71140 (after 1.16)
+	 * <http://svn.wikimedia.org/viewvc/mediawiki?view=revision&revision=71140>
 	 */
 	static function LoadExtensionSchemaUpdates( $updater = null ) {
-		global $wgSharedDB, $wgDBname;
+		global $wgSharedDB, $wgDBname, $wgDBtype, $wgDBprefix;
+		// Don't create tables on a shared database
 		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
 			return true;
 		}
-		$base = dirname( __FILE__ );
-		if ( $updater === null ) {
-			global $wgDBtype, $wgDBprefix, $wgExtNewTables;
-			if ( $wgDBtype == 'mysql' ) {
-				$wgExtNewTables[] = array("{$wgDBprefix}user_fbconnect", "$base/sql/fbconnect_table.sql");
-				$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_stats", "$base/sql/fbconnect_event_stats.sql");
-				$wgExtNewTables[] = array("{$wgDBprefix}fbconnect_event_show", "$base/sql/fbconnect_event_show.sql");
-			} else if ( $wgDBtype == 'postgres' ) {
-				$wgExtNewTables[] = array('user_fbconnect', "$base/sql/fbconnect_table.pg.sql");
-				$wgExtNewTables[] = array('fbconnect_event_stats', "$base/sql/fbconnect_event_stats.pg.sql");
-				$wgExtNewTables[] = array('fbconnect_event_show', "$base/sql/fbconnect_event_show.pg.sql");
+		// Tables to add to the database
+		$tables = array( 'user_fbconnect', 'fbconnect_event_stats', 'fbconnect_event_show' );
+		// Sql directory inside the extension folder
+		$sql = dirname( __FILE__ ) . '/sql';
+		// Extension of the table schema file (depending on the database type)
+		switch ( $updater !== null ? $updater->getDB()->getType() : $wgDBtype ) {
+			case 'mysql':
+				$ext = 'sql';
+				break;
+			case 'postgres':
+				$ext = 'pg.sql';
+				break;
+			default:
+				$ext = 'sql';
+		}
+		// Do the updating
+		foreach ( $tables as $table ) {
+			if ( $wgDBprefix ) {
+				$table = $wgDBprefix . $table;
 			}
-		} else {
-			if ( $updater->getDB()->getType() == 'mysql' ) {
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'user_fbconnect',
-					"$base/sql/fbconnect_table.sql",
-					true
-				));
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'fbconnect_event_stats',
-					"$base/sql/fbconnect_event_stats.sql",
-					true
-				));
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'fbconnect_event_show',
-					"$base/sql/fbconnect_event_show.sql",
-					true
-				));
-			} elseif ( $updater->getDB()->getType() == 'postgres' ) {
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'user_fbconnect',
-					"$base/sql/fbconnect_table.pg.sql",
-					true
-				));
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'fbconnect_event_stats',
-					"$base/sql/fbconnect_event_stats.pg.sql",
-					true
-				));
-				$updater->addExtensionUpdate(array(
-					'addTable',
-					'fbconnect_event_show',
-					"$base/sql/fbconnect_event_show.pg.sql",
-					true
-				));
+			// Location of the table schema file
+			$schema = "$sql/$table.$ext";
+			// If we're using the new version of the LoadExtensionSchemaUpdates hook
+			if ( $updater !== null ) {
+				$updater->addExtensionUpdate( array( 'addTable', $table, $schema, true ) );
+			} else {
+				global $wgExtNewTables;
+				$wgExtNewTables[] = array( $table, $schema );
 			}
-		}	
+		}
 		return true;
 	}
 	
