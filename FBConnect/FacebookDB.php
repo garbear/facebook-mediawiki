@@ -185,11 +185,11 @@ class FacebookDB {
 	/**
 	 * Returns the name of the shared database, if one is in use for the Facebook
 	 * Connect users table. Note that 'user_fbconnect' (without respecting
-	 * $wgSharedPrefix) is added to $wgSharedTables in Facebook::init by default.
-	 * This function can also be used as a test for whether a shared database for
-	 * Facebook Connect users is in use.
+	 * $wgSharedPrefix) is added to $wgSharedTables in FacebookInit::init() by
+	 * default. This function can also be used as a test for whether a shared
+	 * database for Facebook users is in use.
 	 * 
-	 * See also: <http://www.mediawiki.org/wiki/Manual:Shared_database>
+	 * See also <http://www.mediawiki.org/wiki/Manual:Shared_database>
 	 */
 	public static function sharedDB() {
 		global $wgExternalSharedDB;

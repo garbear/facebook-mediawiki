@@ -21,7 +21,7 @@
  * This class contains all the hooks used in this extension. HOOKS DO NOT NEED
  * TO BE EXPLICITLY ADDED TO $wgHooks. Simply write a public static function
  * with the same name as the hook that provokes it, place it inside this class
- * and let Facebook::init() do its magic. Helper functions should be private,
+ * and let FacebookInit::init() do its magic. Helper functions should be private,
  * because only public static methods are added as hooks.
  */
 class FacebookHooks {
@@ -731,8 +731,8 @@ STYLE;
 			// User is a MediaWiki user but isn't connected yet
 			// Display a message and button to connect
 			$loginButton = '<fb:login-button id="fbPrefsConnect" ' .
-			               Facebook::getPermissionsAttribute() .
-			               Facebook::getOnLoginAttribute() . '></fb:login-button>';
+			               FacebookInit::getPermissionsAttribute() .
+			               FacebookInit::getOnLoginAttribute() . '></fb:login-button>';
 			$html = wfMsg('facebook-convert') . '<br/>' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
 			$preferences['facebook-disconnect'] = array(
@@ -755,7 +755,7 @@ STYLE;
 			LoginForm::setLoginToken();
 		}
 		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
-		$tmpl->set( 'fbButtton', Facebook::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
+		$tmpl->set( 'fbButtton', FacebookInit::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
 		$html = $tmpl->execute( 'ajaxLoginMerge' );
 		return true;
 	}

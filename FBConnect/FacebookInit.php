@@ -1,0 +1,180 @@
+<?php
+
+/**
+ * Class FacebookInit
+ * 
+ * This class initializes the extension, and contains the core non-hook,
+ * non-authentification code.
+ */
+class FacebookInit {
+	static private $fbOnLoginJs;
+	
+	/**
+	 * Initializes and configures the extension.
+	 */
+	public static function init() {
+		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks,
+		       $wgFbOnLoginJsOverride, $wgFbHooksToAddImmediately, $wgFbUserRightsFromGroup;
+		
+		// The xmlns:fb attribute is required for proper rendering on IE
+		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
+		
+		// Facebook/username associations should be shared when $wgSharedDB is enabled
+		$wgSharedTables[] = 'user_fbconnect';
+		
+		// Create our Facebook instance and make it available through $facebook
+		$facebook = new FacebookAPI();
+		
+		// Install all public static functions in class FacebookHooks as MediaWiki hooks
+		$hooks = self::enumMethods( 'FacebookHooks' );
+		foreach( $hooks as $hookName ) {
+			if (!in_array( $hookName, $wgFbHooksToAddImmediately )) {
+				$wgHooks[$hookName][] = "FacebookHooks::$hookName";
+			}
+		}
+
+		// Allow configurable over-riding of the onLogin handler.
+		if( !empty( $wgFbOnLoginJsOverride ) ) {
+			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;
+		} else {
+			self::$fbOnLoginJs = 'window.location.reload(true);';
+		}
+		
+		// Default to pull new info from Facebook
+		global $wgDefaultUserOptions;
+		foreach (FacebookUser::$availableUserUpdateOptions as $option) {
+			$wgDefaultUserOptions["facebook-update-on-login-$option"] = 1;
+		}
+		
+		// If we are configured to pull group info from Facebook, then set up
+		// the group permissions here
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
+			global $wgGroupPermissions, $wgImplictGroups, $wgAutopromote;
+			$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+			$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
+			$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
+			$wgImplictGroups[] = 'fb-groupie';
+			$wgImplictGroups[] = 'fb-officer';
+			$wgImplictGroups[] = 'fb-admin';
+			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+			$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
+			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+		}
+	}
+	
+	/**
+	 * Returns an array with the names of all public static functions
+	 * in the specified class.
+	 */
+	public static function enumMethods( $className ) {
+		$hooks = array();
+		try {
+			$class = new ReflectionClass( $className );
+			foreach( $class->getMethods( ReflectionMethod::IS_PUBLIC ) as $method ) {
+				if ( $method->isStatic() ) {
+					$hooks[] = $method->getName();
+				}
+			}
+		} catch( Exception $e ) {
+			// If PHP's version doesn't support the Reflection API, then exit
+			die( 'PHP version (' . phpversion() . ') must be great enough to support the Reflection API' );
+			// Or list the extensions here manually...
+			$hooks = array(
+				'AuthPluginSetup', 'UserLoadFromSession',
+				'RenderPreferencesForm', 'PersonalUrls',
+				'ParserAfterTidy', 'BeforePageDisplay', /*...*/
+			);
+		}
+		return $hooks;
+	}
+	
+	/**
+	 * Return the code for the permissions attribute (with leading space) to use on all fb:login-buttons.
+	 */
+	public static function getPermissionsAttribute() {
+		global $wgFbExtendedPermissions;
+		$attr = '';
+		if (!empty($wgFbExtendedPermissions)) {
+			$attr = ' perms="' . implode( ',', $wgFbExtendedPermissions ) . '"';
+		}
+		return $attr;
+	} // end getPermissionsAttribute()
+	
+	/**
+	 * Return the code for the onlogin attribute which should be appended to all fb:login-button's in this
+	 * extension.
+	 *
+	 * TODO: Generate the entire fb:login-button in a function in this class.  We have numerous buttons now.
+	 */
+	public static function getOnLoginAttribute() {
+		$attr = '';
+		if ( !empty( self::$fbOnLoginJs ) ) {
+			$attr = ' onlogin="' . self::$fbOnLoginJs . '"';
+		}
+		return $attr;
+	} // end getOnLoginAttribute()
+	
+	public static function getFBButton( $onload = '', $id = '' ) {
+		global $wgFbExtendedPermissions;
+		return '<fb:login-button length="short" size="large" onlogin="' . $onload .
+		       '" perms="' . implode(',', $wgFbExtendedPermissions) . '" id="' . $id .
+		       '"></fb:login-button>';
+	}
+	
+	/**
+	 * Ajax function to disconect from Facebook.
+	 */
+	public static function disconnectFromFB( $user = null ) {
+		$response = new AjaxResponse();
+		$response->addText(json_encode(self::coreDisconnectFromFB($user)));
+		return $response;
+	}
+	
+	/**
+	 * Facebook disconnect function and send mail with temp password.
+	 */
+	public static function coreDisconnectFromFB( $user = null ) {
+		global $wgRequest, $wgUser, $wgAuth;
+		
+		wfLoadExtensionMessages('Facebook');
+		
+		if ($user == null) {
+			$user = $wgUser;
+		}
+		$statusError = array('status' => 'error', 'msg' => wfMsg('facebook-unknown-error'));
+		
+		if ($user->getId() == 0) {
+			return $statusError;
+		}
+		
+		$dbw = wfGetDB( DB_MASTER, array(), FacebookDB::sharedDB() );
+		$dbw->begin();
+		$rows = FacebookDB::removeFacebookID($user);
+		
+		// Remind password attemp
+		$params = new FauxRequest(array (
+			'wpName' => $user->getName()
+		));
+		
+		if( !$wgAuth->allowPasswordChange() ) {
+			return $statusError;
+		}
+		
+		$result = array();
+		$loginForm = new LoginForm($params);
+		
+		if ($wgUser->getOption('fbFromExist')) {
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
+		} else {
+			$res = $loginForm->mailPasswordInternal( $wgUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
+		}
+		
+		if( WikiError::isError( $res ) ) {
+			return $statusError;
+		}
+				
+		return array( 'status' => 'ok' );
+		$dbw->commit();
+		return $response;
+	}
+}

@@ -213,7 +213,7 @@ class FacebookPushEvent {
 		
 		self::$eventCounter++;
 		
-		if( wfRunHooks( 'Facebook::BeforePushEvent', array( $id, &$message, &$params, &$class ) ) ) {
+		if( wfRunHooks( 'FacebookInit::BeforePushEvent', array( $id, &$message, &$params, &$class ) ) ) {
 			$fb = new FacebookAPI();
 
 			$image = $params['$EVENTIMG'];
