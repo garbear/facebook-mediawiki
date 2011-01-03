@@ -2,7 +2,7 @@
 -- SQL schema for FBConnect extension
 --
 
-CREATE TABLE `/*$wgDBprefix*/fbconnect_event_show` (
+CREATE TABLE /*$wgDBprefix*/fbconnect_event_show (
   `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` int(11) DEFAULT NULL,
   `post_time` int(11) DEFAULT NULL,
