@@ -52,6 +52,9 @@
 	}
 })();
 
+//Clone the jQuery reference from the MediaWiki's alias, $j
+if ($j) $ = $j;
+
 /**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
  * it looks for the global fbAsyncInit and executes the function when found.
