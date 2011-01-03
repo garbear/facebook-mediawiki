@@ -15,8 +15,8 @@
  *        http://www.facebook.com/developers/apps.php
  *    B.  Select your application and click "Edit Settings".
  *    C.  Upload icon and logo images. The icon appears in Stream stories.
- *    D.  In the "Connect" section, set your Connect Logo and base domain
- *        (which should also be copied into this config file).
+ *    D.  If you need Facebook authentication across subdomains, specify the base
+ *        domain in the "Web Site" section and copy it into this config file.
  *
  * It is recommended that, rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
@@ -24,7 +24,7 @@
  */
 $wgFbAppId          = 'YOUR_APP_ID';    # Change this!
 $wgFbSecret         = 'YOUR_SECRET';    # Change this!
-#$wgFbDomain         = 'BASE_DOMAIN';    # Optional
+//$wgFbDomain       = 'BASE_DOMAIN';    # Optional
 
 /**
  * Turns the wiki into a Facebook-only wiki. All users must authenticate using
