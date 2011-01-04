@@ -919,7 +919,6 @@ class SpecialConnect extends SpecialPage {
 	 */
 	private function connectForm() {
 		global $wgOut, $wgSitename;
-		
 		// Redirect the user back to where they came from
 		$titleObj = Title::newFromText( $this->mReturnTo );
 		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
@@ -931,10 +930,11 @@ class SpecialConnect extends SpecialPage {
 		} else {
 			// Outputs the canonical name of the special page at the top of the page
 			$this->outputHeader();
-			
 			// Render a humble Facebook Connect button
-			$wgOut->addHTML('<div>'.wfMsgExt( 'facebook-intro', array('parse', 'content')) . '<br/>' . wfMsg( 'facebook-click-to-login', $wgSitename ) .'
-				<fb:login-button size="large" background="black" length="long"'.FacebookInit::getPermissionsAttribute().FacebookInit::getOnLoginAttribute().'></fb:login-button>
+			$wgOut->addHTML('<div>' . wfMsgExt( 'facebook-intro', array('parse', 'content')) . '<br/>' .
+				wfMsg( 'facebook-click-to-login', $wgSitename ) .'
+				<fb:login-button size="large" background="black" length="long"' . FacebookInit::getPermissionsAttribute() .
+				FacebookInit::getOnLoginAttribute() . '></fb:login-button>
 				</div>'
 			);
 		}

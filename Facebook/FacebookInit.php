@@ -47,7 +47,7 @@ class FacebookInit {
 				$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 			}
 		}
-
+		
 		// Allow configurable over-riding of the onLogin handler.
 		if( !empty( $wgFbOnLoginJsOverride ) ) {
 			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;

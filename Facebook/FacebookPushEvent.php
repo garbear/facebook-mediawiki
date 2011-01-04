@@ -5,7 +5,7 @@
  * This class is an extendable superclass for events to push to a Facebook news-feed.
  *
  * To create a push event, override this class, then add it to config.php in the way
- * defined in config.sample.php.
+ * defined in config.default.php.
  */
 
 $wgExtensionFunctions[] = 'FacebookPushEvent::initExtension';
