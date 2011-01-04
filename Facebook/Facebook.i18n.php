@@ -54,9 +54,9 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'facebook-or'       => 'OR',
 
 	// Special:Connect
-	'facebook-title'    => 'Connect account with Facebook',
+	'facebook-title'    => 'Log in with Facebook',
 	'facebook-intro'    => 'This wiki is enabled with Facebook for the Web, the next evolution of Facebook Platform.
-This means that when your profile is connected with Facebook, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
+This means that when your account is connected with Facebook, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
 	'facebook-click-to-login' => 'Click to login to this site via Facebook',
 	'facebook-click-to-connect-existing' => 'Click to connect your Facebook account to $1',
 	'facebook-conv'     => 'Convenience',
