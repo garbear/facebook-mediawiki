@@ -49,9 +49,9 @@ class FacebookDB {
 		$dbr = wfGetDB( $db, array(), self::sharedDB() );
 		$fbid = array();
 		if ( $user instanceof User && $user->getId() != 0 ) {
-			$memkey = wfMemcKey( "fb_user_id", $user->getId() );
-			$val = $wgMemc->get($memkey);
-			if ( ( is_array($val) ) &&  ( $db == DB_SLAVE ) ){
+			$memkey = wfMemcKey( 'fb_user_id', $user->getId() );
+			$val = $wgMemc->get( $memkey );
+			if ( ( is_array( $val ) ) &&  ( $db == DB_SLAVE ) ){
 				return $val;
 			}
 			
@@ -66,7 +66,7 @@ class FacebookDB {
 				$fbid[] = $row->user_fbid;
 			}
 			$res->free();
-			$wgMemc->set($memkey,$fbid);
+			$wgMemc->set( $memkey, $fbid );
 		}
 		return $fbid;
 	}
@@ -123,9 +123,9 @@ class FacebookDB {
 		global $wgMemc;
 		wfProfileIn( __METHOD__ );
 		
-		$memkey = wfMemcKey( "fb_user_id", $user->getId() );
+		$memkey = wfMemcKey( 'fb_user_id', $user->getId() );
 			
-		if($user->getId() == 0){
+		if ( $user->getId() == 0 ) {
 			wfDebug("Facebook: tried to store a mapping from fbid \"$fbid\" to a user with no id (ie: not logged in).\n");
 		} else {
 			$prefix = self::getPrefix();
@@ -141,7 +141,7 @@ class FacebookDB {
 		}
 		
 		$dbw->commit();
-		$wgMemc->set($memkey, self::getFacebookIDs($user, DB_MASTER )  );
+		$wgMemc->set( $memkey, self::getFacebookIDs( $user, DB_MASTER ) );
 		
 		wfProfileOut( __METHOD__ );
 	}
@@ -154,16 +154,16 @@ class FacebookDB {
 		$prefix = self::getPrefix();
 		if ( $user instanceof User && $user->getId() != 0 ) {
 			$dbw = wfGetDB( DB_MASTER, array(), self::sharedDB() );
-			$memkey = wfMemcKey( "fb_user_id", $user->getId() );
+			$memkey = wfMemcKey( 'fb_user_id', $user->getId() );
 			$dbw->delete(
 				"{$prefix}user_fbconnect",
 				array(
-					'user_id' => $user->getId()
+					'user_id' => $user->getId(),
 				),
 				__METHOD__
 			); 
 			$dbw->commit();
-	 		$wgMemc->set($memkey, self::getFacebookIDs($user, DB_MASTER )  );
+	 		$wgMemc->set( $memkey, self::getFacebookIDs( $user, DB_MASTER ) );
 		}
 
 		return (bool) $dbw->affectedRows();
@@ -207,4 +207,48 @@ class FacebookDB {
 		global $wgDBprefix, $wgSharedPrefix;
 		return self::sharedDB() ? $wgSharedPrefix : $wgDBprefix;
 	}
+	
+	/**
+	 * Put stats for Facebook.
+	 * @author Tomasz Odrobny  
+	 */
+	public static function addEventStat( $status, $class ) {
+		global $wgStatsDB, $wgUser, $wgCityId;
+		$class = str_replace( 'FBPush_', '', $class );
+		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
+		$dbs->begin();
+		$dbs->insert(
+			'fbconnect_event_stats',
+			array(
+				 'user_id' => $wgUser->getId(),
+				 'status' => $status,
+				 'city_id' => empty( $wgCityId ) ? 0 : $wgCityId, // A Wikia thing
+  				 'event_type' =>  $class,
+			),
+			__METHOD__
+		);
+		$dbs->commit();
+	}
+	
+	/**
+	 * Put stats for Facebook events display
+	 * @author Tomasz Odrobny
+	 */
+	public static function addDisplayStat( $fbuser_id, $time, $class ) {
+		global $wgStatsDB, $wgUser, $wgCityId;
+		$class = str_replace( 'FBPush_', '', $class );
+		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
+		$dbs->begin();
+		$dbs->insert(
+			'fbconnect_event_show',
+			array(
+				'event_type' => $class,
+				'user_id' => (int) $fbuser_id,
+				'post_time' => (int) $time,
+			),
+			__METHOD__
+		);
+		$dbs->commit();
+	}
+	
 }

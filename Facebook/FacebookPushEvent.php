@@ -61,8 +61,9 @@ class FacebookPushEvent {
 	 * Adds enable/disable toggles to the Preferences form for controlling all push events.
 	 */
 	static public function addPreferencesToggles( $user, &$preferences ) {
-		wfProfileIn( __METHOD__ );
 		global $wgFbPushEventClasses, $wgUser;
+		wfProfileIn( __METHOD__ );
+		
 		wfLoadExtensionMessages( 'Facebook' );
 		$id = FacebookDB::getFacebookIDs( $wgUser );
 		if( count( $id ) > 0 ) {			
@@ -131,7 +132,7 @@ class FacebookPushEvent {
 			$results[] = $result;
 		}
 
-		wfProfileOut(__METHOD__);
+		wfProfileOut( __METHOD__ );
 		return $results;
 	} // end createPreferencesToggles()
 
@@ -226,33 +227,12 @@ class FacebookPushEvent {
 			}
 			
 			$status = $facebook->publishStream( $href, $description, $short, $link, $image );
-			self::addEventStat( $status, $class );
+			FacebookDB::addEventStat( $status, $class );
 			return $status;
 		}
 		
 		return false;
 	} 
-	
-	/**
-	 * Put stats for Facebook.
-	 * @author Tomasz Odrobny  
-	 */
-	static public function addEventStat( $status, $class ) {
-		global $wgStatsDB, $wgUser, $wgCityId;
-		$class = str_replace( 'FBPush_', '', $class );
-		$dbs = wfGetDB( DB_MASTER, array(), $wgStatsDB );  
-		$dbs->begin();
-		$dbs->insert( 'fbconnect_event_stats',
-			array(
-				 'user_id' => $wgUser->getId(),
-				 'status' => $status,
-				 'city_id' => $wgCityId,
-  				 'event_type' =>  $class,
-			),
-			__METHOD__
-		);
-		$dbs->commit();
-	}
 	
 	/**
 	 * Short text for blog.
@@ -301,27 +281,6 @@ class FacebookPushEvent {
 	}
 	
 	/**
-	 * Put stats for Facebook events display
-	 * @author Tomasz Odrobny
-	 */
-	static public function addDisplayStat( $fbuser_id, $time, $class ) {
-		global $wgStatsDB, $wgUser, $wgCityId;
-		$class = str_replace( 'FBPush_', '', $class );
-		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB);
-		$dbs->begin();
-		$dbs->insert(
-			'fbconnect_event_show',
-			array(
-				'event_type' => $class,
-				'user_id' => (int) $fbuser_id,
-				'post_time' => (int) $time,
-			),
-			__METHOD__
-		);
-		$dbs->commit();
-	}
-	
-	/**
 	 * AJAX function to count number of feed display in Facebook.
 	 *
 	 * @author Tomasz Odrobny
@@ -329,7 +288,7 @@ class FacebookPushEvent {
 	 */
 	static public function showImage() {
 		global $wgServer, $wgRequest;
-		FacebookPushEvent::addDisplayStat(
+		FacebookDB::addDisplayStat(
 			$wgRequest->getVal( 'fb_id', '0' ),
 			$wgRequest->getVal( 'time', '0' ),
 			$wgRequest->getVal( 'class' )
