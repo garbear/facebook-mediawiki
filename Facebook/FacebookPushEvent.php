@@ -187,23 +187,22 @@ class FacebookPushEvent {
 	 * put facebook message
 	 * @author Tomasz Odrobny 
 	 */
-	
 	static public function pushEvent( $message, $params, $class ) {
 		global $wgServer, $wgUser;
 
 		$id = FacebookDB::getFacebookIDs( $wgUser );
-		if( count( $id ) < 1 ) {
-			return 1001; //status for disconnected 
+		if ( count( $id ) < 1 ) {
+			return 1001; // status for disconnected 
 		}
-		/* only one event par request */
-		if( self::$eventCounter > 0 ) {
-			return 1000; //status for out of limit  
+		// only one event per request
+		if ( self::$eventCounter > 0 ) {
+			return 1000; // status for out of limit  
 		}
 		
 		self::$eventCounter++;
 		
 		if( wfRunHooks( 'FacebookInit::BeforePushEvent', array( $id, &$message, &$params, &$class ) ) ) {
-			$fb = new FacebookAPI();
+			global $facebook;
 			
 			$image = $params['$EVENTIMG'];
 			if( strpos( $params['$EVENTIMG'], 'http://' ) === false ) {
@@ -217,7 +216,7 @@ class FacebookPushEvent {
 			$short = wfMsg( $message . '-short' ) ;
 			
 			$params['$FB_NAME'] = '';
-			foreach ($params as $key => $value) {
+			foreach ( $params as $key => $value ) {
 				if( $value instanceof Article ) {
 					continue;
 				}
@@ -226,7 +225,7 @@ class FacebookPushEvent {
 				$short = str_replace( $key, $value, $short );
 			}
 			
-			$status = $fb->publishStream( $href, $description, $short, $link, $image );
+			$status = $facebook->publishStream( $href, $description, $short, $link, $image );
 			self::addEventStat( $status, $class );
 			return $status;
 		}
@@ -260,8 +259,7 @@ class FacebookPushEvent {
 	 * 
 	 * @author Tomasz Odrobny 
 	 * @access private
-	 */	
-	
+	 */
 	static public function shortenText( $source_text, $char_count = 100 ) 
 	{
 		$source_text = strip_tags( $source_text );
@@ -306,7 +304,7 @@ class FacebookPushEvent {
 	 * Put stats for Facebook events display
 	 * @author Tomasz Odrobny
 	 */
-	static public function addDisplayStat($fbuser_id, $time, $class) {
+	static public function addDisplayStat( $fbuser_id, $time, $class ) {
 		global $wgStatsDB, $wgUser, $wgCityId;
 		$class = str_replace( 'FBPush_', '', $class );
 		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB);
@@ -322,7 +320,7 @@ class FacebookPushEvent {
 		);
 		$dbs->commit();
 	}
-
+	
 	/**
 	 * AJAX function to count number of feed display in Facebook.
 	 *

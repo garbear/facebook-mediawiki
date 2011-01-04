@@ -30,7 +30,7 @@ class FBPush_OnLargeEdit extends FacebookPushEvent {
 	
 	public function loadMsg() {
 		wfProfileIn(__METHOD__);
-				
+		
 		wfLoadExtensionMessages('FBPush_OnLargeEdit');
 		
 		wfProfileOut(__METHOD__);
@@ -57,12 +57,12 @@ class FBPush_OnLargeEdit extends FacebookPushEvent {
 			$params = array(
 				'$ARTICLENAME' => $article->getTitle()->getText(),
 				'$WIKINAME' => $wgSitename,
-				'$ARTICLE_URL' => $article->getTitle()->getFullURL("ref=fbfeed&fbtype=largeedit"),
+				'$ARTICLE_URL' => $article->getTitle()->getFullURL( 'ref=fbfeed&fbtype=largeedit' ),
 				'$EVENTIMG' => self::$eventImage,
 				'$SUMMART' => $summary,
-				'$TEXT' => self::shortenText(self::parseArticle($article, $newText))			
+				'$TEXT' => self::shortenText( self::parseArticle( $article, $newText ))			
 			);
-			self::pushEvent(self::$messageName, $params, __CLASS__ );
+			self::pushEvent( self::$messageName, $params, __CLASS__ );
 		}
 
 		wfProfileOut(__METHOD__);
