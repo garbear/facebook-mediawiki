@@ -1,0 +1,3 @@
+Extension folder has changed from extensions/FBConnect to extensions/Facebook. Don't just overwrite the old files.
+
+For help on upgrading see http://www.mediawiki.org/wiki/Extension:Facebook#Upgrading.
