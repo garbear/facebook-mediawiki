@@ -40,21 +40,22 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FacebookDB {
 	/**
-	 * Find the Facebook IDs of the given user, if any, using the database connection provided.
-	 *
+	 * Find the Facebook IDs of the given user, if any, using the database
+	 * connection provided.
 	 */
 	public static function getFacebookIDs( $user, $db = DB_SLAVE  ) {
 		global $wgMemc;
-		
+		// Connect to the database
 		$dbr = wfGetDB( $db, array(), self::sharedDB() );
 		$fbid = array();
 		if ( $user instanceof User && $user->getId() != 0 ) {
+			// Try memcached to avoid hitting the database
 			$memkey = wfMemcKey( 'fb_user_id', $user->getId() );
 			$val = $wgMemc->get( $memkey );
 			if ( ( is_array( $val ) ) &&  ( $db == DB_SLAVE ) ){
 				return $val;
 			}
-			
+			// Query the database
 			$prefix = self::getPrefix();
 			$res = $dbr->select(
 				array( "{$prefix}user_fbconnect" ),
@@ -62,11 +63,15 @@ class FacebookDB {
 				array( 'user_id' => $user->getId() ),
 				__METHOD__
 			);
-			foreach( $res as $row ) {
-				$fbid[] = $row->user_fbid;
+			// $res might be null if the table user_fbconnect wasn't created
+			if ( $res ) {
+				foreach( $res as $row ) {
+					$fbid[] = $row->user_fbid;
+				}
+				$res->free();
+				$wgMemc->set( $memkey, $fbid );
 			}
-			$res->free();
-			$wgMemc->set( $memkey, $fbid );
+			
 		}
 		return $fbid;
 	}
@@ -88,7 +93,6 @@ class FacebookDB {
 			array( 'user_fbid' => $fbid ),
 			__METHOD__
 		);
-
 		if ( $id ) {
 			return User::newFromId( $id );
 		} else {
