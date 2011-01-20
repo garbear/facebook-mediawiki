@@ -364,6 +364,8 @@ class Facebook
               : $_COOKIE[$cookieName],
             '"'
           ), $session);
+		  //temporary fix for http://bugs.php.net/48697 (found by Wikia RT#69832)
+		  mb_internal_encoding('UTF-8');
           $session = $this->validateSessionObject($session);
           // write only if we need to delete a invalid session cookie
           $write_cookie = empty($session);
@@ -893,6 +895,8 @@ class Facebook
     if (!empty($parts['query'])) {
       $params = array();
       parse_str($parts['query'], $params);
+	  //temporary fix for http://bugs.php.net/48697 (found by Wikia RT#69832)
+	  mb_internal_encoding('UTF-8'); 
       foreach(self::$DROP_QUERY_PARAMS as $key) {
         unset($params[$key]);
       }
