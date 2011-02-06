@@ -53,7 +53,7 @@
 })();
 
 //Clone the jQuery reference from the MediaWiki alias $j
-if ($j) $ = $j;
+if (typeof $j !== 'undefined') $ = $j;
 
 /**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
