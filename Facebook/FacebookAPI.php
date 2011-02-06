@@ -128,18 +128,18 @@ class FacebookAPI extends Facebook {
 		
 		$gid = !empty( $wgFbUserRightsFromGroup ) ? $wgFbUserRightsFromGroup : false;
 		// If no group ID is specified, then there's no group to belong to
-		if (
-			!$gid ||
-			// If $user wasn't specified, set it to the logged in user
-			!$user ||
-			// If there is no logged in user
-			!( $user = $this->getUser() )
-		) {
+		if ( !$gid ) {
 			return $rights;
 		}
-		
-		// If a User object was provided, translate it into a Facebook ID
-		if ( $user instanceof User ) {
+		// If $user wasn't specified, set it to the logged in user
+		if ( $user === null ) {
+			$user = $this->getUser();
+			// If there is no logged in user
+			if ( !$user ) {
+				return $rights;
+			}
+		} else if ( $user instanceof User ) {
+			// If a User object was provided, translate it into a Facebook ID
 			// TODO: Does this call for a special api call without access_token?
 			$users = FacebookDB::getFacebookIDs( $user );
 			if ( count($users) ) {
@@ -157,12 +157,21 @@ class FacebookAPI extends Facebook {
 			return $rights_cache[$user];
 		}
 		
+		/*
+		 * We query for group members using the old REST API instead of the new
+		 * Graph API. The REST API is the only one that will allow querying of
+		 * Group Officers, because the concept of officers has been removed in
+		 * the reintroduction of Facebook Groups.
+		 * 
+		 * Announcement: <http://www.facebook.com/blog.php?post=434700832130>
+		 * Officer disappearance: <http://www.facebook.com/help/?faq=14511>
+		 */
 		// This can contain up to 500 IDs, avoid requesting this info twice
 		static $members = false;
 		// Get a random 500 group members, along with officers, admins and not_replied's
 		if ( $members === false ) {
+			// Check to make sure our session is still valid
 			try {
-				// Check to make sure our session is still valid
 				$members = $this->api( array(
 					'method' => 'groups.getMembers',
 					'gid' => $gid
@@ -257,6 +266,7 @@ class FacebookAPI extends Facebook {
 			/**/
 		);
 		
+		// Submit the query and decode the result
 		$result = json_decode( $this->api( $query ) );
 		
 		if ( is_array( $result ) ) {
