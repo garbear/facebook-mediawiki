@@ -43,7 +43,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 $wgEnablePreferencesExt = true;
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '3.0, January 3, 2011' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '3.0_r403, February 5, 2011' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
