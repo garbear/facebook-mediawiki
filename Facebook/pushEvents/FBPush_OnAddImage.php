@@ -18,8 +18,8 @@ class FBPush_OnAddImage extends FacebookPushEvent {
 		wfProfileIn(__METHOD__);
 		
 		wfLoadExtensionMessages('FBPush_OnAddImage');
-		$wgHooks['ArticleSaveComplete'][] = 'FBPush_OnAddImage::onArticleSaveComplete'; 	
-		$wgHooks['UploadComplete'][] = 'FBPush_OnAddImage::onUploadComplete';   
+		$wgHooks['ArticleSaveComplete'][] = 'FBPush_OnAddImage::onArticleSaveComplete';
+		$wgHooks['UploadComplete'][] = 'FBPush_OnAddImage::onUploadComplete';
 		wfProfileOut(__METHOD__);
 	}
 
@@ -31,22 +31,25 @@ class FBPush_OnAddImage extends FacebookPushEvent {
 		wfProfileOut(__METHOD__);
 	}
 	
-	public static function onArticleSaveComplete(&$article, &$user, $text, $summary,$flag, $fake1, $fake2, &$flags, $revision, &$status, $baseRevId){ 
+	public static function onArticleSaveComplete(&$article, &$user, $text, $summary,$flag, $fake1, $fake2, &$flags, $revision, &$status, $baseRevId){
 		if( $article->getTitle()->getNamespace() != NS_FILE ) {
 			return true;
 		}
 		$img = wfFindFile( $article->getTitle()->getText() );
 		if (!empty($img) && ($img->media_type == 'BITMAP') ) {
-			FBPush_OnAddImage::uploadNews($img, $img->title->getText(), $img->title->getFullUrl("?ref=fbfeed&fbtype=addimage")) ;	
+			FBPush_OnAddImage::uploadNews($img, $img->title->getText(), $img->title->getFullUrl("?ref=fbfeed&fbtype=addimage"));
 		}
 		return true;
 	}
 	
 	public static function onUploadComplete(&$image) {
 		global $wgServer, $wgSitename;
-		
-		if ($image->mLocalFile->media_type == 'BITMAP' ) {
-			FBPush_OnAddImage::uploadNews( $image->mLocalFile, $image->mLocalFile->getTitle(), $image->mLocalFile->getTitle()->getFullUrl( "?ref=fbfeed&fbtype=addimage" ) );
+		/** 
+		 * $image->mLocalFile is protected 
+		 */
+		$localFile = $image->getLocalFile(); 
+		if ($localFile->mLocalFile->media_type == 'BITMAP' ) {
+			FBPush_OnAddImage::uploadNews( $localFile, $localFile->getTitle(), $localFile->getTitle()->getFullUrl( "?ref=fbfeed&fbtype=addimage" ) );
 		}
 		return true;
 	}
@@ -54,18 +57,18 @@ class FBPush_OnAddImage extends FacebookPushEvent {
 	public static function uploadNews($image, $name, $url) {
 		global $wgSitename;
 		
-		$is = new imageServing(array(), 90);		
+		$is = new imageServing(array(), 90);
 		$thumb_url = $is->getThumbnails(array($image));
-		$thumb_url = array_pop($thumb_url); 
+		$thumb_url = array_pop($thumb_url);
 		$thumb_url = $thumb_url['url'];
 		
 		$params = array(
 			'$IMGNAME' => $name,
-			'$ARTICLE_URL' => $url, //inside use  
+			'$ARTICLE_URL' => $url, //inside use
 			'$WIKINAME' => $wgSitename,
 			'$IMG_URL' => $url,
 			'$EVENTIMG' => $thumb_url,
 		);
-		self::pushEvent(self::$messageName, $params, __CLASS__ );	
+		self::pushEvent(self::$messageName, $params, __CLASS__ );
 	}
 }
