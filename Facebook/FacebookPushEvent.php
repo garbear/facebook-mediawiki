@@ -20,7 +20,7 @@ class FacebookPushEvent {
 	
 	// This must correspond to the name of the message for the text on the tab itself.
 	static private $eventCounter = 0;
-	static protected $PREFERENCES_TAB_NAME = 'facebook-prefstext';
+	static protected $PREFERENCES_TAB_NAME = 'facebook-prefstext/facebook-event-prefstext';
 	static public $PREF_TO_DISABLE_ALL = 'facebook-push-allow-never';
 	
 	/**
@@ -113,6 +113,7 @@ class FacebookPushEvent {
 				$result = array(
 					'id' => $prefName,
 					'name' => $prefName,
+					'section' => self::$PREFERENCES_TAB_NAME,
 					'text' => $prefText,
 					'shortText' => $prefTextShort,
 					'checked' => true
@@ -126,6 +127,7 @@ class FacebookPushEvent {
 				'fullLine' => true,
 				'id' => $prefName,
 				'name' => $prefName,
+				'section' => self::$PREFERENCES_TAB_NAME,
 				'text' => $prefText,
 				'shortText' => $prefText, 
 			);

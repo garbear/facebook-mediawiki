@@ -695,28 +695,28 @@ STYLE;
 		$id = FacebookDB::getFacebookIDs($user, DB_MASTER);
 		if( count($id) > 0 ) {
 			$html = Xml::openElement("div",array("id" => "fbDisconnectLink" ));
-				$html .= '<br/>'.wfMsg('facebook-disconnect-link');
+				$html .= wfMsg('facebook-disconnect-link');
 			$html .= Xml::closeElement( "div" );
 			
 			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectProgress" ));
-				$html .= '<br/>'.wfMsg('facebook-disconnect-done');
+				$html .= wfMsg('facebook-disconnect-done');
 				$html .= Xml::openElement("img",array("id" => "fbDisconnectProgressImg", 'src' => $wgBlankImgUrl, "class" => "sprite progress" ),true);
 			$html .= Xml::closeElement( "div" );
 			
 			$html .= Xml::openElement("div",array("style" => "display:none","id" => "fbDisconnectDone" ));
-				$html .= '<br/>'.wfMsg('facebook-disconnect-info');
+				$html .= wfMsg('facebook-disconnect-info');
 			$html .= Xml::closeElement( "div" );
 			
 			$preferences['facebook-prefstext'] = array(
 				'label' => '',
 				'type' => 'info',
-				'section' => 'facebook-prefstext',
+				'section' => 'facebook-prefstext/facebook-event-prefstext',
 			);
 			
 			$preferences['tog-facebook-push-allow-never'] = array(
 				'name' => 'toggle',
 				'label-message' => 'facebook-push-allow-never',
-				'section' => 'facebook-prefstext',
+				'section' => 'facebook-prefstext/facebook-event-prefstext',
 				'default' => 1,
 			);
 			
@@ -724,7 +724,7 @@ STYLE;
 				'help' => $html,
 				'label' => '',
 				'type' => 'info',
-				'section' => 'facebook-prefstext',
+				'section' => 'facebook-prefstext/facebook-event-prefstext',
 			);
 			
 		} else {
@@ -739,7 +739,7 @@ STYLE;
 				'help' => $html,
 				'label' => '',
 				'type' => 'info',
-				'section' => 'facebook-prefstext',
+				'section' => 'facebook-prefstext/facebook-event-prefstext',
 			);
 		}
 		return true;

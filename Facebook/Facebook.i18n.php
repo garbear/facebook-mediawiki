@@ -148,6 +148,8 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
 	'facebook-prefs-show' => 'Show feed preferences >>',
     'facebook-prefs-hide' => 'Hide feed preferences >>',
 	'facebook-prefs-post' => 'Post to my Facebook News Feed when I:',
+	'prefs-facebook-event-prefstext' => 'News Feeds',
+	'prefs-facebook-status-prefstext' => 'Status',
     'facebook-connect-msg' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
 Check your <a href='$1'>preferences</a> to control which events appear in Facebook feed.",
     'facebook-connect-error-msg' => "We're sorry, we couldn't complete your connection without permission to post to your Facebook account. After setup you have [[w:c:help:Help:Facebook_Connect#Sharing_with_your_Facebook_activity_feed|full control]] of what's posted to your news feed. Please try again.",
