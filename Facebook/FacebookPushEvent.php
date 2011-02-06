@@ -185,7 +185,8 @@ class FacebookPushEvent {
 	public function loadMsg() {}
 	
 	/**
-	 * put facebook message
+	 * Put facebook message.
+	 * 
 	 * @author Tomasz Odrobny 
 	 */
 	static public function pushEvent( $message, $params, $class ) {
@@ -238,11 +239,11 @@ class FacebookPushEvent {
 	 * Short text for blog.
 	 * 
 	 * @author Tomasz Odrobny 
-	 * @access private
+	 * @access public
 	 */
 	static public function shortenText( $source_text, $char_count = 100 ) 
 	{
-		$source_text = strip_tags( $source_text );
+		$source_text = self::stripHtmlTags( $source_text );
 		$source_text = trim( $source_text );
 		$source_text_no_endline = str_replace( "\n", ' ', $source_text );
 		if ( $source_text == '' ) {
@@ -262,7 +263,35 @@ class FacebookPushEvent {
 	}
 	
 	/**
-	 * easy parse of article text
+	 * Cleans HTML tags and content between.
+	 * 
+	 * @author Jakub Kurcek 
+	 * @access public
+	 */
+	static public function stripHtmlTags( $text ) {
+		$text = preg_replace(
+			array(
+				// Remove invisible content
+				'@<head[^>]*?>.*?</head>@siu',
+				'@<style[^>]*?>.*?</style>@siu',
+				'@<script[^>]*?.*?</script>@siu',
+				'@<object[^>]*?.*?</object>@siu',
+				'@<embed[^>]*?.*?</embed>@siu',
+				'@<applet[^>]*?.*?</applet>@siu',
+				'@<noframes[^>]*?.*?</noframes>@siu',
+				'@<noscript[^>]*?.*?</noscript>@siu',
+				'@<noembed[^>]*?.*?</noembed>@siu',
+			),
+			array(
+				' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
+			),
+			$text
+		);
+		return strip_tags( $text );
+	}
+	
+	/**
+	 * Easy parse of article text.
 	 *
 	 * @author Tomasz Odrobny 
 	 * @access private
