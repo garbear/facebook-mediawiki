@@ -650,7 +650,7 @@ STYLE;
 			$mwUser = FacebookDB::getUser($fbId);
 			$id = $mwUser ? $mwUser->getId() : 0;
 			// If the user doesn't exist, ask them to name their new account
-			if (!$id) {
+			if ( !$id && !empty( $wgTitle ) ) {
 				// TODO: $wgTitle was empty for some strange reason...
 				if (!empty( $wgTitle )) {
 					$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
