@@ -210,7 +210,7 @@ class FacebookDB {
 	 */
 	private static function getPrefix() {
 		global $wgDBprefix, $wgSharedPrefix;
-		return self::sharedDB() ? $wgSharedPrefix : $wgDBprefix;
+		return self::sharedDB() ? $wgSharedPrefix : ""; //bugfix for $wgDBprefix;
 	}
 	
 	/**
