@@ -86,7 +86,7 @@ class FacebookHooks {
 		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion, $wgTitle;
 		
 		if ( $wgTitle->getArticleID() > 0 ) {
-			$images = new imageServing(array($wgTitle->getArticleId()), 100, array( 'w' => 1, 'h' => 1 ));
+			$images = new ImageServing(array($wgTitle->getArticleId()), 100, array( 'w' => 1, 'h' => 1 ));
 			$image = $images->getImages( 1 );
 			if ( !empty($image) ) {
 				$out->addLink(
