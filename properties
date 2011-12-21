@@ -1,0 +1,8 @@
+Property:
+svn:externals
+
+Value:
+FBConnect_r77741 -r77741      http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/FBConnect
+
+Extra value if you have write access to the MediaWiki repository:
+extensions_commit svn+ssh://gbruin@svn.wikimedia.org/svnroot/mediawiki/trunk/extensions
