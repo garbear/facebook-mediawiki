@@ -717,7 +717,6 @@ STYLE;
 				'name' => 'toggle',
 				'label-message' => 'facebook-push-allow-never',
 				'section' => 'facebook-prefstext/facebook-event-prefstext',
-				'default' => 1,
 			);
 			
 			$preferences['facebook-connect'] = array(
