@@ -151,7 +151,9 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
 	'prefs-facebook-event-prefstext' => 'News Feeds',
 	'prefs-facebook-status-prefstext' => 'Status',
     'facebook-connect-msg' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
-Check your <a href='$1'>preferences</a> to control which events appear in Facebook feed.",
+Check your <a href='$1'>preferences</a> to control which events appear in your Facebook feed.",
+    'facebook-connect-msg-sync-profile' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
+Check your <a href='$1'>preferences</a> to control which events appear in your Facebook feed. Sync your <a href='$2'>Wikia profile</a> with Facebook.",
     'facebook-connect-error-msg' => "We're sorry, we couldn't complete your connection without permission to post to your Facebook account. After setup you have [[w:c:help:Help:Facebook_Connect#Sharing_with_your_Facebook_activity_feed|full control]] of what's posted to your news feed. Please try again.",
 	'facebook-disconnect-link' => 'You can also <a id="facebookDisconnect" href="#"> disconnect your account from Facebook.</a>
 You will able continue using your account as normal, with your history (edits, points, achievements) intact.',
