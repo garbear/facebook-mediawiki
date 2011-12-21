@@ -156,7 +156,7 @@ function sendToConnectOnLoginForSpecificForm(formName) {
     }
 	// If the AJAX methods fail, accomplish the same thing with a GET request
 	// by sending the user to destUrl
-	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + (fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" + wgPageQuery;
+	var destUrl = wgServer + wgScript + "?title=Special:Connect" + formName + "&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" + encodeURIComponent(wgPageQuery);
 	
 	// No AJAX form for ConnectExisting, redirect the user now
 	if (formName == "/ConnectExisting") {
@@ -181,7 +181,7 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 				window.location.href = destUrl;
 				return;
 			}
-			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + wgPageName + "&returntoquery=" + wgPageQuery,  "#facebookModal", {
+			$().getModal(window.wgScript + '?action=ajax&rs=SpecialConnect::ajaxModalChooseName&returnto=' + encodeURIComponent(wgPageName) + '&returntoquery=' + encodeURIComponent(wgPageQuery),  "#facebookModal", {
 				id: "facebookModalWrapper",
 				width: 600,
 				callback: function() {
