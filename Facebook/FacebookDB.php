@@ -220,20 +220,22 @@ class FacebookDB {
 	public static function addEventStat( $status, $class ) {
 		global $wgStatsDB, $wgUser, $wgCityId, $wgStatsDBEnabled, $wgDevelEnvironment;
 		if ( !empty( $wgStatsDBEnabled ) && $wgDevelEnvironment !== true ) { // devboxes don't have writable stats
-			$class = str_replace( 'FBPush_', '', $class );
-			$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
-			$dbs->begin();
-			$dbs->insert(
-				'fbconnect_event_stats',
-				array(
-					 'user_id' => $wgUser->getId(),
-					 'status' => $status,
-					 'city_id' => empty( $wgCityId ) ? 0 : $wgCityId, // A Wikia thing
-					 'event_type' =>  $class,
-				),
-				__METHOD__
-			);
-			$dbs->commit();
+			if ( !wfReadOnly() ) {
+				$class = str_replace( 'FBPush_', '', $class );
+				$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
+				$dbs->begin();
+				$dbs->insert(
+					'fbconnect_event_stats',
+					array(
+						 'user_id' => $wgUser->getId(),
+						 'status' => $status,
+						 'city_id' => empty( $wgCityId ) ? 0 : $wgCityId, // A Wikia thing
+						 'event_type' =>  $class,
+					),
+					__METHOD__
+				);
+				$dbs->commit();
+			}
 		}
 	}
 	
@@ -243,19 +245,20 @@ class FacebookDB {
 	 */
 	public static function addDisplayStat( $fbuser_id, $time, $class ) {
 		global $wgStatsDB, $wgUser, $wgCityId;
-		$class = str_replace( 'FBPush_', '', $class );
-		$dbs = wfGetDB( DB_MASTER, array(), $wgStatsDB );
-		$dbs->begin();
-		$dbs->insert(
-			'fbconnect_event_show',
-			array(
-				'event_type' => $class,
-				'user_id' => (int) $fbuser_id,
-				'post_time' => (int) $time,
-			),
-			__METHOD__
-		);
-		$dbs->commit();
+		if ( !wfReadOnly() ) {
+			$class = str_replace( 'FBPush_', '', $class );
+			$dbs = wfGetDB( DB_MASTER, array(), $wgStatsDB );
+			$dbs->begin();
+			$dbs->insert(
+				'fbconnect_event_show',
+				array(
+					'event_type' => $class,
+					'user_id' => (int) $fbuser_id,
+					'post_time' => (int) $time,
+				),
+				__METHOD__
+			);
+			$dbs->commit();
+		}
 	}
-	
 }
