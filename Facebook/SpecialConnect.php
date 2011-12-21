@@ -680,7 +680,7 @@ class SpecialConnect extends SpecialPage {
 		$mExtUser = ExternalUser::newFromName( $name );
 		if ( is_object( $mExtUser ) && ( 0 != $mExtUser->getId() ) ) {
 			return false;
-		} elseif ( 0 != $u->idForName() ) {
+		} elseif ( 0 != $u->idForName( true ) ) {
 			return false;
 		}
 		
