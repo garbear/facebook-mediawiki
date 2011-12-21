@@ -26,6 +26,8 @@
 class SpecialConnect extends SpecialPage {
 	private $userNamePrefix;
 	private $isNewUser = false;
+	private $mEmail = '';
+	private $mRealName = '';
 	static private $fbOnLoginJs;
 	
 	/**
@@ -541,8 +543,10 @@ class SpecialConnect extends SpecialPage {
 		      $u->setPassword( $this->mPassword );
 		}
 		*/
-		$u->setEmail( $this->mEmail );
-		//$u->setRealName( $this->mRealName ); // real name isn't required by Facebook extension
+		if ( $this->mEmail )
+			$u->setEmail( $this->mEmail );
+		if ( $this->mRealName )
+			$u->setRealName( $this->mRealName );
 		$u->setToken();
 		
 		$wgAuth->initUser( $u, $autocreate );
