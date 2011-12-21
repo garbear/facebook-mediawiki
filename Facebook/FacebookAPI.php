@@ -79,9 +79,11 @@ class FacebookAPI extends Facebook {
 	/**
 	 * Calls users.getInfo. Requests information about the user from Facebook.
 	 */
-	public function getUserInfo() {
+	public function getUserInfo( $user = 0, $fields = null ) {
 		// First check to see if we have a session (if not, return null)
-		$user = $this->getUser();
+		if ( $user = 0 ) {
+			$user = $this->getUser();
+		}
 		if ( !$user ) {
 			return null;
 		}
@@ -94,7 +96,7 @@ class FacebookAPI extends Facebook {
 				$query = array(
 					'method' => 'users.getInfo',
 					'uids' => $user,
-					'fields' => join( ',', array(
+					'fields' => join( ',', !is_null($fields) && is_array($fields) ? $fields : array(
 						'first_name', 'name', 'sex', 'timezone', 'locale',
 						/*'profile_url',*/
 						'username', 'proxied_email', 'contact_email',
