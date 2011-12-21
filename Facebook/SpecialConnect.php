@@ -536,14 +536,13 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// No passwords for Facebook accounts.
-		/**
+		/*
 		if ( $wgAuth->allowPasswordChange() ) {
 		      $u->setPassword( $this->mPassword );
 		}
-		/**
-		$u->setEmail( $this->mEmail ); // emails aren't required by Facebook extension (some customizations such as Wikia require it on their own).
-		$u->setRealName( $this->mRealName ); // real name isn't required by Facebook extension
-		/**/
+		*/
+		$u->setEmail( $this->mEmail );
+		//$u->setRealName( $this->mRealName ); // real name isn't required by Facebook extension
 		$u->setToken();
 		
 		$wgAuth->initUser( $u, $autocreate );
