@@ -121,16 +121,6 @@ window.fbAsyncInit = function() {
 $(document).ready(function() {
 	// Add a pretty logo to Facebook links
 	$('#pt-facebook,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
-	
-	// Wikia click tracking code (hopefully this doesn't get called)
-	// TODO: where is getUrlVal defined?
-	if ($.getUrlVal && $.getUrlVal( "ref" ) == "fbfeed") {
-		var suffix = "";
-		if ( $.getUrlVal( "fbtype" ) != "" ) {
-			suffix = "/" + $.getUrlVal("fbtype");
-		}
-		WET.byStr( 'FBconnect/userfromfb' + suffix );
-	}
 });
 
 /**
