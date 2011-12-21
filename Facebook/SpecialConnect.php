@@ -524,9 +524,16 @@ class SpecialConnect extends SpecialPage {
 	 * @private 
 	 */ 
 	protected function initUser( $u, $autocreate ) {
-		global $wgAuth;
+		global $wgAuth, $wgExternalAuthType;
 		
-		$u->addToDatabase();
+		if ( $wgExternalAuthType ) {
+			$u = ExternalUser::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
+			if ( is_object( $u ) ) {
+				$this->mExtUser = ExternalUser::newFromName( $this->mName );
+			}
+		} else {
+			$u->addToDatabase();
+		}
 		
 		// No passwords for Facebook accounts.
 		/**
@@ -540,9 +547,19 @@ class SpecialConnect extends SpecialPage {
 		$u->setToken();
 		
 		$wgAuth->initUser( $u, $autocreate );
+		
+		if ( is_object( $this->mExtUser ) ) {
+			$this->mExtUser->linkToLocal( $u->getId() );
+			$email = $this->mExtUser->getPref( 'emailaddress' );
+			if ( $email && !$this->mEmail ) {
+				$u->setEmail( $email );
+			}
+		}
+		
 		$wgAuth->updateUser($u);
 		
 		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
+		//$u->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
 		$u->setOption('skinoverwrite', 1);
 		$u->saveSettings();
 		
