@@ -218,8 +218,8 @@ class FacebookDB {
 	 * @author Tomasz Odrobny  
 	 */
 	public static function addEventStat( $status, $class ) {
-		global $wgStatsDB, $wgUser, $wgCityId, $wgStatsDBEnabled;
-		if ( !empty( $wgStatsDBEnabled ) ) {
+		global $wgStatsDB, $wgUser, $wgCityId, $wgStatsDBEnabled, $wgDevelEnvironment;
+		if ( !empty( $wgStatsDBEnabled ) && $wgDevelEnvironment !== true ) { // devboxes don't have writable stats
 			$class = str_replace( 'FBPush_', '', $class );
 			$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
 			$dbs->begin();
