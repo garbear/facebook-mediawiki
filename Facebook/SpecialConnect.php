@@ -593,7 +593,7 @@ class SpecialConnect extends SpecialPage {
 			return false;
 		}
 		// Look up the user by their name
-		$user = new FacebookUser(User::newFromName($name));
+		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
 		if (!$user || !$user->checkPassword($password)) {
 			$this->sendPage('chooseNameForm', 'wrongpassword');
 			return false;
