@@ -218,21 +218,23 @@ class FacebookDB {
 	 * @author Tomasz Odrobny  
 	 */
 	public static function addEventStat( $status, $class ) {
-		global $wgStatsDB, $wgUser, $wgCityId;
-		$class = str_replace( 'FBPush_', '', $class );
-		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
-		$dbs->begin();
-		$dbs->insert(
-			'fbconnect_event_stats',
-			array(
-				 'user_id' => $wgUser->getId(),
-				 'status' => $status,
-				 'city_id' => empty( $wgCityId ) ? 0 : $wgCityId, // A Wikia thing
-  				 'event_type' =>  $class,
-			),
-			__METHOD__
-		);
-		$dbs->commit();
+		global $wgStatsDB, $wgUser, $wgCityId, $wgStatsDBEnabled;
+		if ( !empty( $wgStatsDBEnabled ) ) {
+			$class = str_replace( 'FBPush_', '', $class );
+			$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
+			$dbs->begin();
+			$dbs->insert(
+				'fbconnect_event_stats',
+				array(
+					 'user_id' => $wgUser->getId(),
+					 'status' => $status,
+					 'city_id' => empty( $wgCityId ) ? 0 : $wgCityId, // A Wikia thing
+					 'event_type' =>  $class,
+				),
+				__METHOD__
+			);
+			$dbs->commit();
+		}
 	}
 	
 	/**
