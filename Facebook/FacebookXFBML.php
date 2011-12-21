@@ -42,7 +42,7 @@ class FacebookXFBML {
 	 * function that simply redirects to parserHook(), filling in the missing
 	 * $tag argument with the $tag provided to createParserHook.
 	 */
-	static function parserHook($innertext, $args, &$parser, $tag = '' ) {
+	static function parserHook($innertext, $args, $parser, $tag = '' ) {
 		// Run hook to allow modifying the default behavior. If $override is
 		// set, it is used instead. Return false to disable the tag. 
 		$override = '';
@@ -97,7 +97,7 @@ class FacebookXFBML {
 	 * that function, but I had no way of knowing which tag provoked the function.
 	 */
 	static function createParserHook($tag) {
-		$args = '$text,$args,&$parser';
+		$args = '$text,$args,$parser';
 		$code = 'return FacebookXFBML::parserHook($text,$args,$parser,\''.$tag.'\');';
 		return create_function($args, $code);
 	}
