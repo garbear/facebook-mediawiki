@@ -124,7 +124,7 @@ class FacebookHooks {
 		if ( !empty($wgFbScript) && empty($wgNoExternals) ) {
 			$out->prependHTML('
 				<div id="fb-root"></div>
-				<script type="text/javascript">
+				<script type="$wgJsMimeType">
 					(function(){var e=document.createElement("script");e.type="' .
 					$wgJsMimeType . '";e.src="' . $wgFbScript .
 					'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
