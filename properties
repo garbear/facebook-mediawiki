@@ -1,0 +1,6 @@
+Property name:
+svn:externals
+
+Value:
+FBConnect                       https://svn.wikia-code.com/wikia/trunk/extensions/FBConnect
+FBConnect_r31666 -r31666      https://svn.wikia-code.com/wikia/trunk/extensions/FBConnect
