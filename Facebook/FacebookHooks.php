@@ -524,7 +524,7 @@ STYLE;
 	 * Special:ListUsers.
 	 */
 	// r274: Fix error with PHP 5.3 involving parameter references (thanks, PChott)
-	static function SpecialListusersHeaderForm( /*&*/$pager, &$out ) {
+	static function SpecialListusersHeaderForm( $pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook;
 		
 		if ( empty($wgFbUserRightsFromGroup) ) {
