@@ -245,6 +245,8 @@ class FacebookPushEvent {
 	 */
 	static public function shortenText( $source_text, $char_count = 100 ) 
 	{
+		$source_text = preg_replace('/(<figure.+?)+(<\/figure>)/i', '', $source_text);
+		
 		$source_text = self::stripHtmlTags( $source_text );
 		$source_text = trim( $source_text );
 		$source_text_no_endline = str_replace( "\n", ' ', $source_text );
