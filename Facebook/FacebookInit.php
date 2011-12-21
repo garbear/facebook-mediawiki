@@ -133,7 +133,7 @@ class FacebookInit {
 		global $wgFbExtendedPermissions;
 		return '<fb:login-button length="short" size="large" onlogin="' . $onload .
 		       '" perms="' . implode( ',', $wgFbExtendedPermissions ) . '" id="' . $id .
-		       '"></fb:login-button>';
+		       '">' . wfMsg('fbconnect-log-in') . '</fb:login-button>';
 	}
 	
 	/**

@@ -52,6 +52,7 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'facebook-logout'   => 'Logout of Facebook',
 	'facebook-link'     => 'Back to facebook.com',
 	'facebook-or'       => 'OR',
+	'facebook-log-in'   => 'Log In',
 
 	// Special:Connect
 	'facebook-title'    => 'Log in with Facebook',
