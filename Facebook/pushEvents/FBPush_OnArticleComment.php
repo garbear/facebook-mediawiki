@@ -38,7 +38,7 @@ class FBPush_OnArticleComment extends FacebookPushEvent {
 			return true;
 		}
 
-		if( $article->getTitle()->getNamespace() == NS_TALK ) {
+		if( $article->getTitle()->getNamespace() == NS_TALK && $flags & EDIT_NEW ) {
 			$title = explode("/", $article->getTitle()->getText());
 			$title = $title[0];
 			$title = Title::newFromText($title);
