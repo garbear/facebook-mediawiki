@@ -74,6 +74,7 @@ window.fbAsyncInit = function() {
 	// The onlogin attribute of the fb:login-buttons is being used instead.
 	
 	// Register a function for when the user logs out of Facebook
+	/*
 	FB.Event.subscribe('auth.logout', function(response) {
 		// TODO: Internationalize
 		var login = confirm("Not logged in.\n\nYou have been loggout out of " +
@@ -83,6 +84,7 @@ window.fbAsyncInit = function() {
 			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
 		}
 	});
+	*/
 	
 	// Events involving Facebook code should only be attached once Facebook and
 	// jQuery have both been loaded
