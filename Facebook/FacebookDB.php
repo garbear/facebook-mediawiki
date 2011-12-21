@@ -244,7 +244,7 @@ class FacebookDB {
 	public static function addDisplayStat( $fbuser_id, $time, $class ) {
 		global $wgStatsDB, $wgUser, $wgCityId;
 		$class = str_replace( 'FBPush_', '', $class );
-		$dbs = wfGetDB( DB_MASTER, array() ); //, $wgStatsDB );
+		$dbs = wfGetDB( DB_MASTER, array(), $wgStatsDB );
 		$dbs->begin();
 		$dbs->insert(
 			'fbconnect_event_show',
