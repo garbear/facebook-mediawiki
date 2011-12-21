@@ -44,13 +44,21 @@ class FBPush_OnLargeEdit extends FacebookPushEvent {
 		global $wgContentNamespaces, $wgSitename;
 		wfProfileIn(__METHOD__);
 		
+		if ( is_null( $revision ) ) {
+			// nothing's changed, quit early
+			wfProfileOut( __METHOD__ );
+			return true;
+		}
+		
 		if( !in_array($article->getTitle()->getNamespace(), $wgContentNamespaces) ) {
+			wfProfileOut( __METHOD__ );
 			return true;	
 		}
 		
 		// do not push reverts 
 		$baseRevision = Revision::newFromId( $baseRevId );
 		if ( $baseRevision && $revision->getTextId() == $baseRevision->getTextId() ) {
+			wfProfileOut( __METHOD__ );
 			return true; 
 		}
 		
