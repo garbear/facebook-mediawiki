@@ -90,7 +90,6 @@ $wgFbUseRealName = false;
  */
 $wgFbShowPersonalUrls = array(
 	'connect',        // Show the "Log in with Facebook Connect" button
-#	'connect-simple', // Shorter "Connect" button 
 #	'convert',        // Give logged-in users a link to Connect their accounts (not available)
 	'logout',         // Log the user out of Facebook when they log out of the wiki
 );
@@ -101,7 +100,7 @@ $wgFbShowPersonalUrls = array(
  */
 $wgFbHidePersonalUrlsBySkin = array(
 	'SkinMonaco' => array( 'connect', 'convert', 'logout' ),
-	'SkinAnswers' => array( 'connect-simple', 'convert', 'logout' ),
+	'SkinAnswers' => array( 'convert', 'logout' ),
 	'SkinCorporate' => '*',
 	'SkinOasis' => array( 'connect', 'convert', 'logout' ),
 );

@@ -47,7 +47,6 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'grouppage-fb-admin'      => '{{ns:project}}:Group admins',
 	// Personal toolbar
 	'facebook-connect'  => 'Log in with Facebook',
-	'facebook-connect-simple'  => 'Connect',
 	'facebook-convert'  => 'Connect this account with Facebook',
 	'facebook-logout'   => 'Logout of Facebook',
 	'facebook-link'     => 'Back to facebook.com',

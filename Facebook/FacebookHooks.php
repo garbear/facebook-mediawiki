@@ -230,7 +230,7 @@ STYLE;
 			$vars['wgStyleVersion'] = $wgStyleVersion;
 		}
 		$vars['fbAppId']     = $wgFbAppId;
-		$vars['fbUseXFBML'] = $wgFbSocialPlugins;
+		$vars['fbUseXFBML']  = $wgFbSocialPlugins;
 		$vars['fbLogo']      = $wgFbLogo ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
 			$wgTitle->isSpecial('Preferences') ? '' : 'returnto=' . $wgTitle->getPrefixedURL() );
@@ -365,7 +365,7 @@ STYLE;
 		}
 		// User is not logged in
 		else {
-			if (self::showButton( 'connect' ) || self::showButton( 'connect-simple' )) {
+			if (self::showButton( 'connect' )) {
 				// Add an option to connect via Facebook Connect
 				$personal_urls['facebook'] = array(
 					'text'   => wfMsg( 'facebook-connect' ),
@@ -373,17 +373,6 @@ STYLE;
 					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
 					'active' => $wgTitle->isSpecial('Connect'),
 				);
-			}
-			
-			if (self::showButton( 'connect-simple' )) {
-				$html = Xml::openElement('span', array('id' => 'facebook' ));
-					$html .= Xml::openElement('a', array('href' => '#', 'class' => 'fb_button fb_button_small' ));
-						$html .= Xml::openElement('span', array('class' => 'fb_button_text' ));
-							$html .= wfMsg( 'facebook-connect-simple' );
-						$html .= Xml::closeElement( 'span' );
-					$html .= Xml::closeElement( 'a' );
-				$html .= Xml::closeElement( 'span' );
-				$personal_urls['facebook']['html'] = $html;
 			}
 			
 			if ( !empty( $wgFbDisableLogin ) ) {
