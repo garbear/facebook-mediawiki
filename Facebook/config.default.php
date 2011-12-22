@@ -4,7 +4,7 @@
 /**
  * To use Facebook you will first need to create a Facebook application:
  *    1.  Visit the "Create an Application" setup wizard:
- *        http://developers.facebook.com/setup/
+ *        https://developers.facebook.com/setup/
  *    2.  Enter a descriptive name for your wiki in the Site Name field.
  *        This will be seen by users when they sign up for your site.
  *    3.  Enter the Site URL and Locale, then click "Create application".
@@ -32,24 +32,30 @@ $wgFbSecret         = 'YOUR_SECRET';    # Change this!
  *        behavior, see FacebookHooks::UserGetRights.
  *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
  *    3.  The "Log in / create account" links in the personal toolbar are removed.
+ * 
+ * If you have a Facebook-only wiki, you probably want to hide IP addresses. This
+ * can be done by setting $wgShowIPinHeader to false in LocalSettings.php. For more
+ * information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
  */
 $wgFbDisableLogin = false;
 
 /**
  * For easier wiki rights management, create a group on Facebook and place the
- * group ID here. Three new implicit groups will be created:
+ * group ID here. The "user_groups" right will automatically be requested from
+ * users.
+ * 
+ * Two new implicit groups will be created:
  * 
  *     fb-groupie    A member of the specified group
- *     fb-officer    A group member with an officer title
  *     fb-admin      An administrator of the Facebook group
  * 
- * By default, they map to User, Bureaucrat and Sysop privileges, respectively.
- * Users will automatically be promoted or demoted when their membership, title
- * or admin status is modified from the group page within Facebook.
- * Unfortunately, this has a minor degredation on performance.
+ * By default, they map to User and Sysop privileges. Users will automatically
+ * be promoted or demoted when their membership or admin status is modified
+ * from the group page within Facebook. Unfortunately, this has a minor
+ * degredation on performance.
  * 
  * This setting can also be used in conjunction with $wgFbDisableLogin. To have
- * this group exclusively control access to the wiki, set $wgFbDisableLogin equal
+ * this group exclusively control access to the wiki, set $wgFbDisableLogin
  * to true and add the following settings to Localsettings.php:
  * 
  * # Disable reading and editing by anonymous users
@@ -66,8 +72,11 @@ $wgFbDisableLogin = false;
 $wgFbUserRightsFromGroup = false;  # Or a group ID
 
 /**
- * Allow the use of XFBML in wiki text. To learn more about Facebook Markup
- * Language, please see <http://developers.facebook.com/docs/reference/fbml>.
+ * Allow the use of social plugins in wiki text. To learn more about social
+ * plugins, please see <https://developers.facebook.com/docs/plugins>.
+ * 
+ * Open Graph Beta social plugins can also be used.
+ * <https://developers.facebook.com/docs/beta/plugins>
  */
 $wgFbUseMarkup = true;
 
@@ -75,13 +84,6 @@ $wgFbUseMarkup = true;
  * Shows the real name for all Facebook users instead of their wiki user name.
  */
 $wgFbUseRealName = false;
-
-/**
- * This MediaWiki global variable can also be used to customized the Personal Urls.
- * If you have a Facebook-only wiki, you probably want to hide IP addresses. For
- * more information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>
- */
-#$wgShowIPinHeader = false;
 
 /**
  * Options regarding the personal toolbar (in the upper right).
@@ -113,14 +115,13 @@ $wgFbHidePersonalUrlsBySkin = array(
 $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
- * URL of the Facebook JavaScript SDK. Because this library is currently
- * a beta release, changes to the APIs may be made on a regular basis. If you
- * use Facebook on your production wiki, you may wish to insulate yourself
- * from these changes by downloading and hosting your own copy of the library.
+ * URL of the Facebook JavaScript SDK. If you use Facebook on your production
+ * wiki, you may wish to insulate yourself from changes by downloading and
+ * hosting your own copy of the library.
  * 
- * For more info, see <http://developers.facebook.com/docs/reference/javascript/>
+ * For more info, see <https://developers.facebook.com/docs/reference/javascript>
  */
-$wgFbScript = 'http://connect.facebook.net/en_US/all.js';   # Can also be https://
+$wgFbScript = 'https://connect.facebook.net/en_US/all.js';
 
 /**
  * If this is set to true, and the user's language is anything other than
@@ -149,7 +150,7 @@ $wgFbScriptLangCode = 'en';
  * WARNING: It is highly-unlikely that you'll need to change this fallback-URL.
  * If you're not sure that you need to change it, it's best to leave it alone.
  */
-$wgFbScriptByLocale = 'http://connect.facebook.net/%LOCALE%/all.js';
+$wgFbScriptByLocale = 'https://connect.facebook.net/%LOCALE%/all.js';
 
 /**
  * Path to the extension's client-side JavaScript.
