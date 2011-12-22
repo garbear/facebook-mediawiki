@@ -62,10 +62,10 @@ if (typeof $j !== 'undefined') $ = $j;
 window.fbAsyncInit = function() {
 	// Initialize the library with the API key
 	FB.init({
-		appId  : window.fbAppId,   // See $wgFbAppId in config.php
-		status : true,             // Check login status
-		cookie : true,             // Enable cookies to allow the server to access the session
-		xfbml  : window.fbUseXFBML // Whether XFBML should be automatically parsed
+		appId  : window.fbAppId,    // See $wgFbAppId in config.php
+		status : true,              // Check login status
+		cookie : true,              // Enable cookies to allow the server to access the session
+		xfbml  : window.fbUseXFBML, // Whether XFBML should be automatically parsed
 		oauth  : true
 	});
 
