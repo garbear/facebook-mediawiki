@@ -104,16 +104,16 @@ class FacebookHooks {
 			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
 		
-		// Asynchronously load the Facebook Connect JavaScript SDK before the page's content
+		// Asynchronously load the Facebook JavaScript SDK before the page's content
+		// See <https://developers.facebook.com/docs/reference/javascript>
 		global $wgNoExternals;
 		if ( !empty($wgFbScript) && empty($wgNoExternals) ) {
 			$out->prependHTML('
 				<div id="fb-root"></div>
-				<script type="$wgJsMimeType">
-					(function(){var e=document.createElement("script");e.type="' .
-					$wgJsMimeType . '";e.src="' . $wgFbScript .
-					'";e.async=true;document.getElementById("fb-root").appendChild(e)})();
-				</script>' . "\n"
+<script type="' . $wgJsMimeType . '">
+(function(d){var js,id="facebook-jssdk";if(!d.getElementById(id)){js=d.createElement("script");js.id=id;js.async=true;js.type="' .
+	$wgJsMimeType . '";js.src="' . $wgFbScript . '";d.getElementsByTagName("head")[0].appendChild(js);}}(document));
+</script>' . "\n"
 			);
 		}
 		
