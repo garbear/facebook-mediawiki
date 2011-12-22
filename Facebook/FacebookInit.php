@@ -64,11 +64,11 @@ class FacebookInit {
 		// If we are configured to pull group info from Facebook, then set up
 		// the group permissions here
 		if ( !empty( $wgFbUserRightsFromGroup ) ) {
-			global $wgGroupPermissions, $wgImplictGroups, $wgAutopromote;
+			global $wgGroupPermissions, $wgImplicitGroups, $wgAutopromote;
 			$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 			$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
-			$wgImplictGroups[] = 'fb-groupie';
-			$wgImplictGroups[] = 'fb-admin';
+			$wgImplicitGroups[] = 'fb-groupie';
+			$wgImplicitGroups[] = 'fb-admin';
 			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
 			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 		}
