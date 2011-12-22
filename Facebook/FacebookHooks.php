@@ -124,11 +124,10 @@ class FacebookHooks {
 		
 		// Add a Facebook logo to the class .mw-fblink
 		$style = empty($wgFbLogo) ? '' : <<<STYLE
-		/* Add a pretty logo to Facebook links */
-		.mw-fblink {
-			background: url($wgFbLogo) top left no-repeat !important;
-			padding-left: 17px !important;
-		}
+.mw-fblink {
+	background: url($wgFbLogo) top left no-repeat !important;
+	padding-left: 17px !important;
+}
 STYLE;
 		
 		// Things get a little simpler in 1.16...
