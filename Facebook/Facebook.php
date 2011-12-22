@@ -111,7 +111,7 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user']; // Create a new group for Facebook users
 $wgImplicitGroups[] = 'fb-user'; // Because Wikia says it should be
 
-$wgAjaxExportList[] = 'Facebook::disconnectFromFB';
+$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
 $wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
 $wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
 $wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
