@@ -62,13 +62,14 @@ if (typeof $j !== 'undefined') $ = $j;
 window.fbAsyncInit = function() {
 	// Initialize the library with the API key
 	FB.init({
-		appId  : window.fbAppId, // See $wgFbAppId in config.php
-		oauth  : true,
+		appId  : window.fbAppId,   // See $wgFbAppId in config.php
 		// TODO: Load the session from cookies, not the fbSession variable
 		session: window.fbSession, // Don't re-fetch the session if PHP provides it
-		status : true, // Check login status
-		cookie : true, // Enable cookies to allow the server to access the session
-		xfbml  : window.fbUseMarkup // Whether XFBML should be automatically parsed
+		status : true,             // Check login status
+		cookie : true,             // Enable cookies to allow the server to access the session
+		xfbml  : window.fbUseXFBML // Whether XFBML should be automatically parsed
+		oauth  : true,
+		
 	});
 
 	// NOTE: Auth.login doesn't appear to work anymore.

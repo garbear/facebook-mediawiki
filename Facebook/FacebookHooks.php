@@ -209,7 +209,7 @@ STYLE;
 	 * 
 	 * fbAppId		 The application ID (see $wgFbAppId in config.php)
 	 * fbSession     Assist the JavaScript SDK with loading the session
-	 * fbUseMarkup   Should XFBML tags be rendered (see $wgFbSocialPlugins in config.default.php)
+	 * fbUseXFBML    Should XFBML tags be rendered (see $wgFbSocialPlugins in config.default.php)
 	 * fbLogo        Facebook logo (see $wgFbLogo in config.php)
 	 * fbLogoutURL   The URL to be redirected to on a disconnect
 	 * 
@@ -233,7 +233,7 @@ STYLE;
 		$vars['fbAppId']     = $wgFbAppId;
 		// TODO: For debugging purposes -- remove in production
 		$vars['fbSession']   = $facebook->getSession();
-		$vars['fbUseMarkup'] = $wgFbSocialPlugins;
+		$vars['fbUseXFBML'] = $wgFbSocialPlugins;
 		$vars['fbLogo']      = $wgFbLogo ? true : false;
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
 			$wgTitle->isSpecial('Preferences') ? '' : 'returnto=' . $wgTitle->getPrefixedURL() );
