@@ -148,8 +148,8 @@ STYLE;
 			if ( !empty( $wgFbLogo) ) {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			}
-			// Include the most recent 1.4 version (currently 1.4.4)
-			$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js' );
+			// Include the most recent 1.7 version
+			$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js' );
 			// Add the script file specified by $url
 			if( !empty( $wgFbExtensionScript ) ) {
 				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
