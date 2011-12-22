@@ -118,9 +118,9 @@ class FacebookHooks {
 		
 		// Add a Facebook logo to the class .mw-fblink
 		$style = empty($wgFbLogo) ? '' : <<<STYLE
-.mw-fblink {
+.mw-facebook-logo {
 	background: url($wgFbLogo) top left no-repeat !important;
-	padding-left: 17px !important;
+	padding-left: 19px !important;
 }
 STYLE;
 		
@@ -345,7 +345,7 @@ STYLE;
 				);
 				/*
 				$html = Xml::openElement('span', array('id' => 'fbuser' ));
-					$html .= Xml::openElement('a', array('href' => $personal_urls['userpage']['href'], 'class' => 'fb_button fb_button_small fb_usermenu_button' ));
+					$html .= Xml::openElement('a', array('href' => $personal_urls['userpage']['href'], 'class' => 'fb_usermenu_button' ));
 					$html .= Xml::closeElement( 'a' );
 				$html .= Xml::closeElement( 'span' );
 				$personal_urls['fbuser']['html'] = $html;
@@ -359,7 +359,8 @@ STYLE;
 					'text'   => wfMsg( 'facebook-convert' ),
 					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
 					                          'returnto=' . $wgTitle->getPrefixedURL()),
-					'active' => $wgTitle->isSpecial( 'Connect' )
+					'class'  => 'mw-facebook-logo',
+					'active' => $wgTitle->isSpecial( 'Connect' ),
 				);
 			}
 		}
@@ -369,8 +370,8 @@ STYLE;
 				// Add an option to connect via Facebook Connect
 				$personal_urls['facebook'] = array(
 					'text'   => wfMsg( 'facebook-connect' ),
-					'class' => 'fb_button fb_button_small',
 					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+					'class' => 'mw-facebook-logo',
 					'active' => $wgTitle->isSpecial('Connect'),
 				);
 			}
