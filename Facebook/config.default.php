@@ -9,13 +9,13 @@
  *        This will be seen by users when they sign up for your site.
  *    3.  Enter the Site URL and Locale, then click "Create application".
  *    4.  Copy the displayed App ID and Secret into this config file.
+ *    5.  One more step... Inside the developer app select your new app
+ *        and click "Edit App". Now scroll down, click the check next to
+ *        "Website," and finally enter your wiki's URL.
  * 
  * Optionally, you may customize your application:
- *    A.  Visit the Facebook Developers app:
- *        https://developers.facebook.com/apps/
- *    B.  Select your application and click "Edit Settings".
- *    C.  Upload icon and logo images. The icon appears in Timeline events.
- *    D.  If you need Facebook authentication across subdomains, specify the app
+ *    A.  Upload icon and logo images. The icon appears in Timeline events.
+ *    B.  If you need Facebook authentication across subdomains, specify the app
  *        domain in the "Basic Info" section and copy it into this config file.
  *
  * It is recommended that, rather than changing the settings in this file, you
