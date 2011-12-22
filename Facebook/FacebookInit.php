@@ -66,13 +66,10 @@ class FacebookInit {
 		if ( !empty( $wgFbUserRightsFromGroup ) ) {
 			global $wgGroupPermissions, $wgImplictGroups, $wgAutopromote;
 			$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
-			$wgGroupPermissions['fb-officer'] = $wgGroupPermissions['bureaucrat'];
 			$wgGroupPermissions['fb-admin'] = $wgGroupPermissions['sysop'];
 			$wgImplictGroups[] = 'fb-groupie';
-			$wgImplictGroups[] = 'fb-officer';
 			$wgImplictGroups[] = 'fb-admin';
 			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
-			$wgAutopromote['fb-officer'] = APCOND_FB_ISOFFICER;
 			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 		}
 	}

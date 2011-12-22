@@ -62,13 +62,11 @@ class FacebookHooks {
 		}
 		$types = array(
 			APCOND_FB_INGROUP   => 'member',
-			APCOND_FB_ISOFFICER => 'officer',
 			APCOND_FB_ISADMIN   => 'admin'
 		);
 		$type = $types[$cond_type];
 		switch( $type ) {
 			case 'member':
-			case 'officer':
 			case 'admin':
 				global $facebook;
 				// Connect to the Facebook API and ask if the user is in the group

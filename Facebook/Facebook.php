@@ -104,7 +104,6 @@ $wgSpecialPages['Connect'] = 'SpecialConnect';
 
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
 define( 'APCOND_FB_INGROUP',   'fb*g' );
-define( 'APCOND_FB_ISOFFICER', 'fb*o' );
 define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
 // rt#68127 - Giving basic permissions to other groups might open security holes
