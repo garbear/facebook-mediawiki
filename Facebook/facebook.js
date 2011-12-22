@@ -102,15 +102,19 @@ window.fbAsyncInit = function() {
 		
 		// Attach event to the Login with Facebook button
 		$("#pt-facebook a").click(function(ev) {
-			loginByFacebook();
-			ev.preventDefault();
-		});
-		
-		// Wikia uses the #fbconnect ID for their connect button
-		$("#fbconnect a").click(function(ev) {
-			// Wikia Event Tracker
-			WET.byStr( 'FBconnect/userlinks/connect' );
-			loginByFacebook();
+			/*
+			// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
+			fn = FB.bind(sendToConnectOnLogin, null);
+			// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
+			//fn = sendToConnectOnLogin;
+			FB.login(fn, {scope : "publish_stream"});
+			*/
+			var perms = "publish_stream"; // email also?
+			FB.login(function(response) {
+				if (response && response.authResponse) {
+					// User logged in and fully authorized
+				}
+			}, {scope: perms});
 			ev.preventDefault();
 		});
 	});
@@ -122,15 +126,6 @@ window.fbAsyncInit = function() {
 $(document).ready(function() {
 	//
 });
-
-/**
- * Check that the API has been initialized (FB.init)
- * @return bool
- */
-function isFbApiInit() {
-	return !(typeof FB._apiKey == 'undefined' ||  FB._apiKey == null);
-}
-
 
 /**
  * An optional handler to use in fbOnLoginJsOverride for when a user logs in
@@ -194,29 +189,6 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 		}
 	});
 	return;
-}
-
-/**
- * Precondition: FB.init() has been called from window.fbAsyncInit.
- * Don't attach this function to an event if the precondition hasn't been met.
- */
-function openFbLogin() {
-	// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
-	fn = FB.bind(sendToConnectOnLogin, null);
-	// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
-	//fn = sendToConnectOnLogin;
-	FB.login(fn, {scope : "publish_stream"});
-}
-
-/**
- * Only for user header button. (What does Wikia mean by this?)
- * 
- * Precondition: FB.init() has been called from window.fbAsyncInit.
- * Don't attach this function to an event if the precondition hasn't been met.
- */
-function loginByFacebook() {
-	openFbLogin();
-	return false;
 }
 
 /**
@@ -371,21 +343,3 @@ function loggedInNowNeedToConnect() {
 	});
 }
 /**/
-
-/**
- * When the page is loaded, always init the FaceBook code if it has not been
- * initialized. This will allow XFBML tags in content (if configured to do this).
- */
-$(document).ready(function(){
-	initFbWhenReady();
-});
-
-function initFbWhenReady(){
-	if(typeof FB == 'undefined'){
-		// The fbsdk code hasn't been loaded yet. Give it more time.
-		setTimeout("initFbWhenReady()", 500);
-	} else if (!isFbApiInit()) {
-		// The fbsdk has loaded but didn't initialize. Force it to init.
-		window.fbAsyncInit();
-	}
-}
