@@ -78,7 +78,7 @@ $wgFbUserRightsFromGroup = false;  # Or a group ID
  * Open Graph Beta social plugins can also be used.
  * <https://developers.facebook.com/docs/beta/plugins>
  */
-$wgFbUseMarkup = true;
+$wgFbSocialPlugins = true;
 
 /**
  * Shows the real name for all Facebook users instead of their wiki user name.

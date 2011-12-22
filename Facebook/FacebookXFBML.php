@@ -103,12 +103,12 @@ class FacebookXFBML {
 	}
 	
 	/**
-	 * Returns true if XFBML is enabled (i.e. $wgFbUseMarkup is not false).
-	 * Defaults to true if $wgFbUseMarkup is not set.
+	 * Returns true if XFBML is enabled (i.e. $wgFbSocialPlugins is not false).
+	 * Defaults to true if $wgFbSocialPlugins is not set.
 	 */
 	static function isEnabled() {
-		global $wgFbUseMarkup;
-		return !isset($wgFbUseMarkup) || $wgFbUseMarkup;
+		global $wgFbSocialPlugins;
+		return !isset($wgFbSocialPlugins) || $wgFbSocialPlugins;
 	}
 	
 	/**
