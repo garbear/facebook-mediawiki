@@ -125,36 +125,44 @@ class FacebookXFBML {
 	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L255>
 	 * and, because the JS SDK on GitHub seems to have been abondoned by Facebook
 	 * in June 2010, from the live version of the JS code at
-	 * <http://connect.facebook.net/en_US/all.js>.
+	 * <http://connect.facebook.net/en_US/all.js> (hint: grep for "_tagInfos:").
 	 */
 	static function availableTags() {
 		if (!self::isEnabled()) {
 			// If XFBML isn't enabled, then don't report any tags
 			return array( );
 		}
-		$tags = array('fb:activity',
-		              'fb:add-profile-tab',
-		              'fb:bookmark',
-		              'fb:comments',
-		              'fb:connect-bar', # Not in docs
-		              'fb:facepile',  # Clone of fb:friendpile, not in docs
-		              'fb:fan', # Not in docs
-		              'fb:friendpile',
-		              'fb:like',
-		              'fb:like-box',
-		              'fb:live-stream',
-		              'fb:login', # Not in docs
-		              'fb:login-button',
-		              'fb:name', # Not in docs
-		              'fb:profile-pic', # Not in docs
-		              //'fb:pronoun', # In docs but not in JS SDK (uh oh...)
-		              'fb:recommendations',
-					  'fb:registration', # Not in docs or GitHub source (really, Facebook?)
-					  'fb:send', # Not in docs or GitHub source (really, Facebook?)
-		              'fb:serverfbml',
-		              'fb:share-button', # Not in docs
-		              'fb:social-bar', # Not in docs
-		              //'fb:user-status', # In docs but not in JS SDK (uh oh...)
+		$tags = array('fb:activity',            # https://developers.facebook.com/docs/reference/plugins/activity
+		                                        # https://developers.facebook.com/docs/reference/plugins/activity2 (Open Graph beta version)
+		              'fb:add-profile-tab',     # Not in docs (deprecated?)
+		              'fb:add-to-timeline',     # https://developers.facebook.com/docs/reference/plugins/add-to-timeline
+		              'fb:bookmark',            # Not in docs (deprecated?)
+		              'fb:comments',            # https://developers.facebook.com/docs/reference/plugins/comments
+		              'fb:connect-bar',         # Not in docs (deprecated?)
+		              'fb:facepile',            # https://developers.facebook.com/docs/reference/plugins/facepile
+		                                        # https://developers.facebook.com/docs/reference/plugins/facepile2 (Open Graph beta version)
+		              'fb:fan',                 # Not in docs (deprecated?)
+		              'fb:friendpile',          # Clone of fb:facepile, not in docs (deprecated?)
+		                                        # According to Facebook, fb:friendpile is a legal-friendly version of fb:facepile
+		              'fb:like',                # https://developers.facebook.com/docs/reference/plugins/like
+		              'fb:like-box',            # https://developers.facebook.com/docs/reference/plugins/like-box
+		              'fb:live-stream',         # https://developers.facebook.com/docs/reference/plugins/live-stream
+		              'fb:login',               # Not in docs (deprecated?)
+		              'fb:login-button',        # https://developers.facebook.com/docs/reference/plugins/login
+		              'fb:name',                # Not in docs (deprecated?)
+		              'fb:profile-pic',         # Not in docs (deprecated?)
+		              //'fb:pronoun',           # Removed from the JS SDK
+		              'fb:question',            # Very new, not in docs (possibly still in testing)
+		              'fb:recommendations',     # https://developers.facebook.com/docs/reference/plugins/recommendations
+		                                        # https://developers.facebook.com/docs/reference/plugins/recommendations2 (Open Graph beta version)
+		              'fb:recommendations-bar', # https://developers.facebook.com/docs/reference/plugins/recommendationsbar
+		              'fb:registration',        # https://developers.facebook.com/docs/plugins/registration
+		              'fb:send',                # https://developers.facebook.com/docs/reference/plugins/send
+		              'fb:serverfbml',          # Not in docs (deprecated?)
+		              'fb:share-button',        # Not in docs (deprecated?)
+		              //'fb:social-bar',        # Recently removed from JS SDK
+		              'fb:subscribe',           # https://developers.facebook.com/docs/reference/plugins/subscribe
+		              //'fb:user-status',       # Removed from the JS SDK
 		);
 		
 		// Reject discarded tags (that return an empty string) from Special:Version
