@@ -86,12 +86,12 @@ class FacebookHooks {
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
 			return true;
 		
-		// If the user's language is different from the default language, use the correctly
-		// localized Facebook code. NOTE: Can't use $wgLanguageCode here because the same Facebook
-		// config can run for many $wgLanguageCode's on one site (such as Wikia).
+		// Check to see if we should localize the JS SDK
 		if (strpos( $wgFbScript, FACEBOOK_LOCALE ) !== false) {
-			global $wgLang;
 			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+			// NOTE: Can't use $wgLanguageCode here because the same Facebook config can
+			// run for many $wgLanguageCode's on one site (such as Wikia).
+			global $wgLang;
 			// Attempt to find a matching Facebook locale
 			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
 			$wgFbScript = str_replace( FACEBOOK_LOCALE, $locale, $wgFbScript );
