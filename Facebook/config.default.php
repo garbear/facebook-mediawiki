@@ -93,8 +93,6 @@ $wgFbShowPersonalUrls = array(
 #	'connect-simple', // Shorter "Connect" button 
 #	'convert',        // Give logged-in users a link to Connect their accounts (not available)
 	'logout',         // Log the user out of Facebook when they log out of the wiki
-	'link',           // Show a handy "Back to facebook.com" link. This helps enforce
-                      // the idea that this wiki is "in front" of Facebook
 );
 
 /**
@@ -102,10 +100,10 @@ $wgFbShowPersonalUrls = array(
  * acts to match all Facebook-related buttons.
  */
 $wgFbHidePersonalUrlsBySkin = array(
-	'SkinMonaco' => array( 'connect', 'convert', 'logout', 'link' ),
-	'SkinAnswers' => array( 'connect-simple', 'convert', 'logout', 'link' ),
+	'SkinMonaco' => array( 'connect', 'convert', 'logout' ),
+	'SkinAnswers' => array( 'connect-simple', 'convert', 'logout' ),
 	'SkinCorporate' => '*',
-	'SkinOasis' => array( 'connect', 'convert', 'logout', 'link' ),
+	'SkinOasis' => array( 'connect', 'convert', 'logout' ),
 );
 
 /**

@@ -123,7 +123,7 @@ window.fbAsyncInit = function() {
  */
 $(document).ready(function() {
 	// Add a pretty logo to Facebook links
-	$('#pt-facebook,#pt-fblink,#pt-fbconvert').addClass('mw-fblink');
+	$('#pt-facebook,#pt-fbconvert').addClass('mw-fblink');
 });
 
 /**

@@ -354,24 +354,6 @@ STYLE;
 				$personal_urls['fbuser']['html'] = $html;
 				*/
 			}
-			
-			/*
-			 * Personal URLs option: link_back_to_facebook
-			 */
-			if (self::showButton( 'link' )) {
-				try {
-					$fbUser = $facebook->api('/me');
-					$link = $fbUser['link'];
-				} catch (FacebookApiException $e) {
-					$link = 'http://www.facebook.com/profile.php?id=' .
-						    $facebook->getUser();
-				}
-				$personal_urls['fblink'] = array(
-					'text'   => wfMsg( 'facebook-link' ),
-					'href'   => $link,
-					'active' => false
-				);
-			}
 		}
 		// User is logged in but not Connected
 		else if ($wgUser->isLoggedIn()) {
