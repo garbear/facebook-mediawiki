@@ -11,12 +11,12 @@
  *    4.  Copy the displayed App ID and Secret into this config file.
  * 
  * Optionally, you may customize your application:
- *    A.  Click "developer dashboard" link on the previous screen or visit:
- *        http://www.facebook.com/developers/apps.php
+ *    A.  Visit the Facebook Developers app:
+ *        https://developers.facebook.com/apps/
  *    B.  Select your application and click "Edit Settings".
- *    C.  Upload icon and logo images. The icon appears in Stream stories.
- *    D.  If you need Facebook authentication across subdomains, specify the base
- *        domain in the "Web Site" section and copy it into this config file.
+ *    C.  Upload icon and logo images. The icon appears in Timeline events.
+ *    D.  If you need Facebook authentication across subdomains, specify the app
+ *        domain in the "Basic Info" section and copy it into this config file.
  *
  * It is recommended that, rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
