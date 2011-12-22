@@ -83,20 +83,7 @@ class FacebookHooks {
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
 		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
-		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion, $wgTitle;
-		
-		if ( $wgTitle->getArticleID() > 0 ) {
-			$images = new imageServing(array($wgTitle->getArticleId()), 100, array( 'w' => 1, 'h' => 1 ));
-			$image = $images->getImages( 1 );
-			if ( !empty($image) ) {
-				$out->addLink(
-					array(
-						'rel' => 'image_src',
-						'href' => $image[$wgTitle->getArticleId()][0]['url']
-					)
-				);
-			}			
-		}
+		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
