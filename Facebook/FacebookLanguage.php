@@ -21,7 +21,7 @@
 
 class FacebookLanguage{
 
-	// All of the Facebook Locales according to http://www.facebook.com/translations/FacebookLocales.xml as of 2010-06-22
+	// All of the Facebook Locales according to http://www.facebook.com/translations/FacebookLocales.xml as of 20100622
 	private static $allFbLocales = array(
 		'af_ZA', 'ar_AR', 'ay_BO', 'az_AZ', 'be_BY', 'bg_BG', 'bn_IN', 'bs_BA', 'ca_ES', 'ck_US', 'cs_CZ', 'cy_GB', 'da_DK', 'de_DE', 'el_GR',
 		'en_GB', 'en_PI', 'en_UD', 'en_US', 'eo_EO', 'es_CL', 'es_CO', 'es_ES', 'es_LA', 'es_MX', 'es_VE', 'et_EE', 'eu_ES', 'fa_IR', 'fb_FI',
@@ -32,19 +32,6 @@ class FacebookLanguage{
 		'ta_IN', 'te_IN', 'tg_TJ', 'th_TH', 'tl_PH', 'tl_ST', 'tr_TR', 'tt_RU', 'uk_UA', 'ur_PK', 'uz_UZ', 'vi_VN', 'xh_ZA', 'yi_DE', 'zh_CN',
 		'zh_HK', 'zh_TW', 'zu_ZA'
 	);
-	
-	/*
-	// All of the Facebook Locales according to http://www.facebook.com/translations/FacebookLocales.xml as of 2011-12-21
-	// Let's stick with the previous list so we don't miss any
-	private static $allFbLocales = array(
-		'af_ZA', 'ar_AR', 'az_AZ', 'be_BY', 'bg_BG', 'bn_IN', 'bs_BA', 'ca_ES', 'cs_CZ', 'cy_GB', 'da_DK', 'de_DE', 'el_GR', 'en_GB', 'en_PI',
-		'en_UD', 'en_US', 'eo_EO', 'es_ES', 'es_LA', 'et_EE', 'eu_ES', 'fa_IR', 'fb_LT', 'fi_FI', 'fo_FO', 'fr_CA', 'fr_FR', 'fy_NL', 'ga_IE',
-		'gl_ES', 'he_IL', 'hi_IN', 'hr_HR', 'hu_HU', 'hy_AM', 'id_ID', 'is_IS', 'it_IT', 'ja_JP', 'ka_GE', 'km_KH', 'ko_KR', 'ku_TR', 'la_VA',
-		'lt_LT', 'lv_LV', 'mk_MK', 'ml_IN', 'ms_MY', 'nb_NO', 'ne_NP', 'nl_NL', 'nn_NO', 'pa_IN', 'pl_PL', 'ps_AF', 'pt_BR', 'pt_PT', 'ro_RO',
-		'ru_RU', 'sk_SK', 'sl_SI', 'sq_AL', 'sr_RS', 'sv_SE', 'sw_KE', 'ta_IN', 'te_IN', 'th_TH', 'tl_PH', 'tr_TR', 'uk_UA', 'vi_VN', 'zh_CN',
-		'zh_HK', 'zh_TW'
-	);
-	*/
 	
 	private static $messageKey = 'facebook-mediawiki-lang-to-fb-locale';
 
