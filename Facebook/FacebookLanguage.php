@@ -38,10 +38,14 @@ class FacebookLanguage{
 	/**
 	 * Given a MediaWiki language code, gets a corresponding Facebook locale.
 	 */
-	public static function getFbLocaleForLangCode($mediaWikiLangCode){
-		wfProfileIn(__METHOD__);
+	public static function getFbLocaleForLangCode($mediaWikiLangCode) {
 		$locale = 'en_US'; // default facebook locale to use
-
+		
+		if ( empty( $mediaWikiLangCode ) )
+			return $locale;
+		
+		wfProfileIn(__METHOD__);
+				
 		// See if the mapping is in memcache already.  If not, figure out the mapping from the mediawiki message.
 		global $wgMemc;
 		$memkey = wfMemcKey( 'FacebookLanguage', self::$messageKey);

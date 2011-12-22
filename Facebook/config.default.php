@@ -115,42 +115,18 @@ $wgFbHidePersonalUrlsBySkin = array(
 $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
- * URL of the Facebook JavaScript SDK. If you use Facebook on your production
- * wiki, you may wish to insulate yourself from changes by downloading and
- * hosting your own copy of the library.
+ * URL of the Facebook JavaScript SDK. If the URL includes the token "%LOCALE%"
+ * then it will be replaced with the correct Facebook locale based on the user's
+ * configured language. To disable localization, use e.g.
  * 
- * For more info, see <https://developers.facebook.com/docs/reference/javascript>
+ * https://connect.facebook.net/en_US/all.js
+ * 
+ * You may wish to insulate your production wiki from changes by downloading and
+ * hosting your own copy of the JavaScript SDK. If you still wish to support
+ * multiple languages, you will also need to host localized versions of the SDK.
+ * For a list of locales supported by Facebook, see FacebookLanguage.php.
  */
-$wgFbScript = 'https://connect.facebook.net/en_US/all.js';
-
-/**
- * If this is set to true, and the user's language is anything other than
- * $wgFbScriptLangCode, then the $wgFbScriptLangCode URL will be used to load
- * the correspondingly-localized version of the Facebook JavaScript SDK.
- */
-$wgFbScriptEnableLocales = true;
-
-/**
- * The MEDIAWIKI language code which corresponds to the file in $wgFbScript.
- * If the user is in a language other than wgFbScriptLangCode, then the
- * $wgFbScriptByLocale will be used if $wgFbScriptEnableLocales is set to true.
- */
-$wgFbScriptLangCode = 'en';
-
-/**
- * If $wgFbScriptEnableLocales is true and the user's language is anything
- * except for the $wgFbScriptLangCode, we assume that instead of using the file
- * in $wgFbScript (which is quite likely a locally-cached version of the
- * JavaScript SDK), that we should instead take the risk and use the
- * Facebook-hosted version for the corresponding language.
- *
- * NOTE: URL should include "%LOCALE%" which will be replaced with the correct
- * Facebook Locale based on the user's configured language.
- *
- * WARNING: It is highly-unlikely that you'll need to change this fallback-URL.
- * If you're not sure that you need to change it, it's best to leave it alone.
- */
-$wgFbScriptByLocale = 'https://connect.facebook.net/%LOCALE%/all.js';
+$wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
 
 /**
  * Path to the extension's client-side JavaScript.

@@ -80,27 +80,21 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
-		       $wgFbScriptEnableLocales, $wgJsMimeType, $wgStyleVersion;
+		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
 			return true;
 		
-		// If the user's language is different from the default language, use the correctly localized Facebook code.
-		// NOTE: Can't use wgLanguageCode here because the same Facebook config can run for many wgLanguageCode's on one site (such as Wikia).
-		if ( $wgFbScriptEnableLocales ) {
-			global $wgFbScriptLangCode, $wgLang;
+		// If the user's language is different from the default language, use the correctly
+		// localized Facebook code. NOTE: Can't use $wgLanguageCode here because the same Facebook
+		// config can run for many $wgLanguageCode's on one site (such as Wikia).
+		if (strpos( $wgFbScript, FACEBOOK_LOCALE ) !== false) {
+			global $wgLang;
 			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
-			if ( $wgLang->getCode() !== $wgFbScriptLangCode ) {
-				// Attempt to find a matching facebook locale.
-				$defaultLocale = FacebookLanguage::getFbLocaleForLangCode( $wgFbScriptLangCode );
-				$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
-				if ( $defaultLocale != $locale ) {
-					global $wgFbScriptByLocale;
-					$wgFbScript = str_replace( FACEBOOK_LOCALE, $locale, $wgFbScriptByLocale );
-				}
-			}
+			// Attempt to find a matching Facebook locale
+			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
+			$wgFbScript = str_replace( FACEBOOK_LOCALE, $locale, $wgFbScript );
 			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
 		
