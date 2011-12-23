@@ -198,7 +198,6 @@ class SpecialConnect extends SpecialPage {
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user isn't logged in to Facebook or MediaWiki. Nothing to see
 					// here, move along
-					die("Here1<br/>\n");
 					$this->sendRedirect('UserLogin');
 				} else {
 					// The user is logged in to MediaWiki but not Facebook
@@ -236,7 +235,6 @@ class SpecialConnect extends SpecialPage {
 					if ( $mwId == $wgUser->getId() ) {
 						// MediaWiki user belongs to the Facebook account. Nothing to see
 						// here, move along
-						die("Here2<br/>\n");
 						$this->sendRedirect('UserLogin');
 					} else {
 						// Accounts don't agree. Let's find out what's going on
