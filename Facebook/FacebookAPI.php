@@ -79,42 +79,29 @@ class FacebookAPI extends Facebook {
 	}
 	
 	/**
-	 * Calls users.getInfo. Requests information about the user from Facebook.
+	 * Requests information about the user from Facebook.
 	 */
 	public function getUserInfo( $user = 0, $fields = null ) {
 		// First check to see if we have a session (if not, return null)
-		if ( $user = 0 ) {
+		if ( $user == 0 ) {
 			$user = $this->getUser();
 		}
 		if ( !$user ) {
 			return null;
 		}
-		try {
-			// Cache information about users to reduce the number of Facebook hits
-			static $userinfo = array();
-			
-			if ( !isset( $userinfo[$user] ) ) {
-				// Query the Facebook API with the users.getInfo method
-				$query = array(
-					'method' => 'users.getInfo',
-					'uids' => $user,
-					'fields' => join( ',', !is_null($fields) && is_array($fields) ? $fields : array(
-						'first_name', 'name', 'sex', 'timezone', 'locale',
-						/*'profile_url',*/
-						'username', 'proxied_email', 'contact_email',
-					)),
-				);
-				$user_details = $this->api( $query );
-				// Cache the data in the $userinfo array
-				// Also avoid "Notice: Uninitialized string offset: 0"
-				$userinfo[$user] = !empty( $user_details[0] ) ? $user_details[0] : null;
+		
+		// Cache information about users
+		static $userinfo = array();
+		if ( !isset( $userinfo[$user] ) ) {
+			try {
+				// Test: https://developers.facebook.com/tools/explorer/111867578932893/?method=GET&path=2539590
+				$user_profile = $this->api('/me');
+				$userinfo[$user] = $user_profile;
+			} catch (FacebookApiException $e) {
+				error_log( 'Failure in the api when requesting /me: ' . $e->getMessage() );
 			}
-			return isset( $userinfo[$user] ) ? $userinfo[$user] : null;
-		} catch ( FacebookApiException $e ) {
-			error_log( 'Failure in the api when requesting users.getInfo ' .
-			           "on uid $user: " . $e->getMessage() );
 		}
-		return null;
+		return isset( $userinfo[$user] ) ? $userinfo[$user] : null;
 	}
 	
 	/**
