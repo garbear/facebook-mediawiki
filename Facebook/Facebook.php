@@ -112,7 +112,7 @@ $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user']; // Create a new gr
 $wgImplicitGroups[] = 'fb-user'; // Because Wikia says it should be
 
 $wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
-$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
+//$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
 $wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
 $wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 

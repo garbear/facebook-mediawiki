@@ -88,6 +88,19 @@ window.fbAsyncInit = function() {
 	// Events involving Facebook code should only be attached once Facebook and
 	// jQuery have both been loaded
 	$(document).ready(function() {
+		// Attach event to the Login with Facebook button
+		$("#pt-facebook a").click(function(ev) {
+			/*
+			// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
+			fn = FB.bind(sendToConnectOnLogin, null);
+			// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
+			//fn = sendToConnectOnLogin;
+			FB.login(fn, {scope : "publish_stream"});
+			*/
+			FacebookLogin();
+			ev.preventDefault();
+		});
+		
 		// Add the logout behavior to the "Logout of Facebook" button
 		$('#pt-fblogout').click(function() {
 			// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
@@ -99,33 +112,27 @@ window.fbAsyncInit = function() {
 				});
 			}
 		});
-		
-		// Attach event to the Login with Facebook button
-		$("#pt-facebook a").click(function(ev) {
-			/*
-			// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
-			fn = FB.bind(sendToConnectOnLogin, null);
-			// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
-			//fn = sendToConnectOnLogin;
-			FB.login(fn, {scope : "publish_stream"});
-			*/
-			var perms = "publish_stream"; // email also?
-			FB.login(function(response) {
-				if (response && response.authResponse) {
-					// User logged in and fully authorized
-				}
-			}, {scope: perms});
-			ev.preventDefault();
-		});
 	});
 };
 
-/**
- * jQuery code to be run when the DOM is ready to be manhandled.
- */
-$(document).ready(function() {
-	//
-});
+// debug
+if (wgPageName != fbReturnToTitle)
+	alert("wgPageName: " + wgPageName + "\nfbReturnToTitle: " + fbReturnToTitle);
+
+function FacebookLogin() {
+	var perms = "publish_stream"; // email also?
+	FB.login(function(response) {
+		// Check if the user logged in and fully authorized the app
+		if (response && response.authResponse) {
+			// If the AJAX methods fail, accomplish the same thing with a GET request
+			var destUrl = window.wgServer + window.wgScript + "?title=Special:Connect&returnto=" +
+				encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" +
+				encodeURIComponent(wgPageQuery);
+			// No AJAX for now
+			window.location.href = destUrl;
+		}
+	}, {scope: perms});
+}
 
 /**
  * An optional handler to use in fbOnLoginJsOverride for when a user logs in
@@ -184,7 +191,7 @@ function sendToConnectOnLoginForSpecificForm(formName) {
 				}
 			});
 		} else {
-			// alert("Redirecting to " + destUrl);
+			// alert("Error: SpecialConnect::checkCreateAccount returned " + data.code + " (" + data.message + ")");
 			window.location.href = destUrl;
 		}
 	});
