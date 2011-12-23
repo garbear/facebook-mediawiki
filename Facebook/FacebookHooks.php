@@ -581,75 +581,21 @@ STYLE;
 	/**
 	 * If the user isn't logged in, try to authenticate via Facebook.
 	 */
-	static function UserLoadFromSession( $user, &$result ) {
-		global $facebook, $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
-		
-		/*
-		// Work in progess:
-		// Special:Connect handles authentication by itself
-		if ( $wgTitle->isSpecial('Connect') ) {
-			return true;
-		}
-		*/
-		
-		// Check to see if the user can be logged in from Facebook
-		$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
-		// Check to see if the user can be loaded from the session
-		$localId = isset($_COOKIE["{$wgCookiePrefix}UserID"]) ?
-				intval($_COOKIE["{$wgCookiePrefix}UserID"]) :
-				(isset($_SESSION['wsUserID']) ? $_SESSION['wsUserID'] : 0);
-		
-		// Case: Not logged into Facebook, but logged into the wiki
-		/*
-		if (!$fbId && $localId) {
-			$mwUser = User::newFromId($localId);
-			// If the user was Connected, the JS should have logged them out...
-			// TODO: test to see if they logged in normally (with a password)
-			#if (FacebookDB::userLoggedInWithPassword($mwUser)) return true;
-			if (count(FacebookDB::getFacebookIDs($mwUser))) {
-				// Oh well, they shouldn't be here anyways; silently log them out
-				$mwUser->logout();
-				// Defaults have just been loaded, so save some time
-				$result = false;
-			}
-		}
-		// Case: Logged into Facebook, not logged into the wiki
-		else /**/ if ($fbId && !$localId) {
+	static function UserLoadAfterLoadFromSession( $user ) {
+		if ( !$user->isLoggedIn() ) {
+			$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
 			// Look up the MW ID of the Facebook user
 			$mwUser = FacebookDB::getUser($fbId);
-			// If the user doesn't exist, ask them to name their new account
-			if ( !($mwUser && $mwUser->getId()) && !empty( $wgTitle ) ) {
-				// TODO: $wgTitle was empty for some strange reason...
-				if (!empty( $wgTitle )) {
-					$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
-								'' : 'returnto=' . $wgTitle->getPrefixedURL();
-				} else {
-					$returnto = '';
-				}
-				// Don't redirect if we're on certain special pages
-				if ($returnto != '') {
-					// Redirect to Special:Connect so the Facebook user can choose a nickname
-					$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl('Connect', $returnto));
-				}
-			} else {
-				// The user exists, this should log the user on
-				/*
+			if ( $mwUser && $mwUser->getId() ) {
 				// Load the user from their ID
-				if ( $mwUser && $mwUser->getId() ) { // TODO: should we assume this is true? what's with the !empty( $wgTitle ) above?
-					$user->mId = $mwUser->getId();
-					$user->mFrom = 'id';
-					$user->load();
-					// Update user's info from Facebook
-					$fbUser = new FacebookUser($mwUser);
-					$fbUser->updateFromFacebook();
-					// Authentication okay, no need to continue with User::loadFromSession()
-					$result = true;
-				}
-				/**/
+				$user->mId = $mwUser->getId();
+				$user->mFrom = 'id';
+				$user->load();
+				// Update user's info from Facebook
+				$fbUser = new FacebookUser($user);
+				$fbUser->updateFromFacebook();
 			}
 		}
-		// Case: Not logged into Facebook or the wiki
-		// Case: Logged into Facebook, logged into the wiki
 		return true;
 	}
 	
