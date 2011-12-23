@@ -426,8 +426,8 @@ class SpecialConnect extends SpecialPage {
 				" <i>$value</i></label></li>";
 			}
 			// Implode the update options into an unordered list
-			$updateChoices = count($updateOptions) > 0 ? "<br />\n" . wfMsgHtml('facebook-updateuserinfo') .
-			"\n<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n" : '';
+			$updateChoices = count($updateOptions) > 0 ? "<br />\n" . '<div id="mw-facebook-choosename-update" class="fbInitialHidden">' .
+				wfMsgHtml('facebook-updateuserinfo') . "\n<ul>\n" . implode("\n", $updateOptions) . "\n</ul></div>\n" : '';
 			// Create the HTML for the "existing account" option
 			$html = '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
 					'value="existing" id="wpNameChoiceExisting"/></td><td class="mw-input">' .

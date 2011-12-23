@@ -55,6 +55,25 @@
 //Clone the jQuery reference from the MediaWiki alias $j
 if (typeof $j !== 'undefined') $ = $j;
 
+
+// Connecting Facebook with an existing account on Special:Connect
+$(document).ready(function() {
+	$('input[name="wpNameChoice"]').change(function() {
+		var selected;
+		try {
+			// jQuery >= 1.6
+			selected = $('#wpNameChoiceExisting').prop('checked');
+		} catch(err) {
+			selected = $('#wpNameChoiceExisting').attr('checked');
+		}
+		if (selected) {
+			$("#mw-facebook-choosename-update").show('slow');
+		} else {
+			$("#mw-facebook-choosename-update").hide('slow');
+		}
+	});
+});
+
 /**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
  * it looks for the global fbAsyncInit and executes the function when found.
