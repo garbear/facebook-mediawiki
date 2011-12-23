@@ -128,43 +128,40 @@ function FacebookLogin() {
 			var destUrl = window.wgServer + window.wgScript + "?title=Special:Connect&returnto=" +
 				encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" +
 				encodeURIComponent(wgPageQuery);
-			// Check if the user is logged in to MediaWiki
 			if (wgUserName) {
-				// If fbId is set, the MediaWiki user is already connected to a Facebook user
-				if (fbId) {
-					if (fbId == response.authResponse.userID) {
-						// 
-					} else {
-						// MediaWiki user is connected to a different Facebook account
-						// AJAX: Ask if response.authResponse.userID has a MediaWiki account
-						// Yes: redirect to Special:Connect
-						// No: "Your username is already connected to a Facebook account. Would you
-						// like to connect your username with this Facebook acount also?" Yes/No
-						// goto ASDF
-						
-						// For now, goto Special:Connect
-						// Special:Connect: check if fbid has a MediaWiki account
-						// Yes: Display successful login page (TODO: or Special:UserLogin?)
-						// No: "Your username is already connected to a Facebook account. Would you
-						// like to connect your username with this Facebook acount also?" Yes/No
-						
-						// fbId means Facebook wasn't logged in before and now it is
-						// However, the connecting account is different than the one the MW user is associated with
-						// In this case, check the new ID
-						// If it's free, on Special:Connect, ask if the user would like to add the Facebook account to their username
-						// If it's not free, on Special:Connect, ask if the user would like to log out and continue with the new account
-						//  (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndContinue.)
-						// Special:Connect/LogoutAndContinue: Display sucessful login page. Internally, log out MW user and log in new one.
-						window.location.href = destUrl;
-						return;
+				// The user is logged in to MediaWiki
+				if (fbId && fbId.length) {
+					// The MediaWiki user is already connected to a Facebook user
+					// Check to see if it's the one that just logged in
+					var in_array = false;
+					for (var i = 0; i < fbId.length; i++) {
+						if (fbId == response.authResponse.userID) {
+							in_array = true;
+							break;
+						}
 					}
+					if (in_array) {
+						// User is already logged in to MediaWiki
+						alert("Login successful");
+					} else {
+						// MediaWiki user is connected to a Facebook account different
+						// from the one that just logged in
+						// AJAX: Ask if response.authResponse.userID has a MediaWiki account
+						// Yes: Ask to log in as the correct MediaWiki user (if so, redirect to Special:Connect)
+						// "Your username is already connected to a Facebook account. Would you
+						// like to connect your username with this Facebook acount also?" Yes/No
+						// If Yes, post to Special:Connect/LogoutAndConnect
+						// If no, don't do anything, hide prompt
+						window.location.href = destUrl;
+					}
+				} else {
+					// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
+					window.location.href = destUrl; // Fallback if AJAX fails
 				}
-				// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
-				window.location.href = destUrl; // Fallback if AJAX fails
 			} else {
-				// ASDF:
-				// Ask the server if the MW user can be automatically logged in, and get a ChooseName form over AJAX
-				// If so the user can be logged in, redirect to Special:Connect (logs the user in and shows a success message with a returnto link)
+				// User is trying to log in with Facebook 
+				// Ask the server if the MW user can be automatically logged in (and get a ChooseName form over AJAX for later)
+				// If so the user can be logged in, redirect to Special:Connect
 				// If not, let the user fill out the form and post to Special:Connect/ChooseName
 				window.location.href = destUrl; // Fallback if AJAX fails
 			}

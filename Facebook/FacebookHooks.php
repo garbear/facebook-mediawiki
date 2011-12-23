@@ -601,20 +601,30 @@ STYLE;
 	 * If the user isn't logged in, try to authenticate via Facebook.
 	 * 
 	 * This hook was added in MediaWiki 1.14.
-	 *
+	 */
 	static function UserLoadAfterLoadFromSession( $user ) {
+		global $facebook;
 		if ( !$user->isLoggedIn() ) {
 			$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
 			// Look up the MW ID of the Facebook user
 			$mwUser = FacebookDB::getUser($fbId);
 			if ( $mwUser && $mwUser->getId() ) {
-				// Load the user from their ID
-				$user->mId = $mwUser->getId();
-				$user->mFrom = 'id';
-				$user->load();
-				// Update user's info from Facebook
-				$fbUser = new FacebookUser($user);
-				$fbUser->updateFromFacebook();
+				// Look up the "rememberme" option
+				
+				// TODO: in order to implement this, must modify Logout link to log the
+				// user out of Facebook when they are logged out of the wiki
+				//$autologin = $mwUser->getOption('rememberpassword');
+				$autologin = false;
+				
+				if ( $autologin ) {
+					// Load the user from their ID
+					$user->mId = $mwUser->getId();
+					$user->mFrom = 'id';
+					$user->load();
+					// Update user's info from Facebook
+					$fbUser = new FacebookUser($user);
+					$fbUser->updateFromFacebook();
+				}
 			}
 		}
 		return true;
