@@ -126,13 +126,17 @@ class FacebookHooks {
 	padding-left: 19px !important;
 }
 STYLE;
+		$style .= '.fbInitialHidden {display:none;}';
 		
 		// Things get a little simpler in 1.16...
 		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
+			/*
 			// Add a pretty Facebook logo if $wgFbLogo is set
 			if ( !empty( $wgFbLogo) ) {
 				$out->addInlineStyle( $style );
 			}
+			*/
+			$out->addInlineStyle( $style );
 			// Include the common jQuery library (alias defaults to $j instead of $)
 			$out->includeJQuery();
 			// Add the script file specified by $url
@@ -140,10 +144,13 @@ STYLE;
 				$out->addScriptFile( $wgFbExtensionScript );
 			}
 		} else {
+			/*
 			// Add a pretty Facebook logo if $wgFbLogo is set
 			if ( !empty( $wgFbLogo) ) {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			}
+			*/
+			$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			// Include the most recent 1.7 version
 			$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js' );
 			// Add the script file specified by $url
