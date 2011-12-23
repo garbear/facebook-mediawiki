@@ -115,11 +115,6 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * The controller interacts with the views through these two functions.
 	 */
-	protected function sendError($titleMsg, $textMsg) {
-		global $wgOut;
-		$wgOut->showErrorPage($titleMsg, $textMsg);
-	}
-	
 	public function sendPage($function, $arg = NULL) {
 		global $wgOut;
 		// Setup the page for rendering
@@ -134,6 +129,22 @@ class SpecialConnect extends SpecialPage {
 		} else {
 			$this->$function($arg);
 		}
+	}
+	
+	protected function sendError($titleMsg, $textMsg) {
+		global $wgOut;
+		$wgOut->showErrorPage($titleMsg, $textMsg);
+	}
+	
+	protected function sendRedirect($specialPage) {
+		global $wgOut;
+		$urlaction = '';
+		if ( !empty( $this->mReturnTo ) ) {
+			$urlaction = "returnto=$this->mReturnTo";
+			if ( !empty( $this->mReturnToQuery ) )
+				$urlaction .= "&returntoquery=$this->mReturnToQuery";
+		}
+		$wgOut->redirect( $wgUser->getSkin()->makeSpecialUrl( $specialPage, $urlaction ) );
 	}
 	
 	/**
@@ -180,13 +191,68 @@ class SpecialConnect extends SpecialPage {
 				break;
 			}
 		default:
+			// Logged in status (ID, or 0 if not logged in) 
+			$fbid = $facebook->getUser();
+			if ( !$fbid ) {
+				// The user isn't logged in to Facebook
+				if ( !$wgUser->isLoggedIn() ) {
+					// The user isn't logged in to Facebook or MediaWiki. Nothing to see
+					// here, move along
+					$this->sendRedirect('UserLogin');
+				} else {
+					// The user is logged in to MediaWiki but not Facebook
+					$this->sendPage('loginToFacebookView');
+				}
+			} else {
+				// The user is logged in to Facebook
+				$mwUser = FacebookDB::getUser($fbId);
+				$mwId = $mwUser ? $mwUser->getId() : 0;
+				if ( !$wgUser->isLoggedIn() ) {
+					// The user is logged in to Facebook, but not MediaWiki
+					if ( !$mwId ) {
+						// The Facebook user is new to MediaWiki
+						$this->sendPage('connectNewUserView');
+					} else {
+						// Load the user from their ID
+						/*
+						// TODO: Place this somewhere else
+						$user->mId = $mwId;
+						$user->mFrom = 'id';
+						$user->load();
+						// Update user's info from Facebook
+						$fbUser = new FacebookUser($mwUser);
+						$fbUser->updateFromFacebook();
+						*/
+						$this->sendPage('loginSuccessView');
+					}
+				} else {
+					// The user is logged in to Facbook and MediaWiki
+					if ( $mwId == $wgUser->getId() ) {
+						// MediaWiki user belongs to the Facebook account. Nothing to see
+						// here, move along
+						$this->sendRedirect('UserLogin');
+					} else {
+						// Accounts don't agree. Let's find out what's going on
+						if ( !$mwId ) {
+							// The Facebook user isn't connected to a MediaWiki account
+							$this->sendPage('connectExistingUserView');
+						} else {
+							// The Facebook account belongs to a different MediaWiki user
+							// Ask if we should load the new user from their ID
+							// "Would youlike to log out and continue with the new account?"
+							// (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndConnect.)
+							$this->sendPage('logoutAndConnectView');
+						}
+					}
+				}
+			}
+			
+			
 			/*
 			 * If the user is logged in to an unconnected account, and trying to
 			* connect a Facebook ID, but the ID is already connected to a DIFFERENT
 			* account... display an error message.
-			*/
-			$fbid = $facebook->getUser(); # Facebook ID or 0 if none is found
-		
+			*
 			if ( $fbid && $wgUser->isLoggedIn() ) {
 				$foundUser = FacebookDB::getUser( $fbid );
 				if ( $foundUser && ($foundUser->getId() != $wgUser->getId()) ) {
@@ -241,8 +307,82 @@ class SpecialConnect extends SpecialPage {
 				// If the user isn't Connected, then show a form with the Connect button
 				$this->sendPage('connectFormView');
 			}
+			/**/
 		}
 	}
+	
+	/**
+	 * The user is logged in to MediaWiki but not Facebook.
+	 * No Facebook user is associated with this MediaWiki account.
+	 */
+	private function loginToFacebookView() {
+		global $wgOut, $wgSitename, $wgUser;
+		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
+		
+		$this->outputHeader();
+		$html = '<div>';
+		if ( !count( $fb_ids ) ) {
+			// No Facebook user associated with this MediaWiki account
+			$html .= wfMsgExt( 'facebook-intro', array('parse', 'content')) . '<br/>';
+			$html .= wfMsg( 'facebook-click-to-login', $wgSitename );
+		} else {
+			// User is already connected to a Facebook account. Send a page asking
+			// them to log in to one of their (possibly several) Facebook accounts
+			// For now, scold them for trying to log in to a connected account
+			$html = 'Error: Your account is already connected with Facebook. Click the button to log in to Facebook.';
+		}
+		// FacebookInit::getPermissionsAttribute()
+		// FacebookInit::getOnLoginAttribute()
+		$html .= '<fb:login-button show-faces="true" width="600" max-rows="3" scope="email"></fb:login-button></div>';
+		$wgOut->addHTML($html);
+	}
+	
+	/**
+	 * The user is logged in to Facebook, but not MediaWiki.
+	 * The Facebook user is new to MediaWiki.
+	 */
+	private function connectNewUserView() {
+		
+	}
+	
+	/**
+	 * The user has just been logged in by their Facebook account.
+	 */
+	private function loginSuccessView() {
+		
+	}
+	
+	/**
+	 * The user is logged in to Facbook and MediaWiki.
+	 * The Facebook user isn't connected to a MediaWiki account.
+	 */
+	private function connectExistingUserView() {
+		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
+		if ( !count( $fb_ids ) ) {
+			// The Facebook user is new to MediaWiki
+		} else {
+			// The Facebook use has been to MediaWiki with a different Facebook
+			// "Your username is already connected to a Facebook account. Would you
+			// like to connect your username with this Facebook acount also?"
+		}
+	}
+	
+	/**
+	 * The Facebook account belongs to a different MediaWiki user.
+	 * Ask if we should load the new user from their ID.
+	 * "Would youlike to log out and continue with the new account?"
+	 * (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndConnect.)
+	 */
+	private function logoutAndConnectView() {
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Disconnect from Facebook.
@@ -389,8 +529,8 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * This error-page is shown when the user is attempting to connect a Wikia account with a Facebook ID which is
-	 * already connected to a different Wikia account.
+	 * This error-page is shown when the user is attempting to connect a wiki account with
+	 * a Facebook ID which is already connected to a different wiki account.
 	 */
 	private function fbIdAlreadyConnectedView() {
 		global $wgOut, $facebook;

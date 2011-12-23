@@ -48,7 +48,7 @@
 	if (!jQuery.postJSON) {
 		jQuery.postJSON = function(url, data, callback) {
 			return jQuery.post(url, data, callback, "json");
-		}
+		};
 	}
 })();
 
@@ -120,16 +120,54 @@ if (wgPageName != fbReturnToTitle)
 	alert("wgPageName: " + wgPageName + "\nfbReturnToTitle: " + fbReturnToTitle);
 
 function FacebookLogin() {
-	var perms = "publish_stream"; // email also?
+	//var perms = "publish_stream"; // email also?
+	var perms = "email";
 	FB.login(function(response) {
 		// Check if the user logged in and fully authorized the app
 		if (response && response.authResponse) {
-			// If the AJAX methods fail, accomplish the same thing with a GET request
 			var destUrl = window.wgServer + window.wgScript + "?title=Special:Connect&returnto=" +
 				encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" +
 				encodeURIComponent(wgPageQuery);
-			// No AJAX for now
-			window.location.href = destUrl;
+			// Check if the user is logged in to MediaWiki
+			if (wgUserName) {
+				// If fbId is set, the MediaWiki user is already connected to a Facebook user
+				if (fbId) {
+					if (fbId == response.authResponse.userID) {
+						// 
+					} else {
+						// MediaWiki user is connected to a different Facebook account
+						// AJAX: Ask if response.authResponse.userID has a MediaWiki account
+						// Yes: redirect to Special:Connect
+						// No: "Your username is already connected to a Facebook account. Would you
+						// like to connect your username with this Facebook acount also?" Yes/No
+						// goto ASDF
+						
+						// For now, goto Special:Connect
+						// Special:Connect: check if fbid has a MediaWiki account
+						// Yes: Display successful login page (TODO: or Special:UserLogin?)
+						// No: "Your username is already connected to a Facebook account. Would you
+						// like to connect your username with this Facebook acount also?" Yes/No
+						
+						// fbId means Facebook wasn't logged in before and now it is
+						// However, the connecting account is different than the one the MW user is associated with
+						// In this case, check the new ID
+						// If it's free, on Special:Connect, ask if the user would like to add the Facebook account to their username
+						// If it's not free, on Special:Connect, ask if the user would like to log out and continue with the new account
+						//  (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndContinue.)
+						// Special:Connect/LogoutAndContinue: Display sucessful login page. Internally, log out MW user and log in new one.
+						window.location.href = destUrl;
+						return;
+					}
+				}
+				// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
+				window.location.href = destUrl; // Fallback if AJAX fails
+			} else {
+				// ASDF:
+				// Ask the server if the MW user can be automatically logged in, and get a ChooseName form over AJAX
+				// If so the user can be logged in, redirect to Special:Connect (logs the user in and shows a success message with a returnto link)
+				// If not, let the user fill out the form and post to Special:Connect/ChooseName
+				window.location.href = destUrl; // Fallback if AJAX fails
+			}
 		}
 	}, {scope: perms});
 }

@@ -38,10 +38,11 @@ class FacebookHooks {
 			if (!$user || $user->getID() == 0) {
 				return true;
 			}
-			$fb_id = FacebookDB::getFacebookIDs($user->getId());
-			if (!count($fb_id) || !($fb_id = $fb_id[0])) {
+			$fb_ids = FacebookDB::getFacebookIDs($user->getId());
+			if ( !count($fb_ids) ) {
 				return true;
 			}
+			$fb_id = $fb_ids[0]; // possibly multiple Facebook accounts associated with this user
 			// TODO: Something with the Facebook ID stored in $fb_id
 			return true;
 		}
@@ -220,7 +221,7 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgFbAppId, $facebook, $wgFbSocialPlugins, $wgFbLogo, $wgTitle, $wgRequest, $wgStyleVersion;
+		global $wgFbAppId, $facebook, $wgFbSocialPlugins, $wgTitle, $wgRequest, $wgStyleVersion, $wgUser;
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -233,15 +234,25 @@ STYLE;
 		}
 		$vars['fbAppId']     = $wgFbAppId;
 		$vars['fbUseXFBML']  = $wgFbSocialPlugins;
-		$vars['fbLogo']      = $wgFbLogo ? true : false;
+		/*
 		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
 			$wgTitle->isSpecial('Preferences') ? '' : 'returnto=' . $wgTitle->getPrefixedURL() );
-		
+		*/
 		$vals = $wgRequest->getValues();
 		if( !empty( $vals ) && !empty( $vals['title'] ) ) {
 			$vars['fbReturnToTitle'] = $vals['title'];
 		}
-		
+		// Let JavaScript know if the Facebook ID belongs to someone else
+		if ($wgUser->isLoggedIn() /*&& !$facebook->getUser()*/) { // TODO: uncomment
+			$ids = FacebookDB::getFacebookIDs($wgUser);
+			if ( count($ids) > 0 ) {
+				// Turn numbers into strings
+				foreach ( $ids as $index => $id ) {
+					$ids[$index] = strval( $id );
+				}
+				$vars['fbIds'] = $ids; // possibly more than 1 Facebook ID for this user
+			}
+		}
 		return true;
 	}
 	
@@ -357,12 +368,20 @@ STYLE;
 		// User is logged in but not Connected
 		else if ($wgUser->isLoggedIn()) {
 			if (self::showButton( 'convert' )) {
+				/*
 				$personal_urls['fbconvert'] = array(
 					'text'   => wfMsg( 'facebook-convert' ),
 					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
 					                          'returnto=' . $wgTitle->getPrefixedURL()),
 					'class'  => 'mw-facebook-logo',
 					'active' => $wgTitle->isSpecial( 'Connect' ),
+				);
+				*/
+				$personal_urls['facebook'] = array(
+						'text'   => wfMsg( 'facebook-convert' ),
+						'href'   => '#',
+						'class'  => 'mw-facebook-logo',
+						'active' => $wgTitle->isSpecial( 'Connect' ),
 				);
 			}
 		}
@@ -580,7 +599,9 @@ STYLE;
 	
 	/**
 	 * If the user isn't logged in, try to authenticate via Facebook.
-	 */
+	 * 
+	 * This hook was added in MediaWiki 1.14.
+	 *
 	static function UserLoadAfterLoadFromSession( $user ) {
 		if ( !$user->isLoggedIn() ) {
 			$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
