@@ -205,7 +205,7 @@ class SpecialConnect extends SpecialPage {
 				}
 			} else {
 				// The user is logged in to Facebook
-				$mwUser = FacebookDB::getUser($fbId);
+				$mwUser = FacebookDB::getUser($fbid);
 				$mwId = $mwUser ? $mwUser->getId() : 0;
 				if ( !$wgUser->isLoggedIn() ) {
 					if ( !$mwId ) {

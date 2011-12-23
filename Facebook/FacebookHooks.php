@@ -327,7 +327,7 @@ STYLE;
 		}
 		
 		// If the user is logged in and connected
-		if ( $wgUser->isLoggedIn() && $facebook->getSession() &&
+		if ( $wgUser->isLoggedIn() && $facebook->getUser() &&
 				count( FacebookDB::getFacebookIDs($wgUser) ) > 0 ) {
 			if ( !empty( $wgFbUseRealName ) ) {
 				// Start with the real name in the database
@@ -605,7 +605,7 @@ STYLE;
 	static function UserLoadAfterLoadFromSession( $user ) {
 		global $facebook;
 		if ( !$user->isLoggedIn() ) {
-			$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
+			$fbId = $facebook->getUser();
 			// Look up the MW ID of the Facebook user
 			$mwUser = FacebookDB::getUser($fbId);
 			if ( $mwUser && $mwUser->getId() ) {

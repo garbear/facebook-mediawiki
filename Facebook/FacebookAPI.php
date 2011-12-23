@@ -41,14 +41,16 @@ class FacebookAPI extends Facebook {
 			die ( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
 		}
 		$config = array(
-			'appId' => $wgFbAppId,
-			'secret' => $wgFbSecret,
-			'cookie' => true,
+			'appId'      => $wgFbAppId,
+			'secret'     => $wgFbSecret,
+			'fileUpload' => false, // optional
 		);
+		/*
 		// Include the optional domain parameter if it has been set
 		if ( !empty( $wgFbDomain ) && $wgFbDomain != 'BASE_DOMAIN' ) {
 			$config['domain'] = $wgFbDomain;
 		}
+		*/
 		parent::__construct( $config );
 	}
 	
