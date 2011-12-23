@@ -43,19 +43,6 @@ class FacebookUser extends User {
 	}
 	
 	/**
-	 * It's important that Facebook-proxied emails are not revealed to users.
-	 * If the user has an email address at the domain proxymail.facebook.com,
-	 * then the name is stripped and xxx@proxymail.facebook.com is returned.
-	 */
-	static function getCleanEmail($email) {
-		$proxy = '@proxymail.facebook.com';
-		if (strrpos($email, $proxy) === strlen($email) - strlen($proxy)) {
-			$email = 'xxx' . $proxy;
-		}
-		return $email;
-	}
-	
-	/**
 	 * Update a user's settings with the values retrieved from the current
 	 * logged-in Facebook user. Settings are only updated if a different value
 	 * is returned from Facebook and the user's settings allow an update on
@@ -168,12 +155,7 @@ class FacebookUser extends User {
 				$value = '';
 				break;
 			case 'email':
-				// For information on emails, see <http://www.facebook.com/help/?page=1028>
-				// If a contact email isn't available, then use a proxied email
-				if ($value == '') {
-					// Keep in mind, this address must stay hidden from the user
-					$value = $userinfo['proxied_email'];
-				}
+				// For information on emails, see <https://www.facebook.com/help/?page=216574428360510>
 				// TODO: if the user's email is updated from Facebook, then
 				// automatically authenticate the email address
 				#$user->mEmailAuthenticated = wfTimestampNow();

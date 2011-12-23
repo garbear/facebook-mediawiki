@@ -408,8 +408,7 @@ class SpecialConnect extends SpecialPage {
 		if (empty( $wgFbDisableLogin )) {
 			// Grab the UserName from the cookie if it exists
 			global $wgCookiePrefix;
-			$name = isset($_COOKIE[$wgCookiePrefix . 'UserName']) ?
-			trim($_COOKIE[$wgCookiePrefix . 'UserName']) : '';
+			$name = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
 			// Build an array of attributes to update
 			$updateOptions = array();
 			foreach ($this->getAvailableUserUpdateOptions() as $option) {
@@ -418,11 +417,6 @@ class SpecialConnect extends SpecialPage {
 				// If no corresponding value was received from Facebook, then continue
 				if (!$value) {
 					continue;
-				}
-	
-				// Do not reveal proxied email addresses
-				if ($option == 'email') {
-					$value = FacebookUser::getCleanEmail($value);
 				}
 	
 				// Build the list item for the update option
@@ -884,11 +878,6 @@ class SpecialConnect extends SpecialPage {
 				// If no corresponding value was received from Facebook, then continue
 				if (!$value) {
 					continue;
-				}
-	
-				// Do not reveal proxied email addresses
-				if ($option == 'email') {
-					$value = FacebookUser::getCleanEmail($value);
 				}
 	
 				// Build the list item for the update option

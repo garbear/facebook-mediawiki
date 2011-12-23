@@ -409,17 +409,6 @@ STYLE;
 		return true;
 	}
 	
-	public static function GetPreferences( $user, &$preferences ) {
-		$email = FacebookUser::getCleanEmail($preferences['emailaddress']['default']);
-		if ($email != $preferences['emailaddress']['default']) {
-			// User is using a Facebook proxy email address
-			#$preferences['emailaddress']['default'] = $email;
-			$preferences['enotifrevealaddr']['disabled'] = true;
-			// TODO: Inject some JS into the page to take of changing email addresses
-		}
-		return true;
-	}
-	
 	/**
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
