@@ -579,11 +579,18 @@ STYLE;
 	}
 	
 	/**
-	 * If the user isn't logged in, try to auto-authenticate via Facebook
-	 * Connect. The Single Sign On magic of Facebook happens in this function.
+	 * If the user isn't logged in, try to authenticate via Facebook.
 	 */
 	static function UserLoadFromSession( $user, &$result ) {
 		global $facebook, $wgCookiePrefix, $wgTitle, $wgOut, $wgUser;
+		
+		/*
+		// Work in progess:
+		// Special:Connect handles authentication by itself
+		if ( $wgTitle->isSpecial('Connect') ) {
+			return true;
+		}
+		*/
 		
 		// Check to see if the user can be logged in from Facebook
 		$fbId = $facebook->getSession() ? $facebook->getUser() : 0;
@@ -610,9 +617,8 @@ STYLE;
 		else /**/ if ($fbId && !$localId) {
 			// Look up the MW ID of the Facebook user
 			$mwUser = FacebookDB::getUser($fbId);
-			$id = $mwUser ? $mwUser->getId() : 0;
 			// If the user doesn't exist, ask them to name their new account
-			if ( !$id && !empty( $wgTitle ) ) {
+			if ( !($mwUser && $mwUser->getId()) && !empty( $wgTitle ) ) {
 				// TODO: $wgTitle was empty for some strange reason...
 				if (!empty( $wgTitle )) {
 					$returnto = $wgTitle->isSpecial('Userlogout') || $wgTitle->isSpecial('Connect') ?
@@ -626,17 +632,19 @@ STYLE;
 					$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl('Connect', $returnto));
 				}
 			} else {
-				// TODO: To complete the SSO experience, this should log the user on
+				// The user exists, this should log the user on
 				/*
 				// Load the user from their ID
-				$user->mId = $id;
-				$user->mFrom = 'id';
-				$user->load();
-				// Update user's info from Facebook
-				$fbUser = new FacebookUser($mwUser);
-				$fbUser->updateFromFacebook();
-				// Authentification okay, no need to continue with User::loadFromSession()
-				$result = true;
+				if ( $mwUser && $mwUser->getId() ) { // TODO: should we assume this is true? what's with the !empty( $wgTitle ) above?
+					$user->mId = $mwUser->getId();
+					$user->mFrom = 'id';
+					$user->load();
+					// Update user's info from Facebook
+					$fbUser = new FacebookUser($mwUser);
+					$fbUser->updateFromFacebook();
+					// Authentication okay, no need to continue with User::loadFromSession()
+					$result = true;
+				}
 				/**/
 			}
 		}
