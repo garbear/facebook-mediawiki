@@ -96,10 +96,10 @@ class FacebookUser extends User {
 		$params = array('nickname'       => 'username',
 		                'fullname'       => 'name',
 		                'firstname'      => 'first_name',
-		                'gender'         => 'sex',
+		                'gender'         => 'gender',
 		                'language'       => 'locale',
 		                'timecorrection' => 'timezone',
-		                'email'          => 'contact_email');
+		                'email'          => 'email');
 		if (empty($userinfo)) {
 			return null;
 		}
