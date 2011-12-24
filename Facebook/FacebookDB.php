@@ -42,13 +42,19 @@ class FacebookDB {
 	/**
 	 * Find the Facebook IDs of the given user, if any, using the database
 	 * connection provided.
+	 * 
+	 * If $user is not specified, the ID of the logged in user will be used.
 	 */
-	public static function getFacebookIDs( $user, $db = DB_SLAVE  ) {
+	public static function getFacebookIDs( $user = NULL, $db = DB_SLAVE  ) {
 		global $wgMemc;
 		// Connect to the database
 		$dbr = wfGetDB( $db, array(), self::sharedDB() );
 		$fbid = array();
-		if ( $user instanceof User && $user->getId() != 0 ) {
+		if ( empty( $user) || !($user instanceof User) || $user->getId() == 0 ) {
+			global $wgUser;
+			$user = $wgUser;
+		}
+		if ( $user->getId() != 0 ) {
 			// Try memcached to avoid hitting the database
 			$memkey = wfMemcKey( 'fb_user_id', $user->getId() );
 			$val = $wgMemc->get( $memkey );
