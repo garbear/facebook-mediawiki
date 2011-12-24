@@ -52,9 +52,6 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	// Special:Connect
 	'facebook-title'    => 'Log in with Facebook',
 	'facebook-welcome'  => 'Welcome, Facebook user!',
-	'facebook-loginbox' => "Or '''login''' with Facebook:
-
-$1",
 	'facebook-merge'    => 'Merge your wiki account with your Facebook ID',
 /*
 	'facebook-mergebox' => 'This feature has not yet been implemented.
@@ -272,9 +269,6 @@ $messages['be-tarask'] = array(
 	'facebook-link' => 'Вярнуцца на facebook.com',
 	'facebook-title' => 'Злучыць рахунак з Facebook',
 	'facebook-welcome' => 'Вітаем карыстальніка злучэньня Facebook!',
-	'facebook-loginbox' => "Ці '''увайдзіце ў сыстэму''' праз Facebook:
-	
-$1",
 	'facebook-merge' => 'Аб’яднаць Ваш вікі-рахунак з Вашым ідэнтыфікатарам Facebook',
 	'facebook-logoutbox' => '$1
 	
@@ -347,9 +341,6 @@ Kinnig a ra ur gwiriekadur diazezet war strolladoù Facebook hag implij FBML en 
 	'facebook-link' => 'E facebook.com en-dro',
 	'facebook-title' => 'Kont kevreañ gant Facebook',
 	'facebook-welcome' => "Degemer mat deoc'h-c'hwi implijer Facebook Connect !",
-	'facebook-loginbox' => "Pe '''kevreañ''' gant Facebook :
-
-$1",
 	'facebook-merge' => 'Kendeuziñ ho kont wiki gant ho ker-anaout Facebook.',
 	'facebook-logoutbox' => "$1
 	
@@ -410,9 +401,6 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'facebook-click-to-login' => 'Kliknite da se prijavite na ovu stranicu preko Facebooka',
 	'facebook-click-to-connect-existing' => 'Kliknite da spojite vaš Facebook račun na $1',
 	'facebook-comm' => 'Komunikacija',
-	'facebook-loginbox' => "Ili se '''prijavite''' preko Facebook:
-	
-$1",
 	'facebook-merge' => 'Spoji svoj wiki račun sa svojim Facebook ID',
 	'facebook-cancel' => 'Akcija obustavljena',
 	'facebook-invalid' => 'Nevaljana opcija',
@@ -484,9 +472,6 @@ Zudem wird die Authentifizierung basierend auf Facebook-Gruppen und der Einsatz 
 	'facebook-link' => 'Zurück zu de-de.facebook.com',
 	'facebook-title' => 'Konto mit Facebook verknüpfen',
 	'facebook-welcome' => 'Willkommen, Facebook-Connect-Benutzer!',
-	'facebook-loginbox' => "Oder via Facebook '''anmelden''':
-
-$1",
 	'facebook-merge' => 'Das Wikikonto mit der Facebook-ID verknüpfen',
 	'facebook-logoutbox' => '$1
 
@@ -563,9 +548,6 @@ $messages['dsb'] = array(
 	'facebook-fbml' => 'Wobznamjeńska rěc Facebook',
 	'facebook-comm' => 'Komunikacija',
 	'facebook-welcome' => 'Wita, wužywaŕ Facebook Connect!',
-	'facebook-loginbox' => "Abo '''pśizjawjenje''' pśez Facebook:
-
-$1",
 	'facebook-cancel' => 'akcija pśetergnjona',
 	'facebook-invalid' => 'Njepłaśiwa akcija',
 	'facebook-nickname' => 'Pśimě',
@@ -608,9 +590,6 @@ $messages['eo'] = array(
 	'facebook-link' => 'Reveni al facebook.com',
 	'facebook-title' => 'Konekti konton kun Facebook',
 	'facebook-comm' => 'Komunikado',
-	'facebook-loginbox' => "Aŭ '''ensaluti''' ĉe Facebook:
-	
-$1",
 	'facebook-merge' => 'Kunigi vian vikikonton kun via Facebook-identigo',
 	'facebook-logoutbox' => '$1
 	
@@ -661,9 +640,6 @@ Ofrece autenticación basada en grupos de Facebook y usa FBML en texto wiki',
 	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar esta cuenta con Facebook',
 	'facebook-welcome' => '¡Bienvenido, usuario de Facebook Connect!',
-	'facebook-loginbox' => "O '''accede al sistema''' con Facebook:
-	
-$1",
 	'facebook-merge' => 'Fusiona tu wiki cuenta con tu identificador de Facebook',
 	'facebook-logoutbox' => '$1
 	
@@ -799,9 +775,6 @@ $messages['fr'] = array(
 	'facebook-link' => 'Retour à Facebook.com',
 	'facebook-title' => 'Connecter un compte avec Facebook',
 	'facebook-welcome' => 'Bienvenue, utilisateur de Facebook Connect !',
-	'facebook-loginbox' => "Ou '''connexion''' avec Facebook :
-
-$1",
 	'facebook-merge' => 'Fusionner votre compte wiki avec votre identifiant Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -871,9 +844,6 @@ Ofrece unha autenticación baseada en grupos do Facebook e o uso de FBML no text
 	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar a conta co Facebook',
 	'facebook-welcome' => 'Benvido, usuario do Facebook Connect!',
-	'facebook-loginbox' => "Ou '''acceda ao sistema''' co Facebook:
-	
-$1",
 	'facebook-merge' => 'Fusionar a súa conta wiki co ID do Facebook',
 	'facebook-logoutbox' => '$1
 	
@@ -943,9 +913,6 @@ Macht e Authentifizierig megli, wu uf Facebook-Gruppe basiert, un dr Yysatz vu F
 	'facebook-link' => 'Zruck zue facebook.com',
 	'facebook-title' => 'Konto mit Facebook verbinde',
 	'facebook-welcome' => 'Willchuu, Facebook-Connect-Benutzer!',
-	'facebook-loginbox' => "Oder iber Facebook '''aamälde''':
-
-$1",
 	'facebook-merge' => 'S Wikikonto mit dr Facebook-ID zämmefiere',
 	'facebook-logoutbox' => '$1
 
@@ -1056,9 +1023,6 @@ $messages['hsb'] = array(
 	'facebook-link' => 'Wróćo k facebook.com',
 	'facebook-title' => 'Konto z Facebookom zwjazać',
 	'facebook-welcome' => 'Witaj, wužiwarjo Facebook Connect!',
-	'facebook-loginbox' => "Abo '''přizjewjenje''' přez Facebook:
-
-$1",
 	'facebook-merge' => 'Twoje wikikonto z twojim Facebook-ID zwjazać',
 	'facebook-logoutbox' => '$1
 
@@ -1130,9 +1094,6 @@ $messages['hu'] = array(
 	'facebook-fbml' => 'Facebook-jelölőnyelv',
 	'facebook-comm' => 'Kommunikáció',
 	'facebook-welcome' => 'Üdvözöllek, Facebook Connect felhasználó!',
-	'facebook-loginbox' => "Vagy '''jelentkezz be''' Facebookon keresztül:
-
-$1",
 	'facebook-merge' => 'Wikis fiók összekötése facebookos azonosítóval',
 	'facebook-error' => 'Hiba az ellenőrzés során',
 	'facebook-errortext' => 'Hiba történt a Facebook Connect ellenőrzése közben.',
@@ -1188,9 +1149,6 @@ Offere authentication a base de gruppos de Facebook e le uso de FBML in texto wi
 	'facebook-link' => 'Retornar a facebook.com',
 	'facebook-title' => 'Connecter le conto con Facebook',
 	'facebook-welcome' => 'Benvenite, usator de Facebook Connect!',
-	'facebook-loginbox' => "O '''aperir session''' via Facebook:
-	
-$1",
 	'facebook-merge' => 'Fusionar tu conto wiki con tu ID de Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -1261,9 +1219,6 @@ Memberikan autentikasi berdasarkan grup Facebook dan penggunaan FBML dalam teks 
 	'facebook-link' => 'Kembali ke facebook.com',
 	'facebook-title' => 'Hubungkan akun dengan Facebook',
 	'facebook-welcome' => 'Selamat datang, pengguna Facebook Connect!',
-	'facebook-loginbox' => "Atau '''masuk''' dengan Facebook:
-
-$1",
 	'facebook-merge' => 'Gabungkan akun wiki dengan ID Facebook Anda',
 	'facebook-logoutbox' => '$1
 
@@ -1359,9 +1314,6 @@ $messages['ja'] = array(
 	'facebook-link' => 'facebook.comに戻る',
 	'facebook-title' => 'Facebookでアカウントに接続',
 	'facebook-welcome' => 'ようこそ、Facebook接続の利用者さん！',
-	'facebook-loginbox' => "もしくは、Facebookで'''ログイン'''：
-
-$1",
 	'facebook-merge' => 'FacebookのIDを使用して、ウィキ上の自分のアカウントを統合',
 	'facebook-logoutbox' => '$1
 
@@ -1439,9 +1391,6 @@ Wann d'Autorisatioun virläit kann dës Wiki esouguer Facebook als E-Mail-Proxy 
 	'facebook-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
 Kuckt wie vun Äre Frënn d'Wiki benotzt, a virun allem deelt Är Aktioune mat Äre Frënn iwwer d'Facebook-Newsfeed.",
 	'facebook-welcome' => 'Wëllkomm, Facebook-Connect-Benotzer!',
-	'facebook-loginbox' => "Oder op Facebook '''aloggen''':
-
-$1",
 	'facebook-merge' => 'Verbannt Äre Wiki-Kont mat Ärer Facebook-ID',
 	'facebook-logoutbox' => '$1
 
@@ -1511,9 +1460,6 @@ $messages['mk'] = array(
 	'facebook-link' => 'Назад кон страницата на Facebook',
 	'facebook-title' => 'Поврзи ја сметката преку Facebook',
 	'facebook-welcome' => 'Добредојде, кориснику на Facebook Connect!',
-	'facebook-loginbox' => "Или пак '''најавете се''' со Facebook:
-
-$1",
 	'facebook-merge' => 'Спојте ја Вашата вики-сметка со Вашата назнака (ID) на Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -1599,9 +1545,6 @@ Maakt het mogelijk om aan te melden met de Facebookgebruiker en FBML te gebruike
 	'facebook-link' => 'Terug naar facebookcom',
 	'facebook-title' => 'Gebruiker verbinden met Facebook',
 	'facebook-welcome' => 'Welkom, Facebook Connectgebruiker!',
-	'facebook-loginbox' => "Of '''meld aan'''via Facebook:
-
-$1",
 	'facebook-merge' => 'Voeg uw wikigebruiker samen met uw Facebookgebruiker',
 	'facebook-logoutbox' => '$1
 
@@ -1682,9 +1625,6 @@ Tilbyr autentisering basert på Facebookgrupper og bruken av FBML i wikitekst',
 	'facebook-link' => 'Tilbake til facebook.com',
 	'facebook-title' => 'Koble til konto med Facebook',
 	'facebook-welcome' => 'Velkommen, Facebook Connect-bruker!',
-	'facebook-loginbox' => "Eller '''logg inn''' med Facebook:
-
-$1",
 	'facebook-merge' => 'Slå sammen wikikontoen din med din Facebook-ID',
 	'facebook-logoutbox' => '$1
 
@@ -1755,9 +1695,6 @@ Umożliwia uwierzytelnianie w oparciu o grupy Facebooka i wykorzystanie FBML w t
 	'facebook-link' => 'Powrót na facebook.com',
 	'facebook-title' => 'Połącz konto z Facebookiem',
 	'facebook-welcome' => 'Witaj użytkowniku Facebook Connect!',
-	'facebook-loginbox' => "Lub '''zaloguj się''' z Facebookiem
-
-$1",
 	'facebook-merge' => 'Połącz swoje konto wiki ze swoim identyfikatorem w Facebooku.',
 	'facebook-logoutbox' => '$1
 
@@ -1828,9 +1765,6 @@ A eufr n'autenticassion basà an sle partìe Facebook e l'utilisassion ëd FBML 
 	'facebook-link' => 'André a Facebook.com',
 	'facebook-title' => 'Coleghé un cont con Facebook',
 	'facebook-welcome' => 'Bin ëvnù, utent ëd Facebook Connect!',
-	'facebook-loginbox' => "O '''intré ant ël sistema''' con Facebook:
-
-$1",
 	'facebook-merge' => 'Mës-cé sò cont wiki con sò identificativ Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -1901,9 +1835,6 @@ $messages['pt'] = array(
 	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
 	'facebook-welcome' => 'Bem-vindo, utilizador do Facebook Connect!',
-	'facebook-loginbox' => "Ou '''entre''' com o Facebook:
-
-$1",
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -1973,9 +1904,6 @@ $messages['pt-br'] = array(
 	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
 	'facebook-welcome' => 'Bem-vindo, usuário do Facebook Connect!',
-	'facebook-loginbox' => "Ou '''entre''' com o Facebook:
-
-$1",
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
 	'facebook-logoutbox' => '$1
 
@@ -2038,9 +1966,6 @@ $messages['ro'] = array(
 	'facebook-click-to-connect-existing' => 'Apăsaţi pentru a vă conecta contul dvs. Facebook la $1',
 	'facebook-comm' => 'Comunicaţie',
 	'facebook-welcome' => 'Bun venit, utilizator Facebook Connect!',
-	'facebook-loginbox' => "Sau '''autentificaţi-vă''' cu Facebook:
-
-$1",
 	'facebook-error' => 'Eroare la verificare',
 	'facebook-cancel' => 'Acţiune anulată',
 	'facebook-invalid' => 'Opţiune invalidă',
@@ -2147,9 +2072,6 @@ $messages['sv'] = array(
 	'facebook-link' => 'Tillbaka till facebook.com',
 	'facebook-title' => 'Anslut kontot med Facebook',
 	'facebook-welcome' => 'Välkomna, Facebook Connect användare!',
-	'facebook-loginbox' => "Eller '''login''' med Facebook:
-
-$1",
 	'facebook-merge' => 'Koppla din wiki konto med ditt Facebook-ID',
 	'facebook-logoutbox' => '$1 
 
@@ -2234,9 +2156,6 @@ Nagbibigay ng pagpapatunay batay sa mga pangkat sa Facebook at ang paggamit ng F
 	'facebook-link' => 'Bumalik sa facebook.com',
 	'facebook-title' => 'Iugnay ang akawnt sa Facebook',
 	'facebook-welcome' => 'Maligayang pagdating, tagagamit ng Ugnay sa Facebook!',
-	'facebook-loginbox' => "O '''lumagda''' sa pamamagitan ng Facebook:
-
-$1",
 	'facebook-merge' => 'Isanib ang iyong akawnt na pangwiki sa iyong ID na pang-Facebook',
 	'facebook-logoutbox' => '$1
 
