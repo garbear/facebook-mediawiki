@@ -50,7 +50,7 @@ class FacebookUser extends User {
 	 * is returned from Facebook and the user's settings allow an update on
 	 * login.
 	 */
-	function updateFromFacebook() {
+	function updateFromFacebook($saveSettings = true) {
 		wfProfileIn(__METHOD__);
 		global $facebook;
 		
@@ -82,7 +82,7 @@ class FacebookUser extends User {
 			}
 		}
 		// Only save the updated settings if something was changed
-		if ($mod) {
+		if ( $mod && $saveSettings ) {
 			$this->saveSettings();
 		}
 		
