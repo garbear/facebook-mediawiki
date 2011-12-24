@@ -24,7 +24,6 @@
  * Visiting the subpage will generate an error; it is only useful when POSTed to.
  */
 class SpecialConnect extends SpecialPage {
-	private $userNamePrefix;
 	private $isNewUser = false;
 	private $mEmail = '';
 	private $mRealName = '';
@@ -41,15 +40,7 @@ class SpecialConnect extends SpecialPage {
 		$wgSpecialPageGroups['Connect'] = 'login';
 		
 		wfLoadExtensionMessages( 'Facebook' );
-		$this->userNamePrefix = wfMsg('facebook-usernameprefix');
-	}
-	
-	/**
-	 * Allows the prefix to be changed at runtime.  This is useful, for example,
-	 * to generate a username based off of a facebook name.
-	 */
-	public function setUserNamePrefix( $prefix ) {
-		$this->userNamePrefix = $prefix;
+		FacebookUser::setUserNamePrefix( wfMsg('facebook-usernameprefix') );
 	}
 	
 	/**
@@ -1396,7 +1387,7 @@ class SpecialConnect extends SpecialPage {
 		wfProfileOut(__METHOD__);
 		return true;
 	}
-
+	
 	/**
 	 * Generates a unique username for a wiki account based on the prefix specified
 	 * in the message 'facebook-usernameprefix'. The number appended is equal to
@@ -1410,7 +1401,7 @@ class SpecialConnect extends SpecialPage {
 		$i = FacebookDB::countUsers();
 		#$i = 1; // This is the DUMB WAY to do this for large databases
 		while ($i < PHP_INT_MAX) {
-			$name = $this->userNamePrefix . $i;
+			$name = FacebookUser::getUserNamePrefix() . $i;
 			if (FacebookUser::userNameOK($name)) {
 				return $name;
 			}

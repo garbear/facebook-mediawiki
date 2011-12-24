@@ -33,6 +33,8 @@ class FacebookUser extends User {
 	
 	static public $availableUserUpdateOptions = array('fullname', 'gender', 'nickname', 'email', 'language', 'timecorrection');
 	
+	static private $userNamePrefix;
+	
 	/**
 	 * Constructor: Create this object from an existing User. Bonus points if
 	 * the existing User was created form an ID and has not yet been loaded! 
@@ -162,6 +164,27 @@ class FacebookUser extends User {
 		}
 		// If an appropriate value was found, return it
 		return $value == '' ? null : $value;
+	}
+	
+	/**
+	 * Allows the prefix to be changed at runtime.  This is useful, for example,
+	 * to generate a username based off of a facebook name. Make sure to call
+	 * this function before getUserNamePrefix() is called.
+	 * 
+	 * TODO: Add these two lines to this class's constructor/static initializer
+	 * wfLoadExtensionMessages( 'Facebook' );
+	 * FacebookUser::setUserNamePrefix( wfMsg('facebook-usernameprefix') );
+	 */
+	static function setUserNamePrefix( $prefix ) {
+		$this->userNamePrefix = $prefix;
+	}
+	
+	/**
+	 * Returns the prefix set by.  This is useful, for example, to generate a
+	 * username based off of a facebook name.
+	 */
+	static function getUserNamePrefix() {
+		return $this->userNamePrefix;
 	}
 	
 	static function userNameOK($name) {
