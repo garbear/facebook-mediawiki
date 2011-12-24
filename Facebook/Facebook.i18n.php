@@ -37,10 +37,6 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'group-fb-groupie'        => 'Group members',
 	'group-fb-groupie-member' => 'Group member',
 	'grouppage-fb-groupie'    => '{{ns:project}}:Group members',
-	// Officers of the Facebook group
-	'group-fb-officer'        => 'Group officers',
-	'group-fb-officer-member' => 'Group officer',
-	'grouppage-fb-officer'    => '{{ns:project}}:Group officers',
 	// Admins of the Facebook group
 	'group-fb-admin'          => 'Group admins',
 	'group-fb-admin-member'   => 'Group administrator',
