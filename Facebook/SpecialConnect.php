@@ -226,9 +226,13 @@ class SpecialConnect extends SpecialPage {
 				$choice = $wgRequest->getText('wpNameChoice');
 				try {
 					$this->manageChooseNamePost($choice);
-					$this->sendPage('chooseNameView');
+					$this->sendPage('displaySuccessAttachingView');
 				} catch (FacebookUserException $e) {
-					$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
+					// If the title msg is 'connectNewUserView' then we send the view instead of an error
+					if ($e->getTitleMsg() == 'connectNewUserView')
+						$this->sendPage('connectNewUserView', $e->getTextMsg());
+					else
+						$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
 				}
 			}
 			break;
@@ -387,6 +391,7 @@ class SpecialConnect extends SpecialPage {
 				$name = $wgRequest->getText('wpExistingName');
 				$passwprd = $wgRequest->getText('wpExistingPassword');
 				$this->attachUser($fbid, $name, $password, $updatePrefs);
+				$this->sendPage('displaySuccessAttachingView');
 				break;
 				// Check to see if the user selected another valid option
 			case 'nick':
@@ -401,7 +406,7 @@ class SpecialConnect extends SpecialPage {
 				}
 				// If no valid username was found, something's not right; ask again
 				if (!FacebookUser::userNameOK($username)) {
-					$this->sendPage('chooseNameFormView', 'facebook-invalidname');
+					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
 				} else {
 					$this->createUser($fbid, $username);
 				}
@@ -427,9 +432,9 @@ class SpecialConnect extends SpecialPage {
 	 * @throws FacebookUserException
 	 */
 	protected function attachUser($fbid, $name, $password, $updatePrefs) {
-		global $wgOut, $wgUser;
+		global $wgUser;
 		wfProfileIn(__METHOD__);
-	
+		
 		// The user must be logged into Facebook before choosing a wiki username
 		if ( !$fbid ) {
 			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
@@ -437,9 +442,8 @@ class SpecialConnect extends SpecialPage {
 		}
 		// Look up the user by their name
 		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
-		if (!$user || !$user->checkPassword($password)) {
-			$this->sendPage('chooseNameFormView', 'wrongpassword');
-		}
+		if (!$user || !$user->checkPassword($password))
+			throw new FacebookUserException('connectNewUserView', 'wrongpassword');
 	
 		// Attach the user to their Facebook account in the database
 		FacebookDB::addFacebookID($user, $fbid);
@@ -471,7 +475,6 @@ class SpecialConnect extends SpecialPage {
 	
 		// User has been successfully attached and logged in
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
-		$this->sendPage('displaySuccessAttachingView');
 		wfProfileOut(__METHOD__);
 		return true;
 	}
@@ -513,7 +516,7 @@ class SpecialConnect extends SpecialPage {
 	 * The user is logged in to Facebook, but not MediaWiki.
 	 * The Facebook user is new to MediaWiki.
 	 */
-	private function connectNewUserView() {
+	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
 		/**
 		 * TODO: Add an option to disallow this extension to access your Facebook
 		 * information. This option could simply point you to your Facebook privacy
@@ -524,7 +527,6 @@ class SpecialConnect extends SpecialPage {
 		 * to update from fb. Haven't tested it though.
 		 */
 		global $wgUser, $facebook, $wgOut, $wgFbDisableLogin;
-		$messagekey = 'facebook-chooseinstructions';
 		
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
@@ -910,7 +912,7 @@ class SpecialConnect extends SpecialPage {
 		
 		return true;
 	}
-
+	
 	/**
 	 * @throws FacebookUserException
 	 */
