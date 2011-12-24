@@ -74,7 +74,6 @@ class SpecialConnect extends SpecialPage {
 	private $isNewUser = false;
 	private $mEmail = '';
 	private $mRealName = '';
-	static private $fbOnLoginJs;
 	
 	/**
 	 * Constructor.
@@ -138,7 +137,8 @@ class SpecialConnect extends SpecialPage {
 			// remove the temporary array
 			unset( $aReturnToQuery );
 		}
-	
+		
+		// TODO: 302 redirect if returnto is a bad page
 		$title = Title::newFromText($this->mReturnTo);
 		if ($title instanceof Title) {
 			$this->mResolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
@@ -229,7 +229,7 @@ class SpecialConnect extends SpecialPage {
 					if ( $choice == 'existing' ) {
 						$this->sendPage('displaySuccessAttachingView');
 					} else {
-						$this->sendPage('successfulLoginView');
+						$this->sendPage('loginSuccessView');
 					}
 				} catch (FacebookUserException $e) {
 					// If the title msg is 'connectNewUserView' then we send the view instead of an error
@@ -460,7 +460,7 @@ class SpecialConnect extends SpecialPage {
 		// Update the user with settings from Facebook
 		if (count($updatePrefs)) {
 			foreach ($updatePrefs as $option) {
-				$user->setOption("Facebookupdate-on-login-$option", '1');
+				$user->setOption("facebookupdate-on-login-$option", '1');
 			}
 		}
 		$user->updateFromFacebook();
@@ -491,28 +491,26 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * @throws FacebookUserException
 	 */
-	protected function createUser($fb_id, $name) {
-		global $wgUser, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc;
-		// Disabled. Because exceptions are used, an RAII model should be used
+	protected function createUser($fb_id, $username) {
+		global $wgUser, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc, $facebook;
+		// Disabled. Because exceptions are used, an RAII model should be used here
 		#wfProfileIn(__METHOD__);
 		
 		// Handle accidental reposts.
 		if ( $wgUser->isLoggedIn() ) {
-			return; // sorry for the early return
+			return;
 		}
 		
-		// Make sure we're not stealing an existing user account.
-		if (!$name || !FacebookUser::userNameOK($name)) {
-			wfDebug("Facebook: Name not OK: '$name'\n");
+		// Make sure we're not stealing an existing user account (it can't hurt to check twice)
+		if ( empty( $username ) || !FacebookUser::userNameOK($username)) {
+			wfDebug("Facebook: Name not OK: '$username'\n");
 			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
-			throw new FacebookUserException('connectNewUserView' /*, 'facebook-chooseinstructions' */);
-			return;
+			throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
 		}
 		
 		/// START OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
 		
 		// Check the restrictions again to make sure that the user can create this account.
-		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			// Special case for readOnlyPage error
 			throw new FacebookUserException(null, null);
@@ -525,6 +523,7 @@ class SpecialConnect extends SpecialPage {
 				wfDebug("Facebook: Blocked user was attempting to create account via Facebook Connect.\n");
 				throw new FacebookUserException('facebook-error', 'facebook-errortext');
 			} else {
+				$titleObj = SpecialPage::getTitleFor( 'Connect' );
 				$permErrors = $titleObj->getUserPermissionsErrors('createaccount', $wgUser, true);
 				if (count($permErrors) > 0) {
 					// Special case for permission errors
@@ -539,7 +538,7 @@ class SpecialConnect extends SpecialPage {
 		// create a local account and login as any domain user). We only need
 		// to check this for domains that aren't local.
 		$mDomain = $wgRequest->getText( 'wpDomain' );
-		if ('local' != $mDomain && '' != $mDomain && !$wgAuth->canCreateAccounts() && !$wgAuth->userExists($name))
+		if ('local' != $mDomain && '' != $mDomain && !$wgAuth->canCreateAccounts() && !$wgAuth->userExists($username))
 			throw new FacebookUserException('facebook-error', 'wrongpassword');
 		
 		// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
@@ -555,28 +554,27 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		$user = User::newFromName($name);
+		$user = User::newFromName($username);
 		if (!$user) {
 			wfDebug("Facebook: Error creating new user.\n");
 			throw new FacebookUserException('facebook-error', 'facebook-error-creating-user');
 		}
+		// TODO: Make user a Facebook user here: $fbUser = new FacebookUser($user);
 		
-		// Let extensions abort the account creation.  If you have extensions which are expecting
-		// a Real Name or Email, you may need to disable them since these are not requirements of
-		// Facebook Connect (so users will not have them).
+		// Let extensions abort the account creation.
 		// NOTE: Currently this is commented out because it seems that most wikis might have a
 		// handful of restrictions that won't be needed on Facebook Connections. For instance,
-		// requiring a CAPTCHA or age-verification, etc.  Having a Facebook account as a
-		// pre-requisitie removes the need for that.
+		// requiring a CAPTCHA or age-verification, etc. Having a Facebook account as a pre-
+		// requisitie removes the need for that.
 		/*
-		 $abortError = '';
+		$abortError = '';
 		if( !wfRunHooks( 'AbortNewAccount', array( $user, &$abortError ) ) ) {
 		// Hook point to add extra creation throttles and blocks
 		wfDebug( "SpecialConnect::createUser: a hook blocked creation\n" );
 		throw new FacebookUserException('facebook-error', 'facebook-error-user-creation-hook-aborted',
 				array( $abortError ));
 		}
-		/**/
+		*/
 		
 		// Apply account-creation throttles
 		global $wgAccountCreationThrottle;
@@ -588,66 +586,117 @@ class SpecialConnect extends SpecialPage {
 			}
 			if ( $value >= $wgAccountCreationThrottle ) {
 				// 'acct_creation_throttle_hit' should actually use 'parseinline' not 'parse' in $wgOut->showErrorPage()
-				throw new FacebookUserException('facebook-error', 'acct_creation_throttle_hit', array($wgAccountCreationThrottle));
+				throw new FacebookUserException('facebook-error', 'acct_creation_throttle_hit',
+							array($wgAccountCreationThrottle));
 			}
 			$wgMemc->incr( $key );
 		}
 		
 		/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
 		
+		// Fill in the info we know
+		$userinfo = $facebook->getUserInfo();
+		$email    = FacebookUser::getOptionFromInfo('email', $userinfo);
+		$realName = FacebookUser::getOptionFromInfo('fullname', $userinfo);
+		$pass     = null;
+		
 		// Create the account (locally on main cluster or via $wgAuth on other clusters)
-		$email = $realName = ""; // The real values will get filled in outside of the scope of this function.
-		$pass = null;
+		// $wgAuth essentially checks to see if these are valid parameters for new users
 		if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
 			wfDebug("Facebook: Error adding new user to database.\n");
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
 		
-		// Adds the user to the local database (regardless of whether $wgAuth was used)
-		$user = $this->initUser( $user, true );
+		// Add the user to the local database (regardless of whether $wgAuth was used)
+		// This is a custom version of similar code in SpecialUserLogin's LoginForm
+		// with differences due to the fact that this code doesn't require a password, etc.
+		global $wgExternalAuthType;
+		if ( $wgExternalAuthType ) {
+			$user = ExternalUser::addUser( $user, $pass, $email, $realName );
+			if ( is_object( $user ) ) {
+				$extUser = ExternalUser::newFromName( $username );
+			}
+		} else {
+			$user->addToDatabase();
+		}
 		
-		// Attach the user to their Facebook account in the database
-		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups
-		FacebookDB::addFacebookID($user, $fb_id);
+		if ( !empty( $extUser ) && is_object( $extUser ) ) {
+			$extUser->linkToLocal( $user->getId() );
+			$extEmail = $extUser->getPref( 'emailaddress' );
+			if ( !empty( $extEmail ) && empty( $email ) ) {
+				$user->setEmail( $extEmail );
+			}
+		}
 		
-		wfRunHooks( 'AddNewAccount', array( $user ) );
+		$wgAuth->initUser( $user, true ); // $autocreate = true;
+		$wgAuth->updateUser($user);
 		
-		// Mark that the user is a Facebook user
-		$user->addGroup('fb-user');
+		// No passwords for Facebook accounts.
+		/*
+		if ( $wgAuth->allowPasswordChange() ) {
+			$u->setPassword( $this->mPassword );
+		}
+		*/
 		
 		// Store which fields should be auto-updated from Facebook when the user logs in.
 		$updateFormPrefix = 'wpUpdateUserInfo';
 		foreach ($this->getAvailableUserUpdateOptions() as $option) {
-			if($wgRequest->getVal($updateFormPrefix . $option, '') != ''){
-				$user->setOption("facebook-update-on-login-$option", 1);
+			/*
+			 if ($wgRequest->getVal($updateFormPrefix . $option, '') != '') {
+			$user->setOption("facebook-update-on-login-$option", 1);
 			} else {
-				$user->setOption("facebook-update-on-login-$option", 0);
+			$user->setOption("facebook-update-on-login-$option", 0);
 			}
+			*/
+			// Default all values to true
+			$user->setOption("facebook-update-on-login-$option", 1);
 		}
 		
 		// Process the FacebookPushEvent preference checkboxes if Push Events are enabled
 		global $wgFbEnablePushToFacebook;
-		if( $wgFbEnablePushToFacebook ) {
+		if( !empty( $wgFbEnablePushToFacebook ) ) {
 			global $wgFbPushEventClasses;
-			if (!empty( $wgFbPushEventClasses )) {
+			if ( !empty( $wgFbPushEventClasses ) ) {
 				foreach( $wgFbPushEventClasses as $pushEventClassName ) {
 					$pushObj = new $pushEventClassName;
 					$className = get_class();
 					$prefName = $pushObj->getUserPreferenceName();
-					
 					$user->setOption($prefName, ($wgRequest->getCheck($prefName) ? '1' : '0'));
 				}
 			}
-			
+		
 			// Save the preference for letting user select to never send anything to their newsfeed
 			$prefName = FacebookPushEvent::$PREF_TO_DISABLE_ALL;
 			$user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0');
 		}
 		
-		// Unfortunately, performs a second database lookup
+		//$user->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
+		$user->setOption( 'rememberpassword', 1 );
+		//$user->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
+		$user->setOption( 'skinoverwrite', 1 );
+		
+		// Mark that the user is a Facebook user
+		$user->addGroup('fb-user');
+		
+		// I think this should be done here
+		$user->setToken();
+		
+		$user->saveSettings();
+		
+		// Update user count
+		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
+		$ssUpdate->doUpdate();
+		
+		// Attach the user to their Facebook account in the database
+		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups
+		FacebookDB::addFacebookID($user, $fb_id);
+		
+		// Update the user with settings from Facebook (must be called somewhere
+		// between $user->saveSettings(); and the end of this function)
 		$fbUser = new FacebookUser($user);
-		// Update the user with settings from Facebook
 		$fbUser->updateFromFacebook();
+		
+		wfRunHooks( 'AddNewAccount', array( $user ) );
 		
 		// Start the session if it's not already been started
 		global $wgSessionStarted;
@@ -661,10 +710,10 @@ class SpecialConnect extends SpecialPage {
 		
 		/*
 		 * Similar to what's done in LoginForm::authenticateUserData(). Load
-		* $wgUser now. This is necessary because loading $wgUser (say by
-				* calling getName()) calls the UserLoadFromSession hook, which
-		* potentially creates the user in the local database.
-		*/
+		 * $wgUser now. This is necessary because loading $wgUser (say by
+		 * calling getName()) calls the UserLoadFromSession hook, which
+		 * potentially creates the user in the local database.
+		 */
 		$sessionUser = User::newFromSession();
 		$sessionUser->load();
 		
@@ -673,67 +722,8 @@ class SpecialConnect extends SpecialPage {
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
 		
 		$user->addNewUserLogEntryAutoCreate();
+		// This is picked up by the 'loginSuccessView' view
 		$this->isNewUser = true;
-	}
-	
-	/**
-	 * Actually add a user to the database.
-	 * Give it a User object that has been initialised with a name.
-	 *
-	 * This is a custom version of similar code in SpecialUserLogin's LoginForm with differences
-	 * due to the fact that this code doesn't require a password, etc.
-	 *
-	 * @param $u User object.
-	 * @param $autocreate boolean -- true if this is an autocreation via auth plugin
-	 * @return User object.
-	 * @private
-	 */
-	protected function initUser( $u, $autocreate ) {
-		global $wgAuth, $wgExternalAuthType;
-		
-		if ( $wgExternalAuthType ) {
-			$u = ExternalUser::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
-			if ( is_object( $u ) ) {
-				$this->mExtUser = ExternalUser::newFromName( $this->mName );
-			}
-		} else {
-			$u->addToDatabase();
-		}
-		
-		// No passwords for Facebook accounts.
-		/*
-		 if ( $wgAuth->allowPasswordChange() ) {
-		$u->setPassword( $this->mPassword );
-		}
-		*/
-		if ( $this->mEmail )
-			$u->setEmail( $this->mEmail );
-		if ( $this->mRealName )
-			$u->setRealName( $this->mRealName );
-		$u->setToken();
-		
-		$wgAuth->initUser( $u, $autocreate );
-	
-		if ( is_object( $this->mExtUser ) ) {
-			$this->mExtUser->linkToLocal( $u->getId() );
-			$email = $this->mExtUser->getPref( 'emailaddress' );
-			if ( $email && !$this->mEmail ) {
-				$u->setEmail( $email );
-			}
-		}
-		
-		$wgAuth->updateUser($u);
-		
-		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
-		//$u->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
-		$u->setOption('skinoverwrite', 1);
-		$u->saveSettings();
-		
-		// Update user count
-		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
-		$ssUpdate->doUpdate();
-		
-		return $u;
 	}
 	
 	
@@ -895,11 +885,13 @@ class SpecialConnect extends SpecialPage {
 		if (!empty($this->mReturnTo)) {
 			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
 					$this->mReturnTo . '">');
+			// Only need returntoquery if returnto is set
+			if (!empty($this->mReturnToQuery)) {
+				$wgOut->addHTML('<input type="hidden" name="returntoquery" value="' .
+						$this->mReturnToQuery . '">');
+			}
 		}
-		if (!empty($this->mReturnToQuery)) {
-			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
-					$this->mReturnToQuery . '">');
-		}
+		
 		$wgOut->addHTML("</td></tr></table></fieldset></form>\n\n");
 	}
 	
@@ -928,10 +920,11 @@ class SpecialConnect extends SpecialPage {
 			$titleObj = Title::newFromText( $this->mReturnTo );
 			if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
 					!$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
-				$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery .
-						(!empty($this->mReturnToQuery) ? '&' : '') .
-						'cb=' . rand(1, 10000) . $addParam )
-				);
+				$query = '';
+				if ( !empty($this->mReturnToQuery) )
+					$query .= $this->mReturnToQuery . '&';
+				$query .= 'cb=' . rand(1, 10000);
+				$wgOut->redirect( $titleObj->getFullURL( $query ) );
 			} else {
 				$titleObj = Title::newMainPage();
 				$wgOut->redirect( $titleObj->getFullURL( 'cb=' . rand(1, 10000) . $addParam ) );
@@ -1021,10 +1014,11 @@ class SpecialConnect extends SpecialPage {
 		$titleObj = Title::newFromText( $this->mReturnTo );
 		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
 				!$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
-			$wgOut->redirect( $titleObj->getFullURL($this->mReturnToQuery .
-					(!empty($this->mReturnToQuery) ? '&' : '') .
-					'fbconnected=1&cb=' . rand(1, 10000) )
-			);
+			$query = '';
+			if ( !empty($this->mReturnToQuery) )
+				$query .=  $query = $this->mReturnToQuery . '&';
+			$query .= 'fbconnected=1&cb=' . rand(1, 10000);
+			$wgOut->redirect( $titleObj->getFullURL( $query ) );
 		} else {
 			/*
 			 // Render a "return to" link retrieved from the URL
