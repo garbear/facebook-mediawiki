@@ -1411,37 +1411,6 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * Tests whether the name is OK to use as a user name.
-	 *
-	public function userNameOK ($name) {
-		global $wgReservedUsernames;
-		
-		$name = trim( $name );
-		
-		if ( empty( $name ) ) {
-			return false;
-		}
-		
-		$u = User::newFromName( $name, 'creatable' );
-		if ( !is_object( $u ) ) {
-			return false;
-		}
-		
-		if ( !empty($wgReservedUsernames) && in_array($name, $wgReservedUsernames) ) {
-			return false;
-		}
-		
-		$mExtUser = ExternalUser::newFromName( $name );
-		if ( is_object( $mExtUser ) && ( 0 != $mExtUser->getId() ) ) {
-			return false;
-		} elseif ( 0 != $u->idForName( true ) ) {
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/**
 	 * Check to see if the user can create a Facebook-linked account.
 	 */
 	function checkCreateAccount() {

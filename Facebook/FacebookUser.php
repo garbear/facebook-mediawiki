@@ -187,6 +187,9 @@ class FacebookUser extends User {
 		return $this->userNamePrefix;
 	}
 	
+	/**
+	 * Tests whether the name is OK to use as a user name.
+	 */
 	static function userNameOK($name) {
 		global $wgReservedUsernames;
 		
