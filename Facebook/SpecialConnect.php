@@ -15,6 +15,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/**
+ * Thrown when a FacebookUser encounters a problem.
+ */
+class FacebookUserException extends Exception
+{
+	protected $titleMsg;
+	protected $textMsg;
+	protected $msgParams;
+
+	/**
+	 * Make a new FacebookUser Exception with the given result.
+	 */
+	public function __construct($titleMsg, $textMsg, $msgParams = NULL) {
+		$this->titleMsg  = $titleMsg;
+		$this->textMsg   = $textMsg;
+		$this->msgParams = $msgParams;
+		
+		// In general, $msg and $code are not meant to be used
+		$msg = wfMsg( $this->textMsg );
+		$code = 0;
+		
+		parent::__construct($msg, $code);
+	}
+	
+	public function getTitleMsg() {
+		return $this->titleMsg;
+	}
+	
+	public function getTextMsg() {
+		return $this->textMsg;
+	}
+	
+	public function getMsgParams() {
+		return $this->msgParams;
+	}
+	
+	public function getType() {
+		return 'Exception';
+	}
+
+	public function __toString() {
+		return wfMsg( $this->textMsg );
+	}
+}
+
+
 /**
  * Class SpecialConnect
  * 
@@ -122,9 +169,19 @@ class SpecialConnect extends SpecialPage {
 		}
 	}
 	
-	protected function sendError($titleMsg, $textMsg) {
+	protected function sendError($titleMsg, $textMsg, $msgParams = NULL) {
 		global $wgOut;
-		$wgOut->showErrorPage($titleMsg, $textMsg);
+		// Special case: $titleMsg is a list of permission errors
+		if ( is_array( $titleMsg ) )
+			$wgOut->showPermissionsErrorPage( $titleMsg, $textMsg );
+		// Special case: read only error, all parameters are null
+		else if ( is_null( $titleMsg ) && is_null( $textMsg ) )
+ 			$wgOut->readOnlyPage();
+		// General cases: normal error page
+		else if ($msgParams)
+ 			$wgOut->showErrorPage($titleMsg, $textMsg, $msgParams);
+		else
+			$wgOut->showErrorPage($titleMsg, $textMsg);
 	}
 	
 	protected function sendRedirect($specialPage) {
@@ -167,8 +224,13 @@ class SpecialConnect extends SpecialPage {
 				$this->sendError('facebook-cancel', 'facebook-canceltext');
 			} else {
 				$choice = $wgRequest->getText('wpNameChoice');
-				$this->manageChooseNamePost($choice);
-				$this->sendPage('chooseNameView');
+				// manageChooseNamePost() returns false if it displays an error message
+				try {
+					$this->manageChooseNamePost($choice);
+					$this->sendPage('chooseNameView');
+				} catch (FacebookUserException $e) {
+					$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
+				}
 			}
 			break;
 		case 'ConnectExisting':
@@ -308,6 +370,9 @@ class SpecialConnect extends SpecialPage {
 		}
 	}
 	
+	/**
+	 * @throws FacebookUserException
+	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest, $facebook;
 		$fbid = $facebook->getUser();
@@ -414,9 +479,12 @@ class SpecialConnect extends SpecialPage {
 				// This is not an explicitly static method but doesn't use $this and can be called like static
 				LoginForm::userBlockedMessage();
 				return false;
-			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) ) > 0 ) {
-				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-				return false;
+			} else {
+				$permErrors = $titleObj->getUserPermissionsErrors('createaccount', $wgUser, true);
+				if (count( $permErrors ) > 0) {
+					// Special case for permission errors
+					throw new FacebookUserException($permErrors, 'createaccount');
+				}
 			}
 		}
 		
@@ -1059,8 +1127,11 @@ class SpecialConnect extends SpecialPage {
 		return true;
 	}
 
+	/**
+	 * @throws FacebookUserException
+	 */
 	protected function createUser($fb_id, $name) {
-		global $wgUser, $wgOut, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc;
+		global $wgUser, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc;
 		wfProfileIn(__METHOD__);
 		
 		// Handle accidental reposts.
@@ -1083,8 +1154,8 @@ class SpecialConnect extends SpecialPage {
 		// Check the restrictions again to make sure that the user can create this account.
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
-			$wgOut->readOnlyPage();
-			return;
+			// Special case for readOnlyPage error
+			throw new FacebookUserException(null, null);
 		}
 		
 		if ( empty( $wgFbDisableLogin ) ) {
@@ -1092,11 +1163,13 @@ class SpecialConnect extends SpecialPage {
 			// then technically no users can create accounts
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("Facebook: Blocked user was attempting to create account via Facebook Connect.\n");
-				$wgOut->showErrorPage('facebook-error', 'facebook-errortext');
-				return;
-			} elseif ( count( $permErrors = $titleObj->getUserPermissionsErrors( 'createaccount', $wgUser, true ) )>0 ) {
-				$wgOut->showPermissionsErrorPage( $permErrors, 'createaccount' );
-				return;
+				throw new FacebookUserException('facebook-error', 'facebook-errortext');
+			} else {
+				$permErrors = $titleObj->getUserPermissionsErrors('createaccount', $wgUser, true);
+				if (count($permErrors) > 0) {
+					// Special case for permission errors
+					throw new FacebookUserException($permErrors, 'createaccount');
+				}
 			}
 		}
 		
@@ -1106,44 +1179,26 @@ class SpecialConnect extends SpecialPage {
 		// create a local account and login as any domain user). We only need
 		// to check this for domains that aren't local.
 		$mDomain = $wgRequest->getText( 'wpDomain' );
-		if( 'local' != $mDomain && '' != $mDomain ) {
-			if( !$wgAuth->canCreateAccounts() && ( !$wgAuth->userExists( $name ) ) ) {
-				$wgOut->showErrorPage('facebook-error', 'wrongpassword');
-				return false;
-			}
-		}
+		if ('local' != $mDomain && '' != $mDomain && !$wgAuth->canCreateAccounts() && !$wgAuth->userExists($name))
+			throw new FacebookUserException('facebook-error', 'wrongpassword');
 		
 		// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
 		global $wgEnableSorbs, $wgProxyWhitelist;
 		$ip = wfGetIP();
-		if ( $wgEnableSorbs && !in_array( $ip, $wgProxyWhitelist ) &&
-					$wgUser->inSorbsBlacklist( $ip ) )
-		{
-			$wgOut->showErrorPage('facebook-error', 'sorbs_create_account_reason');
-			return;
-		}
+		if ($wgEnableSorbs && !in_array($ip, $wgProxyWhitelist) && $wgUser->inSorbsBlacklist($ip))
+			throw new FacebookUserException('facebook-error', 'sorbs_create_account_reason');
  		
-		/**
-		// Test to see if we are denied by $wgAuth or the user can't create an account
-		if ( !$wgAuth->autoCreate() || !$wgAuth->userExists( $userName ) ||
-									   !$wgAuth->authenticate( $userName )) {
-			$result = false;
-			return true;
-		}
-		/**/
-		
 		// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
 		// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
 		// Can use 'this' to call sendPage('chooseNameFormView', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
-		if(! wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )){
+		if (!wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )) {
 			return;
 		}
 
 		$user = User::newFromName($name);
 		if (!$user) {
 			wfDebug("Facebook: Error creating new user.\n");
-			$wgOut->showErrorPage('facebook-error', 'facebook-error-creating-user');
-			return;
+			throw new FacebookUserException('facebook-error', 'facebook-error-creating-user');
 		}
 		
 		// Let extensions abort the account creation.  If you have extensions which are expecting
@@ -1158,8 +1213,8 @@ class SpecialConnect extends SpecialPage {
 		if( !wfRunHooks( 'AbortNewAccount', array( $user, &$abortError ) ) ) {
 			// Hook point to add extra creation throttles and blocks
 			wfDebug( "SpecialConnect::createUser: a hook blocked creation\n" );
-			$wgOut->showErrorPage('facebook-error', 'facebook-error-user-creation-hook-aborted', array($abortError));
-			return false;
+			throw new FacebookUserException('facebook-error', 'facebook-error-user-creation-hook-aborted',
+						array( $abortError ));
 		}
 		/**/
 		
@@ -1172,9 +1227,8 @@ class SpecialConnect extends SpecialPage {
 				$wgMemc->set( $key, 0, 86400 );
 			}
 			if ( $value >= $wgAccountCreationThrottle ) {
-				// TODO: 'acct_creation_throttle_hit' should use 'parseinline' not 'parse' inside $wgOut->showErrorPage()
-				$wgOut->showErrorPage('permissionserrors', 'acct_creation_throttle_hit', array($wgAccountCreationThrottle));
-				return false;
+				// 'acct_creation_throttle_hit' should actually use 'parseinline' not 'parse' in $wgOut->showErrorPage()
+				throw new FacebookUserException('facebook-error', 'acct_creation_throttle_hit', array($wgAccountCreationThrottle));
 			}
 			$wgMemc->incr( $key );
 		}
@@ -1186,8 +1240,7 @@ class SpecialConnect extends SpecialPage {
 		$pass = null;
 		if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
 			wfDebug("Facebook: Error adding new user to database.\n");
-			$wgOut->showErrorPage('facebook-error', 'facebook-errortext');
-			return;
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
 		
 		// Adds the user to the local database (regardless of whether $wgAuth was used)
@@ -1335,6 +1388,8 @@ class SpecialConnect extends SpecialPage {
 	 *
 	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
 	 * code. Does it handle setting push-preferences correctly?
+	 * 
+	 * @throws FacebookUserException
 	 */
 	protected function attachUser($fbid, $name, $password, $updatePrefs) {
 		global $wgOut, $wgUser;
@@ -1343,14 +1398,12 @@ class SpecialConnect extends SpecialPage {
 		// The user must be logged into Facebook before choosing a wiki username
 		if ( !$fbid ) {
 			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
-			$wgOut->showErrorPage( 'facebook-error', 'facebook-errortext' );
-			return false;
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
 		// Look up the user by their name
 		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
 		if (!$user || !$user->checkPassword($password)) {
 			$this->sendPage('chooseNameFormView', 'wrongpassword');
-			return false;
 		}
 		
 		// Attach the user to their Facebook account in the database
