@@ -175,6 +175,8 @@ class SpecialConnect extends SpecialPage {
 			if ( $wgRequest->getCheck('wpCancel') ) {
 				$this->sendError('facebook-cancel', 'facebook-canceltext');
 			} else {
+				$choice = $wgRequest->getText('wpNameChoice');
+				$this->manageChooseNamePost($choice);
 				$this->sendPage('chooseNameView');
 			}
 			break;
@@ -315,6 +317,51 @@ class SpecialConnect extends SpecialPage {
 		}
 	}
 	
+	private function manageChooseNamePost($choice) {
+		global $wgRequest, $facebook;
+		$fbid = $facebook->getUser();
+		switch ($choice) {
+			// Check to see if the user opted to connect an existing account
+			case 'existing':
+				$updatePrefs = array();
+				foreach ($this->getAvailableUserUpdateOptions() as $option) {
+					if ($wgRequest->getText("wpUpdateUserInfo$option", '0') == '1') {
+						$updatePrefs[] = $option;
+					}
+				}
+				$name = $wgRequest->getText('wpExistingName');
+				$passwprd = $wgRequest->getText('wpExistingPassword');
+				$this->attachUser($fbid, $name, $password, $updatePrefs);
+				break;
+				// Check to see if the user selected another valid option
+			case 'nick':
+			case 'first':
+			case 'full':
+				// Get the username from Facebook (Note: not from the form)
+				$username = FacebookUser::getOptionFromInfo($choice . 'name', $facebook->getUserInfo());
+			case 'manual':
+				if (!isset($username) || !FacebookUser::userNameOK($username)) {
+					// Use manual name if no username is set, even if manual wasn't chosen
+					$username = $wgRequest->getText('wpName2');
+				}
+				// If no valid username was found, something's not right; ask again
+				if (!FacebookUser::userNameOK($username)) {
+					$this->sendPage('chooseNameFormView', 'facebook-invalidname');
+				} else {
+					$this->createUser($fbid, $username);
+				}
+				break;
+			case 'auto':
+				// Create a user with a unique generated username
+				$this->createUser($fbid, $this->generateUserName());
+				break;
+			default:
+				$this->sendError('facebook-invalid', 'facebook-invalidtext');
+		}
+	}
+	
+	
+	
 	/**
 	 * The user is logged in to MediaWiki but not Facebook.
 	 * No Facebook user is associated with this MediaWiki account.
@@ -418,7 +465,7 @@ class SpecialConnect extends SpecialPage {
 				if (!$value) {
 					continue;
 				}
-	
+				
 				// Build the list item for the update option
 				$updateOptions[] = "<li><input name=\"wpUpdateUserInfo$option\" type=\"checkbox\" " .
 				"value=\"1\" id=\"wpUpdateUserInfo$option\" checked=\"checked\" /><label for=\"wpUpdateUserInfo$option\">" .
@@ -443,7 +490,7 @@ class SpecialConnect extends SpecialPage {
 		// TODO: Wikify the usernames (i.e. Full name should have an _ )
 		foreach (array('nick', 'first', 'full') as $option) {
 			$nickname = FacebookUser::getOptionFromInfo($option . 'name', $userinfo);
-			if ($nickname && $this->userNameOK($nickname)) {
+			if ($nickname && FacebookUser::userNameOK($nickname)) {
 				$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="' .
 						$option . ($checked ? '' : '" checked="checked') . '" id="wpNameChoice' . $option .
 						'"/></td><td class="mw-input"><label for="wpNameChoice' . $option . '">' .
@@ -619,6 +666,9 @@ class SpecialConnect extends SpecialPage {
 		return true;
 	}
 	
+	/**
+	 * 
+	 *
 	private function chooseNameView() {
 		global $wgRequest, $facebook;
 		$fbid = $facebook->getUser();
@@ -633,8 +683,7 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 				$this->attachUser($fbid, $wgRequest->getText('wpExistingName'),
-						$wgRequest->getText('wpExistingPassword'),
-						$updatePrefs);
+						$wgRequest->getText('wpExistingPassword'), $updatePrefs);
 				break;
 				// Check to see if the user selected another valid option
 			case 'nick':
@@ -1031,7 +1080,7 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// Make sure we're not stealing an existing user account.
-		if (!$name || !$this->userNameOK($name)) {
+		if (!$name || !FacebookUser::userNameOK($name)) {
 			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
 			wfDebug("Facebook: Name not OK: '$name'\n");
 			$this->sendPage('chooseNameFormView');
@@ -1362,7 +1411,7 @@ class SpecialConnect extends SpecialPage {
 		#$i = 1; // This is the DUMB WAY to do this for large databases
 		while ($i < PHP_INT_MAX) {
 			$name = $this->userNamePrefix . $i;
-			if ($this->userNameOK($name)) {
+			if (FacebookUser::userNameOK($name)) {
 				return $name;
 			}
 			++$i;
@@ -1372,7 +1421,7 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Tests whether the name is OK to use as a user name.
-	 */
+	 *
 	public function userNameOK ($name) {
 		global $wgReservedUsernames;
 		
