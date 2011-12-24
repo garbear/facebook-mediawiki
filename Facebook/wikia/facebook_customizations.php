@@ -246,8 +246,8 @@ class ChooseNameForm extends LoginForm {
 							$nickname = $fullname;
 						}
 						// Their nickname and full name were taken, so generate a username based on the nickname.
-						$specialConnect->setUserNamePrefix( $nickname );
-						$this->mName = $specialConnect->generateUserName();
+						FacebookUser::setUserNamePrefix( $nickname );
+						$this->mName = FacebookUser::generateUserName();
 					}
 				}
 			}

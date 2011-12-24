@@ -415,7 +415,7 @@ class SpecialConnect extends SpecialPage {
 			case 'auto':
 				if ( empty($username) ) {
 					// We got here if and only if $choice is 'auto'
-					$username = $this->generateUserName();
+					$username = FacebookUser::generateUserName();
 				}
 				// Just in case the automatically-generated username is a bad egg
 				if ( empty($username) || !FacebookUser::userNameOK($username) ) {
@@ -872,7 +872,7 @@ class SpecialConnect extends SpecialPage {
 		// The options for auto and manual usernames are always available
 		$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="auto" ' .
 				($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto"/></td><td class="mw-input">' .
-				'<label for="wpNameChoiceAuto">' . wfMsg('facebook-chooseauto', $this->generateUserName()) .
+				'<label for="wpNameChoiceAuto">' . wfMsg('facebook-chooseauto', FacebookUser::generateUserName()) .
 				'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
 				'value="manual" id="wpNameChoiceManual"/></td><td class="mw-input"><label ' .
 				'for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;' .
@@ -1161,28 +1161,6 @@ class SpecialConnect extends SpecialPage {
 		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
 		
 		return true;
-	}
-	
-	/**
-	 * Generates a unique username for a wiki account based on the prefix specified
-	 * in the message 'facebook-usernameprefix'. The number appended is equal to
-	 * the number of Facebook Connect to user ID associations in the user_fbconnect
-	 * table, so quite a few numbers will be skipped. However, this approach is
-	 * more scalable. For smaller wiki installations, uncomment the line $i = 1 to
-	 * have consecutive usernames starting at 1.
-	 */
-	public function generateUserName() {
-		// Because $i is incremented the first time through the while loop
-		$i = FacebookDB::countUsers();
-		#$i = 1; // This is the DUMB WAY to do this for large databases
-		while ($i < PHP_INT_MAX) {
-			$name = FacebookUser::getUserNamePrefix() . $i;
-			if (FacebookUser::userNameOK($name)) {
-				return $name;
-			}
-			++$i;
-		}
-		return $prefix;
 	}
 	
 	/**

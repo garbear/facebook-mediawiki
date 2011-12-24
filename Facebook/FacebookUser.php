@@ -188,6 +188,28 @@ class FacebookUser extends User {
 	}
 	
 	/**
+	 * Generates a unique username for a wiki account based on the prefix specified
+	 * in the message 'facebook-usernameprefix'. The number appended is equal to
+	 * the number of Facebook Connect to user ID associations in the user_fbconnect
+	 * table, so quite a few numbers will be skipped. However, this approach is
+	 * more scalable. For smaller wiki installations, uncomment the line $i = 1 to
+	 * have consecutive usernames starting at 1.
+	 */
+	static function generateUserName() {
+		// Because $i is incremented the first time through the while loop
+		$i = FacebookDB::countUsers(); // rough estimate
+		$max = $i + 100;
+		while ($i < PHP_INT_MAX && i < $max) {
+			$name = self::getUserNamePrefix() . $i;
+			if (FacebookUser::userNameOK($name)) {
+				return $name;
+			}
+			++$i;
+		}
+		return $prefix;
+	}
+	
+	/**
 	 * Tests whether the name is OK to use as a user name.
 	 */
 	static function userNameOK($name) {
