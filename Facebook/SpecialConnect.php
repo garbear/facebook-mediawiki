@@ -226,7 +226,11 @@ class SpecialConnect extends SpecialPage {
 				$choice = $wgRequest->getText('wpNameChoice');
 				try {
 					$this->manageChooseNamePost($choice);
-					$this->sendPage('displaySuccessAttachingView');
+					if ( $choice == 'existing' ) {
+						$this->sendPage('displaySuccessAttachingView');
+					} else {
+						$this->sendPage('successfulLoginView');
+					}
 				} catch (FacebookUserException $e) {
 					// If the title msg is 'connectNewUserView' then we send the view instead of an error
 					if ($e->getTitleMsg() == 'connectNewUserView')
@@ -391,7 +395,6 @@ class SpecialConnect extends SpecialPage {
 				$name = $wgRequest->getText('wpExistingName');
 				$passwprd = $wgRequest->getText('wpExistingPassword');
 				$this->attachUser($fbid, $name, $password, $updatePrefs);
-				$this->sendPage('displaySuccessAttachingView');
 				break;
 				// Check to see if the user selected another valid option
 			case 'nick':
@@ -416,7 +419,7 @@ class SpecialConnect extends SpecialPage {
 				$this->createUser($fbid, $this->generateUserName());
 				break;
 			default:
-				$this->sendError('facebook-invalid', 'facebook-invalidtext');
+				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
 		}
 	}
 	
@@ -484,20 +487,19 @@ class SpecialConnect extends SpecialPage {
 	 */
 	protected function createUser($fb_id, $name) {
 		global $wgUser, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc;
-		wfProfileIn(__METHOD__);
+		// Disabled. Because exceptions are used, an RAII model should be used
+		#wfProfileIn(__METHOD__);
 	
 		// Handle accidental reposts.
 		if ( $wgUser->isLoggedIn() ) {
-			$this->sendPage('successfulLoginView');
-			wfProfileOut(__METHOD__);
-			return;
+			return; // sorry for the early return
 		}
 	
 		// Make sure we're not stealing an existing user account.
 		if (!$name || !FacebookUser::userNameOK($name)) {
-			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
 			wfDebug("Facebook: Name not OK: '$name'\n");
-			$this->sendPage('chooseNameFormView');
+			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
+			throw new FacebookUserException('connectNewUserView' /*, 'facebook-chooseinstructions' */);
 			return;
 		}
 	
@@ -665,11 +667,7 @@ class SpecialConnect extends SpecialPage {
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
 	
 		$user->addNewUserLogEntryAutoCreate();
-	
 		$this->isNewUser = true;
-		$this->sendPage('successfulLoginView');
-	
-		wfProfileOut(__METHOD__);
 	}
 	
 	
