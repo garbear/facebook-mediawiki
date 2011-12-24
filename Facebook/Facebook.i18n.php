@@ -51,19 +51,6 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 
 	// Special:Connect
 	'facebook-title'    => 'Log in with Facebook',
-	'facebook-intro'    => 'This wiki is enabled with Facebook for the Web, the next evolution of Facebook Platform.
-This means that when your account is connected with Facebook, in addition to the normal [[Wikipedia:Help:Logging in#Why log in?|benefits]] you see when logging in, you will be able to take advantage of some extra features...',
-	'facebook-click-to-login' => 'Click to login to this site via Facebook',
-	'facebook-click-to-connect-existing' => 'Click to connect your Facebook account to $1',
-	'facebook-conv'     => 'Convenience',
-	'facebook-convdesc' => 'Connected users are automatically logged in.
-If permission is given, then this wiki can even use Facebook as an email proxy so you can continue to receive important notifications without revealing your e-mail address.',
-	'facebook-fbml'     => 'Facebook markup language',
-	'facebook-fbmldesc' => 'Facebook has provided a bunch of built-in tags that will render dynamic data.
-Many of these tags can be included in wiki text, and will be rendered differently depending on which Connected user they are being viewed by.',
-	'facebook-comm'     => 'Communication',
-	'facebook-commdesc' => 'Facebook ushers in a whole new level of networking.
-See which of your friends are using the wiki, and optionally share your actions with your friends through the Facebook news feed.',
 	'facebook-welcome'  => 'Welcome, Facebook user!',
 	'facebook-loginbox' => "Or '''login''' with Facebook:
 
@@ -284,19 +271,6 @@ $messages['be-tarask'] = array(
 	'facebook-logout' => 'Выйсьці з Facebook',
 	'facebook-link' => 'Вярнуцца на facebook.com',
 	'facebook-title' => 'Злучыць рахунак з Facebook',
-	'facebook-intro' => 'У {{GRAMMAR:месны|{{SITENAME}}}} дазволенае злучэньне Facebook, што зьяўляецца наступным крокам эвалюцыі плятформы Facebook.
-Гэта азначае, што калі Вы далучаныя, у дадатак да звычайных [[Wikipedia:Help:Logging in#Why log in?|магчымасьцяў]], якія Вы бачыце пад час уваходу у сыстэму, Вы зможаце карыстацца некаторымі дадатковымі магчымасьцямі…',
-	'facebook-click-to-login' => 'Націсьніце, каб увайсьці на гэты сайт праз Facebook',
-	'facebook-click-to-connect-existing' => 'Націсьніце, каб злучыць Ваш рахунак на Facebook з $1',
-	'facebook-conv' => 'Зручнасьць',
-	'facebook-convdesc' => 'Злучаныя удзельнікі аўтаматычна ўваходзяць у сыстэму.
-Калі дазвол атрыманы, то {{GRAMMAR:вінавальны|{{SITENAME}}}} можа нават выкарыстоўваць Facebook як проксі для электроннай пошты, такім чынам Вы можаце атрымліваць важныя паведамленьні, ня робячы вядомым Ваш адрас электроннай пошты.',
-	'facebook-fbml' => 'Мова разьметкі Facebook',
-	'facebook-fbmldesc' => 'Facebook прадстаўляе ўбудаваныя тэгаў, якія візуалізуюць дынамічныя зьвесткі.
-Большасьць з гэтых тэгаў могуць утрымлівацца ў вікі-тэксьце, і будуць паказвацца па рознаму, у залежнасьці ад таго, які ўдзельнік іх праглядаць.',
-	'facebook-comm' => 'Сувязь',
-	'facebook-commdesc' => 'Злучэньне Facebook — новы ўзровень працы ў сетцы.
-Паглядзіце, хто з Вашых сяброў выкарыстоўвае вікі, і распавядзіце ім пра тое, што Вы робіце, праз стужку навінаў Facebook.',
 	'facebook-welcome' => 'Вітаем карыстальніка злучэньня Facebook!',
 	'facebook-loginbox' => "Ці '''увайдзіце ў сыстэму''' праз Facebook:
 	
@@ -372,19 +346,6 @@ Kinnig a ra ur gwiriekadur diazezet war strolladoù Facebook hag implij FBML en 
 	'facebook-logout' => 'Digrevreañ eus Facebook',
 	'facebook-link' => 'E facebook.com en-dro',
 	'facebook-title' => 'Kont kevreañ gant Facebook',
-	'facebook-intro' => "Gweredekaet eo ar wiki-mañ gant Facebook Connect, anezhañ un emdroadur nevez eus savenn Facebook.
-Talvezout a ra kement-se e c'hallit ober ho mad eus arc'hwelioù ouzhpenn pa vezit kevreet, en tu all d'ar [[Wikipedia:Help:Logging in#Why log in?|spletoù]] normal hoc'h eus pa gevreit.",
-	'facebook-click-to-login' => "Klikit evit kevreañ el lec'hienn-mañ dre Facebook",
-	'facebook-click-to-connect-existing' => 'Klikit evit kevreañ ho kont Facebook da $1',
-	'facebook-conv' => 'Aezamant',
-	'facebook-convdesc' => "Enskrivet e vez an implijerien kevreet ent emgefre.
-Mar bez roet an aotre e c'hall ar wiki-mañ implijout Facebook evel ur proksi posteloù zoken. Evel-se e c'hallit kenderc'hel da zegemer ar c'hemennoù pouezus hep bezañ rediet da ziskouez ho chomlec'h postel.",
-	'facebook-fbml' => 'Yezh balizenniñ Facebook',
-	'facebook-fbmldesc' => "Pourchaset en deus Facebook un toullad balizennoù enframmet a ziskwelo roadennoù dinamek.
-Un niver bras eus ar balizennoù-se  a c'hall bezañ lakaet en destenn wiki. Dont a raint war wel e modoù disheñvel hervez an implijerien kevreet a vez o sellet outo.",
-	'facebook-comm' => 'Daremprederezh',
-	'facebook-commdesc' => "Digeriñ a ra Facebook Connect ul live rouedadiñ nevez.
-Sellit 'ta, e-touez ho mignoned, piv a ra gant ar wiki ha, mar fell deoc'h, e c'hallit kenrannañ hoc'h oberiadennoù dre neudennad keleier Facebook.",
 	'facebook-welcome' => "Degemer mat deoc'h-c'hwi implijer Facebook Connect !",
 	'facebook-loginbox' => "Pe '''kevreañ''' gant Facebook :
 
@@ -522,19 +483,6 @@ Zudem wird die Authentifizierung basierend auf Facebook-Gruppen und der Einsatz 
 	'facebook-logout' => 'Aus Facebook abmelden',
 	'facebook-link' => 'Zurück zu de-de.facebook.com',
 	'facebook-title' => 'Konto mit Facebook verknüpfen',
-	'facebook-intro' => 'Dieses Wiki hat Facebook Connect, die nächsten Weiterentwicklung der Plattform Facebook, aktiviert.
-Dies bedeutet, dass man, sofern man angemeldet ist, zusätzlich zu den herkömmlichen [[Wikipedia:Help:Logging in#Why log in?|Vorteilen]] einer Anmeldung, weitere zusätzliche Funktionen nutzen kann...',
-	'facebook-click-to-login' => 'Auf diese Schaltfläche klicken, um sich auf diesem Wiki via Facebook anzumelden',
-	'facebook-click-to-connect-existing' => 'Auf diese Schaltfläche klicken, um das Facebook-Konto mit $1 zu verknüpfen',
-	'facebook-conv' => 'Bequemlichkeit',
-	'facebook-convdesc' => 'Verknüpfte Benutzer werden automatisch angemeldet.
-Sofern die Erlaubnis vorliegt, kann dieses Wiki sogar Facebook als Kommunikationsschnittstelle für E-Mails nutzen, so dass man weiterhin wichtige Nachrichten erhalten kann, ohne hierzu die E-Mail-Adresse offenlegen zu müssen.',
-	'facebook-fbml' => 'Facebook Auszeichnungssprache',
-	'facebook-fbmldesc' => 'Facebook stellt ein Bündel integrierter Tags bereit, die dynamisch erzeugte Daten verarbeiten können.
-Viele dieser Tags können in Wikitext einbezogen werden. Sie werden, je nach auf dem Wiki angemeldeten Benutzer, individuell mit Daten versehen und ausgegeben.',
-	'facebook-comm' => 'Kommunikation',
-	'facebook-commdesc' => 'Facebook Connect ermöglicht eine vollkommen neuartige Möglichkeit des Netzwerkens.
-Man kann sehen welche der eigenen Freunde das Wiki nutzen und, sofern gewünscht, ihnen die eigenen Aktionen über den eigenen Facebook-Newsfeed ausgeben lassen.',
 	'facebook-welcome' => 'Willkommen, Facebook-Connect-Benutzer!',
 	'facebook-loginbox' => "Oder via Facebook '''anmelden''':
 
@@ -712,19 +660,6 @@ Ofrece autenticación basada en grupos de Facebook y usa FBML en texto wiki',
 	'facebook-logout' => 'Desconectarse de Facebook',
 	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar esta cuenta con Facebook',
-	'facebook-intro' => 'Este wiki tiene Facebook Connect, ls próxima evolución de la plataforma Facebook, activado.
-Esto quiere decir que al estar conectado, además de los [[Wikipedia:Help:Logging in#Why log in?|beneficios]] normales que ves al iniciar sesión, podrás gozar de algunas características adicinales.',
-	'facebook-click-to-login' => 'Haz clic para acceder a este sitio a través de Facebook',
-	'facebook-click-to-connect-existing' => 'Haz clic para conectar tu cuenta  de Facebook  a $1',
-	'facebook-conv' => 'Comodidad',
-	'facebook-convdesc' => 'Los usuarios conectados inician sesión automáticamente.
-Si se otorga el permiso, este wiki puede inclusive utilizar Facebook como un proxy de correos electrónicos para que continúes recibiendo notificaciones importantes sin revelar tu dirección de correos electrónicos.',
-	'facebook-fbml' => 'Lenguaje de marcado de Facebook',
-	'facebook-fbmldesc' => 'Facebook ha ofrecido una cantidad de etiquetas integradas que procesará información dinámica.
-Muchas de estas etiquetas pueden ser incluidas en texto wiki y se procesarán de maneras diferenes dependiendo de qué usuario conectado esté viéndolas.',
-	'facebook-comm' => 'Comunicación',
-	'facebook-commdesc' => 'Facebook Connect marca el comienzo de un nuevo nivel de red. 
-ve cuales de tus amigos está usando el wiki, y, opcionalmente, comparte tus acciones con tus amigos a través de la fuente de noticias de Facebook.',
 	'facebook-welcome' => '¡Bienvenido, usuario de Facebook Connect!',
 	'facebook-loginbox' => "O '''accede al sistema''' con Facebook:
 	
@@ -863,19 +798,6 @@ $messages['fr'] = array(
 	'facebook-logout' => 'Se déconnecter de Facebook',
 	'facebook-link' => 'Retour à Facebook.com',
 	'facebook-title' => 'Connecter un compte avec Facebook',
-	'facebook-intro' => 'Ce wiki est activé avec Facebook Connect, une évolution récente de la plateforme Facebook.
-Cela signifie que lorsque vous êtes connecté, en plus des [[Wikipedia:Help:Logging in#Why log in?|avantages]] dont vous bénéficiez lorsque vous vous connectez, vous pourrez profiter de quelques fonctionnalités supplémentaires...',
-	'facebook-click-to-login' => 'Cliquez pour accéder à ce site via Facebook',
-	'facebook-click-to-connect-existing' => 'Cliquez ici pour connecter votre compte Facebook à $1',
-	'facebook-conv' => 'Commodité',
-	'facebook-convdesc' => 'Les utilisateurs connectés sont automatiquement inscrits. 
-Si l’autorisation est donnée, alors ce wiki peut même utiliser Facebook en tant que mandataire de messagerie afin que vous puissiez continuer à recevoir les notifications importantes sans révéler votre adresse courriel.',
-	'facebook-fbml' => 'Langage de balisage Facebook',
-	'facebook-fbmldesc' => 'Facebook a fourni un tas de balises intégrées qui va afficher des données dynamiques. 
-Nombre de ces balises peuvent être inclues dans le texte wiki et seront rendues différemment selon l’utilisateur connecté qui les visualisent.',
-	'facebook-comm' => 'Communication',
-	'facebook-commdesc' => "Facebook Connect inaugure un tout nouveau niveau de mise en réseau.
-Voyez qui de vos amis utilisent le wiki, et éventuellement partagez vos actions avec vos amis par l'intermédiaire du fil de nouvelles Facebook.",
 	'facebook-welcome' => 'Bienvenue, utilisateur de Facebook Connect !',
 	'facebook-loginbox' => "Ou '''connexion''' avec Facebook :
 
@@ -948,19 +870,6 @@ Ofrece unha autenticación baseada en grupos do Facebook e o uso de FBML no text
 	'facebook-logout' => 'Desconectarse do Facebook',
 	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar a conta co Facebook',
-	'facebook-intro' => 'Este wiki ten o Facebook Connect activado, a evolución máis recente da plataforma Facebook.
-Isto significa que cando estea conectado, ademais dos [[Wikipedia:Help:Logging in#Why log in?|beneficios]] habituais, será capaz de sacar proveito dalgúns recursos extra...',
-	'facebook-click-to-login' => 'Prema para acceder a este sitio mediante o Facebook',
-	'facebook-click-to-connect-existing' => 'Prema para conectar a súa conta no Facebook con $1',
-	'facebook-conv' => 'Comodidade',
-	'facebook-convdesc' => 'Os usuarios conectados acceden ao sistema automaticamente.
-Se dá permiso, entón este wiki mesmo pode usar o Facebook como un proxy de correo electrónico para que poida continuar recibindo notificacións importantes sen revelar o seu enderezo de correo electrónico.',
-	'facebook-fbml' => 'Lingua de formato do Facebook',
-	'facebook-fbmldesc' => 'O Facebook ofreceu unha morea de etiquetas integradas que van procesar os datos dinámicos.
-Moitas destas etiquetas poden incluírse no texto wiki e serán tratadas de xeito diferente dependendo do usuario conectado que as estea a ollar.',
-	'facebook-comm' => 'Comunicación',
-	'facebook-commdesc' => 'O Facebook Connect introduce un novo nivel en redes sociais.
-Olle cales dos seus amigos están a usar o wiki; de xeito opcional, pode compartir as súas accións cos seus amigos a través da fonte de novas do Facebook.',
 	'facebook-welcome' => 'Benvido, usuario do Facebook Connect!',
 	'facebook-loginbox' => "Ou '''acceda ao sistema''' co Facebook:
 	
@@ -1033,19 +942,6 @@ Macht e Authentifizierig megli, wu uf Facebook-Gruppe basiert, un dr Yysatz vu F
 	'facebook-logout' => 'Us Facebook abmälde',
 	'facebook-link' => 'Zruck zue facebook.com',
 	'facebook-title' => 'Konto mit Facebook verbinde',
-	'facebook-intro' => 'Des Wiki het Facebook Connect, di negscht Wyterentwicklig vu dr Plattform Facebook, aktiviert.
-Des bedytet, ass mer, wänn mer aagmäldet isch, zuesätzli zue dr normale [[Wikipedia:Help:Logging in#Why log in?|Vorteil]] vun ere Aamäldig, no wyteri Funktione cha nutze...',
-	'facebook-click-to-login' => 'Do druf klicke zum sich aamälde iber Facebook',
-	'facebook-click-to-connect-existing' => 'Do druf klicke zum Dyy Facebook-Konto verbinde mit $1',
-	'facebook-conv' => 'Chummligkeit',
-	'facebook-convdesc' => 'Verbundeni Benutzer wäre automatisch aagmäldet.
-Wänn d Erlaubnis vorlyt, cha des Wiki sogar Facebook as Kommunikationsschnittstell fir E-Mail nutze, ass mer wyter wichtigi Nochrichte cha iberchuu, ohni ass mer d E-Mail-Adräss mueß uffelege.',
-	'facebook-fbml' => 'Facebook-Uuszeichnigssproch',
-	'facebook-fbmldesc' => 'Facebook stellt e Bindel vu integrierte Tag z Verfiegig, wu dynamisch erzygti Date chenne verarbeite.
-Vil vu däne Tag chenne in Wikitext yybezoge wäre. Si wäre, je no uf em Wiki aagmäldete Benutzer, individuäll mit Date versäh un uusgee.',
-	'facebook-comm' => 'Kommunikation',
-	'facebook-commdesc' => 'Facebook Connect stellt e ganz nejartigi Megligkeit vum Netzwärche z Verfiegig.
-Mer cha säh, weli vu dr eigene Frynd s Wiki nutze, un mer cha, wänn gwinscht, ihne di eigene Aktione iber dr eige Facebook-Newsfeed uusgee loo.',
 	'facebook-welcome' => 'Willchuu, Facebook-Connect-Benutzer!',
 	'facebook-loginbox' => "Oder iber Facebook '''aamälde''':
 
@@ -1159,19 +1055,6 @@ $messages['hsb'] = array(
 	'facebook-logout' => 'Z Facebook wotzjewić',
 	'facebook-link' => 'Wróćo k facebook.com',
 	'facebook-title' => 'Konto z Facebookom zwjazać',
-	'facebook-intro' => 'Tutón wiki je z Facebook connect zmóžnjeny, přichodne wuwiće platformy Facebook.
-To woznamjenja, zo móžeš, hdyž sy zwjazany, někotre dalše funkcije wužiwać, přidatnje k normalnym [[Wikipedia:Help:Logging in#Why log in?|lěpšinam]], kotrež při přizjewjenju widźeš.',
-	'facebook-click-to-login' => 'Klikń, zo by so přez Facebook pola tutoho sydła přizjewił',
-	'facebook-click-to-connect-existing' => 'Klikń, zo by swoje konto Facebook z $1 zwjazał',
-	'facebook-conv' => 'Komfortabelnosć',
-	'facebook-convdesc' => 'Zwjzani wužiwarjo su awtomatisce přizjewjeni.
-Jeli prawo je date, da móže tutón wiki Facebook samo jako e-mejlowy proksy wužiwać. Přez to móžeš dale wažne zdźělenki dóstać, bjez toho zo dyrbiš swoju e-mejlowu adresu wotkryć.',
-	'facebook-fbml' => 'Woznamjenjenska rěč Facebook',
-	'facebook-fbmldesc' => 'Facebook je rjad zatwarjenych tafličkow k dispoziciji stajił, kotrež budu dynamiske daty rysować.
-Wjele z tutych tafličkow móže so do wikiteksta zasunyć a budźe so rozdźělnje rysować, wotwisujo wot toho, kotry wužiwar sej je wobhladuje.',
-	'facebook-comm' => 'Komunikacija',
-	'facebook-commdesc' => 'Facebook Connect připowěduje cyle nowu runinu dźěłanja w syći.
-Hlej, kotři z twojich přećelow tutón wiki wužiwaja, a wužij swoje akcije zhromadnje ze swojimi přećelemi na kanalu nowinkow we Facebooku.',
 	'facebook-welcome' => 'Witaj, wužiwarjo Facebook Connect!',
 	'facebook-loginbox' => "Abo '''přizjewjenje''' přez Facebook:
 
@@ -1304,19 +1187,6 @@ Offere authentication a base de gruppos de Facebook e le uso de FBML in texto wi
 	'facebook-logout' => 'Clauder session de Facebook',
 	'facebook-link' => 'Retornar a facebook.com',
 	'facebook-title' => 'Connecter le conto con Facebook',
-	'facebook-intro' => 'Iste wiki dispone de Facebook Connect, le proxime evolution del platteforma Facebook.
-Isto significa que, si tu es connectite, in addition al normal [[Wikipedia:Help:Logging in#Why log in?|beneficios]] que tu vide quando aperir un session, tu potera traher avantage de alcun functionalitate extra...',
-	'facebook-click-to-login' => 'Clicca pro authenticar te a iste sito via Facebook',
-	'facebook-click-to-connect-existing' => 'Clicca pro connecter tu conto de Facebook a $1',
-	'facebook-conv' => 'Commoditate',
-	'facebook-convdesc' => 'Le usatores connectite es automaticamente authenticate.
-Si permission es date, alora iste wiki pote mesmo usar Facebook como proxy de e-mail de sorta que tu pote continuar a reciper importante notificationes sin revelar tu adresse de e-mail.',
-	'facebook-fbml' => 'Linguage de marcation de Facebook',
-	'facebook-fbmldesc' => 'Facebook ha providite un collection de etiquettas integrate pro tractamento dynamic de datos.
-Multes de iste etiquettas pote esser includite in texto wiki, e essera tractate differentemente dependente de qual usator connectite los visualisa.',
-	'facebook-comm' => 'Communication',
-	'facebook-commdesc' => 'Facebook Connect introduce un totalmente nove nivello de communication in rete.
-Vide quales de tu amicos usa le wiki, e optionalmente condivide tu actiones con tu amicos per le syndication de novas de Facebook.',
 	'facebook-welcome' => 'Benvenite, usator de Facebook Connect!',
 	'facebook-loginbox' => "O '''aperir session''' via Facebook:
 	
@@ -1390,19 +1260,6 @@ Memberikan autentikasi berdasarkan grup Facebook dan penggunaan FBML dalam teks 
 	'facebook-logout' => 'Keluar dari Facebook',
 	'facebook-link' => 'Kembali ke facebook.com',
 	'facebook-title' => 'Hubungkan akun dengan Facebook',
-	'facebook-intro' => 'Wiki ini diaktifkan dengan Facebook Connect, evolusi berikutnya dari platform Facebook. 
-Ini berarti bahwa ketika Anda terhubung, di samping [[Wikipedia:Help:Logging in#Why log in?|manfaat]] yang didapat saat masuk, Anda akan dapat mengambil manfaat dari beberapa fitur tambahan ...',
-	'facebook-click-to-login' => 'Klik untuk masuk ke situs ini melalui Facebook',
-	'facebook-click-to-connect-existing' => 'Klik untuk menghubungkan akun Facebook ke $1',
-	'facebook-conv' => 'Kenyamanan',
-	'facebook-convdesc' => 'Pengguna yang terhubung secara otomatis masuk.
-Jika izin diberikan, wiki ini bahkan dapat menggunakan Facebook sebagai proksi surel agar Anda dapat terus menerima pemberitahuan penting tanpa mengungkapkan alamat surel.',
-	'facebook-fbml' => 'Bahasa markah Facebook',
-	'facebook-fbmldesc' => 'Facebook memberikan banyak tag terpasang yang akan menampilkan data dinamis.
-Banyak di antara tag ini dapat dimasukkan dalam teks wiki dan akan ditampilkan berbeda tergantung di mana mereka sedang dilihat oleh pengguna yang terhubung.',
-	'facebook-comm' => 'Komunikasi',
-	'facebook-commdesc' => 'Facebook Connect mengantarkan ke tingkat jejaring baru.
-Lihat mana teman Anda yang telah menggunakan wiki, dan bagikan tindakan Anda dengan teman Anda melalui kabar berita Facebook.',
 	'facebook-welcome' => 'Selamat datang, pengguna Facebook Connect!',
 	'facebook-loginbox' => "Atau '''masuk''' dengan Facebook:
 
@@ -1501,19 +1358,6 @@ $messages['ja'] = array(
 	'facebook-logout' => 'Facebookのログアウト',
 	'facebook-link' => 'facebook.comに戻る',
 	'facebook-title' => 'Facebookでアカウントに接続',
-	'facebook-intro' => 'このウィキは、次世代Facebookプラットフォームである、Facebook接続が有効になっています。
-つまり、接続した時、ログイン時に使える通常の[[Wikipedia:Help:Logging in#Why log in?|利点]]に加え、いくつかの追加機能を活用することができるようになります。',
-	'facebook-click-to-login' => 'クリックして、Facebook経由でこのサイトにログイン',
-	'facebook-click-to-connect-existing' => 'クリックして、Facebookアカウントを$1に接続',
-	'facebook-conv' => '利便性',
-	'facebook-convdesc' => '接続された利用者は、自動的にログインされます。
-許可が与えられていれば、このウィキは、Facebookを電子メールのプロキシとして利用し、重要な通知を、電子メールアドレスを開示することなく受け取り続けることができるようになります。',
-	'facebook-fbml' => 'Facebookマークアップ言語',
-	'facebook-fbmldesc' => 'Facebookは、動的データの描画を行なう組み込みタグ群を提供しています。
-それらのタグの多くは、ウィキ文の中に含めることができ、どの接続利用者がそれを閲覧しているかによって、異なる描画を行なうことができます。',
-	'facebook-comm' => '通信',
-	'facebook-commdesc' => 'Facebook接続は、ネットワーク活用のの全く新しいレベルの先駆けとなります。
-どんなフレンドがそのウィキを利用しているか探し、Facebookニュースフィードを介して、自分の行動をフレンドと共有することもできます。',
 	'facebook-welcome' => 'ようこそ、Facebook接続の利用者さん！',
 	'facebook-loginbox' => "もしくは、Facebookで'''ログイン'''：
 
@@ -1666,19 +1510,6 @@ $messages['mk'] = array(
 	'facebook-logout' => 'Одјава од Facebook',
 	'facebook-link' => 'Назад кон страницата на Facebook',
 	'facebook-title' => 'Поврзи ја сметката преку Facebook',
-	'facebook-intro' => 'Ова вики има овозможено Facebook Connect, следниот развоен стадиум на платформата Facebook.
-Ова значи дека кога сте поврзани, покрај нормалните [[Wikipedia:Help:Logging in#Why log in?|погодности]] при најавување, ќе можете да ги користите предностите на некои дополнителни фунции...',
-	'facebook-click-to-login' => 'Кликнете го копчево за да се најавите на ова мреж. место преку Facebook',
-	'facebook-click-to-connect-existing' => 'Кликнете го копчево за да ја поврзете Вашата сметка на Facebook со $1',
-	'facebook-conv' => 'Погодност',
-	'facebook-convdesc' => 'Поврзаните корисници се автоматски најавени.
-Ако дадете дозвола, ова вики може дури и да го користи Facebook како застапник за е-пошта, така што продолжувате да добивате важни известувања без да ја разоткриете вашата е-поштенска адреса.',
-	'facebook-fbml' => 'Facebook-ов јазик за означување',
-	'facebook-fbmldesc' => 'Facebook ни дава низа вградени ознаки со чија помош се прикажуваат динамичките податоци.
-Многу вакви ознаки можат да се вклучат во викитест, и ќе се прикажуваат различно, во зависност од тоа кој поврзан корисник ги разгледува.',
-	'facebook-comm' => 'Комуникација',
-	'facebook-commdesc' => 'Facebook Connect воведува еден нов начин на мрежно општење.
-Погледајте кои од Вашите пријатели го користат викито, а по желба можете и да го споделувате она што го правите со Вашите пријатели преку каналот за новости на Facebook.',
 	'facebook-welcome' => 'Добредојде, кориснику на Facebook Connect!',
 	'facebook-loginbox' => "Или пак '''најавете се''' со Facebook:
 
@@ -1767,19 +1598,6 @@ Maakt het mogelijk om aan te melden met de Facebookgebruiker en FBML te gebruike
 	'facebook-logout' => 'Afmelden van Facebook',
 	'facebook-link' => 'Terug naar facebookcom',
 	'facebook-title' => 'Gebruiker verbinden met Facebook',
-	'facebook-intro' => 'In deze wiki is Facebook Connect ingeschakeld, de volgende evolutie van het Facebookplatform. 
-Dit betekent dat wanneer u bent verbonden, in aanvulling op de normale [[Wikipedia:Help:Logging in#Why log in?|voordelen]] bij aangemeld zijn, u ook een aantal extra mogelijkheden kunt gebruiken.',
-	'facebook-click-to-login' => 'Klik om bij deze site aan te melden via Facebook',
-	'facebook-click-to-connect-existing' => 'Klik om uw Facebookgebruiker te verbinden met $1',
-	'facebook-conv' => 'Gemak',
-	'facebook-convdesc' => 'Verbonden gebruikers zijn automatisch aangemeld.
-Als er toestemming is gegeven, kan deze wiki zelfs Facebook gebruiken als doorgeefluik voor e-mail, zodat u belangrijke berichten kunt verzenden zonder uw e-mailadres prijs te geven.',
-	'facebook-fbml' => 'Facebookopmaaktaal',
-	'facebook-fbmldesc' => 'Facebook heeft een aantal labels beschikbaar gemaakt die het mogelijk maken gegevens dynamisch weer te geven.
-Veel van deze labels kunnen opgenomen worden in wikitekst en worden anders weergegeven afhankelijk van door welke gebruiker ze worden bekeken.',
-	'facebook-comm' => 'Communicatie',
-	'facebook-commdesc' => 'Facebook Connect biedt een totaal nieuw niveau van netwerken.
-U kunt zien welke van uw vrienden de wiki gebruiken en eventueel uw handelingen met uw vrienden delen via een nieuwsfeed in Facebook.',
 	'facebook-welcome' => 'Welkom, Facebook Connectgebruiker!',
 	'facebook-loginbox' => "Of '''meld aan'''via Facebook:
 
@@ -1863,19 +1681,6 @@ Tilbyr autentisering basert på Facebookgrupper og bruken av FBML i wikitekst',
 	'facebook-logout' => 'Logg ut av Facebook',
 	'facebook-link' => 'Tilbake til facebook.com',
 	'facebook-title' => 'Koble til konto med Facebook',
-	'facebook-intro' => 'Denne wikien er aktivert med Facebook Connect, den neste evolusjonen av Facebook-plattformen.
-Dette betyr at når du er koblet til, i tillegg til de vanlige [[Wikipedia:Help:Logging in#Why log in?|fordelene]] du ser når du logger inn, vil du kunne dra nytte av noen ekstra funksjoner...',
-	'facebook-click-to-login' => 'Klikk for å logge inn på dette nettstedet via Facebook',
-	'facebook-click-to-connect-existing' => 'Klikk for å koble din Facebook-konto til $1',
-	'facebook-conv' => 'Bekvemmelighet',
-	'facebook-convdesc' => 'Tilkoblede brukere er automatisk logget inn.
-Om tillatelse er gitt kan denne wikien til og med bruke Facebook som en e-postmellomtjener slik at du kan fortsette å motta viktige varsler uten å avsløre e-postadressen din.',
-	'facebook-fbml' => 'Facebook-markeringsspråk (markup language)',
-	'facebook-fbmldesc' => 'Facebook har levert en haug med innebygde elementer som vil gjengi dynamiske data.
-Mange av disse elementene kan inkluderes i wikitekst og vil gjengis forskjellig avhengig av hvilken tilkoblet bruker som de blir sett av.',
-	'facebook-comm' => 'Kommunikasjon',
-	'facebook-commdesc' => 'Facebook kobler sammen brukere på et helt nytt nivå av nettverksbygging.
-Se hvilke av dine venner som bruker denne wikien og eventuelt del handlingene dine med vennene dine gjennom Facebooks nyhetsstrøm.',
 	'facebook-welcome' => 'Velkommen, Facebook Connect-bruker!',
 	'facebook-loginbox' => "Eller '''logg inn''' med Facebook:
 
@@ -1949,19 +1754,6 @@ Umożliwia uwierzytelnianie w oparciu o grupy Facebooka i wykorzystanie FBML w t
 	'facebook-logout' => 'Wyloguj się z Facebooka',
 	'facebook-link' => 'Powrót na facebook.com',
 	'facebook-title' => 'Połącz konto z Facebookiem',
-	'facebook-intro' => 'Ta wiki korzysta z Facebook Connect, które jest kolejnym krokiem w ewolucji Facebooka.
-Oznacza to, że po nawiązaniu połączenia, oprócz normalnych [[Wikipedia:Help:Logging in#Why log in?|przydatnych dodatków]] widocznych po zalogowaniu, będziesz mógł korzystać z kilku dodatkowych funkcji...',
-	'facebook-click-to-login' => 'Kliknij, aby zalogować się do tej witryny logując się na Facebooku',
-	'facebook-click-to-connect-existing' => 'Kliknij, aby przyłączyć swoje konto na Facebooku do $1',
-	'facebook-conv' => 'Wygoda',
-	'facebook-convdesc' => 'Użytkownicy korzystający z Facebook Connect są automatycznie zalogowywani.
-Jeśli dopuszczono taką możliwość, ta wiki może korzystać z Facebooka jako pośrednika dla poczty e‐mail, dzięki czemu można otrzymywać powiadomienia o ważnych zdarzeniach bez konieczności podawania swojego adresu e‐mail.',
-	'facebook-fbml' => 'Język znaczników Facebooka',
-	'facebook-fbmldesc' => 'Facebook dostarcza kilka wbudowanych znaczników, które powodują wstawienie dynamicznie generowanej treści.
-Wiele z tych znaczników może zostać wykorzystanych w tekście wiki – zostaną automatycznie zastąpione dynamiczną treścią zależnie od tego, który zalogowany użytkownik ogląda stronę.',
-	'facebook-comm' => 'Komunikacja',
-	'facebook-commdesc' => 'Facebook Connect to nowy poziom współpracy w sieci.
-Sprawdź, którzy z Twoich znajomych korzystają z tej wiki i podziel się z nimi tym co robisz poprzez system aktualności na Facebooku.',
 	'facebook-welcome' => 'Witaj użytkowniku Facebook Connect!',
 	'facebook-loginbox' => "Lub '''zaloguj się''' z Facebookiem
 
@@ -2035,19 +1827,6 @@ A eufr n'autenticassion basà an sle partìe Facebook e l'utilisassion ëd FBML 
 	'facebook-logout' => 'Seurt da Facebook',
 	'facebook-link' => 'André a Facebook.com',
 	'facebook-title' => 'Coleghé un cont con Facebook',
-	'facebook-intro' => "Sta wiki a l'é abilità con Facebook Connect, la pròssima evolussion dla piataforma Facebook.
-Sossì a veul dì che quand ch'a l'é colegà, an dzorpì dij [[Wikipedia:Help:Logging in#Why log in?|benefissi]] normaj ch'a vëd quand ch'a intra ant ël sistema, a podrà benefissié ëd chèiche funsion suplementar...",
-	'facebook-click-to-login' => 'Sgnaca për intré ant sto sit via Facebook',
-	'facebook-click-to-connect-existing' => "Ch'a sgnaca ambelessì për coleghé sò cont Facebook a $1",
-	'facebook-conv' => 'Conveniensa',
-	'facebook-convdesc' => "J'utent colegà a automaticament intrà ant ël sistema.
-Se a son ësmonù ij përmess, antlora sta wiki a peul ëdcò dovré Facebook coma un mandatari ëd pòsta eletrònica an manera ch'a peula continué a arsèive le notìfiche amportante sensa arvelé soa adrëssa ëd pòsta eletrònica.",
-	'facebook-fbml' => 'Lenga dij marcador ëd Facebook',
-	'facebook-fbmldesc' => "Facebok a l'ha dàit un mucc ëd tichëtte antëgrà che a presento dij dàit dinàmich.
-Vàire ëd se tichëtte a peulo esse anserìe ant ël test wiki, e a saran ësmonùe a sconda dl'utent colegà ch'a-j vëdd.",
-	'facebook-comm' => 'Comunicassion',
-	'facebook-commdesc' => "Facebook a men-a j'utent an livel tut neuv ëd rej.
-Ch'a vëdda chi dij sò amis a son an camin ch'a deuvro la wiki, e miraco ch'a condivida soe assion con ij sò amis për mojen dël fil ëd neuve ëd Facebook.",
 	'facebook-welcome' => 'Bin ëvnù, utent ëd Facebook Connect!',
 	'facebook-loginbox' => "O '''intré ant ël sistema''' con Facebook:
 
@@ -2121,19 +1900,6 @@ $messages['pt'] = array(
 	'facebook-logout' => 'Sair do Facebook',
 	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
-	'facebook-intro' => 'Esta wiki tem o Facebook Connect, a evolução seguinte da plataforma Facebook.
-Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logging in#Why log in?|privilégios]] de que desfruta por estar autenticado, tem acesso a algumas funcionalidades adicionais...',
-	'facebook-click-to-login' => 'Clique para se autenticar através do Facebook',
-	'facebook-click-to-connect-existing' => 'Clique para ligar a sua conta no Facebook a $1',
-	'facebook-conv' => 'Comodidade',
-	'facebook-convdesc' => 'Os utilizadores do Facebook Connect são automaticamente autenticados na wiki.
-Se for permitido nesta wiki, é até possível usar o Facebook como proxy (representante) de correio electrónico, podendo continuar a receber notificações importantes sem revelar o seu endereço electrónico.',
-	'facebook-fbml' => 'Linguagem de formatação do Facebook',
-	'facebook-fbmldesc' => 'O Facebook fornece vários elementos predefinidos que apresentam dados dinâmicos.
-Muitos destes elementos podem ser incluídos no texto wiki e serão apresentados de formas diferentes, em função do utilizador que os vê.',
-	'facebook-comm' => 'Comunicação',
-	'facebook-commdesc' => 'O Facebook Connect introduz um nível completamente novo de criar uma rede de amizades.
-Saiba quais dos seus amigos usam a wiki e, se quiser, partilhe as suas acções com os seus amigos através do feed de notícias do Facebook.',
 	'facebook-welcome' => 'Bem-vindo, utilizador do Facebook Connect!',
 	'facebook-loginbox' => "Ou '''entre''' com o Facebook:
 
@@ -2206,19 +1972,6 @@ $messages['pt-br'] = array(
 	'facebook-logout' => 'Sair do Facebook',
 	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
-	'facebook-intro' => 'Esta wiki tem o Facebook Connect, a evolução seguinte da plataforma Facebook.
-Isto significa que quando se autentica, adicionalmente aos [[Wikipedia:Help:Logging in#Why log in?|privilégios]] de que desfruta por estar autenticado, tem acesso a algumas funcionalidades adicionais...',
-	'facebook-click-to-login' => 'Clique para se autenticar através do Facebook',
-	'facebook-click-to-connect-existing' => 'Clique para ligar a sua conta no Facebook a $1',
-	'facebook-conv' => 'Comodidade',
-	'facebook-convdesc' => 'Os usuários do Facebook Connect são automaticamente autenticados na wiki.
-Se for permitido nesta wiki, é até possível usar o Facebook como proxy de e-mail de modo que você possa continuar a receber notificações importantes sem revelar o seu endereço de e-mail.',
-	'facebook-fbml' => 'Linguagem de formatação do Facebook',
-	'facebook-fbmldesc' => 'O Facebook fornece vários elementos predefinidos que apresentam dados dinâmicos.
-Muitos destes elementos podem ser incluídos no texto wiki e serão apresentados de formas diferentes, em função do usuário que os vê.',
-	'facebook-comm' => 'Comunicação',
-	'facebook-commdesc' => 'O Facebook Connect introduz um nível completamente novo de criar uma rede de amizades.
-Saiba quais dos seus amigos usam a wiki e, se quiser, partilhe as suas ações com os seus amigos através do feed de notícias do Facebook.',
 	'facebook-welcome' => 'Bem-vindo, usuário do Facebook Connect!',
 	'facebook-loginbox' => "Ou '''entre''' com o Facebook:
 
@@ -2335,10 +2088,6 @@ $messages['ru'] = array(
 	'facebook-logout' => 'Выход из Facebook',
 	'facebook-link' => 'Вернуться на facebook.com',
 	'facebook-title' => 'Подключение учётной записи к Facebook',
-	'facebook-intro' => 'В этом вики-проекте включена возможность входа через Facebook Connect, следующее поколение платформы Facebook. 
-Это означает, что помимо обычных [[Wikipedia:Help:Logging in#Why log in?|преимуществ]] зарегистрированного участника, вы сможете воспользоваться некоторыми дополнительными функциями…',
-	'facebook-click-to-login' => 'Нажмите, чтобы войти на этот сайт с помощью Facebook',
-	'facebook-click-to-connect-existing' => 'Нажмите, чтобы подключить вашу учётную запись Facebook к $1',
 	'facebook-welcome' => 'Добро пожаловать, участник Facebook Connect!',
 	'facebook-cancel' => 'Действие отменено',
 	'facebook-invalid' => 'Неверный параметр',
@@ -2397,19 +2146,6 @@ $messages['sv'] = array(
 	'facebook-logout' => 'Logga ut från Facebook',
 	'facebook-link' => 'Tillbaka till facebook.com',
 	'facebook-title' => 'Anslut kontot med Facebook',
-	'facebook-intro' => 'Denna wiki är aktiverad med Facebook Connect.
-Detta innebär att när du är ansluten, förutom de vanliga [[Wikipedia:Help:Logging in#Why log in?|fördelarna]] Du ser när du loggar in, kommer du att kunna dra nytta av några extra funktioner!',
-	'facebook-click-to-login' => 'Klicka för att logga in till denna webbplats via Facebook',
-	'facebook-click-to-connect-existing' => 'Klicka för att ansluta ditt Facebook-konto till $1',
-	'facebook-conv' => 'Bekvämlighet',
-	'facebook-convdesc' => 'Anslutna användare är automatiskt inloggade
- Om tillåtelse ges, då denna wiki kan även använda Facebook som ett e-postmeddelande proxy så att du kan fortsätta att få viktiga meddelanden utan att avslöja din e-postadress.',
-	'facebook-fbml' => 'Facebook-markeringsspråk',
-	'facebook-fbmldesc' => 'Facebook har lämnat ett gäng inbyggda taggar som kommer att återge dynamiska data.
-Många av dessa taggar kan inkluderas i wiki text och återges på olika sätt beroende på vilken ansluten användare de betraktas av.',
-	'facebook-comm' => 'Kommunikation',
-	'facebook-commdesc' => 'Facebook Connect inleder en helt ny nivå av nätverk. 
- Se vilka av dina vänner använder wiki, och eventuellt dela dina handlingar med dina vänner genom att komma nyhetsflödet.',
 	'facebook-welcome' => 'Välkomna, Facebook Connect användare!',
 	'facebook-loginbox' => "Eller '''login''' med Facebook:
 
@@ -2497,18 +2233,6 @@ Nagbibigay ng pagpapatunay batay sa mga pangkat sa Facebook at ang paggamit ng F
 	'facebook-logout' => 'Lumabas mula sa Facebook',
 	'facebook-link' => 'Bumalik sa facebook.com',
 	'facebook-title' => 'Iugnay ang akawnt sa Facebook',
-	'facebook-intro' => 'Ang wiking ito ay pinaganang may Ugnay sa Facebook, ang susunod na ebolusyon ng plataporma ng Facebook.
-Nangangahulugan itong kapag nakakunekta ka, bilang dagdag sa normal na [[Wikipedia:Help:Logging in#Why log in?|mga benepisyong]] nakikita mo kapag lumalagdang papasok, maaari kang makinabang sa ilang karagdagang mga tampok...',
-	'facebook-click-to-login' => 'Pindutin upang lumagda sa sityong ito sa pamamagitan ng Facebook',
-	'facebook-click-to-connect-existing' => 'Pindutin upang umugnay sa iyong akawnt sa Facebook sa $1',
-	'facebook-conv' => 'Kaginhawahan',
-	'facebook-convdesc' => 'Ang nakaugnay na mga tagagamit ay kusang naglalagda sa iyong papasok.
-Kapag ibinigay ang pahintulot, kung gayon ang wiki ay maaari ring gamitin ang Facebook bilang isang kahaliling e-liham upang makapagpatuloy kang makatanggap ng mahahalagang mga pabatid na hindi ibinubunyag ang iyong tirahan ng e-liham.',
-	'facebook-fbml' => 'Wikang pangmarka ng Facebook',
-	'facebook-fbmldesc' => 'Nagbigay ang Facebook ng isang bungkos ng nakapaloob nang mga tatak na gagawa ng masisiglang dato.  Marami sa mga tatak na ito ang maidaragdag sa teksto ng wiki, at ipapakitang kaiba depende sa aling nakaugnay na tagagamit ang tumitingin sa kanila.',
-	'facebook-comm' => 'Pakikipag-ugnayan',
-	'facebook-commdesc' => 'Ang Ugnay sa Facebook ay naghahatid ng isang buong bagong antas ng pagnenetwork.
-Tingnan kung sino sa inyong mga kaibigan ang gumagamit ng wiki, at opsyonal na ipamahagi ang iyong mga galaw sa mga kaibigan mo sa pamamagitan ng pakain ng balita ng Facebook.',
 	'facebook-welcome' => 'Maligayang pagdating, tagagamit ng Ugnay sa Facebook!',
 	'facebook-loginbox' => "O '''lumagda''' sa pamamagitan ng Facebook:
 
