@@ -676,6 +676,66 @@ class SpecialConnect extends SpecialPage {
 		$this->isNewUser = true;
 	}
 	
+	/**
+	 * Actually add a user to the database.
+	 * Give it a User object that has been initialised with a name.
+	 *
+	 * This is a custom version of similar code in SpecialUserLogin's LoginForm with differences
+	 * due to the fact that this code doesn't require a password, etc.
+	 *
+	 * @param $u User object.
+	 * @param $autocreate boolean -- true if this is an autocreation via auth plugin
+	 * @return User object.
+	 * @private
+	 */
+	protected function initUser( $u, $autocreate ) {
+		global $wgAuth, $wgExternalAuthType;
+		
+		if ( $wgExternalAuthType ) {
+			$u = ExternalUser::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
+			if ( is_object( $u ) ) {
+				$this->mExtUser = ExternalUser::newFromName( $this->mName );
+			}
+		} else {
+			$u->addToDatabase();
+		}
+		
+		// No passwords for Facebook accounts.
+		/*
+		 if ( $wgAuth->allowPasswordChange() ) {
+		$u->setPassword( $this->mPassword );
+		}
+		*/
+		if ( $this->mEmail )
+			$u->setEmail( $this->mEmail );
+		if ( $this->mRealName )
+			$u->setRealName( $this->mRealName );
+		$u->setToken();
+		
+		$wgAuth->initUser( $u, $autocreate );
+	
+		if ( is_object( $this->mExtUser ) ) {
+			$this->mExtUser->linkToLocal( $u->getId() );
+			$email = $this->mExtUser->getPref( 'emailaddress' );
+			if ( $email && !$this->mEmail ) {
+				$u->setEmail( $email );
+			}
+		}
+		
+		$wgAuth->updateUser($u);
+		
+		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
+		//$u->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
+		$u->setOption('skinoverwrite', 1);
+		$u->saveSettings();
+		
+		// Update user count
+		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
+		$ssUpdate->doUpdate();
+		
+		return $u;
+	}
+	
 	
 	
 	
@@ -1108,66 +1168,6 @@ class SpecialConnect extends SpecialPage {
 		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
 		
 		return true;
-	}
-	
-	/** 
-	 * Actually add a user to the database. 
-	 * Give it a User object that has been initialised with a name. 
-	 * 
-	 * This is a custom version of similar code in SpecialUserLogin's LoginForm with differences 
-	 * due to the fact that this code doesn't require a password, etc. 
-	 * 
-	 * @param $u User object. 
-	 * @param $autocreate boolean -- true if this is an autocreation via auth plugin 
-	 * @return User object. 
-	 * @private 
-	 */ 
-	protected function initUser( $u, $autocreate ) {
-		global $wgAuth, $wgExternalAuthType;
-		
-		if ( $wgExternalAuthType ) {
-			$u = ExternalUser::addUser( $u, $this->mPassword, $this->mEmail, $this->mRealName );
-			if ( is_object( $u ) ) {
-				$this->mExtUser = ExternalUser::newFromName( $this->mName );
-			}
-		} else {
-			$u->addToDatabase();
-		}
-		
-		// No passwords for Facebook accounts.
-		/*
-		if ( $wgAuth->allowPasswordChange() ) {
-		      $u->setPassword( $this->mPassword );
-		}
-		*/
-		if ( $this->mEmail )
-			$u->setEmail( $this->mEmail );
-		if ( $this->mRealName )
-			$u->setRealName( $this->mRealName );
-		$u->setToken();
-		
-		$wgAuth->initUser( $u, $autocreate );
-		
-		if ( is_object( $this->mExtUser ) ) {
-			$this->mExtUser->linkToLocal( $u->getId() );
-			$email = $this->mExtUser->getPref( 'emailaddress' );
-			if ( $email && !$this->mEmail ) {
-				$u->setEmail( $email );
-			}
-		}
-		
-		$wgAuth->updateUser($u);
-		
-		//$u->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
-		//$u->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
-		$u->setOption('skinoverwrite', 1);
-		$u->saveSettings();
-		
-		# Update user count
-		$ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
-		$ssUpdate->doUpdate();
-		
-		return $u;
 	}
 	
 	/**
