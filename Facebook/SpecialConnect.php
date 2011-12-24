@@ -415,6 +415,68 @@ class SpecialConnect extends SpecialPage {
 		}
 	}
 	
+	/**
+	 * Attaches the Facebook ID to an existing wiki account. If the user does
+	 * not exist, or the supplied password does not match, then an error page
+	 * is sent. Otherwise, the accounts are matched in the database and the new
+	 * user object is logged in.
+	 *
+	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
+	 * code. Does it handle setting push-preferences correctly?
+	 *
+	 * @throws FacebookUserException
+	 */
+	protected function attachUser($fbid, $name, $password, $updatePrefs) {
+		global $wgOut, $wgUser;
+		wfProfileIn(__METHOD__);
+	
+		// The user must be logged into Facebook before choosing a wiki username
+		if ( !$fbid ) {
+			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		// Look up the user by their name
+		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
+		if (!$user || !$user->checkPassword($password)) {
+			$this->sendPage('chooseNameFormView', 'wrongpassword');
+		}
+	
+		// Attach the user to their Facebook account in the database
+		FacebookDB::addFacebookID($user, $fbid);
+	
+		// Update the user with settings from Facebook
+		if (count($updatePrefs)) {
+			foreach ($updatePrefs as $option) {
+				$user->setOption("Facebookupdate-on-login-$option", '1');
+			}
+		}
+		$user->updateFromFacebook();
+	
+		// Setup the session
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+	
+		// Log the user in and store the new user as the global user object
+		$user->setCookies();
+		$wgUser = $user;
+	
+		// Similar to what's done in LoginForm::authenticateUserData().
+		// Load $wgUser now. This is necessary because loading $wgUser (say
+		// by calling getName()) calls the UserLoadFromSession hook, which
+		// potentially creates the user in the local database.
+		$sessionUser = User::newFromSession();
+		$sessionUser->load();
+	
+		// User has been successfully attached and logged in
+		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
+		$this->sendPage('displaySuccessAttachingView');
+		wfProfileOut(__METHOD__);
+		return true;
+	}
+	
+	
 	
 	
 	/**
@@ -1100,67 +1162,6 @@ class SpecialConnect extends SpecialPage {
 		$ssUpdate->doUpdate();
 		
 		return $u;
-	}
-	
-	/**
-	 * Attaches the Facebook ID to an existing wiki account. If the user does
-	 * not exist, or the supplied password does not match, then an error page
-	 * is sent. Otherwise, the accounts are matched in the database and the new
-	 * user object is logged in.
-	 *
-	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
-	 * code. Does it handle setting push-preferences correctly?
-	 * 
-	 * @throws FacebookUserException
-	 */
-	protected function attachUser($fbid, $name, $password, $updatePrefs) {
-		global $wgOut, $wgUser;
-		wfProfileIn(__METHOD__);
-		
-		// The user must be logged into Facebook before choosing a wiki username
-		if ( !$fbid ) {
-			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
-		}
-		// Look up the user by their name
-		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
-		if (!$user || !$user->checkPassword($password)) {
-			$this->sendPage('chooseNameFormView', 'wrongpassword');
-		}
-		
-		// Attach the user to their Facebook account in the database
-		FacebookDB::addFacebookID($user, $fbid);
-		
-		// Update the user with settings from Facebook
-		if (count($updatePrefs)) {
-			foreach ($updatePrefs as $option) {
-				$user->setOption("Facebookupdate-on-login-$option", '1');
-			}
-		}
-		$user->updateFromFacebook();
-		
-		// Setup the session
-		global $wgSessionStarted;
-		if (!$wgSessionStarted) {
-			wfSetupSession();
-		}
-		
-		// Log the user in and store the new user as the global user object
-		$user->setCookies();
-		$wgUser = $user;
-		
-		// Similar to what's done in LoginForm::authenticateUserData().
-		// Load $wgUser now. This is necessary because loading $wgUser (say
-		// by calling getName()) calls the UserLoadFromSession hook, which
-		// potentially creates the user in the local database.
-		$sessionUser = User::newFromSession();
-		$sessionUser->load();
-		
-		// User has been successfully attached and logged in
-		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
-		$this->sendPage('displaySuccessAttachingView');
-		wfProfileOut(__METHOD__);
-		return true;
 	}
 	
 	/**
