@@ -495,12 +495,12 @@ class SpecialConnect extends SpecialPage {
 		global $wgUser, $wgFbDisableLogin, $wgAuth, $wgRequest, $wgMemc;
 		// Disabled. Because exceptions are used, an RAII model should be used
 		#wfProfileIn(__METHOD__);
-	
+		
 		// Handle accidental reposts.
 		if ( $wgUser->isLoggedIn() ) {
 			return; // sorry for the early return
 		}
-	
+		
 		// Make sure we're not stealing an existing user account.
 		if (!$name || !FacebookUser::userNameOK($name)) {
 			wfDebug("Facebook: Name not OK: '$name'\n");
@@ -508,16 +508,16 @@ class SpecialConnect extends SpecialPage {
 			throw new FacebookUserException('connectNewUserView' /*, 'facebook-chooseinstructions' */);
 			return;
 		}
-	
+		
 		/// START OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
-	
+		
 		// Check the restrictions again to make sure that the user can create this account.
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			// Special case for readOnlyPage error
 			throw new FacebookUserException(null, null);
 		}
-	
+		
 		if ( empty( $wgFbDisableLogin ) ) {
 			// These two permissions don't apply in $wgFbDisableLogin mode because
 			// then technically no users can create accounts
@@ -532,7 +532,7 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 		}
-	
+		
 		// If we are not allowing users to login locally, we should be checking
 		// to see if the user is actually able to authenticate to the authenti-
 		// cation server before they create an account (otherwise, they can
@@ -541,26 +541,26 @@ class SpecialConnect extends SpecialPage {
 		$mDomain = $wgRequest->getText( 'wpDomain' );
 		if ('local' != $mDomain && '' != $mDomain && !$wgAuth->canCreateAccounts() && !$wgAuth->userExists($name))
 			throw new FacebookUserException('facebook-error', 'wrongpassword');
-	
+		
 		// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
 		global $wgEnableSorbs, $wgProxyWhitelist;
 		$ip = wfGetIP();
 		if ($wgEnableSorbs && !in_array($ip, $wgProxyWhitelist) && $wgUser->inSorbsBlacklist($ip))
 			throw new FacebookUserException('facebook-error', 'sorbs_create_account_reason');
-	
+		
 		// Run a hook to let custom forms make sure that it is okay to proceed with processing the form.
 		// This hook should only check preconditions and should not store values.  Values should be stored using the hook at the bottom of this function.
 		// Can use 'this' to call sendPage('chooseNameFormView', 'SOME-ERROR-MSG-CODE-HERE') if some of the preconditions are invalid.
 		if (!wfRunHooks( 'SpecialConnect::createUser::validateForm', array( &$this ) )) {
 			return;
 		}
-	
+		
 		$user = User::newFromName($name);
 		if (!$user) {
 			wfDebug("Facebook: Error creating new user.\n");
 			throw new FacebookUserException('facebook-error', 'facebook-error-creating-user');
 		}
-	
+		
 		// Let extensions abort the account creation.  If you have extensions which are expecting
 		// a Real Name or Email, you may need to disable them since these are not requirements of
 		// Facebook Connect (so users will not have them).
@@ -577,7 +577,7 @@ class SpecialConnect extends SpecialPage {
 				array( $abortError ));
 		}
 		/**/
-	
+		
 		// Apply account-creation throttles
 		global $wgAccountCreationThrottle;
 		if ( $wgAccountCreationThrottle && $wgUser->isPingLimitable() ) {
@@ -592,9 +592,9 @@ class SpecialConnect extends SpecialPage {
 			}
 			$wgMemc->incr( $key );
 		}
-	
+		
 		/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
-	
+		
 		// Create the account (locally on main cluster or via $wgAuth on other clusters)
 		$email = $realName = ""; // The real values will get filled in outside of the scope of this function.
 		$pass = null;
@@ -602,19 +602,19 @@ class SpecialConnect extends SpecialPage {
 			wfDebug("Facebook: Error adding new user to database.\n");
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
-	
+		
 		// Adds the user to the local database (regardless of whether $wgAuth was used)
 		$user = $this->initUser( $user, true );
-	
+		
 		// Attach the user to their Facebook account in the database
 		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups
 		FacebookDB::addFacebookID($user, $fb_id);
-	
+		
 		wfRunHooks( 'AddNewAccount', array( $user ) );
-	
+		
 		// Mark that the user is a Facebook user
 		$user->addGroup('fb-user');
-	
+		
 		// Store which fields should be auto-updated from Facebook when the user logs in.
 		$updateFormPrefix = 'wpUpdateUserInfo';
 		foreach ($this->getAvailableUserUpdateOptions() as $option) {
@@ -624,7 +624,7 @@ class SpecialConnect extends SpecialPage {
 				$user->setOption("facebook-update-on-login-$option", 0);
 			}
 		}
-	
+		
 		// Process the FacebookPushEvent preference checkboxes if Push Events are enabled
 		global $wgFbEnablePushToFacebook;
 		if( $wgFbEnablePushToFacebook ) {
@@ -634,31 +634,31 @@ class SpecialConnect extends SpecialPage {
 					$pushObj = new $pushEventClassName;
 					$className = get_class();
 					$prefName = $pushObj->getUserPreferenceName();
-	
+					
 					$user->setOption($prefName, ($wgRequest->getCheck($prefName) ? '1' : '0'));
 				}
 			}
-	
+			
 			// Save the preference for letting user select to never send anything to their newsfeed
 			$prefName = FacebookPushEvent::$PREF_TO_DISABLE_ALL;
 			$user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0');
 		}
-	
+		
 		// Unfortunately, performs a second database lookup
 		$fbUser = new FacebookUser($user);
 		// Update the user with settings from Facebook
 		$fbUser->updateFromFacebook();
-	
+		
 		// Start the session if it's not already been started
 		global $wgSessionStarted;
 		if (!$wgSessionStarted) {
 			wfSetupSession();
 		}
-	
+		
 		// Log the user in and store the new user as the global user object
 		$user->setCookies();
 		$wgUser = $user;
-	
+		
 		/*
 		 * Similar to what's done in LoginForm::authenticateUserData(). Load
 		* $wgUser now. This is necessary because loading $wgUser (say by
@@ -667,11 +667,11 @@ class SpecialConnect extends SpecialPage {
 		*/
 		$sessionUser = User::newFromSession();
 		$sessionUser->load();
-	
+		
 		// Allow custom form processing to store values since this form submission was successful.
 		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
-	
+		
 		$user->addNewUserLogEntryAutoCreate();
 		$this->isNewUser = true;
 	}
@@ -993,9 +993,50 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
 	
-	
 	private function fbIdAlreadyConnectedView() {
 		
+	}
+	
+	/**
+	 * Success page for attaching Facebook account to a pre-existing MediaWiki
+	 * account. Shows a link to preferences and a link back to where the user
+	 * came from.
+	 */
+	private function displaySuccessAttachingView() {
+		global $wgOut, $wgUser, $wgRequest;
+		wfProfileIn( __METHOD__ );
+		
+		$wgOut->setPageTitle( wfMsg('facebook-success') );
+		
+		$prefsLink = SpecialPage::getTitleFor('Preferences')->getLinkUrl();
+		$wgOut->addHTML(wfMsg('facebook-success-connecting-existing-account', $prefsLink));
+		
+		// Run any hooks for UserLoginComplete
+		$inject_html = '';
+		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
+		$wgOut->addHtml( $inject_html );
+		
+		// Since there was no additional message for the user, we can just
+		// redirect them back to where they came from
+		$titleObj = Title::newFromText( $this->mReturnTo );
+		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
+				!$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
+			$wgOut->redirect( $titleObj->getFullURL($this->mReturnToQuery .
+					(!empty($this->mReturnToQuery) ? '&' : '') .
+					'fbconnected=1&cb=' . rand(1, 10000) )
+			);
+		} else {
+			/*
+			 // Render a "return to" link retrieved from the URL
+			$wgOut->returnToMain( false, $this->mReturnTo, $this->mReturnToQuery .
+					(!empty($this->mReturnToQuery) ? '&' : '') .
+					'fbconnected=1&cb=' . rand(1, 10000) );
+			/**/
+			$titleObj = Title::newMainPage();
+			$wgOut->redirect( $titleObj->getFullURL('fbconnected=1&cb=' . rand(1, 10000)) );
+		}
+		
+		wfProfileOut(__METHOD__);
 	}
 	
 	
@@ -1086,48 +1127,6 @@ class SpecialConnect extends SpecialPage {
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 		
 		$this->sendPage('displaySuccessAttachingView');
-		wfProfileOut(__METHOD__);
-	}
-	
-	/**
-	 * Success page for attaching Facebook account to a pre-existing MediaWiki
-	 * account. Shows a link to preferences and a link back to where the user
-	 * came from.
-	 */
-	private function displaySuccessAttachingView() {
-		global $wgOut, $wgUser, $wgRequest;
-		wfProfileIn(__METHOD__);
-	
-		$wgOut->setPageTitle(wfMsg('facebook-success'));
-	
-		$prefsLink = SpecialPage::getTitleFor('Preferences')->getLinkUrl();
-		$wgOut->addHTML(wfMsg('facebook-success-connecting-existing-account', $prefsLink));
-	
-		// Run any hooks for UserLoginComplete
-		$inject_html = '';
-		wfRunHooks( 'UserLoginComplete', array( &$wgUser, &$inject_html ) );
-		$wgOut->addHtml( $inject_html );
-	
-		// Since there was no additional message for the user, we can just
-		// redirect them back to where they came from
-		$titleObj = Title::newFromText( $this->mReturnTo );
-		if ( ($titleObj instanceof Title) && !$titleObj->isSpecial('Userlogout') &&
-				!$titleObj->isSpecial('Signup') && !$titleObj->isSpecial('Connect') ) {
-			$wgOut->redirect( $titleObj->getFullURL($this->mReturnToQuery .
-					(!empty($this->mReturnToQuery) ? '&' : '') .
-					'fbconnected=1&cb=' . rand(1, 10000) )
-			);
-		} else {
-			/*
-			 // Render a "return to" link retrieved from the URL
-			$wgOut->returnToMain( false, $this->mReturnTo, $this->mReturnToQuery .
-					(!empty($this->mReturnToQuery) ? '&' : '') .
-					'fbconnected=1&cb=' . rand(1, 10000) );
-			/**/
-			$titleObj = Title::newMainPage();
-			$wgOut->redirect( $titleObj->getFullURL('fbconnected=1&cb=' . rand(1, 10000)) );
-		}
-	
 		wfProfileOut(__METHOD__);
 	}
 	
