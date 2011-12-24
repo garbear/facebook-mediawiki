@@ -402,21 +402,27 @@ class SpecialConnect extends SpecialPage {
 			case 'full':
 				// Get the username from Facebook (Note: not from the form)
 				$username = FacebookUser::getOptionFromInfo($choice . 'name', $facebook->getUserInfo());
+				// no break
 			case 'manual':
-				if (!isset($username) || !FacebookUser::userNameOK($username)) {
-					// Use manual name if no username is set, even if manual wasn't chosen
+				// Use manual name if no username is set, even if manual wasn't chosen
+				if ( empty($username) || !FacebookUser::userNameOK($username) )
 					$username = $wgRequest->getText('wpName2');
-				}
 				// If no valid username was found, something's not right; ask again
-				if (!FacebookUser::userNameOK($username)) {
+				if (empty($username) || !FacebookUser::userNameOK($username)) {
 					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
-				} else {
-					$this->createUser($fbid, $username);
 				}
-				break;
+				// no break
 			case 'auto':
-				// Create a user with a unique generated username
-				$this->createUser($fbid, $this->generateUserName());
+				if ( empty($username) ) {
+					// We got here if and only if $choice is 'auto'
+					$username = $this->generateUserName();
+				}
+				// Just in case the automatically-generated username is a bad egg
+				if ( empty($username) || !FacebookUser::userNameOK($username) ) {
+					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+				}
+				// Now that we got our username, create the user
+				$this->createUser($fbid, $username);
 				break;
 			default:
 				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
