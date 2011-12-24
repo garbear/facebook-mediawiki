@@ -176,7 +176,7 @@ class FacebookUser extends User {
 	 * FacebookUser::setUserNamePrefix( wfMsg('facebook-usernameprefix') );
 	 */
 	static function setUserNamePrefix( $prefix ) {
-		$this->userNamePrefix = $prefix;
+		self::$userNamePrefix = $prefix;
 	}
 	
 	/**
@@ -184,7 +184,7 @@ class FacebookUser extends User {
 	 * username based off of a facebook name.
 	 */
 	static function getUserNamePrefix() {
-		return $this->userNamePrefix;
+		return self::$userNamePrefix;
 	}
 	
 	/**
