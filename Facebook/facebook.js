@@ -144,9 +144,11 @@ function FacebookLogin() {
 	FB.login(function(response) {
 		// Check if the user logged in and fully authorized the app
 		if (response && response.authResponse) {
-			var destUrl = window.wgServer + window.wgScript + "?title=Special:Connect&returnto=" +
-				encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName) + "&returntoquery=" +
-				encodeURIComponent(wgPageQuery);
+			// Build the fallback URL for if the AJAX requests fail
+			var destUrl = window.wgServer + window.wgScript;
+			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName)
+			if (wgPageQuery)
+				destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
 			if (wgUserName) {
 				// The user is logged in to MediaWiki
 				if (fbId && fbId.length) {
