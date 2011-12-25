@@ -172,7 +172,7 @@ abstract class BaseFacebook
    *
    * @var integer
    */
-  protected $user;
+  protected $user = null;
 
   /**
    * The data from the signed_request token.
@@ -348,7 +348,7 @@ abstract class BaseFacebook
     // endpoint, where SOME access token is required.
     $this->setAccessToken($this->getApplicationAccessToken());
     $user_access_token = $this->getUserAccessToken();
-    if ($user_access_token) {
+    if (!empty($user_access_token)) {
       $this->setAccessToken($user_access_token);
     }
 
@@ -486,10 +486,11 @@ abstract class BaseFacebook
         $access_token != $this->getApplicationAccessToken() &&
         !($user && $persisted_access_token == $access_token)) {
       $user = $this->getUserFromAccessToken();
-      if ($user) {
+      if (!empty($user)) {
         $this->setPersistentData('user_id', $user);
       } else {
         $this->clearAllPersistentData();
+        $user = 0;
       }
     }
 
