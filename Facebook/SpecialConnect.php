@@ -240,6 +240,18 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			break;
+		case 'LogoutAndContinue':
+			$oldName = $wgUser->logout();
+			wfRunHooks( 'UserLogoutComplete', array(&$wgUser, &$injected_html, $oldName) );
+			
+			$user = FacebookDB::getUser( $facebook->getUser() );
+			if ( $user && $user->getId() ) {
+				$this->login( $user );
+				$this->sendPage('loginSuccessView');
+			} else {
+				$this->sendRedirect('UserLogin');
+			}
+			break;
 		/*
 		case 'ConnectExisting':
 			// If not logged in, slide down to the default
