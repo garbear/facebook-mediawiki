@@ -53,7 +53,8 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'facebook-title'    => 'Log in with Facebook',
 	'facebook-welcome'  => 'Welcome, Facebook user!',
 	'facebook-welcome-name' => 'Welcome, $1.',
-	'facebook-logout-text' => 'Your Facebook account is connected to the username $1. Would you like to log out and continue as this user?',
+	'facebook-continue-text' => 'Your Facebook account is connected to the username $1. Would you like to log out and continue as this user?',
+	'facebook-continue-button' => 'Continue',
 	'facebook-merge-title' => 'Merge accounts',
 //	'facebook-merge'    => 'Merge your wiki account with your Facebook ID.', // Deprecated
 	'facebook-merge-text' => 'Merging your username with your Facebook account lets you log in to $1 with your Facebook ID.',

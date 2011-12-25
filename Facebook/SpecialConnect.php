@@ -922,7 +922,7 @@ class SpecialConnect extends SpecialPage {
 			if ($nickname && FacebookUser::userNameOK($nickname)) {
 				$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="' .
 						$option . ($checked ? '' : '" checked="checked') . '" id="wpNameChoice' . $option .
-						'"/></td><td class="mw-input"><label for="wpNameChoice' . $option . '">' .
+						'" /></td><td class="mw-input"><label for="wpNameChoice' . $option . '">' .
 						wfMsg('facebook-choose' . $option, $nickname) . '</label></td></tr>');
 				// When the first radio is checked, this flag is set and subsequent options aren't checked
 				$checked = true;
@@ -931,12 +931,12 @@ class SpecialConnect extends SpecialPage {
 	
 		// The options for auto and manual usernames are always available
 		$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="auto" ' .
-				($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto"/></td><td class="mw-input">' .
+				($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto" /></td><td class="mw-input">' .
 				'<label for="wpNameChoiceAuto">' . wfMsg('facebook-chooseauto', FacebookUser::generateUserName()) .
 				'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
-				'value="manual" id="wpNameChoiceManual"/></td><td class="mw-input"><label ' .
+				'value="manual" id="wpNameChoiceManual" /></td><td class="mw-input"><label ' .
 				'for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;' .
-				'<input name="wpName2" size="16" value="" id="wpName2"/></td></tr>');
+				'<input name="wpName2" size="16" value="" id="wpName2" /></td></tr>');
 		// Finish with two options, "Log in" or "Cancel"
 		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
 				'<input type="submit" value="Log in" name="wpOK" />' .
@@ -944,11 +944,11 @@ class SpecialConnect extends SpecialPage {
 		// Include returnto and returntoquery parameters if they are set
 		if (!empty($this->mReturnTo)) {
 			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
-					$this->mReturnTo . '">');
+					$this->mReturnTo . '" />');
 			// Only need returntoquery if returnto is set
 			if (!empty($this->mReturnToQuery)) {
 				$wgOut->addHTML('<input type="hidden" name="returntoquery" value="' .
-						$this->mReturnToQuery . '">');
+						$this->mReturnToQuery . '" />');
 			}
 		}
 		
@@ -1008,11 +1008,8 @@ class SpecialConnect extends SpecialPage {
 	 * A precondition is that a different MediaWiki user is logged in. So, ask
 	 * them to log out and continue.
 	 * 
-	 * But what about the case where a Facebook user is logged in and authorized
-	 * the app, but isn't logged in as a wiki user, and then logs into the wiki
-	 * with the wrong account?
-	 * 
-	 * NOTE: TODO
+	 * TOOD: But what about the case where a Facebook user is logged in, but
+	 * not as a wiki user, and then logs into the wiki with the wrong account?
 	 */
 	private function logoutAndContinueView($userId) {
 		global $wgOut, $facebook;
@@ -1027,9 +1024,19 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		$username = User::newFromId($userId)->getName();
-		$html .= wfMsgExt('facebook-logout-text', 'parse', array('$1' => "[[User:$username|$username]]" ));
+		$html .= wfMsgExt('facebook-continue-text', 'parse', array('$1' => "[[User:$username|$username]]" ));
 		
-		$html .= '<p>Yes/No</p>' . "\n";
+		$html .= '<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">' . "\n";
+		$html .= '<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '"/>' . "\n";
+		
+		if ( !empty( $this->mReturnTo ) ) {
+			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '"/>' . "\n";
+			// Only need returntoquery if returnto is set
+			if ( !empty( $this->mReturnToQuery ) ) {
+				$html .= '<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '"/>' . "\n";
+			}
+		}
+		$html .= "</form><br/>\n";
 		
 		$wgOut->addHTML( $html );
 		
