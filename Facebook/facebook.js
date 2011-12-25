@@ -146,7 +146,7 @@ function FacebookLogin() {
 		if (response && response.authResponse) {
 			// Build the fallback URL for if the AJAX requests fail
 			var destUrl = window.wgServer + window.wgScript;
-			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName)
+			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
 			if (wgPageQuery)
 				destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
 			if (wgUserName) {
@@ -154,14 +154,14 @@ function FacebookLogin() {
 				if (fbId && fbId.length) {
 					// The MediaWiki user is already connected to a Facebook user
 					// Check to see if it's the one that just logged in
-					var in_array = false;
+					var already_logged_in = false;
 					for (var i = 0; i < fbId.length; i++) {
 						if (fbId == response.authResponse.userID) {
-							in_array = true;
+							already_logged_in = true;
 							break;
 						}
 					}
-					if (in_array) {
+					if (already_logged_in) {
 						// User is already logged in to MediaWiki
 						alert("Login successful");
 					} else {
@@ -321,7 +321,7 @@ window.wgAjaxLoginOnInit = function() {
 				}
 			});
 			return false;
-		}
+		};
 		
 		firstSliderCell.animate({
 			marginLeft: slideto
