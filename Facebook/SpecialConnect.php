@@ -692,35 +692,10 @@ class SpecialConnect extends SpecialPage {
 		// This must be done up here so that the data is in the database before copy-to-local is done for sharded setups
 		FacebookDB::addFacebookID($user, $fb_id);
 		
-		// Update the user with settings from Facebook (must be called somewhere
-		// between $user->saveSettings(); and the end of this function)
-		$fbUser = new FacebookUser($user);
-		$fbUser->updateFromFacebook();
-		
 		wfRunHooks( 'AddNewAccount', array( $user ) );
 		
-		// Start the session if it's not already been started
-		global $wgSessionStarted;
-		if (!$wgSessionStarted) {
-			wfSetupSession();
-		}
-		
-		// Log the user in and store the new user as the global user object
-		$user->setCookies();
-		$wgUser = $user;
-		
-		// Provide user interface in correct language immediately on this first page load
-		global $wgLang;
-		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
-		
-		/*
-		 * Similar to what's done in LoginForm::authenticateUserData(). Load
-		 * $wgUser now. This is necessary because loading $wgUser (say by
-		 * calling getName()) calls the UserLoadFromSession hook, which
-		 * potentially creates the user in the local database.
-		 */
-		$sessionUser = User::newFromSession();
-		$sessionUser->load();
+		// Log the user in
+		$this->login($user);
 		
 		// Allow custom form processing to store values since this form submission was successful.
 		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
