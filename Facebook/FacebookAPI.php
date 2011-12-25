@@ -80,28 +80,32 @@ class FacebookAPI extends Facebook {
 	
 	/**
 	 * Requests information about the user from Facebook.
+	 * 
+	 * Possible fields are id, name, first_name, last_name, username, gender, locale, email
 	 */
-	public function getUserInfo( $user = 0, $fields = null ) {
+	public function getUserInfo( $userId = 0 ) {
 		// First check to see if we have a session (if not, return null)
-		if ( $user == 0 ) {
-			$user = $this->getUser();
+		if ( $userId == 0 ) {
+			$userId = $this->getUser();
 		}
-		if ( !$user ) {
+		if ( !$userId ) {
 			return null;
 		}
 		
 		// Cache information about users
 		static $userinfo = array();
-		if ( !isset( $userinfo[$user] ) ) {
+		if ( !isset( $userinfo[$userId] ) ) {
 			try {
-				// Test: https://developers.facebook.com/tools/explorer/111867578932893/?method=GET&path=2539590
-				$user_profile = $this->api('/me');
-				$userinfo[$user] = $user_profile;
+				// Can't use /me here. If our token is acquired for a Facebook Application,
+				// then "me" isn't you anymore - it's the app or maybe nothing.
+				// http://stackoverflow.com/questions/2705756/facebook-access-token-invalid
+				$userinfo[$userId] = $this->api('/' . $userId);
 			} catch (FacebookApiException $e) {
 				error_log( 'Failure in the api when requesting /me: ' . $e->getMessage() );
 			}
 		}
-		return isset( $userinfo[$user] ) ? $userinfo[$user] : null;
+		
+		return isset($userinfo[$userId]) ? $userinfo[$userId] : null;
 	}
 	
 	/**
