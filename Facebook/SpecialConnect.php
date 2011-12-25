@@ -240,6 +240,7 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			break;
+		/*
 		case 'ConnectExisting':
 			// If not logged in, slide down to the default
 			if ($wgUser->isLoggedIn()) {
@@ -252,10 +253,18 @@ class SpecialConnect extends SpecialPage {
 				}
 				break;
 			}
+			// no break
+		*/
 		default:
 			// Logged in status (ID, or 0 if not logged in) 
 			$fbid = $facebook->getUser();
-			if ( !$fbid ) {
+			/*
+			// remove me
+			global $wgOut;
+			$wgOut->redirect( $facebook->getLogoutUrl() );
+			return;
+			/**/
+			if ( empty( $fbid ) ) {
 				// The user isn't logged in to Facebook
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user isn't logged in to Facebook or MediaWiki. Nothing to see
@@ -278,18 +287,9 @@ class SpecialConnect extends SpecialPage {
 						// UserLoadAfterLoadFromSession hook might have failed if the user's
 						// "remember me" option was disabled.
 						
-						// Load the user from their ID
-						/*
-						$wgUser->mId = $mwId;
-						$wgUser->mFrom = 'id';
-						$wgUser->load();
-						// Update user's info from Facebook
-						$fbUser = new FacebookUser($wgUser);
-						$fbUser->updateFromFacebook();
-						// TODO: Replace this with the following line
-						$fbUser = FacebookUser::newFromId($mwId);
-						$fbUser->login();
-						*/
+						$user = User::newFromId( $mwId );
+						$this->login( $user );
+						
 						$this->sendPage('loginSuccessView');
 					}
 				} else {
@@ -453,10 +453,10 @@ class SpecialConnect extends SpecialPage {
 		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
 		if (!$user || !$user->checkPassword($password))
 			throw new FacebookUserException('connectNewUserView', 'wrongpassword');
-	
+		
 		// Attach the user to their Facebook account in the database
 		FacebookDB::addFacebookID($user, $fbid);
-	
+		
 		// Update the user with settings from Facebook
 		if (count($updatePrefs)) {
 			foreach ($updatePrefs as $option) {
@@ -464,24 +464,25 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		$user->updateFromFacebook();
-	
+		
 		// Setup the session
 		global $wgSessionStarted;
 		if (!$wgSessionStarted) {
 			wfSetupSession();
 		}
-	
+		
 		// Log the user in and store the new user as the global user object
 		$user->setCookies();
 		$wgUser = $user;
-	
+		
 		// Similar to what's done in LoginForm::authenticateUserData().
 		// Load $wgUser now. This is necessary because loading $wgUser (say
 		// by calling getName()) calls the UserLoadFromSession hook, which
 		// potentially creates the user in the local database.
+		
 		$sessionUser = User::newFromSession();
 		$sessionUser->load();
-	
+		
 		// User has been successfully attached and logged in
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
 		wfProfileOut(__METHOD__);
@@ -708,6 +709,10 @@ class SpecialConnect extends SpecialPage {
 		$user->setCookies();
 		$wgUser = $user;
 		
+		// Provide user interface in correct language immediately on this first page load
+		global $wgLang;
+		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
+		
 		/*
 		 * Similar to what's done in LoginForm::authenticateUserData(). Load
 		 * $wgUser now. This is necessary because loading $wgUser (say by
@@ -721,10 +726,50 @@ class SpecialConnect extends SpecialPage {
 		// This hook should not fail on invalid input, instead check the input using the SpecialConnect::createUser::validateForm hook above.
 		wfRunHooks( 'SpecialConnect::createUser::postProcessForm', array( &$this ) );
 		
-		$user->addNewUserLogEntryAutoCreate();
+		$wgUser->addNewUserLogEntryAutoCreate();
 		// This is picked up by the 'loginSuccessView' view
 		$this->isNewUser = true;
 	}
+	
+	/**
+	 * Logs in the user by their Facebook ID. If the Facebook user doesn't have
+	 * an account on the wiki, then they are presented with a form prompting
+	 * them to choose a wiki username.
+	 */
+	protected function login($user) {
+		global $wgUser;
+		
+		// Update user's info from Facebook
+		$fbUser = new FacebookUser($user);
+		$fbUser->updateFromFacebook();
+		
+		// Setup the session
+		global $wgSessionStarted;
+		if (!$wgSessionStarted) {
+			wfSetupSession();
+		}
+		
+		// TODO: calling setCookies() and load() might hit the database twice
+		
+		// Log the user in and store the new user as the global user object
+		$user->setCookies();
+		$wgUser = $user;
+		
+		// Similar to what's done in LoginForm::authenticateUserData().
+		// Load $wgUser now. This is necessary because loading $wgUser (say
+		// by calling getName()) calls the UserLoadFromSession hook, which
+		// potentially creates the user in the local database.
+		$sessionUser = User::newFromSession();
+		$sessionUser->load();
+		
+		// Provide user interface in correct language immediately on this first page load
+		global $wgLang;
+		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
+		
+		return true;
+	}
+	
+	
 	
 	
 	
@@ -733,27 +778,57 @@ class SpecialConnect extends SpecialPage {
 	 * The user is logged in to MediaWiki but not Facebook.
 	 * No Facebook user is associated with this MediaWiki account.
 	 * 
-	 * Exit points: Facebook login button causes a post to a Special:Connect/ConnectUsers
+	 * Exit points: Facebook login button causes a post to a Special:Connect/ConnectUser
+	 * 
+	 * NOTE: TODO
 	 */
 	private function loginToFacebookView() {
 		global $wgOut, $wgSitename, $wgUser;
+		$loginFormWidth = 400; // pixels
+		
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		
 		$this->outputHeader();
-		$html = '<div>';
+		$html = '<div id="userloginForm"><form style="width: ' . $loginFormWidth . 'px;">' . "\n";
+		
 		if ( !count( $fb_ids ) ) {
+			// Message was added recently and might not be translated
+			// In that case, fall back to an older, similar message
+			$formTitle = wfMsg( 'facebook-merge-title' );
+			// This test probably isn't correct. I'm open to ideas
+			if ($formTitle == "&lt;facebook-merge-title&gt;") {
+				$formTitle = wfMsg( 'facebook-log-in' );
+			}
+			$html .= '<h2>' . $formTitle . "</h2>\n";
+			
+			$formText = wfMsg( 'facebook-merge-text', $wgSitename );
+			// This test probably isn't correct. I'm open to ideas
+			if ($formText == "&lt;facebook-merge-text&gt;") {
+				$formText = wfMsg( 'facebook-merge' );
+			}
+			$html .= '<p>' . $formText . "<br/><br/></p>\n";
+			
 			// No Facebook user associated with this MediaWiki account
-			$html .= wfMsgExt( 'facebook-intro', array('parse', 'content')) . '<br/>';
-			$html .= wfMsg( 'facebook-click-to-login', $wgSitename );
+			//$html .= wfMsgExt( 'facebook-intro', array('parse', 'content')) . '<br/>';
+			//$html .= wfMsg( 'facebook-click-to-login', $wgSitename );
 		} else {
+			$html .= '<h2>' . wfMsg( 'login' ) . "</h2>\n";
 			// User is already connected to a Facebook account. Send a page asking
 			// them to log in to one of their (possibly several) Facebook accounts
 			// For now, scold them for trying to log in to a connected account
-			$html = 'Error: Your account is already connected with Facebook. Click the button to log in to Facebook.';
+			$html .= '<p>' . wfMsg( 'facebook-connect-text' ) . "<br/><br/></p>\n";
 		}
 		// FacebookInit::getPermissionsAttribute()
 		// FacebookInit::getOnLoginAttribute()
-		$html .= '<fb:login-button show-faces="true" width="600" max-rows="3" scope="email"></fb:login-button></div>';
+		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
+					'" max-rows="3" scope="email"></fb:login-button><br/><br/><br/>' . "\n";
+		
+		// Need to get Main Page link for the Like button
+		$likeUrl = Title::newMainPage()->getFullURL();
+		
+		$html .= '<fb:like href="' . $likeUrl . '" send="false" width="' . $loginFormWidth .
+					'" show_faces="true"></fb:like>' . "\n";
+		$html .= '</form></div>';
 		$wgOut->addHTML($html);
 		
 		// TODO: Add a returnto link
@@ -762,6 +837,8 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * The user is logged in to Facebook, but not MediaWiki.
 	 * The Facebook user is new to MediaWiki.
+	 * 
+	 * NOTE: Finished
 	 */
 	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
 		/**
@@ -897,6 +974,8 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * The user has just been logged in by their Facebook account.
+	 * 
+	 * NOTE: Finished
 	 */
 	private function loginSuccessView() {
 		global $wgOut, $wgUser;
@@ -935,8 +1014,11 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * The user is logged in to Facbook and MediaWiki.
 	 * The Facebook user isn't connected to a MediaWiki account.
+	 * 
+	 * NOTE: TODO
 	 */
 	private function connectExistingUserView() {
+		//global $wgUser, $wgOut;
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		if ( !count( $fb_ids ) ) {
 			// The Facebook user is new to MediaWiki
@@ -962,6 +1044,8 @@ class SpecialConnect extends SpecialPage {
 	 * 
 	 * Previously: This error-page is shown when the user is attempting to connect a wiki account with
 	 * a Facebook ID which is already connected to a different wiki account.
+	 * 
+	 * NOTE: TODO
 	 */
 	private function logoutAndConnectView() {
 		global $wgOut, $facebook;
@@ -986,6 +1070,9 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
 	
+	/**
+	 * NOTE: TODO
+	 */
 	private function fbIdAlreadyConnectedView() {
 		
 	}
@@ -994,6 +1081,8 @@ class SpecialConnect extends SpecialPage {
 	 * Success page for attaching Facebook account to a pre-existing MediaWiki
 	 * account. Shows a link to preferences and a link back to where the user
 	 * came from.
+	 * 
+	 * NOTE: TODO
 	 */
 	private function displaySuccessAttachingView() {
 		global $wgOut, $wgUser, $wgRequest;
@@ -1042,7 +1131,7 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Disconnect from Facebook.
-	 */
+	 *
 	private function disconnectReclamationActionView() {
 		global $wgRequest, $wgOut, $facebook;
 	
@@ -1091,7 +1180,7 @@ class SpecialConnect extends SpecialPage {
 	 * the account via the ChooseName form.  This function, however, is designed for when the existing user is already logged in
 	 * and wants to quickly connect their Facebook account.  The main difference, therefore, is that this function uses default
 	 * preferences while the other form should have already shown the preferences form to the user.
-	 */
+	 *
 	public function connectExistingView() {
 		global $wgUser, $facebook;
 		wfProfileIn(__METHOD__);
@@ -1124,44 +1213,6 @@ class SpecialConnect extends SpecialPage {
 		wfProfileOut(__METHOD__);
 	}
 	
-	
-	### Model Functions ###
-	
-	/**
-	 * Logs in the user by their Facebook ID. If the Facebook user doesn't have
-	 * an account on the wiki, then they are presented with a form prompting
-	 * them to choose a wiki username.
-	 */
-	protected function login($user) {
-		global $wgUser;
-		
-		$fbUser = new FacebookUser($user);
-		// Update user from Facebook (see FacebookUser::updateFromFacebook)
-		$fbUser->updateFromFacebook();
-		
-		// Setup the session
-		global $wgSessionStarted;
-		if (!$wgSessionStarted) {
-			wfSetupSession();
-		}
-		
-		// Log the user in and store the new user as the global user object
-		$user->setCookies();
-		$wgUser = $user;
-		
-		// Similar to what's done in LoginForm::authenticateUserData().
-		// Load $wgUser now. This is necessary because loading $wgUser (say
-		// by calling getName()) calls the UserLoadFromSession hook, which
-		// potentially creates the user in the local database.
-		$sessionUser = User::newFromSession();
-		$sessionUser->load();
-		
-		// Provide user interface in correct language immediately on this first page load
-		global $wgLang;
-		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
-		
-		return true;
-	}
 	
 	/**
 	 * Check to see if the user can create a Facebook-linked account.

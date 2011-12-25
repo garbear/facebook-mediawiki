@@ -52,15 +52,10 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	// Special:Connect
 	'facebook-title'    => 'Log in with Facebook',
 	'facebook-welcome'  => 'Welcome, Facebook user!',
-	'facebook-merge'    => 'Merge your wiki account with your Facebook ID',
-/*
-	'facebook-mergebox' => 'This feature has not yet been implemented.
-Accounts can be [[Special:Renameuser|merged manually]] if the [http://mediawiki.org/wiki/Extension:Renameuser|Rename user extension] has been installed.
-
-$1
-
-Note: This can be undone by a sysop.',
-*/
+	'facebook-merge-title' => 'Merge accounts',
+//	'facebook-merge'    => 'Merge your wiki account with your Facebook ID.', // Deprecated
+	'facebook-merge-text' => 'Merging your username with your Facebook account lets you log in to $1 with your Facebook ID.',
+	'facebook-connect-text' => 'Facebook is enabled for your username. Click the button below to log in to Facebook.',
 	'facebook-logoutbox' => '$1
 
 This will also log you out of Facebook and all connected sites, including this wiki.',
