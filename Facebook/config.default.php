@@ -96,7 +96,7 @@ $wgFbUseRealName = false;
 $wgFbShowPersonalUrls = array(
 	'connect',        // Show the "Log in with Facebook Connect" button
 #	'convert',        // Give logged-in users a link to Connect their accounts (not available)
-	'logout',         // Log the user out of Facebook when they log out of the wiki
+#	'logout',         // Log the user out of Facebook when they log out of the wiki
 );
 
 /**
