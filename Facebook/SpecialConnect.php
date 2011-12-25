@@ -279,6 +279,7 @@ class SpecialConnect extends SpecialPage {
 				$mwUser = FacebookDB::getUser($fbid);
 				$mwId = $mwUser ? $mwUser->getId() : 0;
 				if ( !$wgUser->isLoggedIn() ) {
+					// The user is logged in to Facebook but not MediaWiki
 					if ( !$mwId ) {
 						// The Facebook user is new to MediaWiki
 						$this->sendPage('connectNewUserView');
@@ -288,7 +289,7 @@ class SpecialConnect extends SpecialPage {
 						// "remember me" option was disabled.
 						
 						$user = User::newFromId( $mwId );
-						$this->login( $user );
+						$this->login( $user ); // TODO: Make sure hook code is the same. And move both to FacebookUser, goddammit
 						
 						$this->sendPage('loginSuccessView');
 					}
@@ -299,16 +300,22 @@ class SpecialConnect extends SpecialPage {
 						// here, move along
 						$this->sendRedirect('UserLogin');
 					} else {
-						// Accounts don't agree. Let's find out what's going on
+						// Accounts don't agree
+						$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 						if ( !$mwId ) {
-							// The Facebook user isn't connected to a MediaWiki account
-							$this->sendPage('connectExistingUserView');
+							// Facebook user is new
+							if ( count( $fb_ids ) == 0 ) {
+								// MediaWiki user is free
+								// Both accounts are free. Ask to merge
+								$this->sendPage('mergeAccountsView');
+							} else {
+								// MediaWiki user already associated with Facebook ID
+								// For now, error
+							}
 						} else {
-							// The Facebook account belongs to a different MediaWiki user
-							// Ask if we should load the new user from their ID
-							// "Would youlike to log out and continue with the new account?"
-							// (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndConnect.)
-							$this->sendPage('logoutAndConnectView');
+							// Facebook account has a MediaWiki user
+							// Ask to log out and continue as the new user ($mwId)
+							$this->sendPage('logoutAndContinueView', $mwId);
 						}
 					}
 				}
@@ -801,6 +808,7 @@ class SpecialConnect extends SpecialPage {
 		// Need to get Main Page link for the Like button
 		$likeUrl = Title::newMainPage()->getFullURL();
 		
+		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . $likeUrl . '" send="false" width="' . $loginFormWidth .
 					'" show_faces="true"></fb:like>' . "\n";
 		$html .= '</form></div>';
@@ -987,67 +995,54 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * The user is logged in to Facbook and MediaWiki.
-	 * The Facebook user isn't connected to a MediaWiki account.
-	 * 
-	 * NOTE: TODO
+	 * MediaWiki user and Facebook user are both free. Ask to merge these two.
 	 */
-	private function connectExistingUserView() {
-		//global $wgUser, $wgOut;
-		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
-		if ( !count( $fb_ids ) ) {
-			// The Facebook user is new to MediaWiki
-			$wgOut->addHTML("Connect your Facebook account to your username<br/>(Yes/No)<br/>");
-			// If yes, post to Special:Connect/ConnectExisting or something
-		} else {
-			// The Facebook use has been to MediaWiki with a different Facebook
-			if ( count( $fb_ids ) == 1 ) {
-				$wgOut->addHTML('Your username is already connected to a Facebook account. Would you ' .
-					'like to connect your username with this Facebook acount also?<br/>(Yes/No)<br/>');
-			} else {
-				$wgOut->addHTML('Your username is already connected to the following Facebook accounts. Would you ' .
-					'like to connect your username with this Facebook acount also?<br/>(Yes/No)<br/>');
-			}
-		}
+	private function mergeAccountsView() {
+		
 	}
 	
 	/**
-	 * Both are loggged in.
-	 * The Facebook account belongs to a different MediaWiki user.
-	 * Ask if we should load the new user from their ID.
-	 * (No: Return to previous page. Yes: Post to Special:Connect/LogoutAndConnect.)
+	 * This error page is shown when the user logs in to Facebook, but the
+	 * Facebook account is associated with a different user.
 	 * 
-	 * Previously: This error-page is shown when the user is attempting to connect a wiki account with
-	 * a Facebook ID which is already connected to a different wiki account.
+	 * A precondition is that a different MediaWiki user is logged in. So, ask
+	 * them to log out and continue.
+	 * 
+	 * But what about the case where a Facebook user is logged in and authorized
+	 * the app, but isn't logged in as a wiki user, and then logs into the wiki
+	 * with the wrong account?
 	 * 
 	 * NOTE: TODO
 	 */
-	private function logoutAndConnectView() {
+	private function logoutAndContinueView($userId) {
 		global $wgOut, $facebook;
-		$wgOut->setPageTitle(wfMsg( 'facebook-fbid-is-already-connected-title' ));
 		
-		$wgOut->addHTML('Your Facebook account belongs to a different user. Would you like ' .
-			'to log out and continue as the other user?<br/><br/>');
+		$wgOut->setPageTitle(wfMsg( 'facebook-logout-and-continue' ));
 		
-		$wgOut->addWikiMsg( 'facebook-fbid-is-already-connected' );
+		$html = '';
 		
-		// Find out the username that this facebook id is already connected to.
-		$fb_user = $facebook->getUser(); // fb id or 0 if none is found.
-		if ( $fb_user ) {
-			$foundUser = FacebookDB::getUser( $fb_user );
-			if ( $foundUser ) {
-				$connectedToUser = $foundUser->getName();
-				$wgOut->addWikiMsg('facebook-fbid-connected-to', $connectedToUser);
-			}
+		$profile = $facebook->getUserInfo();
+		if ( $profile && isset($profile['first_name']) ) {
+			$html = '<p>' . wfMsg('facebook-welcome-name', array('$1' => $profile['first_name'])) . "</p>\n";
 		}
+		
+		$username = User::newFromId($userId)->getName();
+		$html .= wfMsgExt('facebook-logout-text', 'parse', array('$1' => "[[User:$username|$username]]" ));
+		
+		$html .= '<p>Yes/No</p>' . "\n";
+		
+		$wgOut->addHTML( $html );
 		
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 	}
 	
+	
+	
+	
 	/**
 	 * NOTE: TODO
-	 */
+	 *
 	private function fbIdAlreadyConnectedView() {
 		
 	}
