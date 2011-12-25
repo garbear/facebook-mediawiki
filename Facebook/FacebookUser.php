@@ -199,7 +199,7 @@ class FacebookUser extends User {
 		// Because $i is incremented the first time through the while loop
 		$i = FacebookDB::countUsers(); // rough estimate
 		$max = $i + 100;
-		while ($i < PHP_INT_MAX && i < $max) {
+		while ($i < PHP_INT_MAX && $i < $max) {
 			$name = self::getUserNamePrefix() . $i;
 			if (FacebookUser::userNameOK($name)) {
 				return $name;
