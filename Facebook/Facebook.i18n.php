@@ -87,6 +87,7 @@ For more info, please contact the group creator $4.',
 	'facebook-language' => 'Language',
 	'facebook-timecorrection' => 'Time zone correction (hours)',
 	'facebook-chooselegend' => 'Username choice',
+	'facebook-updatelegend' => 'Update options',
 	'facebook-chooseinstructions' => 'All users need a nickname; you can choose one from the options below.',
 	'facebook-invalidname' => 'The nickname you chose is already taken or not a valid nickname.
 Please chose a different one.',
