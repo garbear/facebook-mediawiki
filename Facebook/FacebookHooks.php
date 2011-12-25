@@ -295,7 +295,9 @@ STYLE;
 		return true;
 	}
 	
-	
+	/**
+	 * TODO: Document me!
+	 */
 	private static function showButton( $which ) {
 		global $wgUser, $wgFbShowPersonalUrls, $wgFbHidePersonalUrlsBySkin;
 		// If the button isn't marked to be shown in the first place
@@ -568,6 +570,40 @@ STYLE;
 		// Unstub $wgUser (is there a more succinct way to do this?)
 		$user->getId();
 		return true;
+	}
+	
+	/**
+	 * We need to override the password checking so that Facebook users can
+	 * reset their passwords and give themselves a valid password to log in
+	 * without Facebook. This only works if the user specifies a blank password
+	 * and hasn't already given themselves one.
+	 *
+	 * To that effect, you may want to modify the 'resetpass-wrong-oldpass' msg.
+	 *
+	 * Before version 1.14, MediaWiki used Special:Preferences to reset
+	 * passwords instead of Special:ChangePassword, so this hook won't get
+	 * called and Facebook users won't be able to give themselves a password
+	 * unless they request one over email.
+	 */
+	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
+		global $wgTitle;
+		// Only allow the override if no password exists and a blank old password was specified
+		if ( $hash != '' || $password != '' || !$userId ) {
+			return true;
+		}
+		// Only check for password on Special:ChangePassword
+		if ( !$wgTitle->isSpecial( 'Resetpass' ) ) {
+			return true;
+		}
+		// Check to see if the MediaWiki user has connected via Facebook before
+		// For a more strict check, we could check if the user is currently logged in to Facebook
+		$user = User::newFromId( $userId );
+		$fb_ids = FacebookDB::getFacebookIDs($user);
+		if (count($fb_ids) == 0 || !$fb_ids[0]) {
+			return true;
+		}
+		$result = true;
+		return false; // to override internal check
 	}
 	
 	/**
