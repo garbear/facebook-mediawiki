@@ -197,10 +197,8 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Performs any necessary execution and outputs the resulting Special page.
-	 * Minor efforts have been made to conform to a MVC architecture.
 	 * 
-	 * This isn't a strict adherence to MVC, because technically models should
-	 * be manipulated by the controller and the views should observe the models. 
+	 * If you are editing this page, try to conform to a MVC architecture.
 	 */
 	public function execute( $par ) {
 		global $wgUser, $wgRequest, $facebook;
@@ -253,34 +251,11 @@ class SpecialConnect extends SpecialPage {
 			}
 			break;
 		case 'MergeAccount':
-			// If not logged in, slide down to the default
 			try {
 				$this->manageMergeAccountPost($choice);
-				if ( $choice == 'existing' ) {
-					$this->sendPage('displaySuccessAttachingView');
-				} else {
-					$this->sendPage('loginSuccessView', true);
-				}
+				$this->sendPage('displaySuccessAttachingView');
 			} catch (FacebookUserException $e) {
-				// If the title msg is 'connectNewUserView' then we send the view instead of an error
-				if ($e->getTitleMsg() == 'connectNewUserView')
-					$this->sendPage('connectNewUserView', $e->getTextMsg());
-				else
-					$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
-			}
-			
-			
-			
-			
-			if ($wgUser->isLoggedIn()) {
-				$fb_ids = FacebookDB::getFacebookIDs($wgUser);
-				if (count( $fb_ids ) > 0) {
-					// Will display a message that they're already logged in and connected
-					$this->sendPage('alreadyLoggedInView');
-				} else {
-					$this->sendPage('connectExistingView');
-				}
-				break;
+				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
 			}
 			break;
 		default:
@@ -414,6 +389,8 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * @throws FacebookUserException
+	 * 
+	 * NOTE: Finished
 	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest, $facebook;
@@ -467,11 +444,27 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * @throws FacebookUserException
 	 * 
-	 * NOTE: TODO
+	 * NOTE: Finished
 	 */
 	private function manageMergeAccountPost() {
 		global $wgUser, $wgRequest, $facebook;
+		
 		$fbid = $facebook->getUser();
+		if ( !$fbid ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		
+		if ( !$wgUser->isLoggedIn() ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		
+		// Make sure both accounts are free in the database
+		$mwUser = FacebookDB::getUser($fbid);
+		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
+		if ( ($mwUser && $mwUser->getId()) || count($fb_ids) > 0 ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		
 		$updatePrefs = array();
 		foreach ($this->getAvailableUserUpdateOptions() as $option) {
 			if ($wgRequest->getText("wpUpdateUserInfo$option", '0') == '1') {
@@ -505,10 +498,16 @@ class SpecialConnect extends SpecialPage {
 			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
+		
 		// Look up the user by their name
-		$user = new FacebookUser(User::newFromName($name, 'creatable' ));
-		if (!$user || !$user->checkPassword($password))
-			throw new FacebookUserException('connectNewUserView', 'wrongpassword');
+		$user = User::newFromName($name, 'creatable');
+		
+		// If the user is logged in, we can skip the password check
+		if ( !($wgUser->isLoggedIn() && $wgUser->getId() == $user->getId()) ) {
+			if ( !$user->checkPassword($password) ) {
+				throw new FacebookUserException('connectNewUserView', 'wrongpassword');
+			}
+		}
 		
 		// Attach the user to their Facebook account in the database
 		FacebookDB::addFacebookID($user, $fbid);
@@ -519,25 +518,9 @@ class SpecialConnect extends SpecialPage {
 				$user->setOption("facebookupdate-on-login-$option", '1');
 			}
 		}
-		$user->updateFromFacebook();
 		
-		// Setup the session
-		global $wgSessionStarted;
-		if (!$wgSessionStarted) {
-			wfSetupSession();
-		}
-		
-		// Log the user in and store the new user as the global user object
-		$user->setCookies();
-		$wgUser = $user;
-		
-		// Similar to what's done in LoginForm::authenticateUserData().
-		// Load $wgUser now. This is necessary because loading $wgUser (say
-		// by calling getName()) calls the UserLoadFromSession hook, which
-		// potentially creates the user in the local database.
-		
-		$sessionUser = User::newFromSession();
-		$sessionUser->load();
+		// Log in the user if they aren't already logged in
+		$this->login($user);
 		
 		// User has been successfully attached and logged in
 		wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
@@ -778,23 +761,25 @@ class SpecialConnect extends SpecialPage {
 			wfSetupSession();
 		}
 		
-		// TODO: calling setCookies() and load() might hit the database twice
-		
-		// Log the user in and store the new user as the global user object
-		$user->setCookies();
-		$wgUser = $user;
-		
-		// Similar to what's done in LoginForm::authenticateUserData().
-		// Load $wgUser now. This is necessary because loading $wgUser (say
-		// by calling getName()) calls the UserLoadFromSession hook, which
-		// potentially creates the user in the local database.
-		$sessionUser = User::newFromSession();
-		$sessionUser->load();
-		
-		// Provide user interface in correct language immediately on this first page load
-		global $wgLang;
-		$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
-		
+		// Only log the user in if they aren't already logged in
+		if ($user && $user->getId() != $wgUser->getId() ) {
+			// TODO: calling setCookies() and load() might hit the database twice
+			
+			// Log the user in and store the new user as the global user object
+			$user->setCookies();
+			$wgUser = $user;
+			
+			// Similar to what's done in LoginForm::authenticateUserData().
+			// Load $wgUser now. This is necessary because loading $wgUser (say
+			// by calling getName()) calls the UserLoadFromSession hook, which
+			// potentially creates the user in the local database.
+			$sessionUser = User::newFromSession();
+			$sessionUser->load();
+			
+			// Provide user interface in correct language immediately on this first page load
+			global $wgLang;
+			$wgLang = Language::factory( $wgUser->getOption( 'language' ) );
+		}			
 		return true;
 	}
 	
@@ -1063,7 +1048,7 @@ class SpecialConnect extends SpecialPage {
 	 * MediaWiki user and Facebook user are both unconnected. Ask to merge
 	 * these two.
 	 * 
-	 * NOTE: TODO
+	 * NOTE: Finished (I think)
 	 */
 	private function mergeAccountView() {
 		global $wgOut, $wgUser, $facebook, $wgSitename;
@@ -1159,7 +1144,7 @@ class SpecialConnect extends SpecialPage {
 	 * account. Shows a link to preferences and a link back to where the user
 	 * came from.
 	 * 
-	 * NOTE: TODO
+	 * NOTE: Finished
 	 */
 	private function displaySuccessAttachingView() {
 		global $wgOut, $wgUser, $wgRequest;
