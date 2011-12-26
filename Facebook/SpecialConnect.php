@@ -389,8 +389,6 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * @throws FacebookUserException
-	 * 
-	 * NOTE: Finished
 	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest, $facebook;
@@ -443,8 +441,6 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * @throws FacebookUserException
-	 * 
-	 * NOTE: Finished
 	 */
 	private function manageMergeAccountPost() {
 		global $wgUser, $wgRequest, $facebook;
@@ -484,8 +480,6 @@ class SpecialConnect extends SpecialPage {
 	 *
 	 * NOTE: This isn't used by Wikia and hasn't been tested with some of the new
 	 * code. Does it handle setting push-preferences correctly?
-	 * 
-	 * NOTE: TODO
 	 * 
 	 * @throws FacebookUserException
 	 */
@@ -792,9 +786,7 @@ class SpecialConnect extends SpecialPage {
 	 * The user is logged in to MediaWiki but not Facebook.
 	 * No Facebook user is associated with this MediaWiki account.
 	 * 
-	 * Exit points: Facebook login button causes a post to a Special:Connect/ConnectUser
-	 * 
-	 * NOTE: TODO (1 minor one)
+	 * TODO: Facebook login button causes a post to a Special:Connect/ConnectUser or something
 	 */
 	private function loginToFacebookView() {
 		global $wgOut, $wgSitename, $wgUser;
@@ -845,10 +837,8 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * The user is logged in to Facebook, but not MediaWiki.
-	 * The Facebook user is new to MediaWiki.
-	 * 
-	 * NOTE: Finished
+	 * The user is logged in to Facebook, but not MediaWiki. The Facebook user
+	 * is new to MediaWiki.
 	 */
 	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
 		/**
@@ -970,6 +960,9 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addHTML("</td></tr></table></fieldset></form>\n\n");
 	}
 	
+	/**
+	 * TODO: Document me
+	 */
 	private function getUpdateOptions($initialHidden = false) {
 		global $facebook;
 		$userinfo = $facebook->getUserInfo();
@@ -1007,8 +1000,6 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * The user has just been logged in by their Facebook account.
-	 * 
-	 * NOTE: Finished
 	 */
 	private function loginSuccessView($newUser = false) {
 		global $wgOut, $wgUser;
@@ -1047,8 +1038,6 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * MediaWiki user and Facebook user are both unconnected. Ask to merge
 	 * these two.
-	 * 
-	 * NOTE: Finished (I think)
 	 */
 	private function mergeAccountView() {
 		global $wgOut, $wgUser, $facebook, $wgSitename;
@@ -1057,13 +1046,9 @@ class SpecialConnect extends SpecialPage {
 		$html  = '<form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">' . "\n";
 		$html .= '<fieldset id="mw-facebook-chooseoptions">' . "\n";
 		$html .= '<legend>' . wfMsg('facebook-updatelegend') . "</legend>\n";
-		
 		$html .= wfMsgExt('facebook-merge-text', 'parse', array('$1' => $wgSitename ));
-		
 		$html .= '<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>' . "\n";
-		
 		$html .= $this->getUpdateOptions(false);
-		
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />' . "\n";
 			// Only need returntoquery if returnto is set
@@ -1071,23 +1056,10 @@ class SpecialConnect extends SpecialPage {
 				$html .= '<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '" />' . "\n";
 			}
 		}
-		
 		$html .= "</fieldset></form><br/>\n";
-		
 		$wgOut->addHTML($html);
-		
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
-		
-		
 		$wgOut->addHTML('<br/>' . "\n");
-		//$html = wfMsg( 'facebook-merge-text', $wgSitename );
-		
-		
-		$updateChoices = $this->getUpdateOptions(false);
-		
-		
-		
-		
 	}
 	
 	/**
@@ -1099,8 +1071,6 @@ class SpecialConnect extends SpecialPage {
 	 * 
 	 * TODO: But what about the case where a Facebook user is logged in, but
 	 * not as a wiki user, and then logs into the wiki with the wrong account?
-	 * 
-	 * NOTE: Finished
 	 */
 	private function logoutAndContinueView($userId) {
 		global $wgOut, $facebook;
@@ -1143,8 +1113,6 @@ class SpecialConnect extends SpecialPage {
 	 * Success page for attaching Facebook account to a pre-existing MediaWiki
 	 * account. Shows a link to preferences and a link back to where the user
 	 * came from.
-	 * 
-	 * NOTE: Finished
 	 */
 	private function displaySuccessAttachingView() {
 		global $wgOut, $wgUser, $wgRequest;
@@ -1278,7 +1246,7 @@ class SpecialConnect extends SpecialPage {
 	
 	/**
 	 * Check to see if the user can create a Facebook-linked account.
-	 */
+	 *
 	function checkCreateAccount() {
 		global $wgUser, $facebook;
 		// Response object to send return to the client
@@ -1340,6 +1308,10 @@ class SpecialConnect extends SpecialPage {
 		return $response;
 	}
 	
+	/**
+	 * 
+	 * 
+	 *
 	function ajaxModalChooseName() {
 		global $wgRequest;
 		wfLoadExtensionMessages('Facebook');
@@ -1357,4 +1329,5 @@ class SpecialConnect extends SpecialPage {
 		$response->addText( $html );
 		return $response;
 	}
+	/**/
 }

@@ -111,10 +111,10 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user']; // Create a new group for Facebook users
 $wgImplicitGroups[] = 'fb-user'; // Because Wikia says it should be
 
-$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
+//$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
 //$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
-$wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
-$wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
+//$wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
+//$wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
 $wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
