@@ -120,6 +120,16 @@ window.fbAsyncInit = function() {
 			ev.preventDefault();
 		});
 		
+		FB.Event.subscribe('auth.login', function(response) {
+			if (response && response.authResponse) {
+				var destUrl = window.wgServer + window.wgScript;
+				destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
+				if (wgPageQuery)
+					destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
+				window.location.href = destUrl;
+			}
+		});
+		
 		// Add the logout behavior to the "Logout of Facebook" button
 		$('#pt-fblogout').click(function() {
 			// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
@@ -163,7 +173,7 @@ function FacebookLogin() {
 					}
 					if (already_logged_in) {
 						// User is already logged in to MediaWiki
-						alert("Login successful");
+						//alert("Login successful");
 					} else {
 						// MediaWiki user is connected to a Facebook account different
 						// from the one that just logged in
