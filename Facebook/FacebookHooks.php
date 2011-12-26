@@ -663,6 +663,16 @@ STYLE;
 	}
 	
 	/**
+	 * Called when the user is logged out to log them out of Facebook as well.
+	 *
+	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
+		global $faecbook;
+		if ( $facebook->getUser() ) {
+			$facebook->destroySession();
+		}
+	}
+	
+	/**
 	 * Create a disconnect button and other things in preferences.
 	 */
 	static function initPreferencesExtensionForm( $user, &$preferences ) {

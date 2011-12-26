@@ -1047,6 +1047,8 @@ class SpecialConnect extends SpecialPage {
 		$html .= '<fieldset id="mw-facebook-chooseoptions">' . "\n";
 		$html .= '<legend>' . wfMsg('facebook-updatelegend') . "</legend>\n";
 		$html .= wfMsgExt('facebook-merge-text', 'parse', array('$1' => $wgSitename ));
+		// TODO
+		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
 		$html .= '<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>' . "\n";
 		$html .= $this->getUpdateOptions(false);
 		if ( !empty( $this->mReturnTo ) ) {
@@ -1058,6 +1060,8 @@ class SpecialConnect extends SpecialPage {
 		}
 		$html .= "</fieldset></form><br/>\n";
 		$wgOut->addHTML($html);
+		
+		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
 		$wgOut->addHTML('<br/>' . "\n");
 	}
@@ -1086,10 +1090,8 @@ class SpecialConnect extends SpecialPage {
 		
 		$username = User::newFromId($userId)->getName();
 		$html .= wfMsgExt('facebook-continue-text', 'parse', array('$1' => "[[User:$username|$username]]" ));
-		
 		$html .= '<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">' . "\n";
 		$html .= '<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '"/>' . "\n";
-		
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '"/>' . "\n";
 			// Only need returntoquery if returnto is set
@@ -1098,6 +1100,9 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		$html .= "</form><br/>\n";
+		
+		// TODO
+		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
 		
 		$wgOut->addHTML( $html );
 		
