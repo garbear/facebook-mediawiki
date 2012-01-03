@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright © 2010-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
