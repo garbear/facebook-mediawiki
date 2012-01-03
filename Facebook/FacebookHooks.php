@@ -654,7 +654,7 @@ STYLE;
 					$user->mFrom = 'id';
 					$user->load();
 					// Update user's info from Facebook
-					$fbUser = new FacebookUser($user);
+					$fbUser = new FacebookUser();
 					$fbUser->updateFromFacebook();
 				}
 			}
@@ -666,9 +666,12 @@ STYLE;
 	 * Called when the user is logged out to log them out of Facebook as well.
 	 *
 	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
-		global $faecbook;
-		if ( $facebook->getUser() ) {
-			$facebook->destroySession();
+		global $wgTitle, $facebook, $wgUser;
+		if ( $wgTitle->isSpecial('UserLogout') && $facebook->getUser() ) {
+			// Only log the user out of Facebook if it's the right user
+			if (in_array($facebook->getUser(), FacebookDB::getFacebookIDs($wgUser)) {
+				$facebook->destroySession();
+			}
 		}
 	}
 	
