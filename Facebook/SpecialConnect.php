@@ -329,69 +329,8 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 			}
-			
-			/*
-			 * If the user is logged in to an unconnected account, and trying to
-			* connect a Facebook ID, but the ID is already connected to a DIFFERENT
-			* account... display an error message.
-			*
-			if ( $fbid && $wgUser->isLoggedIn() ) {
-				$foundUser = FacebookDB::getUser( $fbid );
-				if ( $foundUser && ($foundUser->getId() != $wgUser->getId()) ) {
-					$this->sendPage( 'fbIdAlreadyConnectedView' );
-					return;
-				}
-			}
-			
-			// Either fully logged out of both services, or fully logged in -- nothing for Special:Conect to do
-			if ( (!$fbid && !$wgUser->isLoggedIn()) || ($fbid && $wgUser->isLoggedIn()) ) {
-				global $wgOut;
-				$urlaction = '';
-				if ( !empty( $this->mReturnTo ) ) {
-					$urlaction = "returnto=$this->mReturnTo";
-					if ( !empty( $this->mReturnToQuery ) )
-						$urlaction .= "&returntoquery=$this->mReturnToQuery";
-				}
-				$wgOut->redirect( $wgUser->getSkin()->makeSpecialUrl( 'UserLogin', $urlaction ) );
-			} else if ($wgUser->isLoggedIn()) {
-				if ($fbid) {
-					// If the user has previously connected, log them in.  If they have not, then complete the connection process.
-					$fb_ids = FacebookDB::getFacebookIDs($wgUser);
-					if (count($fb_ids) > 0) {
-						// Will display a message that they're already logged in and connected.
-						$this->sendPage('alreadyLoggedInView');
-					} else {
-						$this->sendPage('connectExistingView');
-					}
-				} else {
-					// If the user isn't Connected, then show a form with the Connect button (regardless of whether they are logged in or not).
-					$this->sendPage('connectFormView');
-				}
-			} else if ($fbid) {
-				// Check to see if the Connected user exists in the database
-				$user = FacebookDB::getUser($fbid);
-				
-				if ( !(isset($user) && $user instanceof User) ) {
-					$redemption = wfRunHooks('SpecialConnect::login::notFoundLocally', array(&$this, &$user, $fbid));
-					if (!$redemption) {
-						return false;
-					}
-				}
-				
-				// If the user is connected, log them in
-				if ( isset($user) && $user instanceof User ) {
-					$this->login($user);
-					$this->sendPage('successfulLoginView');
-				} else {
-					$this->sendPage('chooseNameFormView');
-				}
-			} else {
-				// If the user isn't Connected, then show a form with the Connect button
-				$this->sendPage('connectFormView');
-			}
-			/**/
 		}
-	}
+	} // execute()
 	
 	/**
 	 * @throws FacebookUserException
