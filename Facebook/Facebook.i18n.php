@@ -118,6 +118,7 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
     'facebook-modal-headmsg' => 'Almost done!',
 	'facebook-error-creating-user' => 'Error creating the user in the local database.',
 	'facebook-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
+	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue logging in as $2, you must first log out of {{SITENAME}}.',
 	// facebook-prefstext
 	'prefs-facebook-prefstext' => 'Facebook',
 	'facebook-link-to-profile' => 'Facebook profile',
@@ -151,7 +152,7 @@ To login go to: $1',
 	'facebook-reclamation-body-error' => 'There was some error during disconnecting from Facebook or you account is already disconnected. 
 
 To login go to: $1',
-    'facebook-unknown-error' => 'Unknown error, try again or contact with us.',          
+    'facebook-unknown-error' => 'Unknown error, please try again or contact with us.',          
 	'facebook-passwordremindertitle' => 'Your Wikia account is now disconnected from Facebook!',
     'facebook-passwordremindertitle-exist' => 'Your account is now disconnected from Facebook!',
 	'facebook-passwordremindertext' => 'Hi,

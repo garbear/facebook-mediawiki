@@ -203,10 +203,12 @@ class SpecialConnect extends SpecialPage {
 	public function execute( $par ) {
 		global $wgUser, $wgRequest, $facebook;
 		
+		/*
 		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
 			$this->sendPage('disconnectReclamationActionView');
 			return;
 		}
+		*/
 		
 		// Setup the session
 		global $wgSessionStarted;
@@ -313,7 +315,11 @@ class SpecialConnect extends SpecialPage {
 								$this->sendPage('mergeAccountView');
 							} else {
 								// MediaWiki user already associated with Facebook ID
-								// For now, error
+								global $wgContLang;
+								$param1 = '[[' . $wgContLang->getNsText( NS_USER ) . ":{$wgUser->getName()}|{$wgUser->getName()}]]";
+								$userInfo = $facebook->getUserInfo();
+								$param2 = $userInfo['name'];
+								$this->sendError('errorpagetitle', 'facebook-error-wrong-id', array('$1' => $param1, '$2' => $param2));
 							}
 						} else {
 							// Facebook account has a MediaWiki user
@@ -1077,7 +1083,7 @@ class SpecialConnect extends SpecialPage {
 	 * not as a wiki user, and then logs into the wiki with the wrong account?
 	 */
 	private function logoutAndContinueView($userId) {
-		global $wgOut, $facebook;
+		global $wgOut, $facebook, $wgContLang;
 		
 		$wgOut->setPageTitle(wfMsg('facebook-logout-and-continue'));
 		
@@ -1089,7 +1095,9 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		$username = User::newFromId($userId)->getName();
-		$html .= wfMsgExt('facebook-continue-text', 'parse', array('$1' => "[[User:$username|$username]]" ));
+		$html .= wfMsgExt('facebook-continue-text', 'parse', array(
+			'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]"
+		));
 		$html .= '<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">' . "\n";
 		$html .= '<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '"/>' . "\n";
 		if ( !empty( $this->mReturnTo ) ) {
