@@ -336,8 +336,7 @@ class SpecialConnect extends SpecialPage {
 				
 				// Now that we got our username, create the user
 				$domain = $wgRequest->getText( 'wpDomain' );
-				$remember = $wgRequest->getCheck( 'wpRemember' );
-				$fbUser->createUser($username, $domain, $remember);
+				$fbUser->createUser($username, $domain);
 				break;
 			default:
 				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
@@ -543,20 +542,6 @@ class SpecialConnect extends SpecialPage {
 				'value="manual" id="wpNameChoiceManual" /></td><td class="mw-input"><label ' .
 				'for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;' .
 				'<input name="wpName2" size="16" value="" id="wpName2" /></td></tr>');
-		
-		// Add an option to remember me
-		global $wgCookieExpiration;
-		if ( $wgCookieExpiration > 0 ) {
-			global $wgRequest;
-			$checked = $wgUser->getOption( 'rememberpassword' ) || $wgRequest->getCheck( 'wpRemember' );
-			#$translator = new MediaWiki_I18N();
-			$wgOut->addHTML('<tr><td></td><td class="mw-input">' .
-				'<input id="wpRemember" type="checkbox" value="1" name="wpRemember"' .
-				($checked ? ' checked="checked"' : '' ) . ' />&nbsp;<label for="wpRemember">' .
-				#htmlspecialchars( $translator->translate( 'remembermypassword' ) ) .
-				'Automatically log me in' .
-				'</label></td></tr>');
-		}
 		
 		// Finish with two options, "Log in" or "Cancel"
 		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
