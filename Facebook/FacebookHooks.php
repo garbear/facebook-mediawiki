@@ -633,15 +633,13 @@ STYLE;
 	 * If the user isn't logged in, try to authenticate via Facebook.
 	 * 
 	 * This hook was added in MediaWiki 1.14.
-	 */
+	 *
 	static function UserLoadAfterLoadFromSession( $user ) {
 		global $wgTitle;
 		// Don't need to automatically authenticate on Special:Connect
 		if ( !$user->isLoggedIn() && !$wgTitle->isSpecial('Connect') ) {
 			$fbUser = new FacebookUser();
 			$mwUser = $fbUser->getMWUser();
-			// TODO: in order to implement this, must modify Logout link to log the
-			// user out of Facebook when they are logged out of the wiki
 			if ( $mwUser->getId() && $mwUser->getOption( 'rememberpassword' ) ) {
 				$fbUser->login();
 			}
@@ -651,7 +649,7 @@ STYLE;
 	
 	/**
 	 * Called when the user is logged out to log them out of Facebook as well.
-	 */
+	 *
 	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
 		global $wgTitle, $facebook;
 		if ( $wgTitle->isSpecial('Userlogout') && $facebook->getUser() ) {
