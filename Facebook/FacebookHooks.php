@@ -635,28 +635,15 @@ STYLE;
 	 * This hook was added in MediaWiki 1.14.
 	 */
 	static function UserLoadAfterLoadFromSession( $user ) {
-		global $facebook;
-		if ( !$user->isLoggedIn() ) {
-			$fbId = $facebook->getUser();
-			// Look up the MW ID of the Facebook user
-			$mwUser = FacebookDB::getUser($fbId);
-			if ( $mwUser && $mwUser->getId() ) {
-				// Look up the "rememberme" option
-				
-				// TODO: in order to implement this, must modify Logout link to log the
-				// user out of Facebook when they are logged out of the wiki
-				//$autologin = $mwUser->getOption('rememberpassword');
-				$autologin = false;
-				
-				if ( $autologin ) {
-					// Load the user from their ID
-					$user->mId = $mwUser->getId();
-					$user->mFrom = 'id';
-					$user->load();
-					// Update user's info from Facebook
-					$fbUser = new FacebookUser();
-					$fbUser->updateFromFacebook();
-				}
+		global $wgTitle;
+		// Don't need to automatically authenticate on Special:Connect
+		if ( !$user->isLoggedIn() && !$wgTitle->isSpecial('Connect') ) {
+			$fbUser = new FacebookUser();
+			$mwUser = $fbUser->getMWUser();
+			// TODO: in order to implement this, must modify Logout link to log the
+			// user out of Facebook when they are logged out of the wiki
+			if ( $mwUser->getId() && $mwUser->getOption( 'rememberpassword' ) ) {
+				$fbUser->login();
 			}
 		}
 		return true;

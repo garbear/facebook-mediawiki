@@ -173,9 +173,12 @@ function FacebookLogin(response) {
 			}
 		} else {
 			// User is trying to log in with Facebook 
-			// Ask the server if the MW user can be automatically logged in (and get a ChooseName form over AJAX for later)
-			// If so the user can be logged in, redirect to Special:Connect
-			// If not, let the user fill out the form and post to Special:Connect/ChooseName
+			// Ask the server about the user over AJAX
+			// If the user exists and 'rememberpassword', reload the page
+			// If the user exists and not 'rememberpassword', redirect to destUrl
+			// (Scratch that, always redirect to destUrl if th euser exists)
+			// If the user is new, a ChooseName form will be returned over AJAX
+			// (let the user fill out the form and post to Special:Connect/ChooseName)
 			window.location.href = destUrl; // Fallback if AJAX fails
 		}
 	}
