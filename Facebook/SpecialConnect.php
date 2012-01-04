@@ -338,7 +338,8 @@ class SpecialConnect extends SpecialPage {
 				
 				// Now that we got our username, create the user
 				$domain = $wgRequest->getText( 'wpDomain' );
-				$fbUser->createUser($username, $domain);
+				$remember = $wgRequest->getCheck( 'wpRemember' );
+				$fbUser->createUser($username, $domain, $remember);
 				break;
 			default:
 				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
@@ -544,6 +545,21 @@ class SpecialConnect extends SpecialPage {
 				'value="manual" id="wpNameChoiceManual" /></td><td class="mw-input"><label ' .
 				'for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;' .
 				'<input name="wpName2" size="16" value="" id="wpName2" /></td></tr>');
+		
+		// Add an option to remember me
+		global $wgCookieExpiration;
+		if ( $wgCookieExpiration > 0 ) {
+			global $wgRequest;
+			$checked = $wgUser->getOption( 'rememberpassword' ) || $wgRequest->getCheck( 'wpRemember' );
+			#$translator = new MediaWiki_I18N();
+			$wgOut->addHTML('<tr><td></td><td class="mw-input">' .
+				'<input id="wpRemember" type="checkbox" value="1" name="wpRemember"' .
+				($checked ? ' checked="checked"' : '' ) . ' />&nbsp;<label for="wpRemember">' .
+				#htmlspecialchars( $translator->translate( 'remembermypassword' ) ) .
+				'Automatically log me in' .
+				'</label></td></tr>');
+		}
+		
 		// Finish with two options, "Log in" or "Cancel"
 		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
 				'<input type="submit" value="Log in" name="wpOK" />' .
@@ -566,6 +582,8 @@ class SpecialConnect extends SpecialPage {
 	 * TODO: Document me
 	 */
 	private function getUpdateOptions($initialHidden = false) {
+		global $wgRequest;
+		
 		$fbUser = new FacebookUser();
 		$userinfo = $fbUser->getUserInfo();
 		
@@ -581,10 +599,14 @@ class SpecialConnect extends SpecialPage {
 				continue;
 			}
 			
+			// Check to see if the option was checked on a previous page (default to true)
+			$checked = ($wgRequest->getText("wpUpdateUserInfo$option", '0') != '1');
+			
 			// Build the list item for the update option
 			$item  = '<li>';
 			$item .= '<input name="wpUpdateUserInfo' . $option . '" type="checkbox" ' .
-			         'value="1" id="wpUpdateUserInfo' . $option . '" checked="checked" />';
+			         'value="1" id="wpUpdateUserInfo' . $option . '" ' .
+			         ($checked ? 'checked="checked" ' : '') . '/>';
 			$item .= '<label for="wpUpdateUserInfo' . $option . '">' . wfMsgHtml("facebook-$option") .
 			         wfMsgExt('colon-separator', array('escapenoentities')) . " <i>$value</i></label></li>";
 			$updateOptions[] = $item;

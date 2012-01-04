@@ -249,7 +249,7 @@ class FacebookUser {
 	/**
 	 * @throws FacebookUserException
 	 */
-	function createUser($username, $domain = '') {
+	function createUser($username, $domain = '', $remember = 1) {
 		global $wgUser, $wgAuth;
 		
 		// Make sure we're not stealing an existing user account (it can't hurt to check twice)
@@ -427,10 +427,8 @@ class FacebookUser {
 			$this->user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0');
 		}
 		
-		//$this->user->setOption( 'rememberpassword', $this->mRemember ? 1 : 0 );
-		$this->user->setOption( 'rememberpassword', 1 );
-		//$this->user->setOption( 'marketingallowed', $this->mMarketingOptIn ? 1 : 0 );
-		$this->user->setOption( 'skinoverwrite', 1 );
+		$this->user->setOption( 'rememberpassword', $remember );
+		//$this->user->setOption( 'skinoverwrite', 1 ); // Wikia code
 		
 		// Mark that the user is a Facebook user
 		$this->user->addGroup('fb-user');
