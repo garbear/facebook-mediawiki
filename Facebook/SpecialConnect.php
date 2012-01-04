@@ -385,7 +385,7 @@ class SpecialConnect extends SpecialPage {
 			$formTitle = wfMsg( 'facebook-merge-title' );
 			// This test probably isn't correct. I'm open to ideas
 			if ($formTitle == "&lt;facebook-merge-title&gt;") {
-				$formTitle = wfMsg( 'facebook-log-in' );
+				$formTitle = wfMsg( 'login' );
 			}
 			$html .= '<h2>' . $formTitle . "</h2>\n";
 			
