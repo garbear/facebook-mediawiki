@@ -53,10 +53,10 @@ class SpecialConnect extends SpecialPage {
 	
 	private function setReturnTo() {
 		global $wgRequest;
-	
+		
 		$this->mReturnTo = $wgRequest->getVal( 'returnto' );
 		$this->mReturnToQuery = $wgRequest->getVal( 'returntoquery' );
-	
+		
 		/**
 		 * Wikia BugId: 13709
 		 * Before the fix, the logic and the usage of parse_str was wrong
@@ -372,7 +372,9 @@ class SpecialConnect extends SpecialPage {
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		
 		$this->outputHeader();
-		$html = '<div id="userloginForm"><form style="width: ' . $loginFormWidth . 'px;">' . "\n";
+		$html = '
+<div id="userloginForm">
+	<form style="width: ' . $loginFormWidth . 'px;">' . "\n";
 		
 		if ( !count( $fb_ids ) ) {
 			// This message was added recently and might not be translated
@@ -406,8 +408,10 @@ class SpecialConnect extends SpecialPage {
 		
 		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .
-					 $loginFormWidth . '" show_faces="true"></fb:like>' . "\n";
-		$html .= '</form></div>';
+					 $loginFormWidth . '" show_faces="true"></fb:like>';
+		$html .= '
+	</form>
+</div>';
 		$wgOut->addHTML($html);
 		
 		// TODO: Add a returnto link
@@ -460,14 +464,15 @@ class SpecialConnect extends SpecialPage {
 		
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
+		
 		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
 		$wgOut->addWikiMsg( $messagekey );
-		// TODO: Format the html a little nicer
-		$wgOut->addHTML('
-				<form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
-				<fieldset id="mw-facebook-choosename">
-				<legend>' . wfMsg('facebook-chooselegend') . '</legend>
-				<table>');
+		
+		$html = '
+<form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
+	<fieldset id="mw-facebook-choosename">
+		<legend>' . wfMsg('facebook-chooselegend') . '</legend>
+		<table>';
 		// Let them attach to an existing. If $wgFbDisableLogin is true, then
 		// stand-alone account aren't allowed in the first place
 		if (empty( $wgFbDisableLogin )) {
@@ -478,59 +483,89 @@ class SpecialConnect extends SpecialPage {
 			$updateChoices = $this->getUpdateOptions();
 			
 			// Create the HTML for the "existing account" option
-			$html = '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
-			        'value="existing" id="wpNameChoiceExisting"/></td><td class="mw-input">' .
-			        '<label for="wpNameChoiceExisting">' . wfMsg('facebook-chooseexisting') .
-			        '</label><div id="mw-facebook-choosename-update" class="fbInitialHidden">' .
-			        '<label for="wpExistingName">' . wfMsgHtml('facebook-chooseusername') . '</label>' .
-			        '<input name="wpExistingName" size="16" value="' . $name .
-			        '" id="wpExistingName" />&nbsp;<label for="wpExistingPassword">' . wfMsgHtml('facebook-choosepassword') .
-			        '</label><input name="wpExistingPassword" ' .
-			        'size="" value="" type="password" id="wpExistingPassword" /><br/>' . $updateChoices .
-			        '</div></td></tr>';
-			
-			$wgOut->addHTML($html);
+			$html .= '
+			<tr>
+				<td class="wm-label">
+					<input name="wpNameChoice" type="radio" value="existing" id="wpNameChoiceExisting"/>
+				</td>
+				<td class="mw-input">
+					<label for="wpNameChoiceExisting">' . wfMsg('facebook-chooseexisting') . '</label>
+					<div id="mw-facebook-choosename-update" class="fbInitialHidden">
+						<label for="wpExistingName">' . wfMsgHtml('facebook-chooseusername') . '</label>
+						<input name="wpExistingName" size="20" value="' . $name . '" id="wpExistingName" />&nbsp;
+						<label for="wpExistingPassword">' . wfMsgHtml('facebook-choosepassword') . '</label>
+						<input name="wpExistingPassword" size="20" value="" type="password" id="wpExistingPassword" /><br/>
+						' . $updateChoices . '
+					</div>
+				</td>
+			</tr>';
 		}
-	
+		
 		// Add the options for nick name, first name and full name if we can get them
 		foreach (array('nick', 'first', 'full') as $option) {
 			$nickname = FacebookUser::getOptionFromInfo($option . 'name', $userinfo);
 			if ($nickname && FacebookUser::userNameOK($nickname)) {
-				$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="' .
-						$option . ($checked ? '' : '" checked="checked') . '" id="wpNameChoice' . $option .
-						'" /></td><td class="mw-input"><label for="wpNameChoice' . $option . '">' .
-						wfMsg('facebook-choose' . $option, $nickname) . '</label></td></tr>');
+				$html .= '
+			<tr>
+				<td class="mw-label">
+					<input name="wpNameChoice" type="radio" value="' . $option . ($checked ? '' : '" checked="checked') .
+						'" id="wpNameChoice' . $option . '" />
+				</td>
+				<td class="mw-input">
+					<label for="wpNameChoice' . $option . '">' . wfMsg('facebook-choose' . $option, $nickname) . '</label>
+				</td>
+			</tr>';
 				// When the first radio is checked, this flag is set and subsequent options aren't checked
 				$checked = true;
 			}
 		}
-	
-		// The options for auto and manual usernames are always available
-		$wgOut->addHTML('<tr><td class="mw-label"><input name="wpNameChoice" type="radio" value="auto" ' .
-				($checked ? '' : 'checked="checked" ') . 'id="wpNameChoiceAuto" /></td><td class="mw-input">' .
-				'<label for="wpNameChoiceAuto">' . wfMsg('facebook-chooseauto', FacebookUser::generateUserName()) .
-				'</label></td></tr><tr><td class="mw-label"><input name="wpNameChoice" type="radio" ' .
-				'value="manual" id="wpNameChoiceManual" /></td><td class="mw-input"><label ' .
-				'for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;' .
-				'<input name="wpName2" size="16" value="" id="wpName2" /></td></tr>');
 		
+		// The options for auto and manual usernames are always available
+		$html .= '
+			<tr>
+				<td class="mw-label">
+					<input name="wpNameChoice" type="radio" value="auto" ' . ($checked ? '' : 'checked="checked" ') .
+						'id="wpNameChoiceAuto" />
+				</td>
+				<td class="mw-input">
+					<label for="wpNameChoiceAuto">' . wfMsg('facebook-chooseauto', FacebookUser::generateUserName()) . '</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="mw-label">
+					<input name="wpNameChoice" type="radio" value="manual" id="wpNameChoiceManual" />
+				</td>
+				<td class="mw-input">
+					<label for="wpNameChoiceManual">' . wfMsg('facebook-choosemanual') . '</label>&nbsp;
+					<input name="wpName2" size="16" value="" id="wpName2" />
+				</td>
+			</tr>';
 		// Finish with two options, "Log in" or "Cancel"
-		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
-				'<input type="submit" value="Log in" name="wpOK" />' .
-				'<input type="submit" value="Cancel" name="wpCancel" />');
+		$html .= '
+			<tr>
+				<td></td>
+				<td class="mw-submit">
+					<input type="submit" value="Log in" name="wpOK" />
+					<input type="submit" value="Cancel" name="wpCancel" />';
 		
 		// Include returnto and returntoquery parameters if they are set
 		if (!empty($this->mReturnTo)) {
-			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
-					$this->mReturnTo . '" />');
+			$html .= '
+					<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />';
 			// Only need returntoquery if returnto is set
 			if (!empty($this->mReturnToQuery)) {
-				$wgOut->addHTML('<input type="hidden" name="returntoquery" value="' .
-						$this->mReturnToQuery . '" />');
+				$html .= '
+					<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '" />';
 			}
 		}
 		
-		$wgOut->addHTML("</td></tr></table></fieldset></form>\n\n");
+		$html .= '
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</form>' . "\n\n";
+		$wgOut->addHTML($html);
 	}
 	
 	/**
@@ -570,7 +605,7 @@ class SpecialConnect extends SpecialPage {
 		// Implode the update options into an unordered list
 		$updateChoices = '';
 		if ( count($updateOptions) > 0 ) {
-			$updateChoices .= "<br />\n";
+			$updateChoices .= "<br/>\n";
 			$updateChoices .= wfMsgHtml('facebook-updateuserinfo') . "\n";
 			$updateChoices .= "<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n";
 		}
@@ -622,29 +657,36 @@ class SpecialConnect extends SpecialPage {
 		global $wgOut, $wgUser, $wgSitename;
 		$wgOut->setPageTitle(wfMsg('facebook-merge-title'));
 		
-		$html  = '<form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">' . "\n";
-		$html .= '<fieldset id="mw-facebook-chooseoptions">' . "\n";
-		$html .= '<legend>' . wfMsg('facebook-updatelegend') . "</legend>\n";
-		$html .= wfMsgExt('facebook-merge-text', 'parse', array('$1' => $wgSitename ));
+		$html = '
+<form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">
+	<fieldset id="mw-facebook-chooseoptions">
+		<legend>' . wfMsg('facebook-updatelegend') . '</legend>
+		' . wfMsgExt('facebook-merge-text', 'parse', array('$1' => $wgSitename )) .
 		// TODO
-		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
-		$html .= '<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>' . "\n";
-		$html .= '<div id="mw-facebook-choosename-update">';
-		$html .= $this->getUpdateOptions();
-		$html .= '</div>';
+		//<p>Not $user? Log in as a different facebook user...</p>
+		'
+		<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>
+		<div id="mw-facebook-choosename-update">
+			' . $this->getUpdateOptions() . '
+		</div>';
 		if ( !empty( $this->mReturnTo ) ) {
-			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />' . "\n";
+			$html .= '
+		<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />';
 			// Only need returntoquery if returnto is set
 			if ( !empty( $this->mReturnToQuery ) ) {
-				$html .= '<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '" />' . "\n";
+				$html .= '
+		<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '" />';
 			}
 		}
-		$html .= "</fieldset></form><br/>\n";
+		$html .= '
+	</fieldset>
+</form><br/>';
+		
 		$wgOut->addHTML($html);
 		
 		// Render the "Return to" text retrieved from the URL
 		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
-		$wgOut->addHTML('<br/>' . "\n");
+		$wgOut->addHTML("<br/>\n");
 	}
 	
 	/**
@@ -667,23 +709,28 @@ class SpecialConnect extends SpecialPage {
 		$fbUser = new FacebookUser();
 		$profile = $fbUser->getUserInfo();
 		if ( $profile && isset($profile['first_name']) ) {
-			$html = '<p>' . wfMsg('facebook-welcome-name', array('$1' => $profile['first_name'])) . "</p>\n";
+			$html = '
+<p>' . wfMsg('facebook-welcome-name', array('$1' => $profile['first_name'])) . '</p>';
 		}
 		
 		$username = User::newFromId($userId)->getName();
-		$html .= wfMsgExt('facebook-continue-text', 'parse', array(
-			'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]"
-		));
-		$html .= '<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">' . "\n";
-		$html .= '<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '"/>' . "\n";
+		$html .= "\n" . wfMsgExt('facebook-continue-text', 'parse', array(
+				'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
+		);
+		$html .= '
+<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">
+	<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '" />';
 		if ( !empty( $this->mReturnTo ) ) {
-			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '"/>' . "\n";
+			$html .= '
+	<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />';
 			// Only need returntoquery if returnto is set
 			if ( !empty( $this->mReturnToQuery ) ) {
-				$html .= '<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '"/>' . "\n";
+				$html .= '
+	<input type="hidden" name="returntoquery" value="' . $this->mReturnToQuery . '" />';
 			}
 		}
-		$html .= "</form><br/>\n";
+		$html .= '
+</form><br/>' . "\n";
 		
 		// TODO
 		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
@@ -740,10 +787,6 @@ class SpecialConnect extends SpecialPage {
 		
 		wfProfileOut(__METHOD__);
 	}
-	
-	
-	
-	
 	
 	
 	
