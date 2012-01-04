@@ -67,11 +67,11 @@ class SpecialConnect extends SpecialPage {
 		 * to be a QUERY_STRING-like string.
 		 */
 		if( !empty($this->mReturnToQuery) ) {
-			// a temporary array
+			// A temporary array
 			$aReturnToQuery = array();
-			// decompose the query string to the array
+			// Decompose the query string to the array
 			parse_str( $this->mReturnToQuery, $aReturnToQuery );
-			// remove unwanted elements
+			// Remove unwanted elements
 			unset( $aReturnToQuery['fbconnected'] );
 	
 			//recompose the query string
@@ -211,14 +211,6 @@ class SpecialConnect extends SpecialPage {
 		default:
 			// Logged in status (ID, or 0 if not logged in) 
 			$fbUser = new FacebookUser();
-			#$fbid = $facebook->getUser();
-			/*
-			// remove me
-			global $wgOut;
-			$wgOut->redirect( $facebook->getLogoutUrl() );
-			return;
-			/**/
-			#if ( empty( $fbid ) ) {
 			if ( !$fbUser->isLoggedIn() ) {
 				// The user isn't logged in to Facebook
 				if ( !$wgUser->isLoggedIn() ) {
@@ -230,9 +222,6 @@ class SpecialConnect extends SpecialPage {
 				}
 			} else {
 				// The user is logged in to Facebook
-				#$fbUser = new FacebookUser();
-				#$mwUser = FacebookDB::getUser($fbid);
-				#$mwId = $mwUser ? $mwUser->getId() : 0;
 				$mwId = $fbUser->getMWUser()->getId();
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user is logged in to Facebook but not MediaWiki
@@ -283,7 +272,6 @@ class SpecialConnect extends SpecialPage {
 	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest;
-		#$fbid = $facebook->getUser();
 		$fbUser = new FacebookUser();
 		switch ($choice) {
 			// Check to see if the user opted to connect an existing account
@@ -296,7 +284,6 @@ class SpecialConnect extends SpecialPage {
 				}
 				$name = $wgRequest->getText('wpExistingName');
 				$password = $wgRequest->getText('wpExistingPassword');
-				#$this->attachUser($fbid, $name, $password, $updatePrefs);
 				$fbUser->attachUser($name, $password, $updatePrefs);
 				break;
 				// Check to see if the user selected another valid option
@@ -346,8 +333,6 @@ class SpecialConnect extends SpecialPage {
 	private function manageMergeAccountPost() {
 		global $wgUser, $wgRequest;
 		
-		#$fbid = $facebook->getUser();
-		#if ( !$fbid ) {
 		$fbUser = new FacebookUser();
 		if ( !$fbUser->isLoggedIn() ) {
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
@@ -373,10 +358,6 @@ class SpecialConnect extends SpecialPage {
 		
 		$fbUser->attachUser($wgUser->getName(), '', $updatePrefs);
 	}
-	
-	
-	
-	
 	
 	/**
 	 * The user is logged in to MediaWiki but not Facebook.
@@ -518,7 +499,6 @@ class SpecialConnect extends SpecialPage {
 		}
 	
 		// Add the options for nick name, first name and full name if we can get them
-		// TODO: Wikify the usernames (i.e. Full name should have an _ )
 		foreach (array('nick', 'first', 'full') as $option) {
 			$nickname = FacebookUser::getOptionFromInfo($option . 'name', $userinfo);
 			if ($nickname && FacebookUser::userNameOK($nickname)) {
@@ -544,6 +524,7 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addHTML('<tr><td></td><td class="mw-submit">' .
 				'<input type="submit" value="Log in" name="wpOK" />' .
 				'<input type="submit" value="Cancel" name="wpCancel" />');
+		
 		// Include returnto and returntoquery parameters if they are set
 		if (!empty($this->mReturnTo)) {
 			$wgOut->addHTML('<input type="hidden" name="returnto" value="' .
@@ -591,8 +572,9 @@ class SpecialConnect extends SpecialPage {
 			         wfMsgExt('colon-separator', array('escapenoentities')) . " <i>$value</i></label></li>";
 			$updateOptions[] = $item;
 		}
-		$updateChoices = '';
+		
 		// Implode the update options into an unordered list
+		$updateChoices = '';
 		if ( count($updateOptions) > 0 ) {
 			$updateChoices .= "<br />\n";
 			$updateChoices .= '<div id="mw-facebook-choosename-update" class="' . ($initialHidden ? 'fbInitialHidden' : '') .
@@ -756,7 +738,7 @@ class SpecialConnect extends SpecialPage {
 			$wgOut->returnToMain( false, $this->mReturnTo, $this->mReturnToQuery .
 					(!empty($this->mReturnToQuery) ? '&' : '') .
 					'fbconnected=1&cb=' . rand(1, 10000) );
-			/**/
+			*/
 			$titleObj = Title::newMainPage();
 			$wgOut->redirect( $titleObj->getFullURL('fbconnected=1&cb=' . rand(1, 10000)) );
 		}
