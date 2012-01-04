@@ -418,15 +418,6 @@ class SpecialConnect extends SpecialPage {
 	 * is new to MediaWiki.
 	 */
 	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
-		/**
-		 * TODO: Add an option to disallow this extension to access your Facebook
-		 * information. This option could simply point you to your Facebook privacy
-		 * settings. This is necessary in case the user wants to perpetually browse
-		 * the wiki anonymously, while still being logged in to Facebook.
-		 *
-		 * NOTE: The above might be done now that we have checkboxes for which options
-		 * to update from fb. Haven't tested it though.
-		 */
 		global $wgUser, $wgOut, $wgFbDisableLogin;
 		
 		$titleObj = SpecialPage::getTitleFor( 'Connect' );
@@ -484,16 +475,19 @@ class SpecialConnect extends SpecialPage {
 			global $wgCookiePrefix;
 			$name = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
 			
-			$updateChoices = $this->getUpdateOptions(true);
+			$updateChoices = $this->getUpdateOptions();
 			
 			// Create the HTML for the "existing account" option
 			$html = '<tr><td class="wm-label"><input name="wpNameChoice" type="radio" ' .
 			        'value="existing" id="wpNameChoiceExisting"/></td><td class="mw-input">' .
-			        '<label for="wnNameChoiceExisting">' . wfMsg('facebook-chooseexisting') . '<br/>' .
-			        wfMsgHtml('facebook-chooseusername') . '<input name="wpExistingName" size="16" value="' .
-			        $name . '" id="wpExistingName"/>' . wfMsgHtml('facebook-choosepassword') .
-			        '<input name="wpExistingPassword" ' . 'size="" value="" type="password"/>' . $updateChoices .
-			        '</td></tr>';
+			        '<label for="wpNameChoiceExisting">' . wfMsg('facebook-chooseexisting') .
+			        '</label><div id="mw-facebook-choosename-update" class="fbInitialHidden">' .
+			        '<label for="wpExistingName">' . wfMsgHtml('facebook-chooseusername') . '</label>' .
+			        '<input name="wpExistingName" size="16" value="' . $name .
+			        '" id="wpExistingName" />&nbsp;<label for="wpExistingPassword">' . wfMsgHtml('facebook-choosepassword') .
+			        '</label><input name="wpExistingPassword" ' .
+			        'size="" value="" type="password" id="wpExistingPassword" /><br/>' . $updateChoices .
+			        '</div></td></tr>';
 			
 			$wgOut->addHTML($html);
 		}
@@ -542,7 +536,7 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * TODO: Document me
 	 */
-	private function getUpdateOptions($initialHidden = false) {
+	private function getUpdateOptions() {
 		global $wgRequest;
 		
 		$fbUser = new FacebookUser();
@@ -577,9 +571,8 @@ class SpecialConnect extends SpecialPage {
 		$updateChoices = '';
 		if ( count($updateOptions) > 0 ) {
 			$updateChoices .= "<br />\n";
-			$updateChoices .= '<div id="mw-facebook-choosename-update" class="' . ($initialHidden ? 'fbInitialHidden' : '') .
-			                  '">' . wfMsgHtml('facebook-updateuserinfo') . "\n";
-			$updateChoices .= "<ul>\n" . implode("\n", $updateOptions) . "\n</ul></div>\n";
+			$updateChoices .= wfMsgHtml('facebook-updateuserinfo') . "\n";
+			$updateChoices .= "<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n";
 		}
 		return $updateChoices;
 	}
@@ -636,7 +629,9 @@ class SpecialConnect extends SpecialPage {
 		// TODO
 		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
 		$html .= '<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>' . "\n";
-		$html .= $this->getUpdateOptions(false);
+		$html .= '<div id="mw-facebook-choosename-update">';
+		$html .= $this->getUpdateOptions();
+		$html .= '</div>';
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '<input type="hidden" name="returnto" value="' . $this->mReturnTo . '" />' . "\n";
 			// Only need returntoquery if returnto is set

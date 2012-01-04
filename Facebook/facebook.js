@@ -67,9 +67,9 @@ $(document).ready(function() {
 			selected = $('#wpNameChoiceExisting').attr('checked');
 		}
 		if (selected) {
-			$("#mw-facebook-choosename-update").show('slow');
+			$("#mw-facebook-choosename-update").slideDown('slow');
 		} else {
-			$("#mw-facebook-choosename-update").hide('slow');
+			$("#mw-facebook-choosename-update").slideUp('slow');
 		}
 	});
 });
