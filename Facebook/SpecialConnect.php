@@ -240,12 +240,10 @@ class SpecialConnect extends SpecialPage {
 						// The Facebook user is new to MediaWiki
 						$this->sendPage('connectNewUserView');
 					} else {
-						// The user is logged in to Facebook, but not MediaWiki. The
-						// UserLoadAfterLoadFromSession hook might have failed if the user's
-						// "remember me" option was disabled.
-						#$user = User::newFromId( $mwId );
-						#$this->login( $user ); // TODO: Make sure hook code is the same
-						$fbUser->login(); // TODO: Make sure hook code is the same
+						// The user is logged in to Facebook, but not MediaWiki.
+						// The UserLoadAfterLoadFromSession hook might have misfired
+						// if the user's "remember me" option was disabled.
+						$fbUser->login();
 						$this->sendPage('loginSuccessView');
 					}
 				} else {
