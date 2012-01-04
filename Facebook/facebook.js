@@ -87,10 +87,8 @@ window.fbAsyncInit = function() {
 		xfbml  : window.fbUseXFBML, // Whether XFBML should be automatically parsed
 		oauth  : true
 	});
-
-	// NOTE: Auth.login doesn't appear to work anymore.
-	// The onlogin attribute of the fb:login-buttons is being used instead.
 	
+	FB.Event.subscribe('auth.login', FacebookLogin);
 	// Register a function for when the user logs out of Facebook
 	/*
 	FB.Event.subscribe('auth.logout', function(response) {
@@ -109,27 +107,13 @@ window.fbAsyncInit = function() {
 	$(document).ready(function() {
 		// Attach event to the Login with Facebook button
 		$("#pt-facebook a").click(function(ev) {
-			/*
-			// See <http://developers.facebook.com/docs/reference/javascript/FB.login>
-			fn = FB.bind(sendToConnectOnLogin, null);
-			// Can we just use this? Why call sendToConnectOnLogin in the context of "null"?
-			//fn = sendToConnectOnLogin;
-			FB.login(fn, {scope : "publish_stream"});
-			*/
-			FacebookLogin();
+			//var perms = "publish_stream"; // email also?
+			var perms = "email";
+			FB.login(FacebookLogin, {scope: perms});
 			ev.preventDefault();
 		});
 		
-		FB.Event.subscribe('auth.login', function(response) {
-			if (response && response.authResponse) {
-				var destUrl = window.wgServer + window.wgScript;
-				destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
-				if (wgPageQuery)
-					destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
-				window.location.href = destUrl;
-			}
-		});
-		
+		/*
 		// Add the logout behavior to the "Logout of Facebook" button
 		$('#pt-fblogout').click(function() {
 			// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
@@ -141,6 +125,7 @@ window.fbAsyncInit = function() {
 				});
 			}
 		});
+		*/
 	});
 };
 
@@ -148,56 +133,52 @@ window.fbAsyncInit = function() {
 if (wgPageName != fbReturnToTitle)
 	alert("wgPageName: " + wgPageName + "\nfbReturnToTitle: " + fbReturnToTitle);
 
-function FacebookLogin() {
-	//var perms = "publish_stream"; // email also?
-	var perms = "email";
-	FB.login(function(response) {
-		// Check if the user logged in and fully authorized the app
-		if (response && response.authResponse) {
-			// Build the fallback URL for if the AJAX requests fail
-			var destUrl = window.wgServer + window.wgScript;
-			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
-			if (wgPageQuery)
-				destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
-			if (wgUserName) {
-				// The user is logged in to MediaWiki
-				if (fbId && fbId.length) {
-					// The MediaWiki user is already connected to a Facebook user
-					// Check to see if it's the one that just logged in
-					var already_logged_in = false;
-					for (var i = 0; i < fbId.length; i++) {
-						if (fbId == response.authResponse.userID) {
-							already_logged_in = true;
-							break;
-						}
+function FacebookLogin(response) {
+	// Check if the user logged in and fully authorized the app
+	if (response && response.authResponse) {
+		// Build the fallback URL for if the AJAX requests fail
+		var destUrl = window.wgServer + window.wgScript;
+		destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
+		if (wgPageQuery)
+			destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
+		if (wgUserName) {
+			// The user is logged in to MediaWiki
+			if (fbId && fbId.length) {
+				// The MediaWiki user is already connected to a Facebook user
+				// Check to see if it's the one that just logged in
+				var already_logged_in = false;
+				for (var i = 0; i < fbId.length; i++) {
+					if (fbId == response.authResponse.userID) {
+						already_logged_in = true;
+						break;
 					}
-					if (already_logged_in) {
-						// User is already logged in to MediaWiki
-						//alert("Login successful");
-					} else {
-						// MediaWiki user is connected to a Facebook account different
-						// from the one that just logged in
-						// AJAX: Ask if response.authResponse.userID has a MediaWiki account
-						// Yes: Ask to log in as the correct MediaWiki user (if so, redirect to Special:Connect)
-						// "Your username is already connected to a Facebook account. Would you
-						// like to connect your username with this Facebook acount also?" Yes/No
-						// If Yes, post to Special:Connect/LogoutAndConnect
-						// If no, don't do anything, hide prompt
-						window.location.href = destUrl;
-					}
+				}
+				if (already_logged_in) {
+					// User is already logged in to MediaWiki
+					//alert("Login successful");
 				} else {
-					// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
-					window.location.href = destUrl; // Fallback if AJAX fails
+					// MediaWiki user is connected to a Facebook account different
+					// from the one that just logged in
+					// AJAX: Ask if response.authResponse.userID has a MediaWiki account
+					// Yes: Ask to log in as the correct MediaWiki user (if so, redirect to Special:Connect)
+					// "Your username is already connected to a Facebook account. Would you
+					// like to connect your username with this Facebook acount also?" Yes/No
+					// If Yes, post to Special:Connect/LogoutAndConnect
+					// If no, don't do anything, hide prompt
+					window.location.href = destUrl;
 				}
 			} else {
-				// User is trying to log in with Facebook 
-				// Ask the server if the MW user can be automatically logged in (and get a ChooseName form over AJAX for later)
-				// If so the user can be logged in, redirect to Special:Connect
-				// If not, let the user fill out the form and post to Special:Connect/ChooseName
+				// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
 				window.location.href = destUrl; // Fallback if AJAX fails
 			}
+		} else {
+			// User is trying to log in with Facebook 
+			// Ask the server if the MW user can be automatically logged in (and get a ChooseName form over AJAX for later)
+			// If so the user can be logged in, redirect to Special:Connect
+			// If not, let the user fill out the form and post to Special:Connect/ChooseName
+			window.location.href = destUrl; // Fallback if AJAX fails
 		}
-	}, {scope: perms});
+	}
 }
 
 /**
