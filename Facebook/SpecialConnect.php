@@ -202,7 +202,7 @@ class SpecialConnect extends SpecialPage {
 			break;
 		case 'MergeAccount':
 			try {
-				$this->manageMergeAccountPost($choice);
+				$this->manageMergeAccountPost();
 				$this->sendPage('displaySuccessAttachingView');
 			} catch (FacebookUserException $e) {
 				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
@@ -259,14 +259,11 @@ class SpecialConnect extends SpecialPage {
 							if ( count( $fb_ids ) == 0 ) {
 								// MediaWiki user is free
 								// Both accounts are free. Ask to merge
-								#$this->sendPage('mergeAccountView');
-								$this->sendPage('mergeAccountView', $fb_ids);
+								$this->sendPage('mergeAccountView');
 							} else {
 								// MediaWiki user already associated with Facebook ID
 								global $wgContLang;
 								$param1 = '[[' . $wgContLang->getNsText( NS_USER ) . ":{$wgUser->getName()}|{$wgUser->getName()}]]";
-								#$userInfo = $fbUser->getUserInfo('name');
-								#$param2 = $userInfo['name'];
 								$param2 = $fbUser->getUserInfo('name');
 								$this->sendError('errorpagetitle', 'facebook-error-wrong-id', array('$1' => $param1, '$2' => $param2));
 							}
@@ -361,7 +358,7 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// Make sure both accounts are free in the database
-		$mwId = $fbUser->getUser()->getId();
+		$mwId = $fbUser->getMWUser()->getId();
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		if ( $mwId || count($fb_ids) > 0 ) {
 			throw new FacebookUserException('facebook-error', 'facebook-errortext'); // TODO: error msg
