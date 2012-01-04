@@ -131,24 +131,24 @@ window.fbAsyncInit = function() {
 
 // debug
 if (wgPageName != fbReturnToTitle)
-	alert("wgPageName: " + wgPageName + "\nfbReturnToTitle: " + fbReturnToTitle);
+	alert("wgPageName: " + window.wgPageName + "\nfbReturnToTitle: " + window.fbReturnToTitle);
 
 function FacebookLogin(response) {
 	// Check if the user logged in and fully authorized the app
 	if (response && response.authResponse) {
 		// Build the fallback URL for if the AJAX requests fail
 		var destUrl = window.wgServer + window.wgScript;
-		destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(fbReturnToTitle ? fbReturnToTitle : wgPageName);
-		if (wgPageQuery)
-			destUrl += "&returntoquery=" + encodeURIComponent(wgPageQuery);
-		if (wgUserName) {
+		destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(window.fbReturnToTitle ? window.fbReturnToTitle : window.wgPageName);
+		if (window.wgPageQuery)
+			destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
+		if (window.wgUserName) {
 			// The user is logged in to MediaWiki
-			if (fbId && fbId.length) {
+			if (window.fbId && window.fbId.length) {
 				// The MediaWiki user is already connected to a Facebook user
 				// Check to see if it's the one that just logged in
 				var already_logged_in = false;
 				for (var i = 0; i < fbId.length; i++) {
-					if (fbId == response.authResponse.userID) {
+					if (window.fbId == response.authResponse.userID) {
 						already_logged_in = true;
 						break;
 					}
