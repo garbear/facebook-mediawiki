@@ -99,7 +99,7 @@ Please chose a different one.',
 	'facebook-chooseexisting' => 'An existing account on this wiki',
 	'facebook-chooseusername' => 'Username:',
 	'facebook-choosepassword' => 'Password:',
-	'facebook-updateuserinfo' => 'Update the following personal information:',
+	'facebook-updateuserinfo' => 'Update the following information:',
 	'facebook-alreadyloggedin-title' => 'Already connected',
 	'facebook-alreadyloggedin' => "'''You are already logged in, $1!'''
 
@@ -118,7 +118,7 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
     'facebook-modal-headmsg' => 'Almost done!',
 	'facebook-error-creating-user' => 'Error creating the user in the local database.',
 	'facebook-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
-	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue logging in as $2, you must first log out of {{SITENAME}}.',
+	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue as $2, you must first log out of {{SITENAME}}.',
 	// facebook-prefstext
 	'prefs-facebook-prefstext' => 'Facebook',
 	'facebook-link-to-profile' => 'Facebook profile',
