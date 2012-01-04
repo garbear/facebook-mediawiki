@@ -338,7 +338,7 @@ class SpecialConnect extends SpecialPage {
 				
 				// Now that we got our username, create the user
 				$domain = $wgRequest->getText( 'wpDomain' );
-				$this->createUser($username, $domain);
+				$fbUser->createUser($username, $domain);
 				break;
 			default:
 				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');

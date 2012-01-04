@@ -205,7 +205,7 @@ class FacebookUser {
 	 *
 	 * @throws FacebookUserException
 	 */
-	protected function attachUser($name, $password, $updatePrefs) {
+	function attachUser($name, $password, $updatePrefs) {
 		global $wgUser;
 		wfProfileIn(__METHOD__);
 		
@@ -249,7 +249,7 @@ class FacebookUser {
 	/**
 	 * @throws FacebookUserException
 	 */
-	protected function createUser($username, $domain = '') {
+	function createUser($username, $domain = '') {
 		global $wgUser, $wgAuth;
 		
 		// Make sure we're not stealing an existing user account (it can't hurt to check twice)
