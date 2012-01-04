@@ -33,7 +33,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 class FacebookAPI extends Facebook {
 	// Constructor
 	public function __construct() {
-		global $wgFbAppId, $wgFbSecret, $wgFbDomain;
+		global $wgFbAppId, $wgFbSecret;
 		// Check to make sure config.default.php was renamed properly, unless we
 		// are running update.php from the command line
 		// TODO: use $wgCommandLineMode, if it is propper to do so
@@ -45,12 +45,6 @@ class FacebookAPI extends Facebook {
 			'secret'     => $wgFbSecret,
 			'fileUpload' => false, // optional
 		);
-		/*
-		// Include the optional domain parameter if it has been set
-		if ( !empty( $wgFbDomain ) && $wgFbDomain != 'BASE_DOMAIN' ) {
-			$config['domain'] = $wgFbDomain;
-		}
-		*/
 		parent::__construct( $config );
 	}
 	
