@@ -51,6 +51,9 @@ class SpecialConnect extends SpecialPage {
 		return wfMsg( 'facebook-title' );
 	}
 	
+	/**
+	 * TODO: Don't return to special pages Connect, Userlogin and Userlogout
+	 */
 	private function setReturnTo() {
 		global $wgRequest;
 		
