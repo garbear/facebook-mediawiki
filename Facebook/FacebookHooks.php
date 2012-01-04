@@ -651,15 +651,17 @@ STYLE;
 	
 	/**
 	 * Called when the user is logged out to log them out of Facebook as well.
-	 *
+	 */
 	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
-		global $wgTitle, $facebook, $wgUser;
-		if ( $wgTitle->isSpecial('UserLogout') && $facebook->getUser() ) {
-			// Only log the user out of Facebook if it's the right user
-			if (in_array($facebook->getUser(), FacebookDB::getFacebookIDs($wgUser)) {
+		global $wgTitle, $facebook;
+		if ( $wgTitle->isSpecial('Userlogout') && $facebook->getUser() ) {
+			// Only log the user out if it's the right user
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getName() == $old_name ) {
 				$facebook->destroySession();
 			}
 		}
+		return true;
 	}
 	
 	/**
