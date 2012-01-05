@@ -276,10 +276,25 @@ STYLE;
 	}
 	
 	/**
+	 * Simple boolean test of whether the "Log in with Facebook" button should
+	 * be shown. This test is isolated in its own function so that the
+	 * PersonalUrls and MakeGlobalVariablesScript hooks can both use it. The
+	 * rationality behind this is that we only needs to pass the list of
+	 * Facebook permissions via JavaScript if the Login button is actually shown.
+	 */
+	private static function showLogin() {
+		global $wgUser, $wgFbAlwaysShowLogin, $facebook;
+		$id = $facebook->getUser();
+		return !$wgUser->isLoggedIn() ||
+		       !(empty( $wgFbAlwaysShowLogin ) ||
+		           ($id && in_array($id, FacebookDB::getFacebookIDs($wgUser))));
+	}
+	
+	/**
 	 * Modify the user's persinal toolbar (in the upper right).
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $facebook, $wgFbUseRealName, $wgFbAlwaysShowLogin, $wgFbDisableLogin;
+		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
 		wfLoadExtensionMessages('Facebook');
 		
 		if ( $wgUser->isLoggedIn() && !empty( $wgFbUseRealName ) ) {
@@ -299,8 +314,7 @@ STYLE;
 			}
 		}
 		
-		if (!$wgUser->isLoggedIn() || (!empty($wgFbAlwaysShowLogin) &&
-				!in_array($facebook->getUser(), FacebookDB::getFacebookIDs($wgUser)))) {
+		if ( self::showLogin() ) {
 			if ( isset( $personal_urls['logout'] ) ) {
 				// Place the convert button before the logout link
 				$logout_item = end( $personal_urls );
