@@ -374,7 +374,7 @@ class SpecialConnect extends SpecialPage {
 		global $facebook;
 		
 		$signed_request = $facebook->getSignedRequest();
-		if ( !signed_request ) {
+		if ( !$signed_request ) {
 			// Error: signed_request not present or hash mismatch
 			return;
 		}
@@ -393,6 +393,7 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		// Check to see if password changes are allowed
+		// TODO: Email the user anyway with a notification about the disconnect
 		if ( !$wgAuth->allowPasswordChange() ) {
 			return;
 		}
@@ -405,9 +406,9 @@ class SpecialConnect extends SpecialPage {
 		
 		// TODO: Update email messages
 		if ( $mwUser->mPassword == '' ) {
-			$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
+			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
 		} else {
-			$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
+			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
 		}
 	}
 	
