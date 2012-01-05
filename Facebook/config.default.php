@@ -19,6 +19,9 @@
  *        settings, click Advanced, scroll to the bottom and click the buttom in
  *        the "App Page" field. This will create a new page for your app. Paste
  *        the Page ID for your app below.
+ *    C.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
+ *        settings). The URL can be found by clicking "Privacy policy" at the
+ *        bottom of your wiki's Main Page.
  * 
  * It is recommended that, rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
