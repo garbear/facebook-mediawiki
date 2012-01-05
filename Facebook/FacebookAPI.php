@@ -27,8 +27,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  * Class FacebookAPI
  * 
- * This class contains the code used to interface with Facebook via the
- * Facebook Platform API.
+ * This class is a thin wrapper for the Facebook PHP SDK. It encapsulates the
+ * initialization of the library and provides a method to verify that this
+ * extension was configured properly.
  */
 class FacebookAPI extends Facebook {
 	// Constructor

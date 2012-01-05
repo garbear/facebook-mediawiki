@@ -106,8 +106,9 @@ class FacebookHooks {
 			$out->prependHTML('
 				<div id="fb-root"></div>
 <script type="' . $wgJsMimeType . '">
-(function(d){var js,id="facebook-jssdk";if(!d.getElementById(id)){js=d.createElement("script");js.id=id;js.async=true;js.type="' .
-	$wgJsMimeType . '";js.src="' . $wgFbScript . '";d.getElementsByTagName("head")[0].appendChild(js);}}(document));
+(function(d){var js,id="facebook-jssdk";if(!d.getElementById(id)){js=d.createElement("script");' .
+'js.id=id;js.async=true;js.type="' . $wgJsMimeType . '";js.src="' . $wgFbScript .
+'";d.getElementsByTagName("head")[0].appendChild(js);}}(document));
 </script>' . "\n"
 			);
 		}
@@ -130,12 +131,6 @@ STYLE;
 		
 		// Things get a little simpler in 1.16...
 		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
-			/*
-			// Add a pretty Facebook logo if $wgFbLogo is set
-			if ( !empty( $wgFbLogo) ) {
-				$out->addInlineStyle( $style );
-			}
-			*/
 			$out->addInlineStyle( $style );
 			// Include the common jQuery library (alias defaults to $j instead of $)
 			$out->includeJQuery();
@@ -144,12 +139,6 @@ STYLE;
 				$out->addScriptFile( $wgFbExtensionScript );
 			}
 		} else {
-			/*
-			// Add a pretty Facebook logo if $wgFbLogo is set
-			if ( !empty( $wgFbLogo) ) {
-				$out->addScript( '<style type="text/css">' . $style . '</style>' );
-			}
-			*/
 			$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			// Include the most recent 1.7 version
 			$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js' );
@@ -220,7 +209,6 @@ STYLE;
 	 * fbAppId		 The application ID (see $wgFbAppId in config.php)
 	 * fbUseXFBML    Should XFBML tags be rendered (see $wgFbSocialPlugins in config.default.php)
 	 * fbLogo        Facebook logo (see $wgFbLogo in config.php)
-	 * fbLogoutURL   The URL to be redirected to on a disconnect
 	 * 
 	 * This hook was added in MediaWiki version 1.14. See:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
@@ -241,23 +229,15 @@ STYLE;
 		}
 		$vars['fbAppId']     = $wgFbAppId;
 		$vars['fbUseXFBML']  = $wgFbSocialPlugins;
-		/*
-		$vars['fbLogoutURL'] = Skin::makeSpecialUrl( 'Userlogout',
-			$wgTitle->isSpecial('Preferences') ? '' : 'returnto=' . $wgTitle->getPrefixedURL() );
-		*/
-		$vals = $wgRequest->getValues();
-		if( !empty( $vals ) && !empty( $vals['title'] ) ) {
-			$vars['fbReturnToTitle'] = $vals['title'];
-		}
 		// Let JavaScript know if the Facebook ID belongs to someone else
-		if ($wgUser->isLoggedIn() /*&& !$facebook->getUser()*/) { // TODO: uncomment
+		if ( $wgUser->isLoggedIn() && !$facebook->getUser() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
 			if ( count($ids) > 0 ) {
 				// Turn numbers into strings
 				foreach ( $ids as $index => $id ) {
 					$ids[$index] = strval( $id );
 				}
-				$vars['fbIds'] = $ids; // possibly more than 1 Facebook ID for this user
+				$vars['fbIds'] = $ids; // possibly more than 1 Facebook ID for this user in the future
 			}
 		}
 		return true;

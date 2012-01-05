@@ -129,10 +129,6 @@ window.fbAsyncInit = function() {
 	});
 };
 
-// debug
-if (wgPageName != fbReturnToTitle)
-	alert("wgPageName: " + window.wgPageName + "\nfbReturnToTitle: " + window.fbReturnToTitle);
-
 function FacebookLogin(response) {
 	// Check if the user logged in and fully authorized the app
 	if (response && response.authResponse) {
