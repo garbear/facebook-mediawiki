@@ -217,12 +217,20 @@ class SpecialConnect extends SpecialPage {
 			$this->sendError('facebook-reclamation-title-error', 'facebook-reclamation-body-error');
 			break;
 		default:
-			// Logged in status (ID, or 0 if not logged in) 
 			$fbUser = new FacebookUser();
-			if ( !$fbUser->isLoggedIn() ) {
+			// Try fetching /me to see if our Facebook session is valid
+			if ( !$fbUser->getUserInfo('name') ) {
 				// The user isn't logged in to Facebook
+				
+				if ( $fbUser->isLoggedIn() ) {
+					// Inconsistent states. Destroy session
+					global $facebook;
+					$facebook->destroySession();
+				}
+				
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user isn't logged in to Facebook or MediaWiki
+					
 					$this->sendRedirect('UserLogin'); // Nothing to see here, move along
 				} else {
 					// The user is logged in to MediaWiki but not Facebook
