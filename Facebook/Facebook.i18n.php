@@ -149,9 +149,7 @@ We have emailed a new password to use with you account - you can log in with the
 
 To login go to: $1',
     'facebook-reclamation-title-error' => 'Disconnecting from Facebook',
-	'facebook-reclamation-body-error' => 'There was some error during disconnecting from Facebook or you account is already disconnected. 
-
-To login go to: $1',
+	'facebook-reclamation-body-error' => 'There was an error disconnecting your account from Facebook or your account is already disconnected.',
     'facebook-unknown-error' => 'Unknown error, please try again or contact with us.',          
 	'facebook-passwordremindertitle' => 'Your Wikia account is now disconnected from Facebook!',
     'facebook-passwordremindertitle-exist' => 'Your account is now disconnected from Facebook!',

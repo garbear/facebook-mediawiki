@@ -211,6 +211,11 @@ class SpecialConnect extends SpecialPage {
 				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
 			}
 			break;
+		case 'Deauth':
+			$this->manageDeauthorizePost();
+			// Always send an error saying the user shouldn't be here
+			$this->sendError('facebook-reclamation-title-error', 'facebook-reclamation-body-error');
+			break;
 		default:
 			// Logged in status (ID, or 0 if not logged in) 
 			$fbUser = new FacebookUser();
@@ -360,6 +365,50 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		$fbUser->attachUser($wgUser->getName(), '', $updatePrefs);
+	}
+	
+	/**
+	 * Disconnect from Facebook.
+	 */
+	private function manageDeauthorizePost() {
+		global $facebook;
+		
+		$signed_request = $facebook->getSignedRequest();
+		if ( !signed_request ) {
+			// Error: signed_request not present or hash mismatch
+			return;
+		}
+		
+		$fbUser = new FacebookUser($signed_request['user_id']);
+		$mwUser = $fbUser->getMWUser();
+		if ( !$mwUser->getId() ) {
+			// Error: Account wasn't associated with a MediaWiki user
+			return;
+		}
+		
+		$rows = FacebookDB::removeFacebookID($mwUser);
+		if ( !$rows ) {
+			// Error: Associated didn't exist in database
+			return;
+		}
+		
+		// Check to see if password changes are allowed
+		if ( !$wgAuth->allowPasswordChange() ) {
+			return;
+		}
+		
+		// Remind password attemp
+		$params = new FauxRequest( array (
+			'wpName' => $mwUser->getName()
+		));
+		$loginForm = new LoginForm($params);
+		
+		// TODO: Update email messages
+		if ( $mwUser->mPassword == '' ) {
+			$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
+		} else {
+			$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
+		}
 	}
 	
 	/**
@@ -791,48 +840,6 @@ class SpecialConnect extends SpecialPage {
 		wfProfileOut(__METHOD__);
 	}
 	
-	
-	
-	
-	/**
-	 * Disconnect from Facebook.
-	 *
-	private function disconnectReclamationActionView() {
-		global $wgRequest, $wgOut, $facebook;
-	
-		$wgOut->setArticleRelated( false );
-		$wgOut->enableClientCache( false );
-		$wgOut->mRedirect = '';
-		$wgOut->mBodytext = '';
-		$wgOut->setRobotPolicy( 'noindex,nofollow' );
-	
-		$fb_user_id = $wgRequest->getVal('u', 0);
-		$hash = $wgRequest->getVal('h', '');
-		$user_id = $facebook->verifyAccountReclamation($fb_user_id, $hash);
-	
-		if (!($user_id === false)) {
-			$result = FacebookInit::coreDisconnectFromFB($user_id);
-		}
-	
-		$title = Title::makeTitle( NS_SPECIAL, 'Signup' );
-	
-		$html = Xml::openElement('a', array( 'href' => $title->getFullUrl() ));
-		$html .= $title->getPrefixedText();
-		$html .= Xml::closeElement( 'a' );
-	
-		if ( (!($user_id === false)) && ($result['status'] == 'ok') ) {
-			$wgOut->setPageTitle( wfMsg('facebook-reclamation-title') );
-			$wgOut->setHTMLTitle( wfMsg('facebook-reclamation-title') );
-			$wgOut->addHTML( wfMsg('facebook-reclamation-body', array('$1' => $html) ));
-	
-		} else {
-			$wgOut->setPageTitle( wfMsg('facebook-reclamation-title-error') );
-			$wgOut->setHTMLTitle( wfMsg('facebook-reclamation-title-error') );
-			$wgOut->addHTML( wfMsg('facebook-reclamation-body-error', array('$1' => $html) ));
-		}
-	
-		return true;
-	}
 	
 	/**
 	 * This is called when a user is logged into a Wikia account and has just gone through the Facebook Connect popups,
