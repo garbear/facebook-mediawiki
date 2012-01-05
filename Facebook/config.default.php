@@ -92,10 +92,15 @@ $wgFbSocialPlugins = true;
 $wgFbUseRealName = true;
 
 /**
- * Another personal toolbar option: Always show a button to log in to Facebook.
- * By default, this button is only show to anonymous users.
+ * Another personal toolbar option: always show a button to log in with
+ * Facebook. By default, this button is only shown to anonymous users.
+ * 
+ * This button simply links to Special:Connect. If you would like to let users
+ * convert their usernames to Facebook-enabled accounts, consider linking to
+ * Special:Connect from the Main Page instead of showing this button on every
+ * page.
  */
-$wgFbAlwaysShowLogin = true;
+$wgFbAlwaysShowLogin = false;
 
 /**
  * The Facebook icon. You can copy this image to your server if you want, or
