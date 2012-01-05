@@ -299,7 +299,7 @@ STYLE;
 			}
 		}
 		
-		if (!empty( $wgFbAlwaysShowLogin ) && (!$wgUser->isLoggedIn() || !$facebook->getUser() ||
+		if (!$wgUser->isLoggedIn() || (!empty($wgFbAlwaysShowLogin) &&
 				!in_array($facebook->getUser(), FacebookDB::getFacebookIDs($wgUser)))) {
 			if ( isset( $personal_urls['logout'] ) ) {
 				// Place the convert button before the logout link
