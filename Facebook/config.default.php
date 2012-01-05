@@ -86,29 +86,16 @@ $wgFbUserRightsFromGroup = false;  # Or a group ID
 $wgFbSocialPlugins = true;
 
 /**
- * Shows the real name for all Facebook users instead of their wiki user name.
+ * Shows the real name for all Facebook users in the personal toolbar (in the
+ * upper right) instead of their wiki username.
  */
 $wgFbUseRealName = false;
 
 /**
- * Options regarding the personal toolbar (in the upper right).
+ * Another personal toolbar option: Show a button to log in with Facebook to
+ * users who have not connected their username with a Facebook account.
  */
-$wgFbShowPersonalUrls = array(
-	'connect',        // Show the "Log in with Facebook Connect" button
-#	'convert',        // Give logged-in users a link to Connect their accounts (not available)
-#	'logout',         // Log the user out of Facebook when they log out of the wiki
-);
-
-/**
- * The Personal Urls above can be blacklisted for specific skins. An asterisk
- * acts to match all Facebook-related buttons.
- */
-$wgFbHidePersonalUrlsBySkin = array(
-	'SkinMonaco' => array( 'connect', 'convert', 'logout' ),
-	'SkinAnswers' => array( 'convert', 'logout' ),
-	'SkinCorporate' => '*',
-	'SkinOasis' => array( 'connect', 'convert', 'logout' ),
-);
+$wgFbConvertButton = true;
 
 /**
  * The Facebook icon. You can copy this image to your server if you want, or

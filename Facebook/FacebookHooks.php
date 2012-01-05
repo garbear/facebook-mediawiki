@@ -276,116 +276,56 @@ STYLE;
 	}
 	
 	/**
-	 * TODO: Document me!
-	 */
-	private static function showButton( $which ) {
-		global $wgUser, $wgFbShowPersonalUrls, $wgFbHidePersonalUrlsBySkin;
-		// If the button isn't marked to be shown in the first place
-		if (!in_array($which, $wgFbShowPersonalUrls)) {
-			return false;
-		}
-		$skinName = get_class($wgUser->getSkin());
-		// If no blacklist rules exist for the skin
-		if (!array_key_exists($skinName, $wgFbHidePersonalUrlsBySkin)) {
-			return true;
-		}
-		// If the value is a string, it's a simple comparison
-		if (is_string($wgFbHidePersonalUrlsBySkin[$skinName])) {
-			return $wgFbHidePersonalUrlsBySkin[$skinName] != '*' &&
-			       $wgFbHidePersonalUrlsBySkin[$skinName] != $which;
-		} else {
-			return !in_array($which, $wgFbHidePersonalUrlsBySkin[$skinName]) &&
-			       !in_array('*', $wgFbHidePersonalUrlsBySkin[$skinName]);
-		}
-	}
-	
-	/**
 	 * Modify the user's persinal toolbar (in the upper right).
-	 * 
-	 * TODO: Better 'returnto' code
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin, $facebook;
-		
+		global $wgUser;
 		wfLoadExtensionMessages('Facebook');
 		
-		// Always false, as 'alt-talk' isn't a valid option currently
-		if (self::showButton( 'alt-talk' ) &&
-				array_key_exists('mytalk', $personal_urls)) {
-			unset($personal_urls['mytalk']);
-		}
-		
-		// If the user is logged in and connected
-		if ( $wgUser->isLoggedIn() && $facebook->getUser() &&
-				count( FacebookDB::getFacebookIDs($wgUser) ) > 0 ) {
-			if ( !empty( $wgFbUseRealName ) ) {
-				// Start with the real name in the database
-				$name = $wgUser->getRealName();
-				if (!$name || $name == '') {
-					// Ask Facebook for the real name
-					try {
-						// This might fail if we load a stale session from cookies
-						$fbUser = $facebook->api('/me');
-						$name = $fbUser['name'];
-					} catch (FacebookApiException $e) {
-						error_log($e);
+		$fbUser = new FacebookUser();
+		if ( $wgUser->isLoggedIn() ) {
+			if ( count( FacebookDB::getFacebookIDs($wgUser) ) > 0 ) {
+				// The user is logged in and connected
+				global $wgFbUseRealName;
+				if ( !empty( $wgFbUseRealName ) ) {
+					// Start with the real name in the database
+					$name = $wgUser->getRealName();
+					if ( empty( $name ) ) {
+						// Ask Facebook for the real name
+						$name = $fbUser->getUserInfo('name');
+					}
+					// Make sure we were able to get a name from the database or Facebook
+					if ( !empty( $name ) ) {
+						$personal_urls['userpage']['text'] = $name;
 					}
 				}
-				// Make sure we were able to get a name from the database or Facebook
-				if ($name && $name != '') {
-					$personal_urls['userpage']['text'] = $name;
-				}
-			}
-			
-			if (self::showButton( 'logout' )) {
-				// Replace logout link with a button to disconnect from Facebook Connect
-				unset( $personal_urls['logout'] );
-				$personal_urls['fblogout'] = array(
-					'text'   => wfMsg( 'facebook-logout' ),
-					'href'   => '#',
-					'active' => false,
-				);
-				/*
-				$html = Xml::openElement('span', array('id' => 'fbuser' ));
-					$html .= Xml::openElement('a', array('href' => $personal_urls['userpage']['href'], 'class' => 'fb_usermenu_button' ));
-					$html .= Xml::closeElement( 'a' );
-				$html .= Xml::closeElement( 'span' );
-				$personal_urls['fbuser']['html'] = $html;
-				*/
-			}
-		}
-		// User is logged in but not Connected
-		else if ($wgUser->isLoggedIn()) {
-			if (self::showButton( 'convert' )) {
-				/*
-				$personal_urls['fbconvert'] = array(
-					'text'   => wfMsg( 'facebook-convert' ),
-					'href'   => SpecialConnect::getTitleFor('Connect', 'Convert')->getLocalURL(
-					                          'returnto=' . $wgTitle->getPrefixedURL()),
-					'class'  => 'mw-facebook-logo',
-					'active' => $wgTitle->isSpecial( 'Connect' ),
-				);
-				*/
-				$personal_urls['facebook'] = array(
-						'text'   => wfMsg( 'facebook-convert' ),
+			} else {
+				// User is logged in but not connected
+				global $wgFbConvertButton;
+				if ( !empty( $wgFbConvertButton ) ) {
+					// Place the convert button before the logout link
+					$logout_key = end( array_keys( $personal_urls ) );
+					$logout_item = end( $personal_urls );
+					$personal_urls = array_slice($personal_urls, 0, -1, true);
+					$personal_urls['facebook'] = array(
+						'text'   => wfMsg( 'facebook-connect' ),
 						'href'   => '#',
 						'class'  => 'mw-facebook-logo',
 						'active' => $wgTitle->isSpecial( 'Connect' ),
-				);
+					);
+					$personal_urls[$logout_key] = $logout_item;
+				}
 			}
-		}
-		// User is not logged in
-		else {
-			if (self::showButton( 'connect' )) {
-				// Add an option to connect via Facebook Connect
-				$personal_urls['facebook'] = array(
-					'text'   => wfMsg( 'facebook-connect' ),
-					'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
-					'class' => 'mw-facebook-logo',
-					'active' => $wgTitle->isSpecial('Connect'),
-				);
-			}
-			
+		} else {
+			// The user is not logged in
+			// Add an option to connect via Facebook Connect
+			$personal_urls['facebook'] = array(
+				'text'   => wfMsg( 'facebook-connect' ),
+				'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+				'class' => 'mw-facebook-logo',
+				'active' => $wgTitle->isSpecial('Connect'),
+			);
+			global $wgFbDisableLogin;
 			if ( !empty( $wgFbDisableLogin ) ) {
 				// Remove other personal toolbar links
 				foreach (array('login', 'anonlogin') as $k) {
