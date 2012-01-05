@@ -15,11 +15,7 @@
  * 
  * Optionally, you may customize your application:
  *    A.  Upload icon and logo images. The icon appears in Timeline events.
- *    B.  Create a Page for your app (if you don't already have one). Visit the
- *        settings, click Advanced, scroll to the bottom and click the buttom in
- *        the "App Page" field. This will create a new page for your app. Paste
- *        the Page ID for your app below.
- *    C.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
+ *    B.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
  *        settings). The URL can be found by clicking "Privacy policy" at the
  *        bottom of your wiki's Main Page.
  * 
@@ -29,7 +25,6 @@
  */
 $wgFbAppId          = 'YOUR_APP_ID';    # Change this!
 $wgFbSecret         = 'YOUR_SECRET';    # Change this!
-//$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
  * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
@@ -130,38 +125,3 @@ $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
 global $wgScriptPath;
 $wgFbExtensionScript = "$wgScriptPath/extensions/Facebook/facebook.js";
 
-/**
- * PUSH EVENTS
- *
- * This section allows controlling of whether push events are enabled, and which
- * of the push events to use.
- */
-
-// NOTE: THIS FEATURE IS NOT COMPLETELY IMPLEMENTED. TEST AT YOUR OWN RISK.
-$wgFbEnablePushToFacebook = false;
-if ( !empty( $wgFbEnablePushToFacebook ) ) {
-	$wgFbPushDir = dirname( __FILE__ ) . '/pushEvents/';
-	
-	// Convenience loop for push event classes in the $wgFbPushDir directory
-	// whose file name corresponds to the class name.  To add a push event
-	// which does not meet these criteria, just explicitly add it below.
-	$pushEventClassNames = array(
-		'FBPush_OnAchBadge',
-		'FBPush_OnAddBlogPost',
-		'FBPush_OnAddImage',
-		'FBPush_OnAddVideo',
-		'FBPush_OnArticleComment',
-		'FBPush_OnBlogComment',
-		'FBPush_OnLargeEdit',
-		'FBPush_OnRateArticle',
-		'FBPush_OnWatchArticle',
-	);
-	foreach ( $pushEventClassNames as $pClassName ) {
-		$wgFbPushEventClasses[] = $pClassName;
-		$wgAutoloadClasses[$pClassName] = $wgFbPushDir . "$pClassName.php";
-	}
-	
-	// Example of explicitly adding a push event which doesn't meet the criteria above.
-	// $wgFbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
-	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $wgFbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
-}

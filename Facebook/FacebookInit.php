@@ -78,23 +78,4 @@ class FacebookInit {
 		}
 		return $hooks;
 	}
-	
-	/**
-	 * Return the code for the permissions attribute (with leading space) to use on all fb:login-buttons.
-	 */
-	public static function getPermissionsAttribute() {
-		global $wgFbExtendedPermissions;
-		$attr = '';
-		if (!empty($wgFbExtendedPermissions)) {
-			$attr = ' perms="' . implode( ',', $wgFbExtendedPermissions ) . '"';
-		}
-		return $attr;
-	}
-	
-	public static function getFBButton( $onload = '', $id = '' ) {
-		global $wgFbExtendedPermissions;
-		return '<fb:login-button length="short" size="large" onlogin="' . $onload .
-		       '" perms="' . implode( ',', $wgFbExtendedPermissions ) . '" id="' . $id .
-		       '">' . wfMsg('fbconnect-log-in') . '</fb:login-button>';
-	}
 }

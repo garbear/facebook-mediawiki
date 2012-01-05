@@ -485,7 +485,6 @@ class SpecialConnect extends SpecialPage {
 		<h2>' . wfMsg( 'userlogin' ) . '</h2>
 		<p>' . wfMsg( 'facebook-only-text', $wgSitename ) . '<br/><br/></p>' . "\n";
 		
-		// TODO: consider bringing back FacebookInit::getPermissionsAttribute()
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
 		'" max-rows="3" scope="email,user_groups"></fb:login-button><br/><br/><br/>' . "\n";
 		

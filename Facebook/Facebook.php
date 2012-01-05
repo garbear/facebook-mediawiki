@@ -77,15 +77,7 @@ require_once $dir . 'facebook-php-sdk/facebook.php';
 // Install the extension
 $wgExtensionFunctions[] = 'FacebookInit::init';
 
-if( !empty( $wgFbEnablePushToFacebook ) ) {
-	// Need to include it explicitly instead of autoload since it has initialization
-	// code of its own. This should be done after Facebook::init is added to
-	// $wgExtensionFunctions so that Facebook gets fully initialized first.
-	require_once $dir . 'FacebookPushEvent.php';
-}
-
 $wgExtensionMessagesFiles['Facebook'] = $dir . 'Facebook.i18n.php';
-$wgExtensionMessagesFiles['FBPushEvents'] = $dir . 'pushEvents/FBPushEvents.i18n.php';
 $wgExtensionMessagesFiles['FacebookLanguage'] = $dir . 'FacebookLanguage.i18n.php';
 $wgExtensionAliasesFiles['Facebook'] = $dir . 'Facebook.alias.php';
 
@@ -94,11 +86,9 @@ $wgAutoloadClasses['FacebookDB'] = $dir . 'FacebookDB.php';
 $wgAutoloadClasses['FacebookHooks'] = $dir . 'FacebookHooks.php';
 $wgAutoloadClasses['FacebookInit'] = $dir . 'FacebookInit.php';
 $wgAutoloadClasses['FacebookLanguage'] = $dir . 'FacebookLanguage.php';
-$wgAutoloadClasses['FacebookProfilePic'] = $dir . 'FacebookProfilePic.php';
 $wgAutoloadClasses['FacebookUser'] = $dir . 'FacebookUser.php';
 $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';
-$wgAutoloadClasses['ChooseNameTemplate'] = $dir . 'templates/ChooseNameTemplate.class.php';
 
 $wgSpecialPages['Connect'] = 'SpecialConnect';
 
@@ -117,11 +107,6 @@ $wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
 $wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 
 $wgImplicitGroups[] = 'fb-user'; // Hide the fb-user group from Special:Listusers
-
-//$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
-//$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
-//$wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
-//$wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
 $wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
