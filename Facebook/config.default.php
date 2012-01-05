@@ -69,12 +69,12 @@ $wgFbDisableLogin = false;
  * 
  * # Reserve normal wiki browsing for only Facebook group members (and admins)
  * $wgGroupPermissions['sysop'] = array_merge($wgGroupPermissions['sysop'], $wgGroupPermissions['user']);
- * $wgGroupPermissions['user'] = $wgGroupPermissions['fb-user'] = $wgGroupPermissions['*'];
+ * $wgGroupPermissions['user'] = $wgGroupPermissions['*'];
  * 
  * # But allow all users to read these pages:
  * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
  */
-$wgFbUserRightsFromGroup = false;  # Or a group ID
+$wgFbUserRightsFromGroup = false;  # Or a quoted group ID
 
 /**
  * Allow the use of social plugins in wiki text. To learn more about social
