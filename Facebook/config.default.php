@@ -130,38 +130,3 @@ $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
 global $wgScriptPath;
 $wgFbExtensionScript = "$wgScriptPath/extensions/Facebook/facebook.js";
 
-/**
- * PUSH EVENTS
- *
- * This section allows controlling of whether push events are enabled, and which
- * of the push events to use.
- */
-
-// NOTE: THIS FEATURE IS NOT COMPLETELY IMPLEMENTED. TEST AT YOUR OWN RISK.
-$wgFbEnablePushToFacebook = false;
-if ( !empty( $wgFbEnablePushToFacebook ) ) {
-	$wgFbPushDir = dirname( __FILE__ ) . '/pushEvents/';
-	
-	// Convenience loop for push event classes in the $wgFbPushDir directory
-	// whose file name corresponds to the class name.  To add a push event
-	// which does not meet these criteria, just explicitly add it below.
-	$pushEventClassNames = array(
-		'FBPush_OnAchBadge',
-		'FBPush_OnAddBlogPost',
-		'FBPush_OnAddImage',
-		'FBPush_OnAddVideo',
-		'FBPush_OnArticleComment',
-		'FBPush_OnBlogComment',
-		'FBPush_OnLargeEdit',
-		'FBPush_OnRateArticle',
-		'FBPush_OnWatchArticle',
-	);
-	foreach ( $pushEventClassNames as $pClassName ) {
-		$wgFbPushEventClasses[] = $pClassName;
-		$wgAutoloadClasses[$pClassName] = $wgFbPushDir . "$pClassName.php";
-	}
-	
-	// Example of explicitly adding a push event which doesn't meet the criteria above.
-	// $wgFbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
-	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $wgFbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
-}
