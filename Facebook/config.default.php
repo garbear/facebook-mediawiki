@@ -93,7 +93,7 @@ $wgFbUseRealName = false;
 
 /**
  * Another personal toolbar option: Show a button to log in with Facebook to
- * users who have not connected their username with a Facebook account.
+ * users who have not connected their username with a Facebook account yet.
  */
 $wgFbConvertButton = true;
 
@@ -104,16 +104,16 @@ $wgFbConvertButton = true;
 $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
- * URL of the Facebook JavaScript SDK. If the URL includes the token "%LOCALE%"
- * then it will be replaced with the correct Facebook locale based on the user's
- * configured language. To disable localization, use e.g.
+ * URL of the Facebook JavaScript SDK. If the URL includes the token %LOCALE%
+ * then it will be replaced with the correct Facebook locale based on the
+ * user's configured language. To disable localization, hardcode the locale:
  * 
  * https://connect.facebook.net/en_US/all.js
  * 
  * You may wish to insulate your production wiki from changes by downloading and
  * hosting your own copy of the JavaScript SDK. If you still wish to support
- * multiple languages, you will also need to host localized versions of the SDK.
- * For a list of locales supported by Facebook, see FacebookLanguage.php.
+ * multiple languages, you will also need to host localized versions. For a list
+ * of locales supported by Facebook, see FacebookLanguage.php.
  */
 $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
 
@@ -124,16 +124,6 @@ $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
  */
 global $wgScriptPath;
 $wgFbExtensionScript = "$wgScriptPath/extensions/Facebook/facebook.js";
-
-/**
- * Optionally override the default javascript handling which occurs when a user
- * logs in. This will generally not be needed unless you are doing heavy
- * customization of this extension.
- *
- * NOTE: This will be put inside of double-quotes, so any single-quotes should
- * be used inside of any JavaScript in this variable.
- */
-#$wgFbOnLoginJsOverride = 'sendToConnectOnLogin();';
 
 /**
  * PUSH EVENTS

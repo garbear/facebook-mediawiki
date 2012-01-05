@@ -29,7 +29,7 @@ class FacebookInit {
 	 */
 	public static function init() {
 		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks,
-		       $wgFbOnLoginJsOverride, $wgFbHooksToAddImmediately, $wgFbUserRightsFromGroup;
+		       $wgFbHooksToAddImmediately, $wgFbUserRightsFromGroup;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
@@ -49,11 +49,7 @@ class FacebookInit {
 		}
 		
 		// Allow configurable over-riding of the onLogin handler.
-		if( !empty( $wgFbOnLoginJsOverride ) ) {
-			self::$fbOnLoginJs = $wgFbOnLoginJsOverride;
-		} else {
-			self::$fbOnLoginJs = 'window.location.reload(true);';
-		}
+		self::$fbOnLoginJs = 'window.location.reload(true);';
 		
 		// Default to pull new info from Facebook
 		global $wgDefaultUserOptions;
