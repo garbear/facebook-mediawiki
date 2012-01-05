@@ -405,7 +405,8 @@ class FacebookUser {
 				$user->setOption("facebook-update-on-login-$option", 0);
 			}
 			*/
-			// Default all values to true
+			// Default all values to true. TODO: Remove this line, defaults are
+			// taken care of by $wgDefaultUserOptions in FacebookInit
 			$this->user->setOption("facebook-update-on-login-$option", 1);
 		}
 		
@@ -455,9 +456,6 @@ class FacebookUser {
 		
 		$wgUser->addNewUserLogEntryAutoCreate();
 	}
-	
-	
-	
 	
 	/**
 	 * Update a user's settings with the values retrieved from the current
@@ -652,5 +650,57 @@ class FacebookUser {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Retrieves group membership data from Facebook.
+	 */
+	public function getGroupRights() {
+		global $wgFbUserRightsFromGroup, $wgUser, $facebook;
+		
+		// Groupies can be members or admins (the latter infers the former)
+		$rights = array(
+			'member'  => false,
+			'admin'   => false,
+		);
+		
+		// If no group ID is specified, then there's no group to belong to
+		// Also, restrict rights to users using the correct Facebook account
+		if ( empty( $wgFbUserRightsFromGroup ) || !$this->id ) {
+			return $rights;
+		}
+		
+		$gids = array( $wgFbUserRightsFromGroup ); // TODO: allow multiple groups
+		
+		// Cache the rights for an individual user to prevent hitting Facebook twice
+		static $rights_cache = array();
+		if ( array_key_exists( $this->id, $rights_cache ) ) {
+			return $rights_cache[$this->id];
+		}
+		
+		try {
+			$groups = $facebook->api('/' . $this->id . '/groups?limit=5000&offset=0');
+			if ( isset( $groups['data'] ) ) {
+				foreach ( $groups['data'] as $group ) {
+					if ( in_array( $group['id'], $gids ) ) {
+						$rights['member'] = true;
+						$rights['admin'] = !empty( $group['administrator'] );
+						// Check to see if we should keep searching
+						if ( count( $gids ) <= 1 || $rights['admin'] )
+							break;
+					}
+				}
+			}
+		} catch (FacebookApiException $e) {
+			error_log( "Failure in the api when requesting groups: " . $e->getMessage() );
+		}
+		
+		echo "<pre>\n";
+		print_r($rights);
+		echo "\n</pre>\n";
+		
+		// Cache the rights
+		$rights_cache[$this->id] = $rights;
+		return $rights;
 	}
 }

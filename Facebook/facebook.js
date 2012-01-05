@@ -108,7 +108,7 @@ window.fbAsyncInit = function() {
 		// Attach event to the Login with Facebook button
 		$("#pt-facebook a").click(function(ev) {
 			//var perms = "publish_stream"; // email also?
-			var perms = "email";
+			var perms = "email,user_groups";
 			FB.login(FacebookLogin, {scope: perms});
 			ev.preventDefault();
 		});

@@ -56,11 +56,11 @@ class FacebookHooks {
 		global $wgFbUserRightsFromGroup;
 		
 		// Probably a redundant check, but with PHP you can never be too sure...
-		if (empty($wgFbUserRightsFromGroup)) {
+		if ( empty( $wgFbUserRightsFromGroup ) ) {
 			// No group to pull rights from, so the user can't be a member
-			$result = false;
 			return true;
 		}
+		
 		$types = array(
 			APCOND_FB_INGROUP   => 'member',
 			APCOND_FB_ISADMIN   => 'admin'
@@ -69,10 +69,13 @@ class FacebookHooks {
 		switch( $type ) {
 			case 'member':
 			case 'admin':
-				global $facebook;
-				// Connect to the Facebook API and ask if the user is in the group
-				$rights = $facebook->getGroupRights($user);
-				$result = $rights[$type];
+				$result = false;
+				$fbUser = new FacebookUser();
+				// Only check for the currently logged-in user
+				if ($user->getId() && $user->getId() == $fbUser->getMWUser()->getId()) {
+					$rights = $fbUser->getGroupRights();
+					$result = $rights[$type];
+				}
 		}
 		return true;
 	}
@@ -256,8 +259,8 @@ STYLE;
 			wfRunHooks('MakeGlobalVariablesScript', array(&$vars));
 			foreach( $vars as $name => $value ) {
 				$script .= "\t\tvar $name = " . json_encode($value) . ";\n";
-    		}
-    		return true;
+			}
+			return true;
 		}
 		return false;
 	}
@@ -404,12 +407,13 @@ STYLE;
 	static function SpecialListusersHeaderForm( $pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook;
 		
-		if ( empty($wgFbUserRightsFromGroup) ) {
+		if ( empty( $wgFbUserRightsFromGroup ) ) {
 			return true;
 		}
 		
 		// TODO: Do we need to verify the Facebook session here?
 		
+		/*
 		$gid = $wgFbUserRightsFromGroup;
 		// Connect to the API and get some info about the group
 		try {
@@ -428,11 +432,12 @@ STYLE;
 						"<a href=\"http://www.facebook.com/profile.php?id={$group['owner']['id']}\" " .
 						"class=\"mw-userlink\">{$group['owner']['name']}</a>") . "
 					</td>
-	        		<td>
-	        			<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
-	        		</td>
-	        	</tr>
-	        </table>";
+					<td>
+						<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
+					</td>
+				</tr>
+			</table>";
+		*/
 		return true;
 	}
 	
