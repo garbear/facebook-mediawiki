@@ -620,8 +620,7 @@ STYLE;
 			// User is a MediaWiki user but isn't connected yet
 			// Display a message and button to connect
 			$loginButton = '<fb:login-button id="fbPrefsConnect" ' .
-			               FacebookInit::getPermissionsAttribute() .
-			               FacebookInit::getOnLoginAttribute() . '></fb:login-button>';
+					FacebookInit::getPermissionsAttribute() . '></fb:login-button>';
 			$html = wfMsg('facebook-convert') . '<br/>' . $loginButton;
 			$html .= "<!-- Convert button -->\n";
 			$preferences['facebook-disconnect'] = array(

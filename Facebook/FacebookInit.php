@@ -22,8 +22,6 @@
  * non-authentification code.
  */
 class FacebookInit {
-	static private $fbOnLoginJs;
-	
 	/**
 	 * Initializes and configures the extension.
 	 */
@@ -47,9 +45,6 @@ class FacebookInit {
 				$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 			}
 		}
-		
-		// Allow configurable over-riding of the onLogin handler.
-		self::$fbOnLoginJs = 'window.location.reload(true);';
 		
 		// Default to pull new info from Facebook
 		global $wgDefaultUserOptions;
@@ -106,21 +101,7 @@ class FacebookInit {
 			$attr = ' perms="' . implode( ',', $wgFbExtendedPermissions ) . '"';
 		}
 		return $attr;
-	} // end getPermissionsAttribute()
-	
-	/**
-	 * Return the code for the onlogin attribute which should be appended to all fb:login-button's in this
-	 * extension.
-	 *
-	 * TODO: Generate the entire fb:login-button in a function in this class.  We have numerous buttons now.
-	 */
-	public static function getOnLoginAttribute() {
-		$attr = '';
-		if ( !empty( self::$fbOnLoginJs ) ) {
-			$attr = ' onlogin="' . self::$fbOnLoginJs . '"';
-		}
-		return $attr;
-	} // end getOnLoginAttribute()
+	}
 	
 	public static function getFBButton( $onload = '', $id = '' ) {
 		global $wgFbExtendedPermissions;
