@@ -695,10 +695,6 @@ class FacebookUser {
 			error_log( "Failure in the api when requesting groups: " . $e->getMessage() );
 		}
 		
-		echo "<pre>\n";
-		print_r($rights);
-		echo "\n</pre>\n";
-		
 		// Cache the rights
 		$rights_cache[$this->id] = $rights;
 		return $rights;
