@@ -122,8 +122,8 @@ class FacebookUser {
 	 * Also see http://stackoverflow.com/questions/6119300/facebook-auto-re-login-from-cookie-php
 	 */
 	function isLoggedIn($ping = false) {
-		if ( $ping ) {
-			global $facebook;
+		global $facebook;
+		if ( $ping && $facebook->getUser() ) {
 			try {
 				$facebook->api('/me');
 			} catch (FacebookApiException $e) {
