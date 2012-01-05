@@ -104,9 +104,32 @@ class FacebookUser {
 	}
 	
 	/**
-	 * Get whether the user is logged in to Facebook
+	 * Get whether the user is logged in to Facebook.
+	 * 
+	 * If $ping is true, this function will ping Facebook's servers and verify
+	 * that the oauth access_token is still valid.
+	 * 
+	 * According to <https://developers.facebook.com/blog/post/500/>, there are
+	 * four ways the user could invalidate their access_token:
+	 *   1. The token expires after expires time (2 hours is the default).
+	 *   2. The user changes her password which invalidates the access token.
+	 *   3. The user de-authorizes your app.
+	 *   4. The user logs out of Facebook.
+	 * 
+	 * If problems are being reported about expiring access_tokens, try asking
+	 * for the offline_access permission.
 	 */
-	function isLoggedIn() {
+	function isLoggedIn($ping = false) {
+		if ( $ping ) {
+			global $facebook;
+			try {
+				$facebook->api('/me');
+			} catch (FacebookApiException $e) {
+				if ( $e->getType() == 'OAuthException' ) {
+					$this->logout();
+				}
+			}
+		}
 		return $this->id != 0;
 	}
 	
@@ -116,6 +139,13 @@ class FacebookUser {
 	
 	function getMWUser() {
 		return $this->user;
+	}
+	
+	function logout() {
+		global $facebook;
+		$facebook->destroySession();
+		$this->id = 0;
+		$this->user = new User();
 	}
 	
 	/*
@@ -151,6 +181,10 @@ class FacebookUser {
 					$userinfo[$this->id] = $facebook->api('/' . $this->id);
 				} catch (FacebookApiException $e) {
 					error_log( "Failure in the api when requesting /{$this->id}: " . $e->getMessage() );
+					// If our access_token expires, invalidate the FacebookUser object
+					if ( $e->getType() == 'OAuthException' ) {
+						$this->logout();
+					}
 				}
 			}
 			if ( isset( $userinfo[$this->id] ) ) {
@@ -680,6 +714,7 @@ class FacebookUser {
 		
 		try {
 			$groups = $facebook->api('/' . $this->id . '/groups?limit=5000&offset=0');
+			
 			if ( isset( $groups['data'] ) ) {
 				foreach ( $groups['data'] as $group ) {
 					if ( in_array( $group['id'], $gids ) ) {
@@ -693,6 +728,10 @@ class FacebookUser {
 			}
 		} catch (FacebookApiException $e) {
 			error_log( "Failure in the api when requesting groups: " . $e->getMessage() );
+			// If our access_token expires, invalidate the FacebookUser object
+			if ( $e->getType() == 'OAuthException' ) {
+				$this->logout();
+			}
 		}
 		
 		// Cache the rights

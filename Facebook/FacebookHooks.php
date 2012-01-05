@@ -55,27 +55,24 @@ class FacebookHooks {
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		global $wgFbUserRightsFromGroup;
 		
-		// Probably a redundant check, but with PHP you can never be too sure...
-		if ( empty( $wgFbUserRightsFromGroup ) ) {
-			// No group to pull rights from, so the user can't be a member
-			return true;
-		}
-		
-		$types = array(
-			APCOND_FB_INGROUP   => 'member',
-			APCOND_FB_ISADMIN   => 'admin'
-		);
-		$type = $types[$cond_type];
-		switch( $type ) {
+		// If there's no group to pull rights from, the user can't be a member
+		$result = false;
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
+			$types = array(
+				APCOND_FB_INGROUP   => 'member',
+				APCOND_FB_ISADMIN   => 'admin'
+			);
+			$type = $types[$cond_type];
+			switch( $type ) {
 			case 'member':
 			case 'admin':
-				$result = false;
 				$fbUser = new FacebookUser();
 				// Only check for the currently logged-in user
 				if ($user->getId() && $user->getId() == $fbUser->getMWUser()->getId()) {
 					$rights = $fbUser->getGroupRights();
 					$result = $rights[$type];
 				}
+			}
 		}
 		return true;
 	}
@@ -526,7 +523,7 @@ STYLE;
 	 * Removes the 'createaccount' right from all users if $wgFbDisableLogin is
 	 * enabled.
 	 */
-	// r270: fix for php 5.3 (cherry picked from http://trac.wikia-code.com/changeset/24606)
+	// r270: fix for php 5.3 (cherry-picked from http://trac.wikia-code.com/changeset/24606)
 	static function UserGetRights( /*&*/$user, &$aRights ) {
 		global $wgFbDisableLogin;
 		if ( !empty( $wgFbDisableLogin ) ) {
@@ -546,18 +543,32 @@ STYLE;
 	}
 	
 	/**
-	 * If the user isn't logged in, try to authenticate via Facebook.
+	 * If $wgFbDisableLogin is set, make sure the user gets logged out if their
+	 * Facebook session is destroyed.
 	 * 
 	 * This hook was added in MediaWiki 1.14.
-	 *
+	 */
 	static function UserLoadAfterLoadFromSession( $user ) {
-		global $wgTitle;
-		// Don't need to automatically authenticate on Special:Connect
-		if ( !$user->isLoggedIn() && !$wgTitle->isSpecial('Connect') ) {
+		global $wgFbDisableLogin, $wgTitle;
+		
+		// Don't mess with authentication on Special:Connect
+		if (!empty($wgFbDisableLogin) && $user->isLoggedIn() && !$wgTitle->isSpecial('Connect')) {
+			global $facebook;
+			
 			$fbUser = new FacebookUser();
-			$mwUser = $fbUser->getMWUser();
-			if ( $mwUser->getId() && $mwUser->getOption( 'rememberpassword' ) ) {
-				$fbUser->login();
+			
+			// If possible, force a preemptive ping to Facebook's servers. Otherwise, we
+			// must wait until the next page view to pick up the user's Facebook login status
+			/*
+			global $wgFbUserRightsFromGroup;
+			if ( !empty( $wgFbUserRightsFromGroup ) ) {
+				$rights = $fbUser->getGroupRights();
+			}
+			/**/
+			$fbUser->isLoggedIn($ping = true);
+			
+			if ( !$fbUser->isLoggedIn() || $user->getId() != $fbUser->getMWUser()->getId() ) {
+				$user->logout();
 			}
 		}
 		return true;

@@ -108,8 +108,15 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
 // rt#68127 - Giving basic permissions to other groups might open security holes
 // See <http://trac.wikia-code.com/changeset/27160> and <http://trac.wikia-code.com/changeset/27928> for fix
-$wgGroupPermissions['fb-user'] = $wgGroupPermissions['user']; // Create a new group for Facebook users
-$wgImplicitGroups[] = 'fb-user'; // Because Wikia says it should be
+$wgGroupPermissions['fb-user']    = array('facebook-user' => true);
+$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+$wgGroupPermissions['fb-admin']   = $wgGroupPermissions['sysop'];
+$wgImplicitGroups[] = 'fb-groupie';
+$wgImplicitGroups[] = 'fb-admin';
+$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+
+$wgImplicitGroups[] = 'fb-user'; // Hide the fb-user group from Special:Listusers
 
 //$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
 //$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';

@@ -135,14 +135,21 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	protected function sendRedirect($specialPage) {
-		global $wgOut, $wgUser;
+		global $wgOut, $wgUser, $wgFbDisableLogin;
+		
+		// $wgFbDisableLogin disables UserLogin page. Avoid infinite redirects.
+		if ( !empty( $wgFbDisableLogin ) && $specialPage == 'UserLogin' ) {
+			$this->sendPage('exclusiveLoginToFacebookView');
+			return;
+		}
+		
 		$urlaction = '';
 		if ( !empty( $this->mReturnTo ) ) {
 			$urlaction = "returnto=$this->mReturnTo";
 			if ( !empty( $this->mReturnToQuery ) )
 				$urlaction .= "&returntoquery=$this->mReturnToQuery";
 		}
-		$wgOut->redirect( $wgUser->getSkin()->makeSpecialUrl( $specialPage, $urlaction ) );
+		$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl($specialPage, $urlaction));
 	}
 	
 	/**
@@ -152,13 +159,6 @@ class SpecialConnect extends SpecialPage {
 	 */
 	public function execute( $par ) {
 		global $wgUser, $wgRequest;
-		
-		/*
-		if ( $wgRequest->getVal('action', '') == 'disconnect_reclamation' ) {
-			$this->sendPage('disconnectReclamationActionView');
-			return;
-		}
-		*/
 		
 		// Setup the session
 		global $wgSessionStarted;
@@ -218,19 +218,12 @@ class SpecialConnect extends SpecialPage {
 			break;
 		default:
 			$fbUser = new FacebookUser();
+			
 			// Try fetching /me to see if our Facebook session is valid
-			if ( !$fbUser->getUserInfo('name') ) {
+			if ( !$fbUser->isLoggedIn($ping = true) ) {
 				// The user isn't logged in to Facebook
-				
-				if ( $fbUser->isLoggedIn() ) {
-					// Inconsistent states. Destroy session
-					global $facebook;
-					$facebook->destroySession();
-				}
-				
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user isn't logged in to Facebook or MediaWiki
-					
 					$this->sendRedirect('UserLogin'); // Nothing to see here, move along
 				} else {
 					// The user is logged in to MediaWiki but not Facebook
@@ -475,6 +468,36 @@ class SpecialConnect extends SpecialPage {
 		
 		// TODO: Add a returnto link
 	}
+	
+	/**
+	 * This view is sent when $wgFbDisableLogin is true. In this case, the user
+	 * must be logged in to Facebook to view the wiki, so we present a single
+	 * login button.
+	 */
+	private function exclusiveLoginToFacebookView() {
+		global $wgOut, $wgSitename, $wgUser;
+		$loginFormWidth = 400; // pixels
+		
+		$this->outputHeader();
+		$html = '
+<div id="userloginForm">
+	<form style="width: ' . $loginFormWidth . 'px;">
+		<h2>' . wfMsg( 'userlogin' ) . '</h2>
+		<p>' . wfMsg( 'facebook-only-text', $wgSitename ) . '<br/><br/></p>' . "\n";
+		
+		// TODO: consider bringing back FacebookInit::getPermissionsAttribute()
+		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
+		'" max-rows="3" scope="email,user_groups"></fb:login-button><br/><br/><br/>' . "\n";
+		
+		// Add a pretty Like box to entice the user to log in
+		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .
+				$loginFormWidth . '" show_faces="true"></fb:like>';
+		$html .= '
+	</form>
+</div>';
+		$wgOut->addHTML($html);
+	}
+	
 	
 	/**
 	 * The user is logged in to Facebook, but not MediaWiki. The Facebook user

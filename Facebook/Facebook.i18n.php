@@ -59,6 +59,7 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 //	'facebook-merge'    => 'Merge your wiki account with your Facebook ID.', // Deprecated
 	'facebook-merge-text' => 'Merging your username with your Facebook account lets you log in to $1 with your Facebook ID.',
 	'facebook-connect-text' => 'Facebook is enabled for your username. Click the button below to log in to Facebook.',
+	'facebook-only-text' => 'Logging in allows you to explore $1 using your Facebook identity.',
 	'facebook-logout-and-continue' => 'Log out and continue',
 	'facebook-logoutbox' => '$1
 
