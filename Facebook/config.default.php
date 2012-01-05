@@ -89,13 +89,13 @@ $wgFbSocialPlugins = true;
  * Shows the real name for all Facebook users in the personal toolbar (in the
  * upper right) instead of their wiki username.
  */
-$wgFbUseRealName = false;
+$wgFbUseRealName = true;
 
 /**
- * Another personal toolbar option: Show a button to log in with Facebook to
- * users who have not connected their username with a Facebook account yet.
+ * Another personal toolbar option: Always show a button to log in to Facebook.
+ * By default, this button is only show to anonymous users.
  */
-$wgFbConvertButton = true;
+$wgFbAlwaysShowLogin = true;
 
 /**
  * The Facebook icon. You can copy this image to your server if you want, or

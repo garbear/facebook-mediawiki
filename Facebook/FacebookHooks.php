@@ -279,62 +279,53 @@ STYLE;
 	 * Modify the user's persinal toolbar (in the upper right).
 	 */
 	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
-		global $wgUser;
+		global $wgUser, $facebook, $wgFbUseRealName, $wgFbAlwaysShowLogin, $wgFbDisableLogin;
 		wfLoadExtensionMessages('Facebook');
 		
-		$fbUser = new FacebookUser();
-		if ( $wgUser->isLoggedIn() ) {
-			if ( count( FacebookDB::getFacebookIDs($wgUser) ) > 0 ) {
-				// The user is logged in and connected
-				global $wgFbUseRealName;
-				if ( !empty( $wgFbUseRealName ) ) {
-					// Start with the real name in the database
-					$name = $wgUser->getRealName();
-					if ( empty( $name ) ) {
-						// Ask Facebook for the real name
-						$name = $fbUser->getUserInfo('name');
-					}
-					// Make sure we were able to get a name from the database or Facebook
-					if ( !empty( $name ) ) {
-						$personal_urls['userpage']['text'] = $name;
-					}
+		if ( $wgUser->isLoggedIn() && !empty( $wgFbUseRealName ) ) {
+			$fb_ids = FacebookDB::getFacebookIDs($wgUser);
+			if ( count( $fb_ids ) ) {
+				// Start with the real name in the database
+				$name = $wgUser->getRealName();
+				if ( empty( $name ) ) {
+					// Ask Facebook for the real name
+					$fbUser = new FacebookUser($fb_ids[0]);
+					$name = $fbUser->getUserInfo('name');
 				}
-			} else {
-				// User is logged in but not connected
-				global $wgFbConvertButton;
-				if ( !empty( $wgFbConvertButton ) ) {
-					// Place the convert button before the logout link
-					$logout_key = end( array_keys( $personal_urls ) );
-					$logout_item = end( $personal_urls );
-					$personal_urls = array_slice($personal_urls, 0, -1, true);
-					$personal_urls['facebook'] = array(
-						'text'   => wfMsg( 'facebook-connect' ),
-						'href'   => '#',
-						'class'  => 'mw-facebook-logo',
-						'active' => $wgTitle->isSpecial( 'Connect' ),
-					);
-					$personal_urls[$logout_key] = $logout_item;
-				}
-			}
-		} else {
-			// The user is not logged in
-			// Add an option to connect via Facebook Connect
-			$personal_urls['facebook'] = array(
-				'text'   => wfMsg( 'facebook-connect' ),
-				'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
-				'class' => 'mw-facebook-logo',
-				'active' => $wgTitle->isSpecial('Connect'),
-			);
-			global $wgFbDisableLogin;
-			if ( !empty( $wgFbDisableLogin ) ) {
-				// Remove other personal toolbar links
-				foreach (array('login', 'anonlogin') as $k) {
-					if (array_key_exists($k, $personal_urls)) {
-						unset($personal_urls[$k]);
-					}
+				// Make sure we were able to get a name from the database or Facebook
+				if ( !empty( $name ) ) {
+					$personal_urls['userpage']['text'] = $name;
 				}
 			}
 		}
+		
+		if (!empty( $wgFbAlwaysShowLogin ) && (!$wgUser->isLoggedIn() || !$facebook->getUser() ||
+				!in_array($facebook->getUser(), FacebookDB::getFacebookIDs($wgUser)))) {
+			if ( isset( $personal_urls['logout'] ) ) {
+				// Place the convert button before the logout link
+				$logout_item = end( $personal_urls );
+				$personal_urls = array_slice( $personal_urls, 0, -1, true );
+			}
+			$personal_urls['facebook'] = array(
+				'text'   => wfMsg( 'facebook-connect' ),
+				'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+				'class'  => 'mw-facebook-logo',
+				'active' => $wgTitle->isSpecial( 'Connect' ),
+			);
+			if ( !empty( $logout_item ) ) {
+				$personal_urls['logout'] = $logout_item;
+			}
+		}
+		
+		if ( !$wgUser->isLoggedIn() && !empty( $wgFbDisableLogin ) ) {
+			// Remove other personal toolbar links
+			foreach (array('login', 'anonlogin') as $k) {
+				if (array_key_exists($k, $personal_urls)) {
+					unset($personal_urls[$k]);
+				}
+			}
+		}
+		
 		return true;
 	}
 	
