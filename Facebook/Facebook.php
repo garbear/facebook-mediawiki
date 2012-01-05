@@ -94,7 +94,6 @@ $wgAutoloadClasses['FacebookDB'] = $dir . 'FacebookDB.php';
 $wgAutoloadClasses['FacebookHooks'] = $dir . 'FacebookHooks.php';
 $wgAutoloadClasses['FacebookInit'] = $dir . 'FacebookInit.php';
 $wgAutoloadClasses['FacebookLanguage'] = $dir . 'FacebookLanguage.php';
-$wgAutoloadClasses['FacebookProfilePic'] = $dir . 'FacebookProfilePic.php';
 $wgAutoloadClasses['FacebookUser'] = $dir . 'FacebookUser.php';
 $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';

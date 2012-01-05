@@ -101,48 +101,6 @@ function wikia_facebook_postProcessForm( &$specialConnect ){
 	return true;
 } // end wikia_facebook_postProcessForm()
 
-/**
- * Called when a user was just created or attached (safe to call at any time later as well).  This
- * function will check to see if the user has a Wikia Avatar and if they don't, it will attempt to
- * use this Facebook-connected user's profile picture as their Wikia Avatar.
- *
- * FIXME: Is there a way to make this fail gracefully if we ever un-include the Masthead extension?
- */
-function wikia_facebook_considerProfilePic( &$specialConnect ){
-	wfProfileIn(__METHOD__);
-	global $wgUser;
-
-	// We need the facebook id to have any chance of getting a profile pic.
-	$fb_ids = FacebookDB::getFacebookIDs($wgUser);
-	if(count($fb_ids) > 0){
-		$fb_id = array_shift($fb_ids);
-		if ( class_exists( 'Masthead' ) ){
-			// If the useralready has a masthead avatar, don't overwrite it, this function shouldn't alter anything in that case.
-			$masthead = Masthead::newFromUser($wgUser);
-			if( ! $masthead->hasAvatar() ){
-				// Attempt to store the facebook profile pic as the Wikia avatar.
-				$picUrl = FacebookProfilePic::getImgUrlById($fb_id, FB_PIC_SQUARE);
-				if($picUrl != ""){
-					$errorNo = $masthead->uploadByUrl($picUrl);
-
-					// Apply this as the user's new avatar if the image-pull went okay.
-					if($errorNo == UPLOAD_ERR_OK){
-						$sUrl = $masthead->getLocalPath();
-						if ( !empty($sUrl) ) {
-							/* set user option */
-							$wgUser->setOption( AVATAR_USER_OPTION_NAME, $sUrl );
-							$wgUser->saveSettings();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	wfProfileOut(__METHOD__);
-	return true;
-} // end wikia_facebook_considerProfilePic()
-
 class ChooseNameForm extends LoginForm {
 	var $mActionType;
 	var $ajaxTemplate;
