@@ -81,18 +81,18 @@ class FacebookDB {
 		}
 		return $fbid;
 	}
-
+	
 	/**
 	 * Find the user by their Facebook ID.
 	 * If there is no user found for the given id, returns null.
 	 */
 	public static function getUser( $fbid ) {
 		$prefix = self::getPrefix();
-
+		
 		// NOTE: Do not just pass this dbr into getUserByDB since that function prevents
 		// rewriting of the database name for shared tables.
 		$dbr = wfGetDB( DB_SLAVE, array(), self::sharedDB() );
-
+		
 		$id = $dbr->selectField(
 			array( "{$prefix}user_fbconnect" ),
 			array( 'user_id' ),
@@ -175,9 +175,9 @@ class FacebookDB {
 			); 
 			$dbw->commit();
 	 		$wgMemc->set( $memkey, self::getFacebookIDs( $user, DB_MASTER ) );
+	 		return (bool) $dbw->affectedRows();
 		}
-
-		return (bool) $dbw->affectedRows();
+		return 0;
 	}
 	
 	/**
@@ -216,7 +216,7 @@ class FacebookDB {
 	 */
 	private static function getPrefix() {
 		global $wgDBprefix, $wgSharedPrefix;
-		return self::sharedDB() ? $wgSharedPrefix : ""; //bugfix for $wgDBprefix;
+		return self::sharedDB() ? $wgSharedPrefix : ""; // bugfix for $wgDBprefix;
 	}
 	
 	/**
