@@ -118,6 +118,8 @@ class FacebookUser {
 	 * 
 	 * If problems are being reported about expiring access_tokens, try asking
 	 * for the offline_access permission.
+	 * 
+	 * Also see http://stackoverflow.com/questions/6119300/facebook-auto-re-login-from-cookie-php
 	 */
 	function isLoggedIn($ping = false) {
 		if ( $ping ) {
