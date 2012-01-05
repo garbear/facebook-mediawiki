@@ -38,9 +38,6 @@ class SpecialConnect extends SpecialPage {
 		parent::__construct( 'Connect' );
 		// Add this special page to the "login" group of special pages
 		$wgSpecialPageGroups['Connect'] = 'login';
-		
-		wfLoadExtensionMessages( 'Facebook' );
-		FacebookUser::setUserNamePrefix( wfMsg('facebook-usernameprefix') );
 	}
 	
 	/**

@@ -616,23 +616,23 @@ class FacebookUser {
 	}
 	
 	/**
-	 * Allows the prefix to be changed at runtime.  This is useful, for example,
-	 * to generate a username based off of a facebook name. Make sure to call
-	 * this function before getUserNamePrefix() is called.
-	 * 
-	 * TODO: Add these two lines to this class's constructor/static initializer
-	 * wfLoadExtensionMessages( 'Facebook' );
-	 * FacebookUser::setUserNamePrefix( wfMsg('facebook-usernameprefix') );
+	 * Allows the prefix to be changed at runtime. This is useful, for example,
+	 * to generate a username based off of a facebook name.
 	 */
 	static function setUserNamePrefix( $prefix ) {
 		self::$userNamePrefix = $prefix;
 	}
 	
 	/**
-	 * Returns the prefix set by.  This is useful, for example, to generate a
-	 * username based off of a facebook name.
+	 * Returns the prefix set by setUserNamePrefix().
 	 */
 	static function getUserNamePrefix() {
+		static $default = NULL;
+		if ( is_null( $default ) && empty( self::$userNamePrefix ) ) {
+			wfLoadExtensionMessages( 'Facebook' );
+			$default = wfMsg('facebook-usernameprefix');
+			self::setUserNamePrefix( $default );
+		}
 		return self::$userNamePrefix;
 	}
 	
