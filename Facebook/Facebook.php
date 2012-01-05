@@ -111,12 +111,9 @@ define( 'APCOND_FB_ISADMIN',   'fb*a' );
 $wgGroupPermissions['fb-user']    = array('facebook-user' => true);
 $wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
 $wgGroupPermissions['fb-admin']   = $wgGroupPermissions['sysop'];
+$wgImplicitGroups[] = 'fb-user'; // Hide the fb-user group from Special:Listusers
 $wgImplicitGroups[] = 'fb-groupie';
 $wgImplicitGroups[] = 'fb-admin';
-$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
-$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
-
-$wgImplicitGroups[] = 'fb-user'; // Hide the fb-user group from Special:Listusers
 
 //$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
 //$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';

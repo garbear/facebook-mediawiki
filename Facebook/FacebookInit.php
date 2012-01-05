@@ -51,6 +51,13 @@ class FacebookInit {
 		foreach (FacebookUser::$availableUserUpdateOptions as $option) {
 			$wgDefaultUserOptions["facebook-update-on-login-$option"] = 1;
 		}
+		
+		// Set up group autopromote conditions
+		global $wgFbUserRightsFromGroup;
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
+			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
+			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
+		}
 	}
 	
 	/**
