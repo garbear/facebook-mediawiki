@@ -73,6 +73,14 @@ class FacebookAPI extends Facebook {
 		return $isSetup;
 	}
 	
+	/**
+	 * Returns true if $wgFbNamespace was setup properly.
+	 */
+	public static function isNamespaceSetup() {
+		global $wgFbNamespace;
+		return !empty( $wgFbNamespace ) && $wgFbNamespace != 'YOUR_NAMESPACE';
+	}
+	
 	/*
 	 * Publish message on Facebook wall.
 	 */

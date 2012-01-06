@@ -683,18 +683,22 @@ STYLE;
 	 * 
 	 * This hook follows the steps outlined in the Open Graph Beta tutorial:
 	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
-	 * (if the beta link still works...)
 	 */
 	static function SkinTemplateOutputPageBeforeExec(&$sk, &$tpl) {
-		global $wgFbNamespace;
-		if ( empty( $wgFbNamespace ) || $wgFbNamespace == 'YOUR_NAMESPACE' ) {
-			// Not configured properly, skip this step
+		global $wgFbOpenGraph, $wgFbNamespace;
+		if ( empty( $wgFbOpenGraph ) ) {
+			// No Open Graph tags, skip this step
 			return true;
 		}
 		
+		$head = '<head prefix="og: http://ogp.me/ns#';
+		#$head .= ' fb: http://ogp.me/ns/fb#'; // Unnecessary?
+		if ( FacebookAPI::isNamespaceSetup() ) {
+			$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
+		}
+		$head .= '">';
+		
 		$headElement = $tpl->data['headelement'];
-		$head = '<head prefix="og: http://ogp.me/ns# ' . /*'fb: http://ogp.me/ns/fb# ' .*/
-		        "$wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#\">";
 		$headElement = str_replace('<head>', $head, $headElement);
 		$tpl->set( 'headelement', $headElement );
 		return true;
