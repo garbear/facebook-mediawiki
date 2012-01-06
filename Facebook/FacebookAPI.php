@@ -38,7 +38,7 @@ class FacebookAPI extends Facebook {
 		// Check to make sure config.default.php was renamed properly, unless we
 		// are running update.php from the command line
 		// TODO: use $wgCommandLineMode, if it is propper to do so
-		if ( !defined( 'MW_CMDLINE_CALLBACK' ) && !$this->isConfigSetup() ) {
+		if ( !defined( 'MW_CMDLINE_CALLBACK' ) && !self::isConfigSetup() ) {
 			die ( '<strong>Please update $wgFbAppId and $wgFbSecret.</strong>' );
 		}
 		$config = array(
@@ -54,7 +54,7 @@ class FacebookAPI extends Facebook {
 	 * and the instructions to fill out the first two important variables were
 	 * followed correctly.
 	 */
-	public function isConfigSetup() {
+	public static function isConfigSetup() {
 		global $wgFbAppId, $wgFbSecret;
 		$isSetup = isset( $wgFbAppId ) && $wgFbAppId != 'YOUR_APP_KEY' &&
 		           isset( $wgFbSecret ) && $wgFbSecret != 'YOUR_SECRET';
