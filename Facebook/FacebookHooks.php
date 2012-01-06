@@ -181,7 +181,7 @@ STYLE;
 			return true;
 		}
 		// Tables to add to the database
-		$tables = array( 'user_fbconnect', 'fbconnect_event_stats', 'fbconnect_event_show' );
+		$tables = array( 'user_fbconnect' /*, 'fbconnect_event_stats', 'fbconnect_event_show'*/ );
 		// Sql directory inside the extension folder
 		$sql = dirname( __FILE__ ) . '/sql';
 		// Extension of the table schema file (depending on the database type)
