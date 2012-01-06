@@ -92,7 +92,7 @@ $wgFbSocialPlugins = true;
  * Shows the real name for all Facebook users in the personal toolbar (in the
  * upper right) instead of their wiki username.
  */
-$wgFbUseRealName = true;
+$wgFbUseRealName = false;
 
 /**
  * Another personal toolbar option: always show a button to log in with
