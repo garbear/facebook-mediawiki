@@ -81,7 +81,8 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$sk ) {
-		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript, $wgJsMimeType, $wgStyleVersion;
+		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
+				$wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
@@ -157,6 +158,43 @@ STYLE;
 				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
 			}
 		}
+		
+		// Add open graph tags to articles
+		global $wgFbOpenGraph;
+		if ( !empty( $wgFbOpenGraph ) ) {
+			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgSitename, $wgRequest;
+			
+			// fb:app_id
+			$out->addHeadItem('fb:app_id',
+				'<meta property="fb:app_id" content="' . $wgFbAppId . '" />' . "\n");
+			
+			// fb:page_id
+			if ( !empty( $wgFbPageId ) && $wgPageId != 'YOUR_PAGE_ID' ) {
+				$out->addHeadItem('fb:page_id',
+					'<meta property="fb:page_id" content="' . $wgFbPageId . '" />' . "\n");
+			}
+			
+			// og:type
+			if ( FacebookAPI::isNamespaceSetup() ) {
+				$out->addHeadItem('og:type',
+					'<meta property="og:type" content="' . $wgFbNamespace . ':article" />' . "\n");
+			}
+			
+			// og:site_name
+			$out->addHeadItem('og:site_name',
+				'<meta property="og:site_name" content="' . $wgSitename . '" />' . "\n");
+			
+			// og:title
+			$title = Title::newFromText( $wgRequest->getVal( 'title' ) )->getText();
+			$out->addHeadItem('og:title',
+				'<meta property="og:title" content="' . $title . '" />' . "\n");
+			
+			// og:url
+			$url = Title::newFromText( $title )->getFullURL();
+			$out->addHeadItem('og:url',
+				'<meta property="og:url" content="' . $url . '" />' . "\n");
+		}
+		
 		return true;
 	}
 	
