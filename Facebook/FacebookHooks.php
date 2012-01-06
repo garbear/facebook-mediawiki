@@ -579,13 +579,7 @@ STYLE;
 			
 			// If possible, force a preemptive ping to Facebook's servers. Otherwise, we
 			// must wait until the next page view to pick up the user's Facebook login status
-			/*
-			global $wgFbUserRightsFromGroup;
-			if ( !empty( $wgFbUserRightsFromGroup ) ) {
-				$rights = $fbUser->getGroupRights();
-			}
-			/**/
-			$fbUser->isLoggedIn($ping = true);
+			#$fbUser->isLoggedIn($ping = true);
 			
 			if ( !$fbUser->isLoggedIn() || $user->getId() != $fbUser->getMWUser()->getId() ) {
 				$user->logout();
@@ -611,7 +605,7 @@ STYLE;
 	
 	/**
 	 * Create a disconnect button and other things in preferences.
-	 */
+	 *
 	static function initPreferencesExtensionForm( $user, &$preferences ) {
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
 		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/Facebook/prefs.js?{$wgStyleVersion}\"></script>\n");
@@ -671,7 +665,7 @@ STYLE;
 	
 	/**
 	 * Add Facebook HTML to AJAX script.
-	 */
+	 *
 	public static function afterAjaxLoginHTML( &$html ) {
 		$tmpl = new EasyTemplate( dirname( __FILE__ ) . '/templates/' );
 		wfLoadExtensionMessages('Facebook');
@@ -684,6 +678,9 @@ STYLE;
 		return true;
 	}
 	
+	/**
+	 * 
+	 *
 	// TODO
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
 		global $wgRequest, $wgUser, $wgServer, $facebook;
@@ -706,4 +703,5 @@ STYLE;
 		}
 		return true;
 	}
+	/**/
 }
