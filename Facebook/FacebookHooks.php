@@ -175,7 +175,7 @@ STYLE;
 					'<meta property="fb:page_id" content="' . $wgFbPageId . '" />' . "\n");
 			}
 			
-			// og:type - TODO: Get this value from configuration parameters
+			// og:type
 			if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraphObjects ) ) {
 				$object = 'article'; // TODO: dynamically determine this
 				if ( isset( $wgFbOpenGraphObjects[$object] ) ) {
@@ -278,7 +278,7 @@ STYLE;
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgFbAppId, $facebook, $wgFbSocialPlugins, $wgTitle, $wgRequest, $wgStyleVersion, $wgUser;
+		global $wgFbAppId, $facebook, $wgFbSocialPlugins, $wgRequest, $wgStyleVersion, $wgUser;
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -351,7 +351,7 @@ STYLE;
 	/**
 	 * Modify the user's persinal toolbar (in the upper right).
 	 */
-	public static function PersonalUrls( &$personal_urls, &$wgTitle ) {
+	public static function PersonalUrls( &$personal_urls, &$title ) {
 		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
 		wfLoadExtensionMessages('Facebook');
 		
@@ -380,9 +380,9 @@ STYLE;
 			}
 			$personal_urls['facebook'] = array(
 				'text'   => wfMsg( 'facebook-connect' ),
-				'href'   => SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+				'href'   => SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $title->getPrefixedURL()),
 				'class'  => 'mw-facebook-logo',
-				'active' => $wgTitle->isSpecial( 'Connect' ),
+				'active' => $title->isSpecial( 'Connect' ),
 			);
 			if ( !empty( $logout_item ) ) {
 				$personal_urls['logout'] = $logout_item;
@@ -571,13 +571,13 @@ STYLE;
 	 * unless they request one over email.
 	 */
 	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
-		global $wgTitle;
+		global $wgRequest;
 		// Only allow the override if no password exists and a blank old password was specified
 		if ( $hash != '' || $password != '' || !$userId ) {
 			return true;
 		}
 		// Only check for password on Special:ChangePassword
-		if ( !$wgTitle->isSpecial( 'Resetpass' ) ) {
+		if (!Title::newFromText($wgRequest->getVal('title'))->isSpecial('Resetpass')) {
 			return true;
 		}
 		// Check to see if the MediaWiki user has connected via Facebook before
@@ -621,12 +621,11 @@ STYLE;
 	 * This hook was added in MediaWiki 1.14.
 	 */
 	static function UserLoadAfterLoadFromSession( $user ) {
-		global $wgFbDisableLogin, $wgTitle;
+		global $wgFbDisableLogin, $wgRequest;
 		
 		// Don't mess with authentication on Special:Connect
-		if (!empty($wgFbDisableLogin) && $user->isLoggedIn() && !$wgTitle->isSpecial('Connect')) {
-			global $facebook;
-			
+		if ( !empty($wgFbDisableLogin) && $user->isLoggedIn() &&
+				!Title::newFromText($wgRequest->getVal('title'))->isSpecial('Connect') ) {
 			$fbUser = new FacebookUser();
 			
 			// If possible, force a preemptive ping to Facebook's servers. Otherwise, we
@@ -644,8 +643,9 @@ STYLE;
 	 * Called when the user is logged out to log them out of Facebook as well.
 	 *
 	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
-		global $wgTitle, $facebook;
-		if ( $wgTitle->isSpecial('Userlogout') && $facebook->getUser() ) {
+		global $facebook, $wgRequest;
+		if ( $facebook->getUser() &&
+				Title::newFromText($wgRequest->getVal('title'))->isSpecial('Userlogout') ) {
 			// Only log the user out if it's the right user
 			$fbUser = new FacebookUser();
 			if ( $fbUser->getMWUser()->getName() == $old_name ) {
