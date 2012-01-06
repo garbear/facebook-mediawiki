@@ -46,6 +46,25 @@ $wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 $wgFbOpenGraph = true;
 
 /**
+ * If you have defined Open Graph actions and objects for the supported types
+ * below, you can name them here. This can be done from the Open Graph
+ * dashboard in your app's settings. If you have no clue about any of this, you
+ * can leave these parameters as their default values.
+ * 
+ * $wgFbOpenGraphActions currently has no effect. In the future, it will allow
+ * actions to be pushed to a user's timeline.
+ */
+#$wgFbOpenGraphActions = array(
+#	'edit'   => 'edit',
+#	'tweak'  => 'tweak', # for a minor edit
+#	'watch'  => 'watch',
+#	'upload' => 'upload',
+#);
+$wgFbOpenGraphObjects = array(
+	'article' => 'article', # Or false to disable Open Graph tag
+);
+
+/**
  * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
  *    1.  All users are stripped of the 'createaccount' right. To override this
  *        behavior, see FacebookHooks::UserGetRights.

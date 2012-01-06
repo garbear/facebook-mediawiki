@@ -162,8 +162,8 @@ STYLE;
 		// Add open graph tags to articles
 		global $wgFbOpenGraph;
 		if ( !empty( $wgFbOpenGraph ) ) {
-			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgSitename, $wgRequest,
-					$wgLogo, $wgServer;
+			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphObjects, $wgSitename,
+					$wgRequest, $wgLogo, $wgServer;
 			
 			// fb:app_id
 			$out->addHeadItem('fb:app_id',
@@ -176,9 +176,13 @@ STYLE;
 			}
 			
 			// og:type - TODO: Get this value from configuration parameters
-			if ( FacebookAPI::isNamespaceSetup() ) {
-				$out->addHeadItem('og:type',
-					'<meta property="og:type" content="' . $wgFbNamespace . ':article" />' . "\n");
+			if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraphObjects ) ) {
+				$object = 'article'; // TODO: dynamically determine this
+				if ( isset( $wgFbOpenGraphObjects[$object] ) ) {
+					$out->addHeadItem('og:type',
+						'<meta property="og:type" content="' . $wgFbNamespace . ':' .
+						$wgFbOpenGraphObjects[$object] . '" />' . "\n");
+				}
 			}
 			
 			// og:site_name
