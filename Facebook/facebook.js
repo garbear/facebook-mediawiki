@@ -136,19 +136,14 @@ function FacebookLogin(response) {
 			destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
 		if (window.wgUserName) {
 			// The user is logged in to MediaWiki
-			if (window.fbId && window.fbId.length) {
+			if (window.fbId) {
 				// The MediaWiki user is already connected to a Facebook user
 				// Check to see if it's the one that just logged in
-				var already_logged_in = false;
-				for (var i = 0; i < fbId.length; i++) {
-					if (window.fbId == response.authResponse.userID) {
-						already_logged_in = true;
-						break;
-					}
-				}
-				if (already_logged_in) {
+				if (window.fbId == response.authResponse.userID) {
 					// User is already logged in to MediaWiki
 					//alert("Login successful");
+					// Hide the login button? For now, reload to re-render XFBML tags
+					window.location.href = window.location.href;
 				} else {
 					// MediaWiki user is connected to a Facebook account different
 					// from the one that just logged in

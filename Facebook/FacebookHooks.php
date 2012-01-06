@@ -126,17 +126,27 @@ class FacebookHooks {
 	background-position: left top !important;
 	padding-left: 19px !important;
 }
+
 STYLE;
 		$style .= '.fbInitialHidden {display:none;}';
 		
 		// Things get a little simpler in 1.16...
 		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
 			$out->addInlineStyle( $style );
-			// Include the common jQuery library (alias defaults to $j instead of $)
+			// Include the common jQuery library
 			$out->includeJQuery();
-			// Add the script file specified by $url
 			if ( !empty( $wgFbExtensionScript ) ) {
-				$out->addScriptFile( $wgFbExtensionScript );
+				if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+					// ResourceLoader was introduced in MW 1.17. This shifted the focus
+					// on delivering page HTML as fast as possible and deferring all
+					// scripts to the end of the page or asynchronous loading. However,
+					// our script is a callback for an async script (Facebook's JS SDK).
+					// This means it must be in place before the script is loaded!
+					$out->addHeadItem('fbscript',
+							"<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
+				} else {
+					$out->addScriptFile( $wgFbExtensionScript );
+				}
 			}
 		} else {
 			$out->addScript( '<style type="text/css">' . $style . '</style>' );
@@ -232,12 +242,8 @@ STYLE;
 		// Let JavaScript know if the Facebook ID belongs to someone else
 		if ( $wgUser->isLoggedIn() && !$facebook->getUser() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
-			if ( count($ids) > 0 ) {
-				// Turn numbers into strings
-				foreach ( $ids as $index => $id ) {
-					$ids[$index] = strval( $id );
-				}
-				$vars['fbIds'] = $ids; // possibly more than 1 Facebook ID for this user in the future
+			if ( count($ids) ) {
+				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
 		return true;
@@ -322,7 +328,7 @@ STYLE;
 			}
 			$personal_urls['facebook'] = array(
 				'text'   => wfMsg( 'facebook-connect' ),
-				'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
+				'href'   => SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $wgTitle->getPrefixedURL()),
 				'class'  => 'mw-facebook-logo',
 				'active' => $wgTitle->isSpecial( 'Connect' ),
 			);
