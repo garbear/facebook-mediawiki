@@ -42,8 +42,8 @@
  */
 
 /**
- * Simple jQuery plugin: postJSON
- */
+ * Simple jQuery plugin: postJSON (currently unused)
+ *
 (function() {
 	if (!jQuery.postJSON) {
 		jQuery.postJSON = function(url, data, callback) {
@@ -51,25 +51,7 @@
 		};
 	}
 })();
-
-
-// Connecting Facebook with an existing account on Special:Connect
-jQuery(document).ready(function($) {
-	$('input[name="wpNameChoice"]').change(function() {
-		var selected;
-		try {
-			// jQuery >= 1.6
-			selected = $('#wpNameChoiceExisting').prop('checked');
-		} catch(err) {
-			selected = $('#wpNameChoiceExisting').attr('checked');
-		}
-		if (selected) {
-			$("#mw-facebook-choosename-update").slideDown('slow');
-		} else {
-			$("#mw-facebook-choosename-update").slideUp('slow');
-		}
-	});
-});
+/**/
 
 /**
  * After the Facebook JavaScript SDK has been asynchronously loaded,
@@ -85,19 +67,8 @@ window.fbAsyncInit = function() {
 		oauth  : true
 	});
 	
+	// Allow this extension to pick up clicks on <fb:login-button>
 	FB.Event.subscribe('auth.login', FacebookLogin);
-	// Register a function for when the user logs out of Facebook
-	/*
-	FB.Event.subscribe('auth.logout', function(response) {
-		// TODO: Internationalize
-		var login = confirm("Not logged in.\n\nYou have been loggout out of " +
-                            "Facebook. Press OK to log in with Facebook again, " +
-                            "or press Cancel to stay on the current page.");
-		if (login) {
-			window.location = window.wgArticlePath.replace(/\$1/, "Special:Connect");
-		}
-	});
-	*/
 	
 	// Events involving Facebook code should only be attached once Facebook and
 	// jQuery have both been loaded
@@ -109,20 +80,6 @@ window.fbAsyncInit = function() {
 			FB.login(FacebookLogin, {scope: perms});
 			ev.preventDefault();
 		});
-		
-		/*
-		// Add the logout behavior to the "Logout of Facebook" button
-		$('#pt-fblogout').click(function() {
-			// TODO: Where did the fancy DHTML window go? Maybe consider jQuery Alert Dialogs:
-			// http://abeautifulsite.net/2008/12/jquery-alert-dialogs/
-			var logout = confirm("You are logging out of both this site and Facebook.");
-			if (logout) {
-				FB.logout(function(response) {
-					window.location = window.fbLogoutURL;
-				});
-			}
-		});
-		*/
 	});
 };
 
@@ -170,3 +127,20 @@ function FacebookLogin(response) {
 	}
 }
 
+//Connecting Facebook with an existing account on Special:Connect
+jQuery(document).ready(function($) {
+	$('input[name="wpNameChoice"]').change(function() {
+		var selected;
+		try {
+			// jQuery >= 1.6
+			selected = $('#wpNameChoiceExisting').prop('checked');
+		} catch(err) {
+			selected = $('#wpNameChoiceExisting').attr('checked');
+		}
+		if (selected) {
+			$("#mw-facebook-choosename-update").slideDown('slow');
+		} else {
+			$("#mw-facebook-choosename-update").slideUp('slow');
+		}
+	});
+});
