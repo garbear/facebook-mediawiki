@@ -680,6 +680,10 @@ STYLE;
 	
 	/**
 	 * Add several meta property namespace attributes to the <head> tag.
+	 * 
+	 * This hook follows the steps outlined in the Open Graph Beta tutorial:
+	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
+	 * (if the beta link still works...)
 	 */
 	static function SkinTemplateOutputPageBeforeExec(&$sk, &$tpl) {
 		global $wgFbNamespace;
