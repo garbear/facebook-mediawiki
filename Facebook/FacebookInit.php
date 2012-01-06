@@ -26,10 +26,18 @@ class FacebookInit {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgXhtmlNamespaces, $wgSharedTables, $facebook, $wgHooks;
+		global $wgSharedTables, $facebook, $wgHooks;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
-		$wgXhtmlNamespaces['fb'] = 'http://www.facebook.com/2008/fbml';
+		global $wgXhtmlNamespaces;
+		$wgXhtmlNamespaces['fb'] = 'https://www.facebook.com/2008/fbml';
+		
+		// Disable $wgHtml5 so that our Open Graph xmlns tags show up
+		global $wgFbOpenGraph, $wgHtml5;
+		if ( !empty( $wgFbOpenGraph ) ) {
+			$wgHtml5 = false;
+			$wgXhtmlNamespaces['og'] = 'http://ogp.me/ns#';
+		}
 		
 		// Facebook/username associations should be shared when $wgSharedDB is enabled
 		$wgSharedTables[] = 'user_fbconnect';

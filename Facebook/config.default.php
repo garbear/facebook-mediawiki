@@ -7,7 +7,7 @@
  *        https://developers.facebook.com/apps/?action=create
  *    2.  Enter a descriptive name for your wiki in the Site Name field.
  *        This will be seen by users when they sign up for your site.
- *    3.  Choose an app namespace (something simple, like coffeewiki)
+ *    3.  Choose an app namespace (something simple, like coffee-wiki)
  *    4.  Copy the App ID, Secret and Namespace into this config file.
  *    5.  One more step... Inside the developer app scroll down, click the
  *        check next to "Website" and enter your wiki's URL.
@@ -33,6 +33,17 @@ $wgFbAppId          = 'YOUR_APP_ID';    # Change this!
 $wgFbSecret         = 'YOUR_SECRET';    # Change this!
 $wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
+
+/**
+ * Enables Facebook Open Graph Protocol. "The Open Graph Protocol enables you
+ * to integrate your Web pages into the social graph."
+ * 
+ * https://developers.facebook.com/docs/opengraph/
+ * 
+ * This parameter is incompatible with $wgHtml5. If set, $wgHtml5 will be
+ * automatically disabled.
+ */
+$wgFbOpenGraph = true;
 
 /**
  * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:

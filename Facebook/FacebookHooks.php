@@ -679,6 +679,24 @@ STYLE;
 	}
 	
 	/**
+	 * Add several meta property namespace attributes to the <head> tag.
+	 */
+	static function SkinTemplateOutputPageBeforeExec(&$sk, &$tpl) {
+		global $wgFbNamespace;
+		if ( empty( $wgFbNamespace ) || $wgFbNamespace == 'YOUR_NAMESPACE' ) {
+			// Not configured properly, skip this step
+			return true;
+		}
+		
+		$headElement = $tpl->data['headelement'];
+		$head = '<head prefix="og: http://ogp.me/ns# ' . /*'fb: http://ogp.me/ns/fb# ' .*/
+		        "$wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#\">";
+		$headElement = str_replace('<head>', $head, $headElement);
+		$tpl->set( 'headelement', $headElement );
+		return true;
+	}
+	
+	/**
 	 * 
 	 *
 	// TODO
