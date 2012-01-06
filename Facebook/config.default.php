@@ -4,21 +4,23 @@
 /**
  * To use Facebook you will first need to create a Facebook application:
  *    1.  Visit the "Create an Application" setup wizard:
- *        https://developers.facebook.com/setup/
+ *        https://developers.facebook.com/apps/?action=create
  *    2.  Enter a descriptive name for your wiki in the Site Name field.
  *        This will be seen by users when they sign up for your site.
- *    3.  Enter the Site URL and Locale, then click "Create application".
- *    4.  Copy the displayed App ID and Secret into this config file.
- *    5.  One more step... Inside the developer app select your new app
- *        and click "Edit App". Now scroll down, click the check next to
- *        "Website," and finally enter your wiki's URL.
+ *    3.  Choose an app namespace (something simple, like coffeewiki)
+ *    4.  Copy the App ID, Secret and Namespace into this config file.
+ *    5.  One more step... Inside the developer app scroll down, click the
+ *        check next to "Website" and enter your wiki's URL.
+ *    6   I lied, it's another step. Under Advanced settings, specify your
+ *        deauth callback: http://wiki.example.com/wiki/Special:Connect/Deauth
+ *        This will disconnect users when they remove your app.
  * 
  * Optionally, you may customize your application:
  *    A.  Upload icon and logo images. The icon appears in Timeline events.
- *    B.  Create a Page for your app (if you don't already have one). Visit the
- *        settings, click Advanced, scroll to the bottom and click the buttom in
- *        the "App Page" field. This will create a new page for your app. Paste
- *        the Page ID for your app below.
+ *    B.  Create a Page for your app (only if you don't already have one).
+ *        Visit the settings, click Advanced, scroll to the bottom and click
+ *        the button in the "App Page" field. This will create a new page for
+ *        your app. Paste the Page ID for your app below.
  *    C.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
  *        settings). The URL can be found by clicking "Privacy policy" at the
  *        bottom of your wiki's Main Page.
@@ -29,6 +31,7 @@
  */
 $wgFbAppId          = 'YOUR_APP_ID';    # Change this!
 $wgFbSecret         = 'YOUR_SECRET';    # Change this!
+$wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
