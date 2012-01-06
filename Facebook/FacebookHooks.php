@@ -162,7 +162,8 @@ STYLE;
 		// Add open graph tags to articles
 		global $wgFbOpenGraph;
 		if ( !empty( $wgFbOpenGraph ) ) {
-			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgSitename, $wgRequest;
+			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgSitename, $wgRequest,
+					$wgLogo, $wgServer;
 			
 			// fb:app_id
 			$out->addHeadItem('fb:app_id',
@@ -174,7 +175,7 @@ STYLE;
 					'<meta property="fb:page_id" content="' . $wgFbPageId . '" />' . "\n");
 			}
 			
-			// og:type
+			// og:type - TODO: Get this value from configuration parameters
 			if ( FacebookAPI::isNamespaceSetup() ) {
 				$out->addHeadItem('og:type',
 					'<meta property="og:type" content="' . $wgFbNamespace . ':article" />' . "\n");
@@ -185,7 +186,8 @@ STYLE;
 				'<meta property="og:site_name" content="' . $wgSitename . '" />' . "\n");
 			
 			// og:title
-			$title = Title::newFromText( $wgRequest->getVal( 'title' ) )->getText();
+			$title = strval( Title::newFromText( $wgRequest->getVal( 'title' ) ) );
+			//$ns = ($title->getNsText() != '' ? $title->getNsText() . ':' : '');
 			$out->addHeadItem('og:title',
 				'<meta property="og:title" content="' . $title . '" />' . "\n");
 			
@@ -193,6 +195,14 @@ STYLE;
 			$url = Title::newFromText( $title )->getFullURL();
 			$out->addHeadItem('og:url',
 				'<meta property="og:url" content="' . $url . '" />' . "\n");
+			
+			// og:image - TODO: use first image on page, otherwise default to $wgLogo
+			$out->addHeadItem('og:image',
+				'<meta property="og:image" content="' . $wgServer . $wgLogo . '" />' . "\n");
+			
+			// og:locale - TODO, higher priority
+			
+			// og:updated_time - TODO
 		}
 		
 		return true;
