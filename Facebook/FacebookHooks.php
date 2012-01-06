@@ -190,13 +190,13 @@ STYLE;
 				'<meta property="og:site_name" content="' . $wgSitename . '" />' . "\n");
 			
 			// og:title
-			$title = strval( Title::newFromText( $wgRequest->getVal( 'title' ) ) );
+			$title = Title::newFromText( $wgRequest->getVal( 'title' ) )->getPrefixedText();
 			//$ns = ($title->getNsText() != '' ? $title->getNsText() . ':' : '');
 			$out->addHeadItem('og:title',
 				'<meta property="og:title" content="' . $title . '" />' . "\n");
 			
 			// og:url
-			$url = Title::newFromText( $title )->getFullURL();
+			$url = Title::newFromText( $title )->getFullURL(); // no additional params
 			$out->addHeadItem('og:url',
 				'<meta property="og:url" content="' . $url . '" />' . "\n");
 			
