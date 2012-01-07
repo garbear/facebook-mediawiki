@@ -251,21 +251,23 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	private static function getFbScript() {
 		global $wgFbScript, $wgLang, $wgFbAppId, $wgFbSocialPlugins;
 		
-		// Check to see if we should localize the JS SDK
-		$fbScript = $wgFbScript;
-		if (strpos( $fbScript, FACEBOOK_LOCALE ) !== false) {
-			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
-			// NOTE: Can't use $wgLanguageCode here because the same Facebook config can
-			// run for many $wgLanguageCode's on one site (such as Wikia).
-			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
-			$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
-			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+		static $fbScript = ''; // In MW <= 1.17 this runs from two different hooks
+		if ( $fbScript === '' ) {
+			$fbScript = $wgFbScript;
+			// Check to see if we should localize the JS SDK
+			if (strpos( $fbScript, FACEBOOK_LOCALE ) !== false) {
+				wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+				// NOTE: Can't use $wgLanguageCode here because the same Facebook config
+				// can run for many $wgLanguageCode's on one site (such as Wikia).
+				$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
+				$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
+				wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+			}
+			
+			// Give Facebook some hints. Commented out because they don't affect anything...
+			#$fbScript .= '#appId=' . $wgFbAppId .
+			#             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		}
-		
-		// Give Facebook some hints. Commented out because they don't affect anything...
-		#$fbScript .= '#appId=' . $wgFbAppId .
-		#             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
-		
 		return $fbScript;
 	}
 	
