@@ -79,7 +79,8 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$skin ) {
-		global $wgVersion, $wgFbScript, $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
+		global $wgVersion, $wgFbScript, $wgFbSocialPlugins, $wgFbAppId,
+				$wgScriptPath, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $skin ) === 'SkinWikiaphone' )
@@ -97,6 +98,10 @@ class FacebookHooks {
 			$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
 			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
+		
+		// Give Facebook some hints
+		$fbScript .= '#appId=' . $wgFbAppId .
+		             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		
 		// Asynchronously load the Facebook JavaScript SDK before the page's content
 		// See <https://developers.facebook.com/docs/reference/javascript>
