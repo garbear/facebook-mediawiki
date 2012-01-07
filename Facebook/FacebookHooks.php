@@ -79,8 +79,7 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$skin ) {
-		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
-				$wgJsMimeType, $wgStyleVersion;
+		global $wgVersion, $wgFbScript, $wgScriptPath, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $skin ) === 'SkinWikiaphone' )
@@ -119,6 +118,7 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 		}
 		
 		// Add a Facebook logo to the class .mw-fblink
+		global $wgFbLogo;
 		$style = empty($wgFbLogo) ? '' : <<<STYLE
 .mw-facebook-logo {
 	background-image: url($wgFbLogo) !important;
@@ -128,34 +128,33 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 }
 
 STYLE;
-		$style .= '.fbInitialHidden {display:none;}';
+		$style .= '.fbInitialHidden {display:none;}'; // Forms on Special:Connect
 		
-		// Things get a little simpler in 1.16...
+		$fbExtensionScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
+		
 		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
 			$out->addInlineStyle( $style );
 			// Include the common jQuery library
 			$out->includeJQuery();
-			if ( !empty( $wgFbExtensionScript ) ) {
-				if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
-					// ResourceLoader was introduced in MW 1.17. This shifted the focus
-					// on delivering page HTML as fast as possible and deferring all
-					// scripts to the end of the page or asynchronous loading. However,
-					// our script is a callback for an async script (Facebook's JS SDK).
-					// This means it must be in place before the script is loaded!
-					$out->addHeadItem('fbscript',
-							"<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
-				} else {
-					$out->addScriptFile( $wgFbExtensionScript );
-				}
+			if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+				// ResourceLoader was introduced in MW 1.17. This shifted the focus
+				// on delivering page HTML as fast as possible and deferring all
+				// scripts to the end of the page or asynchronous loading. However,
+				// our script is a callback for an async script (Facebook's JS SDK).
+				// This means it must be in place before the script is loaded!
+				$out->addHeadItem( 'fbscript',
+						"<script type=\"$wgJsMimeType\" " .
+						"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
+			} else {
+				$out->addScriptFile( $fbExtensionScript );
 			}
 		} else {
 			$out->addScript( '<style type="text/css">' . $style . '</style>' );
 			// Include the most recent 1.7 version
-			$out->addScriptFile( 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js' );
+			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js');
 			// Add the script file specified by $url
-			if( !empty( $wgFbExtensionScript ) ) {
-				$out->addScript("<script type=\"$wgJsMimeType\" src=\"$wgFbExtensionScript?$wgStyleVersion\"></script>\n");
-			}
+			$out->addScript( "<script type=\"$wgJsMimeType\" " .
+					"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
 		}
 		
 		// Add Open Graph tags to articles

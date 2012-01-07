@@ -161,15 +161,3 @@ $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * of locales supported by Facebook, see FacebookLanguage.php.
  */
 $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
-
-/**
- * Path to the extension's client-side JavaScript.
- *     facebook.js        For development
- *     facebook.min.js    Minified version for deployment
- * 
- * Do not load this script asynchronously. It contains a callback for another
- * async script (Facebook JS SDK), which would then cause a race condition.
- */
-global $wgScriptPath;
-$wgFbExtensionScript = "$wgScriptPath/extensions/Facebook/facebook.js";
-
