@@ -101,6 +101,6 @@ class FacebookAPI extends Facebook {
 		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
 			$scope[] = 'publish_actions';
 		}
-		return implode( '', $scope );
+		return implode( ',', $scope );
 	}
 }
