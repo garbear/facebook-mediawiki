@@ -15,7 +15,7 @@
  */
 
 /**
- * facebook.js and facebook.min.js
+ * ext.facebook.js
  * 
  * The Facebook extension relies on several different libraries and frameworks
  * for its JavaScript code. Each framework has its own method to verify that the
@@ -23,19 +23,19 @@
  * the methods for each component are listed below ("lambda" represents a named
  * or anonymous function).
  * 
- * MediaWiki:                  addOnloadHook(lambda);
+ * MediaWiki (removed in 1.17):     addOnloadHook(lambda);
  *     This function manages an array of window.onLoad event handlers to be
  *     called be called by a MediaWiki script when the window is fully loaded.
  *     Because the DOM may be ready before the window (due to large images to
  *     be downloaded), a faster alternative is JQuery's document-ready function.
  * 
- * Facebook JavaScript SDK:    window.fbAsyncInit = lambda;
+ * Facebook JavaScript SDK:         window.fbAsyncInit = lambda;
  *     This global variable is called when the JavaScript SDK is fully
  *     initialized asynchronously to the document's state. This might be long
  *     after the document is finished rendering the first time the script is
  *     downloaded. Subsequently, it may even be called before the DOM is ready.
  * 
- * jQuery:                     $(document).ready(lambda);
+ * jQuery (now the default in MW):  $(document).ready(lambda);
  *     Self-explanatory; to be called when the DOM is ready to be manipulated.
  *     Typically this should occur sooner than MediaWiki's addOnloadHook
  *     function is called.
