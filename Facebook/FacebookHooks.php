@@ -79,30 +79,13 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$skin ) {
-		global $wgVersion, $wgFbScript, $wgFbSocialPlugins, $wgFbAppId,
-				$wgScriptPath, $wgJsMimeType, $wgStyleVersion;
+		global $wgVersion, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $skin ) === 'SkinWikiaphone' )
 			return true;
 		
-		// Check to see if we should localize the JS SDK
-		$fbScript = $wgFbScript;
-		if (strpos( $fbScript, FACEBOOK_LOCALE ) !== false) {
-			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
-			// NOTE: Can't use $wgLanguageCode here because the same Facebook config can
-			// run for many $wgLanguageCode's on one site (such as Wikia).
-			global $wgLang;
-			// Attempt to find a matching Facebook locale
-			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
-			$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
-			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
-		}
-		
-		// Give Facebook some hints
-		$fbScript .= '#appId=' . $wgFbAppId .
-		             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
-		
+		global $wgScriptPath;
 		$fbExtensionScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
 		
 		// Add a Facebook logo to the class .mw-fblink
@@ -143,12 +126,12 @@ STYLE;
 			// Asynchronously load the Facebook JavaScript SDK before the page's content
 			// See <https://developers.facebook.com/docs/reference/javascript>
 			global $wgNoExternals;
-			if ( !empty($fbScript) && empty($wgNoExternals) ) {
+			if ( empty( $wgNoExternals ) ) {
 				$out->prependHTML('
 <div id="fb-root"></div>
 <script type="' . $wgJsMimeType . '">
 (function(d){var js;js=d.createElement("script");js.async=true;js.type="' .
-$wgJsMimeType . '";js.src="' . $fbScript .
+$wgJsMimeType . '";js.src="' . self::getFbScript() .
 '";d.getElementsByTagName("head")[0].appendChild(js);}(document));
 </script>' . "\n"
 				);
@@ -260,6 +243,33 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 	} // BeforePageDisplay hook
 	
 	/**
+	 * Returns the URL to the Facebook JavaScript SDK. If $wgFbScript contains
+	 * a %LOCALE% token, it will be replaced with the current user's language.
+	 * Additionally, the URL is appended with a fragment containing the app ID
+	 * and an option to render XFBML tags.
+	 */
+	private static function getFbScript() {
+		global $wgFbScript, $wgLang, $wgFbAppId, $wgFbSocialPlugins;
+		
+		// Check to see if we should localize the JS SDK
+		$fbScript = $wgFbScript;
+		if (strpos( $fbScript, FACEBOOK_LOCALE ) !== false) {
+			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+			// NOTE: Can't use $wgLanguageCode here because the same Facebook config can
+			// run for many $wgLanguageCode's on one site (such as Wikia).
+			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
+			$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
+			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
+		}
+		
+		// Give Facebook some hints
+		$fbScript .= '#appId=' . $wgFbAppId .
+		             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
+		
+		return $fbScript;
+	}
+	
+	/**
 	 * Fired when MediaWiki is updated (from the command line updater utility or,
 	 * if using version 1.17+, from the initial installer). This hook allows
 	 * Facebook to update the database with the required tables. Each table
@@ -327,7 +337,8 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 	 * to retain backward compatability.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgFbAppId, $facebook, $wgFbSocialPlugins, $wgRequest, $wgStyleVersion, $wgUser;
+		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
+				$wgUser, $facebook; 
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -337,6 +348,10 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 		}
 		if (!isset($vars['wgStyleVersion'])) {
 			$vars['wgStyleVersion'] = $wgStyleVersion;
+		}
+		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+			// Use ResourceLoader to load the JavaScript SDK
+			$vars['wgFbScript'] = self::getFbScript();
 		}
 		$vars['fbAppId']     = $wgFbAppId;
 		$vars['fbUseXFBML']  = $wgFbSocialPlugins;
