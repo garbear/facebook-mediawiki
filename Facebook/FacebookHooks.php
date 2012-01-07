@@ -103,28 +103,11 @@ class FacebookHooks {
 		$fbScript .= '#appId=' . $wgFbAppId .
 		             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		
-		// Asynchronously load the Facebook JavaScript SDK before the page's content
-		// See <https://developers.facebook.com/docs/reference/javascript>
-		global $wgNoExternals;
-		if ( !empty($fbScript) && empty($wgNoExternals) ) {
-			$out->prependHTML('
-				<div id="fb-root"></div>
-<script type="' . $wgJsMimeType . '">
-(function(d){var js;js=d.createElement("script");js.async=true;js.type="' .
-$wgJsMimeType . '";js.src="' . $fbScript .
-'";d.getElementsByTagName("head")[0].appendChild(js);}(document));
-</script>' . "\n"
-			);
-		}
-		
-		// Inserts list of global JavaScript variables if necessary
-		if (self::MGVS_hack( $mgvs_script )) {
-			$out->addInlineScript( $mgvs_script );
-		}
+		$fbExtensionScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
 		
 		// Add a Facebook logo to the class .mw-fblink
 		global $wgFbLogo;
-		$style = empty($wgFbLogo) ? '' : <<<STYLE
+		$style = empty( $wgFbLogo ) ? '' : <<<STYLE
 .mw-facebook-logo {
 	background-image: url($wgFbLogo) !important;
 	background-repeat: no-repeat !important;
@@ -135,31 +118,61 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 STYLE;
 		$style .= '.fbInitialHidden {display:none;}'; // Forms on Special:Connect
 		
-		$fbExtensionScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
-		
-		if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
+		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+			// Throw in a <div id="fb-root"> tag here.
+			// Facebook documentation says to include this <div> before loading
+			// the library. Well, I went through the source code to find out why.
+			//     <https://github.com/facebook/facebook-js-sdk>
+			// This <div> is indeed used by the library, but only for some kind
+			// of dialog (which means that the <div> must be rendered before the
+			// dialog is shown, an almost certain scenario). In all other cases,
+			// the library creates its own <div> 10000px above the top of the page.
+			$out->prependHTML("\n<div id=\"fb-root\"></div>\n");
+			
 			$out->addInlineStyle( $style );
-			// Include the common jQuery library
-			$out->includeJQuery();
-			if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
-				// ResourceLoader was introduced in MW 1.17. This shifted the focus
-				// on delivering page HTML as fast as possible and deferring all
-				// scripts to the end of the page or asynchronous loading. However,
-				// our script is a callback for an async script (Facebook's JS SDK).
-				// This means it must be in place before the script is loaded!
-				$out->addHeadItem( 'fbscript',
-						"<script type=\"$wgJsMimeType\" " .
-						"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
-			} else {
-				$out->addScriptFile( $fbExtensionScript );
-			}
-		} else {
-			$out->addScript( '<style type="text/css">' . $style . '</style>' );
-			// Include the most recent 1.7 version
-			$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js');
-			// Add the script file specified by $url
-			$out->addScript( "<script type=\"$wgJsMimeType\" " .
+			
+			// ResourceLoader was introduced in MW 1.17. This shifted the focus
+			// on delivering page HTML as fast as possible and deferring all
+			// scripts to the end of the page or asynchronous loading. However,
+			// our script is a callback for an async script (Facebook's JS SDK).
+			// This means it must be in place before the script is loaded!
+			$out->addHeadItem( 'fbscript',
+					"<script type=\"$wgJsMimeType\" " .
 					"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
+		} else {
+			// Asynchronously load the Facebook JavaScript SDK before the page's content
+			// See <https://developers.facebook.com/docs/reference/javascript>
+			global $wgNoExternals;
+			if ( !empty($fbScript) && empty($wgNoExternals) ) {
+				$out->prependHTML('
+<div id="fb-root"></div>
+<script type="' . $wgJsMimeType . '">
+(function(d){var js;js=d.createElement("script");js.async=true;js.type="' .
+$wgJsMimeType . '";js.src="' . $fbScript .
+'";d.getElementsByTagName("head")[0].appendChild(js);}(document));
+</script>' . "\n"
+				);
+			}
+			
+			if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
+				// Include the common jQuery library
+				$out->includeJQuery();
+				$out->addInlineStyle( $style );
+				$out->addScriptFile( $fbExtensionScript );
+			
+			} else {
+				$out->addScript( '<style type="text/css">' . $style . '</style>' );
+				// Include the most recent 1.7 version
+				$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js');
+				// Add the script file specified by $url
+				$out->addScript( "<script type=\"$wgJsMimeType\" " .
+						"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
+				
+				// Inserts list of global JavaScript variables if necessary
+				if (self::MGVS_hack( $mgvs_script )) {
+					$out->addInlineScript( $mgvs_script );
+				}
+			}
 		}
 		
 		// Add Open Graph tags to articles
