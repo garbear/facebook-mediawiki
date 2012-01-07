@@ -360,7 +360,7 @@ $wgJsMimeType . '";js.src="' . $fbScript .
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
 	 */
 	private static function MGVS_hack( &$script ) {
-		global $wgVersion, $IP;
+		global $wgVersion;
 		if (version_compare($wgVersion, '1.14.0', '<')) {
 			$script = "";
 			$vars = array();
