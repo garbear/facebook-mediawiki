@@ -497,7 +497,7 @@ STYLE;
 			$head .= '">';
 			
 			$headElement = $tpl->data['headelement'];
-			$headElement = str_replace('<head>', $head, $headElement);
+			$headElement = str_replace('<head>', $head, $headElement, 1);
 			$tpl->set( 'headelement', $headElement );
 		}
 		return true;
