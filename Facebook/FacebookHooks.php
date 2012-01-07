@@ -212,10 +212,13 @@ STYLE;
 				'<meta property="og:locale" content="' . $locale . '" />' . "\n");
 			
 			// og:updated_time
-			$article = new Article( $title, 0 );
-			$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
-			$out->addHeadItem('og:updated_time',
-					'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
+			if ( $title->canExist() ) {
+				// Don't add timestamp to NS_SPECIAL or NS_MEDIA
+				$article = new Article( $title, 0 );
+				$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
+				$out->addHeadItem('og:updated_time',
+						'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
+			}
 		}
 		
 		return true;
