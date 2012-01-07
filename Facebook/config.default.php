@@ -161,3 +161,12 @@ $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * of locales supported by Facebook, see FacebookLanguage.php.
  */
 $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
+
+/**
+ * Location of the extension script (MediaWiki <= 1.16). If you override, it
+ * is recommended that you use $wgExtensionAssetsPath (defined to be
+ * "$wgScriptPath/extensions") instead of $wgScriptPath.
+ * 
+ * This setting is deprecated and is not used in version 1.17 onward.
+ */ 
+$wgFbExtScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";

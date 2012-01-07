@@ -26,7 +26,7 @@ class FacebookInit {
 	 * Initializes and configures the extension.
 	 */
 	public static function init() {
-		global $wgSharedTables, $facebook, $wgHooks;
+		global $wgSharedTables, $facebook, $wgHooks, $wgResourceModules;
 		
 		// The xmlns:fb attribute is required for proper rendering on IE
 		global $wgXhtmlNamespaces;
@@ -44,6 +44,21 @@ class FacebookInit {
 		
 		// Create our Facebook instance and make it available through $facebook
 		$facebook = new FacebookAPI();
+		
+		// Load JavaScript client libraries (MediaWiki 1.17+)
+		$moduleInfo = array(
+			'localBasePath' => dirname( __FILE__ ) . '/modules',
+			'remoteExtPath' => 'Facebook/modules',
+		);
+		
+		$wgResourceModules['ext.facebook'] = array(
+			'scripts'       => 'ext.facebook.js',
+		) + $moduleInfo;
+		
+		$wgResourceModules['ext.facebook.sdk'] = array(
+			'scripts'       => 'ext.facebook.sdk.js',
+			'dependencies'  => array( 'ext.facebook' ),
+		) + $moduleInfo;
 		
 		// Install all public static functions in class FacebookHooks as MediaWiki hooks
 		global $wgFbHooksToAddImmediately;

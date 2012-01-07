@@ -79,14 +79,11 @@ class FacebookHooks {
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
 	public static function BeforePageDisplay( &$out, &$skin ) {
-		global $wgVersion, $wgJsMimeType, $wgStyleVersion;
+		global $wgFbExtScript, $wgVersion, $wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
 		if ( get_class( $skin ) === 'SkinWikiaphone' )
 			return true;
-		
-		global $wgScriptPath;
-		$fbExtensionScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
 		
 		// Add a Facebook logo to the class .mw-fblink
 		global $wgFbLogo;
@@ -114,14 +111,8 @@ STYLE;
 			
 			$out->addInlineStyle( $style );
 			
-			// ResourceLoader was introduced in MW 1.17. This shifted the focus
-			// on delivering page HTML as fast as possible and deferring all
-			// scripts to the end of the page or asynchronous loading. However,
-			// our script is a callback for an async script (Facebook's JS SDK).
-			// This means it must be in place before the script is loaded!
-			$out->addHeadItem( 'fbscript',
-					"<script type=\"$wgJsMimeType\" " .
-					"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
+			// Use the ResourceLoader to add the JS SDK 
+			$out->addModules( 'ext.facebook.sdk' );
 		} else {
 			// Asynchronously load the Facebook JavaScript SDK before the page's content
 			// See <https://developers.facebook.com/docs/reference/javascript>
@@ -141,7 +132,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				// Include the common jQuery library
 				$out->includeJQuery();
 				$out->addInlineStyle( $style );
-				$out->addScriptFile( $fbExtensionScript );
+				$out->addScriptFile( $wgFbExtScript );
 			
 			} else {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
@@ -149,7 +140,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				$out->addScriptFile('http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js');
 				// Add the script file specified by $url
 				$out->addScript( "<script type=\"$wgJsMimeType\" " .
-						"src=\"$fbExtensionScript?$wgStyleVersion\"></script>\n" );
+						"src=\"$wgFbExtScript?$wgStyleVersion\"></script>\n" );
 				
 				// Inserts list of global JavaScript variables if necessary
 				if (self::MGVS_hack( $mgvs_script )) {
