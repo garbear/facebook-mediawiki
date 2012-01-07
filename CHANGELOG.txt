@@ -1,3 +1,7 @@
 Extension folder has changed from extensions/FBConnect to extensions/Facebook. Don't just overwrite the old files.
 
 For help on upgrading see http://www.mediawiki.org/wiki/Extension:Facebook#Upgrading.
+
+Visit GitHub if you are looking for the status of this extension. The commit log has an overview of any source code activity. The Network Graph shows a good overview of the different forks. If you are having problems, check to see if one of the forks has fixed your problem. If not, try asking one of the developers.
+
+The original author's GitHub branch is at https://github.com/garbear/facebook-mediawiki.
