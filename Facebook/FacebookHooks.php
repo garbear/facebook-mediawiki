@@ -380,7 +380,7 @@ STYLE;
 			}
 			$personal_urls['facebook'] = array(
 				'text'   => wfMsg( 'facebook-connect' ),
-				'href'   => '#', # SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $title->getPrefixedURL()),
+				'href'   => SpecialPage::getTitleFor('Connect')->getLocalUrl('returnto=' . $title->getPrefixedURL()),
 				'class'  => 'mw-facebook-logo',
 				'active' => $title->isSpecial( 'Connect' ),
 			);
