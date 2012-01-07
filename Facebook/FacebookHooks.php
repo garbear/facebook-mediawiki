@@ -325,20 +325,11 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	} // LoadExtensionSchemaUpdates hook
 	
 	/**
-	 * Adds several Facebook Connect variables to the page:
-	 * 
-	 * fbAppId		 The application ID (see $wgFbAppId in config.php)
-	 * fbUseXFBML    Should XFBML tags be rendered (see $wgFbSocialPlugins in config.default.php)
-	 * fbLogo        Facebook logo (see $wgFbLogo in config.php)
-	 * 
-	 * This hook was added in MediaWiki version 1.14. See:
-	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
-	 * If we are not at revision 38397 or later, this function is called from BeforePageDisplay
-	 * to retain backward compatability.
+	 * Adds several Facebook variables to the page:
 	 */
-	public static function MakeGlobalVariablesScript( &$vars ) {
+	public static function ResourceLoaderGetConfigVars( &$vars ) {
 		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
-				$wgUser, $facebook; 
+				$wgUser, $facebook;
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -346,19 +337,14 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			}
 			$vars['wgPageQuery'] = wfUrlencode( wfArrayToCGI( $query ) );
 		}
-		if (!isset($vars['wgStyleVersion'])) {
-			$vars['wgStyleVersion'] = $wgStyleVersion;
-		}
-		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
-			// Use ResourceLoader to load the JavaScript SDK
-			$vars['wgFbScript'] = self::getFbScript();
-		}
-		$vars['fbAppId']     = $wgFbAppId;
-		$vars['fbUseXFBML']  = $wgFbSocialPlugins;
-		// Let JavaScript know if the Facebook ID belongs to someone else
+		$vars['wgStyleVersion'] = $wgStyleVersion;
+		$vars['fbScript']       = self::getFbScript();
+		$vars['fbAppId']        = $wgFbAppId;
+		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
 		if ( $wgUser->isLoggedIn() && !$facebook->getUser() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
 			if ( count($ids) ) {
+				// Let JavaScript know if the Facebook ID belongs to someone else
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
@@ -367,7 +353,25 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			$vars['fbScope']  = $scope;
 		}
 		return true;
-	} // MakeGlobalVariablesScript hook
+	}
+	
+	/**
+	 * Backwards compatibility for MediaWiki < 1.17.
+	 * 
+	 * This hook was added in MediaWiki 1.14. If we are not 1.14 or later, this
+	 * function is called from BeforePageDisplay via MGVS_hack() to retain
+	 * backward compatability.
+	 * 
+	 * And then this hook was deprecated in 1.17. You know the drill.
+	 */
+	public static function MakeGlobalVariablesScript( &$vars ) {
+		global $wgVersion;
+		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
+			self::ResourceLoaderGetConfigVars( $vars );
+			unset( $vars['wgFbScript'] ); // not used outside of ResourceLoader
+		}
+		return true;
+	}
 	
 	/**
 	 * Hack: Run MakeGlobalVariablesScript for backwards compatability.
