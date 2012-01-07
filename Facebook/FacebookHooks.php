@@ -205,6 +205,18 @@ STYLE;
 			$out->addHeadItem('og:url',
 				'<meta property="og:url" content="' . $url . '" />' . "\n");
 			
+			// og:description
+			/*
+			 * TODO. This algorithm should work for vector. Start inside the rendered
+			 * page body, <div id="bodyContent">. Next, enter the actual body content,
+			 * <div class="mw-content-ltr">. Then, skip all tags that are not <p>. Now
+			 * that we have come to the actual page content, obtain the first sentence
+			 * inside the <p> tag and strip away all html tags.
+			 */
+			#$description = '';
+			#$out->addHeadItem('og:description',
+			#		'<meta property="og:description" content="' . $description . '" />' . "\n");
+			
 			// og:image - TODO: use first image on page, otherwise default to $wgLogo
 			$out->addHeadItem('og:image',
 				'<meta property="og:image" content="' . $wgServer . $wgLogo . '" />' . "\n");
