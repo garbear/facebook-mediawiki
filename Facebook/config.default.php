@@ -11,7 +11,7 @@
  *    4.  Copy the App ID, Secret and Namespace into this config file.
  *    5.  One more step... Inside the developer app scroll down, click the
  *        check next to "Website" and enter your wiki's URL.
- *    6   I lied, it's another step. Under Advanced settings, specify your
+ *    6.  I lied, it's another step. Under Advanced settings, specify your
  *        deauth callback: http://wiki.example.com/wiki/Special:Connect/Deauth
  *        This will disconnect users when they remove your app.
  * 
@@ -72,43 +72,40 @@ $wgFbOpenGraphRegisteredObjects = array(
 );
 
 /**
- * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
+ * Turns the wiki into a Facebook-only wiki. Additionally, you can hide IP
+ * addresses by setting $wgShowIPinHeader to false in LocalSettings.php. This
+ * setting has three side-effects:
  *    1.  All users are stripped of the 'createaccount' right. To override this
- *        behavior, see FacebookHooks::UserGetRights.
+ *        behavior, see UserGetRights() in FacebookHooks.php.
  *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
  *    3.  The "Log in / create account" links in the personal toolbar are removed.
- * 
- * If you have a Facebook-only wiki, you probably want to hide IP addresses. This
- * can be done by setting $wgShowIPinHeader to false in LocalSettings.php. For more
- * information, see <http://www.mediawiki.org/wiki/Manual:$wgShowIPinHeader>.
  */
 $wgFbDisableLogin = false;
 
 /**
  * For easier wiki rights management, create a group on Facebook and place the
  * group ID here. The "user_groups" right will automatically be requested from
- * users.
+ * users. Two new implicit groups will be created:
  * 
- * Two new implicit groups will be created:
+ *    fb-groupie     A member of the specified group
+ *    fb-admin       An administrator of the Facebook group
  * 
- *     fb-groupie    A member of the specified group
- *     fb-admin      An administrator of the Facebook group
- * 
- * By default, they map to User and Sysop privileges. Users will automatically
- * be promoted or demoted when their membership or admin status is modified
- * from the group page within Facebook. Unfortunately, this has a minor
- * degredation on performance.
+ * By default, they inherit priveleges from User and Sysop. Users will
+ * automatically be promoted or demoted when their status is modified from the
+ * group page within Facebook. Unfortunately, this has a minor degredation on
+ * performance.
  * 
  * This setting can also be used in conjunction with $wgFbDisableLogin. To have
- * this group exclusively control access to the wiki, set $wgFbDisableLogin
- * to true and add the following settings to Localsettings.php:
+ * this group exclusively control access to the wiki, set $wgFbDisableLogin to
+ * true and add the following settings to Localsettings.php:
  * 
  * # Disable reading and editing by anonymous users
  * $wgGroupPermissions['*']['edit'] = false;
  * $wgGroupPermissions['*']['read'] = false;
  * 
  * # Reserve normal wiki browsing for only Facebook group members (and admins)
- * $wgGroupPermissions['sysop'] = array_merge($wgGroupPermissions['sysop'], $wgGroupPermissions['user']);
+ * $wgGroupPermissions['sysop'] = array_merge($wgGroupPermissions['sysop'],
+ *                                            $wgGroupPermissions['user']);
  * $wgGroupPermissions['user'] = $wgGroupPermissions['*'];
  * 
  * # But allow all users to read these pages:
@@ -128,6 +125,10 @@ $wgFbSocialPlugins = true;
 /**
  * Shows the real name for all Facebook users in the personal toolbar (in the
  * upper right) instead of their wiki username.
+ * 
+ * I recommend not using this. People are more emotionally attached to things
+ * they "own", and owning their own username will draw people into your wiki
+ * while allowing them to express themselves.
  */
 $wgFbUseRealName = false;
 
