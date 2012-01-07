@@ -262,9 +262,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
 		
-		// Give Facebook some hints
-		$fbScript .= '#appId=' . $wgFbAppId .
-		             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
+		// Give Facebook some hints. Commented out because they don't affect anything...
+		#$fbScript .= '#appId=' . $wgFbAppId .
+		#             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		
 		return $fbScript;
 	}
