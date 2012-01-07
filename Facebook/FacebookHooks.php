@@ -163,7 +163,7 @@ STYLE;
 		global $wgFbOpenGraph;
 		if ( !empty( $wgFbOpenGraph ) ) {
 			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphObjects, $wgSitename,
-					$wgRequest, $wgLogo, $wgServer;
+					$wgRequest, $wgLogo, $wgServer, $wgLanguageCode;
 			
 			// fb:app_id
 			$out->addHeadItem('fb:app_id',
@@ -204,7 +204,10 @@ STYLE;
 			$out->addHeadItem('og:image',
 				'<meta property="og:image" content="' . $wgServer . $wgLogo . '" />' . "\n");
 			
-			// og:locale - TODO, higher priority
+			// og:locale
+			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLanguageCode );
+			$out->addHeadItem('og:locale',
+				'<meta property="og:locale" content="' . $locale . '" />' . "\n");
 			
 			// og:updated_time - TODO
 		}
