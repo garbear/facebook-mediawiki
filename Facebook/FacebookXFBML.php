@@ -80,12 +80,19 @@ class FacebookXFBML {
 	 * parser hook.
 	 */
 	static function implodeAttrs( $args ) {
-		$attrs = "";
+		$attrs = '';
 		// The default action is to strip all event handlers and allow the tag
 		foreach( $args as $name => $value ) {
-			// Disable all event handlers (e.g. onClick, onligin)
-			if ( substr( $name, 0, 2 ) == "on" )
+			// Disable all event handlers (e.g. onClick, onLogin)
+			if ( substr( $name, 0, 2 ) == 'on' )
 				continue;
+			
+			// Render perms="auto" and scope="auto" with the correct permissions
+			// TODO: allow fields param to be "auto" for <fb:registration>
+			if ( ( $name == 'perms' || $name == 'scope' ) && $value == 'auto' ) {
+				$value = FacebookAPI::getPermissions();
+			}
+			
 			// Otherwise, pass the attribute through htmlspecialchars unmodified
 			$attrs .= " $name=\"" . htmlspecialchars( $value ) . '"';
 		}
