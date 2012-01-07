@@ -104,8 +104,7 @@ $wgFbDisableLogin = false;
  * $wgGroupPermissions['*']['read'] = false;
  * 
  * # Reserve normal wiki browsing for only Facebook group members (and admins)
- * $wgGroupPermissions['sysop'] = array_merge($wgGroupPermissions['sysop'],
- *                                            $wgGroupPermissions['user']);
+ * $wgGroupPermissions['sysop'] = $wgGroupPermissions['sysop'] + $wgGroupPermissions['user'];
  * $wgGroupPermissions['user'] = $wgGroupPermissions['*'];
  * 
  * # But allow all users to read these pages:
