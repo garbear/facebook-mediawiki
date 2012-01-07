@@ -80,4 +80,23 @@ class FacebookAPI extends Facebook {
 		global $wgFbNamespace;
 		return !empty( $wgFbNamespace ) && $wgFbNamespace != 'YOUR_NAMESPACE';
 	}
+	
+	/**
+	 * Generates the Facebook permissions required for this application
+	 * dependent on the MediaWiki configuration parameters.
+	 */
+	static function getPermissions() {
+		global $wgEnableEmail, $wgFbUserRightsFromGroup, $wgFbOpenGraphRegisteredActions;
+		$scope = array();
+		if ( !empty( $wgEnableEmail ) ) {
+			$scope[] = 'email';
+		}
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
+			$scope[] = 'user_groups';
+		}
+		if ( !empty( $wgFbOpenGraphRegisteredActions ) ) {
+			$scope[] = 'publish_actions';
+		}
+		return implode( '', $scope );
+	}
 }

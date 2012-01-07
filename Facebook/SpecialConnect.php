@@ -451,9 +451,9 @@ class SpecialConnect extends SpecialPage {
 			// TODO
 			$html .= '<p>' . wfMsg( 'facebook-connect-text' ) . "<br/><br/></p>\n";
 		}
-		// TODO: consider bringing back FacebookInit::getPermissionsAttribute()
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
-		         '" max-rows="3" scope="email"></fb:login-button><br/><br/><br/>' . "\n";
+				'" max-rows="3" scope="' . FacebookAPI::getPermissions() .
+				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .
@@ -482,9 +482,9 @@ class SpecialConnect extends SpecialPage {
 		<h2>' . wfMsg( 'userlogin' ) . '</h2>
 		<p>' . wfMsg( 'facebook-only-text', $wgSitename ) . '<br/><br/></p>' . "\n";
 		
-		// TODO: consider bringing back FacebookInit::getPermissionsAttribute()
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
-		'" max-rows="3" scope="email,user_groups"></fb:login-button><br/><br/><br/>' . "\n";
+				'" max-rows="3" scope="' . FacebookAPI::getPermissions() .
+				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .

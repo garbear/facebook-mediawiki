@@ -332,6 +332,10 @@ STYLE;
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
+		$scope = FacebookAPI::getPermissions();
+		if ( !empty( $scope ) ) {
+			$vars['fbScope']  = $scope;
+		}
 		return true;
 	}
 	
