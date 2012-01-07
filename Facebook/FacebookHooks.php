@@ -776,7 +776,10 @@ STYLE;
 		}
 		
 		$head = '<head prefix="og: http://ogp.me/ns#';
-		#$head .= ' fb: http://ogp.me/ns/fb#'; // Unnecessary?
+		// I think this is for the fb:app_id and fp:page_id meta tags (see link),
+		// but your guess is as good as mine
+		// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
+		$head .= ' fb: http://ogp.me/ns/fb#';
 		if ( FacebookAPI::isNamespaceSetup() ) {
 			$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
 		}
