@@ -86,7 +86,8 @@ class FacebookAPI extends Facebook {
 	 * dependent on the MediaWiki configuration parameters.
 	 */
 	static function getPermissions() {
-		global $wgEnableEmail, $wgFbUserRightsFromGroup, $wgFbOpenGraphRegisteredActions;
+		global $wgEnableEmail, $wgFbUserRightsFromGroup, $wgFbOpenGraph,
+				$wgFbOpenGraphRegisteredActions;
 		$scope = array();
 		if ( !empty( $wgEnableEmail ) ) {
 			$scope[] = 'email';
@@ -94,7 +95,7 @@ class FacebookAPI extends Facebook {
 		if ( !empty( $wgFbUserRightsFromGroup ) ) {
 			$scope[] = 'user_groups';
 		}
-		if ( !empty( $wgFbOpenGraphRegisteredActions ) ) {
+		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
 			$scope[] = 'publish_actions';
 		}
 		return implode( '', $scope );
