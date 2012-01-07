@@ -239,7 +239,7 @@ STYLE;
 		}
 		
 		return true;
-	}
+	} // BeforePageDisplay hook
 	
 	/**
 	 * Fired when MediaWiki is updated (from the command line updater utility or,
@@ -294,7 +294,7 @@ STYLE;
 			}
 		}
 		return true;
-	}
+	} // LoadExtensionSchemaUpdates hook
 	
 	/**
 	 * Adds several Facebook Connect variables to the page:
@@ -334,7 +334,7 @@ STYLE;
 			$vars['fbScope']  = $scope;
 		}
 		return true;
-	}
+	} // MakeGlobalVariablesScript hook
 	
 	/**
 	 * Hack: Run MakeGlobalVariablesScript for backwards compatability.
@@ -374,6 +374,8 @@ STYLE;
 	 * PersonalUrls and MakeGlobalVariablesScript hooks can both use it. The
 	 * rationality behind this is that we only needs to pass the list of
 	 * Facebook permissions via JavaScript if the Login button is actually shown.
+	 * 
+	 * For now, we always pass the permissions in the fbScope variable.
 	 */
 	private static function showLogin() {
 		global $wgUser, $wgFbAlwaysShowLogin, $facebook;
@@ -436,20 +438,17 @@ STYLE;
 		}
 		
 		return true;
-	}
+	} // PersonalUrls hook
 	
 	/**
 	 * Modify the preferences form. At the moment, we simply turn the user name
 	 * into a link to the user's facebook profile.
 	 * 
-	 * TODO!
-	 */
+	 * TODO: This hook no longer seems to work...
+	 *
 	public static function RenderPreferencesForm( $form, $output ) {
-		//global $facebook, $wgUser;
+		global $facebook, $wgUser;
 		
-		// This hook no longer seems to work...
-		
-		/*
 		$ids = FacebookDB::getFacebookIDs($wgUser);
 		
 		$fb_user = $facebook->getUser();
@@ -474,10 +473,59 @@ STYLE;
 				}
 			}
 		}
-		/**/
+		return true;
+	} // RenderPreferencesForm hook
+	
+	/**
+	 * Add several meta property namespace attributes to the <head> tag.
+	 * 
+	 * This hook follows the steps outlined in the Open Graph Beta tutorial:
+	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
+	 */
+	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
+		global $wgFbOpenGraph, $wgFbNamespace;
+		// If there are no Open Graph tags, we can skip this step
+		if ( !empty( $wgFbOpenGraph ) ) {
+			$head = '<head prefix="og: http://ogp.me/ns#';
+			// I think this is for the fb:app_id and fp:page_id meta tags (see link),
+			// but your guess is as good as mine
+			// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
+			$head .= ' fb: http://ogp.me/ns/fb#';
+			if ( FacebookAPI::isNamespaceSetup() ) {
+				$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
+			}
+			$head .= '">';
+			
+			$headElement = $tpl->data['headelement'];
+			$headElement = str_replace('<head>', $head, $headElement);
+			$tpl->set( 'headelement', $headElement );
+		}
 		return true;
 	}
-
+	
+	/**
+	 * This hook is unused.
+	 *
+	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
+		global $wgRequest, $wgUser, $wgServer, $facebook;
+		wfLoadExtensionMessages('Facebook');
+		$pref = Title::newFromText('Preferences', NS_SPECIAL);
+		if ($wgRequest->getVal('fbconnected', '') == 1) {
+			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
+			if( count($id) > 0 ) {
+				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
+				$msg .= "<p>".wfMsg('facebook-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
+			}
+		}
+		if ($wgRequest->getVal('fbconnected', '') == 2) {
+			if( strlen($facebook->getUser()) < 1 ) {
+				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
+				$msg .= "<p>".wfMsgExt('facebook-connect-error-msg', 'parse', array("$1" => $pref->getFullUrl() ))."</p>";
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * Adds the class "mw-userlink" to links belonging to Connect accounts on
 	 * the page Special:ListUsers.
@@ -506,7 +554,7 @@ STYLE;
 	/**
 	 * Adds some info about the governing Facebook group to the header form of
 	 * Special:ListUsers.
-	 */
+	 *
 	// r274: Fix error with PHP 5.3 involving parameter references (thanks, PChott)
 	static function SpecialListusersHeaderForm( $pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook;
@@ -514,7 +562,6 @@ STYLE;
 		if ( !empty( $wgFbUserRightsFromGroup ) ) {
 			// TODO: Do we need to verify the Facebook session here?
 			
-			/*
 			$gid = $wgFbUserRightsFromGroup;
 			// Connect to the API and get some info about the group
 			try {
@@ -538,10 +585,9 @@ STYLE;
 		</td>
 	</tr>
 </table>";
-			*/
 		}
 		return true;
-	}
+	} // SpecialListusersHeaderForm hook
 	
 	/**
 	 * Removes Special:UserLogin and Special:CreateAccount from the list of
@@ -608,6 +654,7 @@ STYLE;
 		// Only override if no password exists and the old password ($hash) is blank
 		if ( $hash == '' && $password == '' && $userId ) {
 			// Only check for password on Special:ChangePassword
+			// TODO: should we use RequestContext::getMain()->getTitle() instead?
 			$title = $wgUser->getSkin()->getTitle();
 			if ( $title instanceof Title && $title->isSpecial('Resetpass') ) {
 				// Check to see if the MediaWiki user has connected via Facebook
@@ -747,7 +794,7 @@ STYLE;
 			);
 		}
 		return true;
-	}
+	} // initPreferencesExtensionForm hook
 	
 	/**
 	 * Add Facebook HTML to AJAX script.
@@ -761,56 +808,6 @@ STYLE;
 		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
 		$tmpl->set( 'fbButtton', FacebookInit::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
 		$html = $tmpl->execute( 'ajaxLoginMerge' );
-		return true;
-	}
-	
-	/**
-	 * Add several meta property namespace attributes to the <head> tag.
-	 * 
-	 * This hook follows the steps outlined in the Open Graph Beta tutorial:
-	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
-	 */
-	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
-		global $wgFbOpenGraph, $wgFbNamespace;
-		// If there are no Open Graph tags, we can skip this step
-		if ( !empty( $wgFbOpenGraph ) ) {
-			$head = '<head prefix="og: http://ogp.me/ns#';
-			// I think this is for the fb:app_id and fp:page_id meta tags (see link),
-			// but your guess is as good as mine
-			// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
-			$head .= ' fb: http://ogp.me/ns/fb#';
-			if ( FacebookAPI::isNamespaceSetup() ) {
-				$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
-			}
-			$head .= '">';
-			
-			$headElement = $tpl->data['headelement'];
-			$headElement = str_replace('<head>', $head, $headElement);
-			$tpl->set( 'headelement', $headElement );
-		}
-		return true;
-	}
-	
-	/**
-	 * This hook is unused.
-	 *
-	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
-		global $wgRequest, $wgUser, $wgServer, $facebook;
-		wfLoadExtensionMessages('Facebook');
-		$pref = Title::newFromText('Preferences', NS_SPECIAL);
-		if ($wgRequest->getVal('fbconnected', '') == 1) {
-			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
-			if( count($id) > 0 ) {
-				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
-				$msg .= "<p>".wfMsg('facebook-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
-			}
-		}
-		if ($wgRequest->getVal('fbconnected', '') == 2) {
-			if( strlen($facebook->getUser()) < 1 ) {
-				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
-				$msg .= "<p>".wfMsgExt('facebook-connect-error-msg', 'parse', array("$1" => $pref->getFullUrl() ))."</p>";
-			}
-		}
 		return true;
 	}
 	/**/
