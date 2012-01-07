@@ -465,6 +465,8 @@ class FacebookUser {
 		}
 		
 		// Default to automatically login Facebook users
+		// TODO: Don't remember password for Facebook users! If their access_token is
+		// invalidated, we need to get a new one by having them click "login" again
 		$this->user->setOption( 'rememberpassword', 1 ); 
 		//$this->user->setOption( 'skinoverwrite', 1 ); // Wikia code
 		
@@ -518,7 +520,7 @@ class FacebookUser {
 						$this->user->setRealName($value);
 						break;
 					case 'email':
-						if (is_null($this->user->mEmailAuthenticated) || $value != $this->user->getEmail()) {
+						if ( $value != $this->user->getEmail() ) {
 							$this->user->setEmail($value);
 							// Auto-authenticate email address if it was changed
 							$this->user->mEmailAuthenticated = wfTimestampNow();
@@ -607,9 +609,7 @@ class FacebookUser {
 				break;
 			case 'email':
 				// For information on emails, see <https://www.facebook.com/help/?page=216574428360510>
-				// TODO: if the user's email is updated from Facebook, then
-				// automatically authenticate the email address
-				#$user->mEmailAuthenticated = wfTimestampNow();
+				break;
 		}
 		// If an appropriate value was found, return it
 		return $value == '' ? null : $value;
