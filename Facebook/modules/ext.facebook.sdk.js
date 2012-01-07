@@ -29,7 +29,7 @@
 	if (window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw) {
 		// Boo. No async loading. ResourceLoader Version 2 Design Specification mentions
 		// a possible future implementation for asynchronous, non-blocking requests that
-		// download, parse and execute the script simultaneous to document parsing.
+		// download, parse and execute the script concurrent to document parsing.
 		/*
 		mw.loader.load(mw.config.get('fbScript')); // Boo. No async loading
 		*/
