@@ -106,9 +106,9 @@ class FacebookHooks {
 			$out->prependHTML('
 				<div id="fb-root"></div>
 <script type="' . $wgJsMimeType . '">
-(function(d){var js,id="facebook-jssdk";if(!d.getElementById(id)){js=d.createElement("script");' .
-'js.id=id;js.async=true;js.type="' . $wgJsMimeType . '";js.src="' . $fbScript .
-'";d.getElementsByTagName("head")[0].appendChild(js);}}(document));
+(function(d){var js;js=d.createElement("script");js.async=true;js.type="' .
+$wgJsMimeType . '";js.src="' . $fbScript .
+'";d.getElementsByTagName("head")[0].appendChild(js);}(document));
 </script>' . "\n"
 			);
 		}
