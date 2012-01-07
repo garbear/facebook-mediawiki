@@ -162,8 +162,8 @@ STYLE;
 		// Add open graph tags to articles
 		global $wgFbOpenGraph;
 		if ( !empty( $wgFbOpenGraph ) ) {
-			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphObjects, $wgSitename,
-					$wgRequest, $wgLogo, $wgServer, $wgLanguageCode;
+			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphRegisteredObjects,
+					$wgSitename, $wgRequest, $wgLogo, $wgServer, $wgLanguageCode;
 			
 			$title = Title::newFromText( $wgRequest->getVal( 'title' ) );
 			
@@ -178,16 +178,21 @@ STYLE;
 			}
 			
 			// og:type
-			if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraphObjects ) ) {
-				if ( $title->canExist() ) {
-					// Don't consider NS_SPECIAL and NS_MEDIA to be articles
-					$object = 'article'; // TODO: dynamically determine this
+			if ( $title->canExist() ) {
+				// Don't consider NS_SPECIAL and NS_MEDIA to be articles
+				$object = 'article'; // TODO: dynamically determine this
+			} else {
+				$object = null;
+			}
+			if ( !empty( $object ) ) {
+				if (FacebookAPI::isNamespaceSetup() && !empty($wgFbOpenGraphRegisteredObjects) &&
+						!empty($wgFbOpenGraphRegisteredObjects[$object]) ) {
+					$og_type = $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredObjects[$object];
+				} else {
+					$og_type = $object;
 				}
-				if ( !empty( $object ) && isset( $wgFbOpenGraphObjects[$object] ) ) {
-					$out->addHeadItem('og:type',
-						'<meta property="og:type" content="' . $wgFbNamespace . ':' .
-						$wgFbOpenGraphObjects[$object] . '" />' . "\n");
-				}
+				$out->addHeadItem('og:type',
+					'<meta property="og:type" content="' . $og_type . '" />' . "\n");
 			}
 			
 			// og:site_name

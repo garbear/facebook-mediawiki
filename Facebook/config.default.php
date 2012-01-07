@@ -35,33 +35,40 @@ $wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
- * Enables Facebook Open Graph Protocol. "The Open Graph Protocol enables you
- * to integrate your Web pages into the social graph."
+ * Enables Facebook's Open Graph Protocol. This will integrate your wiki into the
+ * social graph. To verify that this process is working, go to the Object Debugger:
+ * https://developers.facebook.com/tools/debug
  * 
- * https://developers.facebook.com/docs/opengraph/
+ * For more info, see: https://developers.facebook.com/docs/opengraph/
  * 
- * This parameter is incompatible with $wgHtml5. If set, $wgHtml5 will be
+ * N.B. This parameter is incompatible with $wgHtml5. If set, $wgHtml5 will be
  * automatically disabled.
  */
 $wgFbOpenGraph = true;
 
 /**
- * If you have defined Open Graph actions and objects for the supported types
- * below, you can name them here. This can be done from the Open Graph
- * dashboard in your app's settings. If you have no clue about any of this, you
- * can leave these parameters as their default values.
+ * If you have registered Open Graph actions and objects for the supported types
+ * below, you can define them here. Registration can be done from the Open Graph
+ * dashboard in your app's settings. If you are completely clueless, you can
+ * leave these values undefined and this extension will "do the right thing" (TM).
+ * 
+ * If you registered and defined everything correctly, the Object Debugger above
+ * should not show any errors.
  * 
  * $wgFbOpenGraphActions currently has no effect. In the future, it will allow
  * actions to be pushed to a user's timeline.
+ * 
+ * If you have more ideas for Facebook Actions, please contact me on GitHub. I'm
+ * open to creative suggestions. https://github.com/garbear
  */
-#$wgFbOpenGraphActions = array(
+#$wgFbOpenGraphRegisteredActions = array(
 #	'edit'   => 'edit',
 #	'tweak'  => 'tweak', # for a minor edit
 #	'watch'  => 'watch',
 #	'upload' => 'upload',
 #);
-$wgFbOpenGraphObjects = array(
-	'article' => 'article', # Or false to disable Open Graph tag
+$wgFbOpenGraphRegisteredObjects = array(
+	#'article' => 'article', # Uncomment this after registering an "article" object in the Dev App
 );
 
 /**
