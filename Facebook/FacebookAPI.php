@@ -91,15 +91,19 @@ class FacebookAPI extends Facebook {
 	static function getPermissions() {
 		global $wgEnableEmail, $wgFbUserRightsFromGroup, $wgFbOpenGraph,
 				$wgFbOpenGraphRegisteredActions;
-		$scope = array();
-		if ( !empty( $wgEnableEmail ) ) {
-			$scope[] = 'email';
-		}
-		if ( !empty( $wgFbUserRightsFromGroup ) ) {
-			$scope[] = 'user_groups';
-		}
-		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
-			$scope[] = 'publish_actions';
+		
+		static $scope = array();
+		if (empty( $scope ) ) {
+			if ( !empty( $wgEnableEmail ) ) {
+				$scope[] = 'email';
+			}
+			if ( !empty( $wgFbUserRightsFromGroup ) ) {
+				$scope[] = 'user_groups';
+			}
+			if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
+				$scope[] = 'publish_actions';
+			}
+			wfRunHooks( 'FacebookPermissions', array( &$scope ) );
 		}
 		return implode( ',', $scope );
 	}
