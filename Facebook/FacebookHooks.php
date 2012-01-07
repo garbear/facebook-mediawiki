@@ -35,17 +35,14 @@ class FacebookHooks {
 		// If the page being viewed is a user page
 		if ( $nt instanceof Title && $nt->getNamespace() == NS_USER &&
 				strpos( $nt->getText(), '/' ) === false ) {
-			$user = User::newFromName($nt->getText());
-			if (!$user || $user->getID() == 0) {
-				return true;
+			$user = User::newFromName( $nt->getText() );
+			if ( $user instanceof User && $user->getID() ) {
+				$fb_ids = FacebookDB::getFacebookIDs( $user->getId() );
+				if ( count($fb_ids) ) {
+					$fb_id = $fb_ids[0];
+					// TODO: Something with the Facebook ID stored in $fb_id
+				}
 			}
-			$fb_ids = FacebookDB::getFacebookIDs($user->getId());
-			if ( !count($fb_ids) ) {
-				return true;
-			}
-			$fb_id = $fb_ids[0]; // possibly multiple Facebook accounts associated with this user
-			// TODO: Something with the Facebook ID stored in $fb_id
-			return true;
 		}
 		return true;
 	}
@@ -393,6 +390,7 @@ STYLE;
 		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
 		wfLoadExtensionMessages('Facebook');
 		
+		// Transmogrify usernames into real names
 		if ( $wgUser->isLoggedIn() && !empty( $wgFbUseRealName ) ) {
 			$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 			if ( count( $fb_ids ) ) {
@@ -410,6 +408,7 @@ STYLE;
 			}
 		}
 		
+		// Render a Log in with Facebook button
 		if ( self::showLogin() ) {
 			if ( isset( $personal_urls['logout'] ) ) {
 				// Place the convert button before the logout link
@@ -427,8 +426,8 @@ STYLE;
 			}
 		}
 		
+		// Remove other personal toolbar links 
 		if ( !$wgUser->isLoggedIn() && !empty( $wgFbDisableLogin ) ) {
-			// Remove other personal toolbar links
 			foreach (array('login', 'anonlogin') as $k) {
 				if (array_key_exists($k, $personal_urls)) {
 					unset($personal_urls[$k]);
@@ -487,21 +486,19 @@ STYLE;
 		global $fbSpecialUsers;
 		
 		// Only modify Facebook Connect users
-		if (empty( $fbSpecialUsers ) ||
-				!count(FacebookDB::getFacebookIDs(User::newFromName($row->user_name)))) {
-			return true;
-		}
-		
-		// Look to see if class="..." appears in the link
-		$regs = array();
-		preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
-		if (count( $regs )) {
-			// If so, append " mw-userlink" to the end of the class list
-			$item = $regs[1] . "class=$regs[2]$regs[3] mw-userlink$regs[2]" . $regs[4];
-		} else {
-			// Otherwise, stick class="mw-userlink" into the link just before the '>'
-			preg_match( '/^([^>]*)(.*)/', $item, $regs );
-			$item = $regs[1] . ' class="mw-userlink"' . $regs[2];
+		if ( !empty( $fbSpecialUsers ) &&
+				count(FacebookDB::getFacebookIDs(User::newFromName($row->user_name)))) {
+			// Look to see if class="..." appears in the link
+			$regs = array();
+			preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
+			if (count( $regs )) {
+				// If so, append " mw-userlink" to the end of the class list
+				$item = $regs[1] . "class=$regs[2]$regs[3] mw-userlink$regs[2]" . $regs[4];
+			} else {
+				// Otherwise, stick class="mw-userlink" into the link just before the '>'
+				preg_match( '/^([^>]*)(.*)/', $item, $regs );
+				$item = $regs[1] . ' class="mw-userlink"' . $regs[2];
+			}
 		}
 		return true;
 	}
@@ -514,37 +511,35 @@ STYLE;
 	static function SpecialListusersHeaderForm( $pager, &$out ) {
 		global $wgFbUserRightsFromGroup, $facebook;
 		
-		if ( empty( $wgFbUserRightsFromGroup ) ) {
-			return true;
+		if ( !empty( $wgFbUserRightsFromGroup ) ) {
+			// TODO: Do we need to verify the Facebook session here?
+			
+			/*
+			$gid = $wgFbUserRightsFromGroup;
+			// Connect to the API and get some info about the group
+			try {
+				$group = $facebook->api('/' . $gid);
+			} catch (FacebookApiException $e) {
+				error_log($e);
+				return true;
+			}
+			$out .= '
+<table style="border-collapse: collapse;">
+	<tr>
+		<td>
+			' . wfMsgWikiHtml( 'facebook-listusers-header',
+			wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
+			"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$group[name]</a>",
+			"<a href=\"http://www.facebook.com/profile.php?id={$group['owner']['id']}\" " .
+			"class=\"mw-userlink\">{$group['owner']['name']}</a>") . "
+		</td>
+		<td>
+			<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
+		</td>
+	</tr>
+</table>";
+			*/
 		}
-		
-		// TODO: Do we need to verify the Facebook session here?
-		
-		/*
-		$gid = $wgFbUserRightsFromGroup;
-		// Connect to the API and get some info about the group
-		try {
-			$group = $facebook->api('/' . $gid);
-		} catch (FacebookApiException $e) {
-			error_log($e);
-			return true;
-		}
-		$out .= '
-			<table style="border-collapse: collapse;">
-				<tr>
-					<td>
-						' . wfMsgWikiHtml( 'facebook-listusers-header',
-						wfMsg( 'group-bureaucrat-member' ), wfMsg( 'group-sysop-member' ),
-						"<a href=\"http://www.facebook.com/group.php?gid=$gid\">$group[name]</a>",
-						"<a href=\"http://www.facebook.com/profile.php?id={$group['owner']['id']}\" " .
-						"class=\"mw-userlink\">{$group['owner']['name']}</a>") . "
-					</td>
-					<td>
-						<img src=\"https://graph.facebook.com/$gid/picture?type=large\" title=\"$group[name]\" alt=\"$group[name]\">
-					</td>
-				</tr>
-			</table>";
-		*/
 		return true;
 	}
 	
@@ -610,22 +605,21 @@ STYLE;
 	 */
 	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
 		global $wgUser;
-		// Only allow the override if no password exists and a blank old password was specified
-		if ( $hash != '' || $password != '' || !$userId ) {
-			return true;
-		}
-		// Only check for password on Special:ChangePassword
-		$title = $wgUser->getSkin()->getTitle();
-		if ( $title instanceof Title && $title->isSpecial('Resetpass') ) {
-			// Check to see if the MediaWiki user has connected via Facebook before
-			// For a more strict check, we could check if the user is currently logged in to Facebook
-			$user = User::newFromId( $userId );
-			$fb_ids = FacebookDB::getFacebookIDs($user);
-			if (count($fb_ids) == 0 || !$fb_ids[0]) {
-				return true;
+		// Only override if no password exists and the old password ($hash) is blank
+		if ( $hash == '' && $password == '' && $userId ) {
+			// Only check for password on Special:ChangePassword
+			$title = $wgUser->getSkin()->getTitle();
+			if ( $title instanceof Title && $title->isSpecial('Resetpass') ) {
+				// Check to see if the MediaWiki user has connected via Facebook
+				// before. For a more strict check, we could check if the user
+				// is currently logged in to Facebook
+				$user = User::newFromId( $userId );
+				$fb_ids = FacebookDB::getFacebookIDs($user);
+				if ( count($fb_ids) && $fb_ids[0] ) {
+					$result = true;
+					return false; // to override internal check
+				}
 			}
-			$result = true;
-			return false; // to override internal check
 		}
 		return true;
 	}
@@ -640,13 +634,12 @@ STYLE;
 		if ( !empty( $wgFbDisableLogin ) ) {
 			// If you would like sysops to still be able to create accounts
 			$whitelistSysops = false;
-			if ($whitelistSysops && in_array( 'sysop', $user->getGroups() )) {
-				return true;
-			}
-			foreach ( $aRights as $i => $right ) {
-				if ( $right == 'createaccount' ) {
-					unset( $aRights[$i] );
-					break;
+			if ( !$whitelistSysops || !in_array( 'sysop', $user->getGroups() ) ) {
+				foreach ( $aRights as $i => $right ) {
+					if ( $right == 'createaccount' ) {
+						unset( $aRights[$i] );
+						break;
+					}
 				}
 			}
 		}
@@ -779,31 +772,28 @@ STYLE;
 	 */
 	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
 		global $wgFbOpenGraph, $wgFbNamespace;
-		if ( empty( $wgFbOpenGraph ) ) {
-			// No Open Graph tags, skip this step
-			return true;
+		// If there are no Open Graph tags, we can skip this step
+		if ( !empty( $wgFbOpenGraph ) ) {
+			$head = '<head prefix="og: http://ogp.me/ns#';
+			// I think this is for the fb:app_id and fp:page_id meta tags (see link),
+			// but your guess is as good as mine
+			// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
+			$head .= ' fb: http://ogp.me/ns/fb#';
+			if ( FacebookAPI::isNamespaceSetup() ) {
+				$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
+			}
+			$head .= '">';
+			
+			$headElement = $tpl->data['headelement'];
+			$headElement = str_replace('<head>', $head, $headElement);
+			$tpl->set( 'headelement', $headElement );
 		}
-		
-		$head = '<head prefix="og: http://ogp.me/ns#';
-		// I think this is for the fb:app_id and fp:page_id meta tags (see link),
-		// but your guess is as good as mine
-		// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
-		$head .= ' fb: http://ogp.me/ns/fb#';
-		if ( FacebookAPI::isNamespaceSetup() ) {
-			$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
-		}
-		$head .= '">';
-		
-		$headElement = $tpl->data['headelement'];
-		$headElement = str_replace('<head>', $head, $headElement);
-		$tpl->set( 'headelement', $headElement );
 		return true;
 	}
 	
 	/**
-	 * 
+	 * This hook is unused.
 	 *
-	// TODO
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
 		global $wgRequest, $wgUser, $wgServer, $facebook;
 		wfLoadExtensionMessages('Facebook');
@@ -811,12 +801,10 @@ STYLE;
 		if ($wgRequest->getVal('fbconnected', '') == 1) {
 			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
 			if( count($id) > 0 ) {
-				// TODO
 				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
 				$msg .= "<p>".wfMsg('facebook-connect-msg', array("$1" => $pref->getFullUrl() ))."</p>";
 			}
 		}
-		// TODO
 		if ($wgRequest->getVal('fbconnected', '') == 2) {
 			if( strlen($facebook->getUser()) < 1 ) {
 				$msg =  Xml::element("img", array("id" => "fbMsgImage", "src" => $wgServer.'/skins/common/fbconnect/fbiconbig.png' ));
