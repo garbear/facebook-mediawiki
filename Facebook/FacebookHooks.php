@@ -165,6 +165,8 @@ STYLE;
 			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphObjects, $wgSitename,
 					$wgRequest, $wgLogo, $wgServer, $wgLanguageCode;
 			
+			$title = Title::newFromText( $wgRequest->getVal( 'title' ) );
+			
 			// fb:app_id
 			$out->addHeadItem('fb:app_id',
 				'<meta property="fb:app_id" content="' . $wgFbAppId . '" />' . "\n");
@@ -190,13 +192,13 @@ STYLE;
 				'<meta property="og:site_name" content="' . $wgSitename . '" />' . "\n");
 			
 			// og:title
-			$title = Title::newFromText( $wgRequest->getVal( 'title' ) )->getPrefixedText();
+			$titleStr = $title->getPrefixedText();
 			//$ns = ($title->getNsText() != '' ? $title->getNsText() . ':' : '');
 			$out->addHeadItem('og:title',
-				'<meta property="og:title" content="' . $title . '" />' . "\n");
+				'<meta property="og:title" content="' . $titleStr . '" />' . "\n");
 			
 			// og:url
-			$url = Title::newFromText( $title )->getFullURL(); // no additional params
+			$url = Title::newFromText( $titleStr )->getFullURL(); // no additional params
 			$out->addHeadItem('og:url',
 				'<meta property="og:url" content="' . $url . '" />' . "\n");
 			
@@ -209,7 +211,11 @@ STYLE;
 			$out->addHeadItem('og:locale',
 				'<meta property="og:locale" content="' . $locale . '" />' . "\n");
 			
-			// og:updated_time - TODO
+			// og:updated_time
+			$article = new Article( $title, 0 );
+			$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
+			$out->addHeadItem('og:updated_time',
+					'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
 		}
 		
 		return true;
