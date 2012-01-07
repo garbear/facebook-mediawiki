@@ -33,7 +33,8 @@ class FacebookHooks {
 		// Get the article title
 		$nt = $article->getTitle();
 		// If the page being viewed is a user page
-		if ($nt && $nt->getNamespace() == NS_USER && strpos($nt->getText(), '/') === false) {
+		if ( $nt instanceof Title && $nt->getNamespace() == NS_USER &&
+				strpos( $nt->getText(), '/' ) === false ) {
 			$user = User::newFromName($nt->getText());
 			if (!$user || $user->getID() == 0) {
 				return true;
@@ -80,12 +81,12 @@ class FacebookHooks {
 	/**
 	 * Injects some important CSS and Javascript into the <head> of the page.
 	 */
-	public static function BeforePageDisplay( &$out, &$sk ) {
+	public static function BeforePageDisplay( &$out, &$skin ) {
 		global $wgUser, $wgVersion, $wgFbLogo, $wgFbScript, $wgFbExtensionScript,
 				$wgJsMimeType, $wgStyleVersion;
 		
 		// Wikiaphone skin for mobile device doesn't need JS or CSS additions 
-		if ( get_class( $wgUser->getSkin() ) === 'SkinWikiaphone' )
+		if ( get_class( $skin ) === 'SkinWikiaphone' )
 			return true;
 		
 		// Check to see if we should localize the JS SDK
@@ -159,13 +160,12 @@ STYLE;
 			}
 		}
 		
-		// Add open graph tags to articles
+		// Add Open Graph tags to articles
 		global $wgFbOpenGraph;
-		if ( !empty( $wgFbOpenGraph ) ) {
+		$title = $skin->getTitle();
+		if ( !empty( $wgFbOpenGraph ) && ( $title instanceof Title ) ) {
 			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphRegisteredObjects,
-					$wgSitename, $wgRequest, $wgLogo, $wgServer, $wgLanguageCode;
-			
-			$title = Title::newFromText( $wgRequest->getVal( 'title' ) );
+					$wgSitename, $wgLogo, $wgServer, $wgLanguageCode;
 			
 			// fb:app_id
 			$out->addHeadItem('fb:app_id',
@@ -609,24 +609,25 @@ STYLE;
 	 * unless they request one over email.
 	 */
 	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
-		global $wgRequest;
+		global $wgUser;
 		// Only allow the override if no password exists and a blank old password was specified
 		if ( $hash != '' || $password != '' || !$userId ) {
 			return true;
 		}
 		// Only check for password on Special:ChangePassword
-		if (!Title::newFromText($wgRequest->getVal('title'))->isSpecial('Resetpass')) {
-			return true;
+		$title = $wgUser->getSkin()->getTitle();
+		if ( $title instanceof Title && $title->isSpecial('Resetpass') ) {
+			// Check to see if the MediaWiki user has connected via Facebook before
+			// For a more strict check, we could check if the user is currently logged in to Facebook
+			$user = User::newFromId( $userId );
+			$fb_ids = FacebookDB::getFacebookIDs($user);
+			if (count($fb_ids) == 0 || !$fb_ids[0]) {
+				return true;
+			}
+			$result = true;
+			return false; // to override internal check
 		}
-		// Check to see if the MediaWiki user has connected via Facebook before
-		// For a more strict check, we could check if the user is currently logged in to Facebook
-		$user = User::newFromId( $userId );
-		$fb_ids = FacebookDB::getFacebookIDs($user);
-		if (count($fb_ids) == 0 || !$fb_ids[0]) {
-			return true;
-		}
-		$result = true;
-		return false; // to override internal check
+		return true;
 	}
 	
 	/**
@@ -659,11 +660,12 @@ STYLE;
 	 * This hook was added in MediaWiki 1.14.
 	 */
 	static function UserLoadAfterLoadFromSession( $user ) {
-		global $wgFbDisableLogin, $wgRequest;
+		global $wgFbDisableLogin;
 		
 		// Don't mess with authentication on Special:Connect
-		if ( !empty($wgFbDisableLogin) && $user->isLoggedIn() &&
-				!Title::newFromText($wgRequest->getVal('title'))->isSpecial('Connect') ) {
+		$title = $user->getSkin()->getTitle();
+		if ( !empty( $wgFbDisableLogin ) && $user->isLoggedIn() &&
+				$title instanceof Title && !$title->isSpecial('Connect') ) {
 			$fbUser = new FacebookUser();
 			
 			// If possible, force a preemptive ping to Facebook's servers. Otherwise, we
@@ -681,9 +683,10 @@ STYLE;
 	 * Called when the user is logged out to log them out of Facebook as well.
 	 *
 	static function UserLogoutComplete( &$user, &$inject_html, $old_name ) {
-		global $facebook, $wgRequest;
-		if ( $facebook->getUser() &&
-				Title::newFromText($wgRequest->getVal('title'))->isSpecial('Userlogout') ) {
+		global $facebook, $wgUser;
+		$title = $wgUser->getSkin()->getTitle();
+		if ( $facebook->getUser() && $title instanceof Title &&
+				$title->isSpecial('Userlogout') ) {
 			// Only log the user out if it's the right user
 			$fbUser = new FacebookUser();
 			if ( $fbUser->getMWUser()->getName() == $old_name ) {
@@ -774,7 +777,7 @@ STYLE;
 	 * This hook follows the steps outlined in the Open Graph Beta tutorial:
 	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
 	 */
-	static function SkinTemplateOutputPageBeforeExec(&$sk, &$tpl) {
+	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
 		global $wgFbOpenGraph, $wgFbNamespace;
 		if ( empty( $wgFbOpenGraph ) ) {
 			// No Open Graph tags, skip this step
