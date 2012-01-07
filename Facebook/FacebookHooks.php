@@ -179,8 +179,11 @@ STYLE;
 			
 			// og:type
 			if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraphObjects ) ) {
-				$object = 'article'; // TODO: dynamically determine this
-				if ( isset( $wgFbOpenGraphObjects[$object] ) ) {
+				if ( $title->canExist() ) {
+					// Don't consider NS_SPECIAL and NS_MEDIA to be articles
+					$object = 'article'; // TODO: dynamically determine this
+				}
+				if ( !empty( $object ) && isset( $wgFbOpenGraphObjects[$object] ) ) {
 					$out->addHeadItem('og:type',
 						'<meta property="og:type" content="' . $wgFbNamespace . ':' .
 						$wgFbOpenGraphObjects[$object] . '" />' . "\n");
