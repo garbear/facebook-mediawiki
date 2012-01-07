@@ -23,6 +23,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+// Load the Facebook PHP SDK
+require_once dirname( __FILE__ ) . '/facebook-php-sdk/facebook.php';
+
 
 /**
  * Class FacebookAPI

@@ -68,8 +68,6 @@ include_once $dir . 'config.default.php';
 if (file_exists( $dir . 'config.php' )) {
 	require_once $dir . 'config.php';
 }
-// Load the PHP SDK
-require_once $dir . 'facebook-php-sdk/facebook.php';
 
 // Install the extension
 $wgExtensionFunctions[] = 'FacebookInit::init';
