@@ -87,26 +87,27 @@ class FacebookHooks {
 			return true;
 		
 		// Check to see if we should localize the JS SDK
-		if (strpos( $wgFbScript, FACEBOOK_LOCALE ) !== false) {
+		$fbScript = $wgFbScript;
+		if (strpos( $fbScript, FACEBOOK_LOCALE ) !== false) {
 			wfProfileIn( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 			// NOTE: Can't use $wgLanguageCode here because the same Facebook config can
 			// run for many $wgLanguageCode's on one site (such as Wikia).
 			global $wgLang;
 			// Attempt to find a matching Facebook locale
 			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLang->getCode() );
-			$wgFbScript = str_replace( FACEBOOK_LOCALE, $locale, $wgFbScript );
+			$fbScript = str_replace( FACEBOOK_LOCALE, $locale, $fbScript );
 			wfProfileOut( __METHOD__ . '::fb-locale-by-mediawiki-lang' );
 		}
 		
 		// Asynchronously load the Facebook JavaScript SDK before the page's content
 		// See <https://developers.facebook.com/docs/reference/javascript>
 		global $wgNoExternals;
-		if ( !empty($wgFbScript) && empty($wgNoExternals) ) {
+		if ( !empty($fbScript) && empty($wgNoExternals) ) {
 			$out->prependHTML('
 				<div id="fb-root"></div>
 <script type="' . $wgJsMimeType . '">
 (function(d){var js,id="facebook-jssdk";if(!d.getElementById(id)){js=d.createElement("script");' .
-'js.id=id;js.async=true;js.type="' . $wgJsMimeType . '";js.src="' . $wgFbScript .
+'js.id=id;js.async=true;js.type="' . $wgJsMimeType . '";js.src="' . $fbScript .
 '";d.getElementsByTagName("head")[0].appendChild(js);}}(document));
 </script>' . "\n"
 			);
