@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright ï¿½ 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -256,7 +256,7 @@ STYLE;
 	 * <http://svn.wikimedia.org/viewvc/mediawiki?view=revision&revision=71140>
 	 */
 	static function LoadExtensionSchemaUpdates( $updater = null ) {
-		global $wgSharedDB, $wgDBname, $wgDBtype, $wgDBprefix;
+		global $wgSharedDB, $wgDBname, $wgDBtype;
 		// Don't create tables on a shared database
 		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
 			return true;
@@ -276,21 +276,21 @@ STYLE;
 			default:
 				$ext = 'sql';
 		}
-		// Do the updating
-		foreach ( $tables as $table ) {
-			if ( $wgDBprefix ) {
-				$table = $wgDBprefix . $table;
-			}
-			// Location of the table schema file
-			$schema = "$sql/$table.$ext";
-			// If we're using the new version of the LoadExtensionSchemaUpdates hook
-			if ( $updater !== null ) {
-				// >= 1.17 support
-				$updater->addExtensionUpdate( array( 'addTable', $table, $schema, true ) );
-			} else {
-				// <= 1.16 support
-				global $wgExtNewTables;
+		// Do the updating - based on version
+		if ( $updater == null ) {
+			// <= 1.16 support
+			global $wgExtNewTables;
+			foreach ( $tables as $table ) {
+				// Location of the table schema file
+				$schema = "$sql/$table.$ext";
 				$wgExtNewTables[] = array( $table, $schema );
+			}
+		} else {
+			// >= 1.17 support
+			foreach ( $tables as $table ) {
+				// Location of the table schema file
+				$schema = "$sql/$table.$ext";
+				$updater->addExtensionUpdate( array( 'addTable', $table, $schema, true ) );
 			}
 		}
 		return true;
