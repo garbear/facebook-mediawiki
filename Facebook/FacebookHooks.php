@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright ï¿½ 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -261,36 +261,41 @@ STYLE;
 		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
 			return true;
 		}
-		// Tables to add to the database
-		$tables = array( 'user_fbconnect' /*, 'fbconnect_event_stats', 'fbconnect_event_show'*/ );
-		// Sql directory inside the extension folder
-		$sql = dirname( __FILE__ ) . '/sql';
-		// Extension of the table schema file (depending on the database type)
-		switch ( $updater !== null ? $updater->getDB()->getType() : $wgDBtype ) {
-			case 'mysql':
-				$ext = 'sql';
-				break;
-			case 'postgres':
-				$ext = 'pg.sql';
-				break;
-			default:
-				$ext = 'sql';
-		}
-		// Do the updating
-		foreach ( $tables as $table ) {
-			if ( $wgDBprefix ) {
-				$table = $wgDBprefix . $table;
+		// If we're using the new version of the LoadExtensionSchemaUpdates hook
+		if ( $updater !== null ) {
+			// >= 1.17 support			
+			$updater->addExtensionUpdate( array(
+			'addTable',
+			'user_fbconnect',
+			dirname( __FILE__ ) . '/sql/user_fbconnect.sql',
+			true
+			) );	
+		} else {
+			// Tables to add to the database
+			$tables = array( 'user_fbconnect' /*, 'fbconnect_event_stats', 'fbconnect_event_show'*/ );
+			// Sql directory inside the extension folder
+			$sql = dirname( __FILE__ ) . '/sql';
+			// Extension of the table schema file (depending on the database type)
+			switch ( $updater !== null ? $updater->getDB()->getType() : $wgDBtype ) {
+				case 'mysql':
+					$ext = 'sql';
+					break;
+				case 'postgres':
+					$ext = 'pg.sql';
+					break;
+				default:
+					$ext = 'sql';
 			}
-			// Location of the table schema file
-			$schema = "$sql/$table.$ext";
-			// If we're using the new version of the LoadExtensionSchemaUpdates hook
-			if ( $updater !== null ) {
-				// >= 1.17 support
-				$updater->addExtensionUpdate( array( 'addTable', $table, $schema, true ) );
-			} else {
-				// <= 1.16 support
-				global $wgExtNewTables;
-				$wgExtNewTables[] = array( $table, $schema );
+			// Do the updating
+			foreach ( $tables as $table ) {
+				if ( $wgDBprefix ) {
+					$table = $wgDBprefix . $table;
+				}
+				// Location of the table schema file
+				$schema = "$sql/$table.$ext";
+					// <= 1.16 support
+					global $wgExtNewTables;
+					$wgExtNewTables[] = array( $table, $schema );
 			}
 		}
 		return true;
