@@ -72,7 +72,7 @@ window.fbAsyncInit = function() {
 	
 	// Events involving Facebook code should only be attached once Facebook and
 	// jQuery have both been loaded
-	jQuery(document).ready(function($) {
+	$(document).ready(function() {
 		// Attach event to the Login with Facebook button
 		$("#pt-facebook a").click(function(ev) {
 			FB.login(FacebookLogin, {scope: window.fbScope});
@@ -126,7 +126,7 @@ function FacebookLogin(response) {
 }
 
 //Connecting Facebook with an existing account on Special:Connect
-jQuery(document).ready(function($) {
+$(document).ready(function() {
 	$('input[name="wpNameChoice"]').change(function() {
 		var selected;
 		try {
