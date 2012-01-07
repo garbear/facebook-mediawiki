@@ -237,7 +237,7 @@ STYLE;
 				$article = new Article( $title, 0 );
 				$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
 				$out->addHeadItem('og:updated_time',
-						'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
+					'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
 			}
 		}
 		
@@ -255,7 +255,7 @@ STYLE;
 	 * be prefixed accordingly. Make sure that the .sql files are modified with
 	 * the database prefix beforehand.
 	 * 
-	 * The $updater parameter added in r71140 (after 1.16)
+	 * The $updater parameter was added in r71140 (after 1.16)
 	 * <http://svn.wikimedia.org/viewvc/mediawiki?view=revision&revision=71140>
 	 */
 	static function LoadExtensionSchemaUpdates( $updater = null ) {
@@ -288,8 +288,10 @@ STYLE;
 			$schema = "$sql/$table.$ext";
 			// If we're using the new version of the LoadExtensionSchemaUpdates hook
 			if ( $updater !== null ) {
+				// >= 1.17 support
 				$updater->addExtensionUpdate( array( 'addTable', $table, $schema, true ) );
 			} else {
+				// <= 1.16 support
 				global $wgExtNewTables;
 				$wgExtNewTables[] = array( $table, $schema );
 			}
