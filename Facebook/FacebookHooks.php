@@ -277,7 +277,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * <http://svn.wikimedia.org/viewvc/mediawiki?view=revision&revision=71140>
 	 */
 	static function LoadExtensionSchemaUpdates( $updater = null ) {
-		global $wgSharedDB, $wgDBname, $wgDBtype, $wgDBprefix;
+		global $wgSharedDB, $wgDBname, $wgDBtype;
 		// Don't create tables on a shared database
 		if( !empty( $wgSharedDB ) && $wgSharedDB !== $wgDBname ) {
 			return true;
@@ -299,9 +299,17 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		}
 		// Do the updating
 		foreach ( $tables as $table ) {
+			
+			// GitHub pull request #4, https://github.com/garbear/facebook-mediawiki/pull/4
+			// Thanks to Varnent for triaging the bug and isolating the offending code.
+			// No thanks to $wgDBprefix.
+			/*
+			global $wgDBprefix;
 			if ( $wgDBprefix ) {
 				$table = $wgDBprefix . $table;
 			}
+			*/
+			
 			// Location of the table schema file
 			$schema = "$sql/$table.$ext";
 			// If we're using the new version of the LoadExtensionSchemaUpdates hook
