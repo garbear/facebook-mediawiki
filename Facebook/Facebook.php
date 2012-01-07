@@ -39,9 +39,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
-// Make it so that the code will survive the push until the config gets updated.
-$wgEnablePreferencesExt = true;
-
 // Facebook version
 define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-alpha, January 5, 2012' );
 
