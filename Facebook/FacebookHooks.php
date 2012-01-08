@@ -195,7 +195,14 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				'<meta property="og:title" content="' . $titleStr . '" />' . "\n");
 			
 			// og:url
-			$url = Title::newFromText( $titleStr )->getFullURL(); // no additional params
+			$basePage = Title::newFromText( $titleStr ); // no additional params
+			if ( $basePage instanceof Title ) {
+				$url = $basePage->getFullURL();
+			} else {
+				// Just use the URL of the page we're currently viewing
+				global $wgRequest;
+				$url = $wgRequest->getFullRequestURL();
+			}
 			$out->addHeadItem('og:url',
 				'<meta property="og:url" content="' . $url . '" />' . "\n");
 			
