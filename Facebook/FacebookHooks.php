@@ -567,7 +567,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	/**
 	 * Adds the class "mw-userlink" to links belonging to Connect accounts on
 	 * the page Special:ListUsers.
-	 */
+	 *
 	static function SpecialListusersFormatRow( &$item, $row ) {
 		global $fbSpecialUsers;
 		
