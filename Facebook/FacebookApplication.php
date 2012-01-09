@@ -84,7 +84,7 @@ class FacebookApplication {
 	 * Returns an array containing four roles (administrators, developers, testers
 	 * and insights users), each role being a list of user IDs having that role.
 	 */
-	private function getRoles() {
+	public function getRoles() {
 		if ( empty( self::$roles ) ) {
 			global $facebook;
 			
@@ -117,16 +117,46 @@ class FacebookApplication {
 	}
 	
 	/**
-	 * Requests the specified info fields of the application from Facebook.
-	 * The results are cached: this implies that the array $fields should not
-	 * change if this function is called multiple times.
+	 * Requests info about the application from Facebook.
 	 * 
 	 * The 'id' field will always be returned. If there was an error, this will
 	 * be the only field in the returned array.
 	 */
-	private function getInfo($fields) {
+	public function getInfo() {
 		if ( empty( self::$info ) ) {
 			global $facebook;
+			
+			// Generate an array of the fields we wish to fetch
+			$fields = array(
+				// No access token required, immutable
+				'name',                    // Application name
+				'link',                    // URL
+				'description',             // Description for the app that appears on News Feed stories
+				'icon_url',                // The icon appears in Timeline events
+				'logo_url',                // Logo
+				'daily_active_users',      // Fun information
+				'weekly_active_users',     // More fun information
+				'monthly_active_users',    // More fun information
+		
+				// No access token required, editable via API
+				'namespace',               // Should match $wgFbNamespace
+		
+				// App access token required, editable via API, max length in parentheses
+				'app_domains',             // Array of domains
+				//'auth_dialog_data_help_url', // I don't know what this URL should be
+				'auth_dialog_description', // The description of an app that appears in the Auth Dialog (140)
+				'auth_dialog_headline',    // One line description of an app that appears in the Auth Dialog (30)
+				//'auth_dialog_perms_explanation', // The text to explain why an app needs additional permissions that
+				                                   // appears in the Auth Dialog. If you ask for any extended permissions,
+				                                   // you should provide an explanation for how your app plans to use them.
+				'contact_email',           // Should probably be $wgEmergencyContact
+				'creator_uid',             // Application creator
+				'deauth_callback_url',     // Deauthorization callback
+				'privacy_policy_url',      // Should point to [[WikiName:Privacy_policy]]
+				'terms_of_service_url',    // Should this point to [[WikiName:General_disclaimer]]?
+				'user_support_email',      // See contact_email above
+				'website_url',             // Should point to the main page
+			);
 			
 			// Calls to an app's properties must be made with an app access token
 			// https://developers.facebook.com/docs/reference/api/application/#application_access_tokens
@@ -144,71 +174,5 @@ class FacebookApplication {
 			$facebook->setAccessToken($user_access_token);
 		}
 		return self::$info;
-	}
-	
-	function getApplicationRoles() {
-		
-	}
-	
-	function getApplicationInfo() {
-		global $facebook;
-		
-		// Get info about the app
-		// For the info we offer to fix, this can be done via the Facebook JS SDK
-		$fields = array(
-				// No access token required, immutable
-				'name',                    // Show this
-				'link',                    // Wrap the name in a link to this url
-				'description',             // "Description for your app that appears on News Feed stories", highlight if null
-				'icon_url',                // Display this next to name. Do all apps use the same URL for default?
-				                           // If so, we can test to see if the administrator has changed it from the default yet.
-				                           // Default for my test app: http://static.ak.fbcdn.net/rsrc.php/v1/yT/r/4QVMqOjUhcd.gif
-				'logo_url',                // Display this alongside name, namespace and description
-				                           // Default for my test app: http://static.ak.fbcdn.net/rsrc.php/v1/yq/r/IobSBNz4FuT.gif
-				'daily_active_users',      // Fun information to display
-				'weekly_active_users',     // More fun information
-				'monthly_active_users',    // More fun information
-				
-				// No access token required, editable via API
-				'namespace',               // Verify it matches $wgFbNamespace, hightlight in red and offer to fix if it doesn't
-				
-				// App access token required, editable via API, max length in parentheses
-				'app_domains',             // Array of domains, check against current domain
-				//'auth_dialog_data_help_url', // only display if not null? I don't know what this URL should be
-				'auth_dialog_description', // "The description of an app that appears in the Auth Dialog." Standardize this
-				                           // with a wiki msg. Check against the wiki message, and offer a button to fix
-				                           // any discrepancies. Link to [[MediaWiki:facebook-auth-dialog-description]]. (140)
-				'auth_dialog_headline',    // One line description of an app that appears in the Auth Dialog. (30)
-				//'auth_dialog_perms_explanation', // "The text to explain why an app needs additional permissions that
-				                           // appears in the Auth Dialog." "If you ask for any extended permissions, provide an
-				                           // explanation for how your app plans to use them."
-				'contact_email',           // Compage against e.g. $wgAdminEmail
-				'creator_uid',             // Link to MediaWiki account of the creator. List above with app info next to app logo
-				'deauth_callback_url',     // Verify this! ask to change if not set up properly
-				'privacy_policy_url',      // Should point to [[WikiName:Privacy_policy]]
-				'terms_of_service_url',    // Should point to [[WikiName:General_disclaimer]] maybe?
-				'user_support_email',      // See contact_email above
-				'website_url',             // Should point to the main page
-		);
-		
-		// TODO: we might need to use the app's access token
-		// https://developers.facebook.com/docs/authentication/#app-login
-		
-		$access_token = $facebook->getAccessToken();
-		// compare to $facebook->getApplicationAccessToken() ?
-		$facebook->setAccessToken( $facebook->getApplicationAccessToken() ); // APP_ID . '|' . APP_SECRET
-		
-		//$access_token = $facebook->getApplicationAccessToken();
-		$info = $facebook->api('/' . $wgFbAppId . '?fields=' . implode( ',', $fields ));
-		
-		$roles = $facebook->api('/' . $wgFbAppId . '/roles');
-		
-		// $roles is an array of objects: {user: 'user_id', role: 'role'}
-		// where 'role' is ['administrators', 'developers', 'testers' or 'insights users']
-		
-		// To set app settings in JavaScript, POST to /APP_ID?field=value
-		
-		// Does the user access token have to be restored? Your guess is as good as mine.
-		$facebook->setAccessToken( $access_token );
 	}
 }
