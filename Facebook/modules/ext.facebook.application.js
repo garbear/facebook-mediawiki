@@ -36,8 +36,8 @@
 				var field = $(this).parent().parent().attr('id').substring('facebook-field-'.length);
 				// namespace can't be set outside of Facebook (even though the docs claim it can)
 				if (field == 'namespace') {
-					Alert("The namespace can not be updated from this page. Visit the application's " +
-					      "settings within Facebook or modify $wgFbNamespace.");
+					alert("The namespace can not be updated from this page. Visit the application's " +
+					      "settings from within Facebook or fix $wgFbNamespace.");
 				} else {
 					var title = $(this).parent().parent().prev().children('b').text();
 					// Strip the ':' and lower-case the first letter
@@ -63,9 +63,9 @@
 									alert('There was an error processing your request.\n\n' + response.error.message);
 								}
 							});
-							/**/
 						}
 					} else {
+						// If app_access_token wasn't set correctly
 						alert("The " + title + " of your Facebook application does not match the value in MediaWiki: " + correct);
 					}
 				}

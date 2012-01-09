@@ -528,6 +528,16 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
+	 * Strip <p> and </p> tags from a string.
+	 */
+	private function trimPTags($str) {
+		$str = str_replace('<p>', '', $str);
+		$str = str_replace('</p>', '', $str);
+		$str = trim($str);
+		return $str;
+	}
+	
+	/**
 	 * Special:Connect/Debug
 	 * 
 	 * This is the only subpage that can be called directly. It allows an admin
@@ -603,6 +613,13 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		
+		// The values of these fields are pulled from the extension messages
+		$fields_with_msgs = array(
+			'auth_dialog_headline'          => 'facebook-auth-dialog-headline',
+			'auth_dialog_description'       => 'facebook-auth-dialog-description',
+			'auth_dialog_perms_explanation' => 'facebook-auth-dialog-explanation',
+		);
+		
 		// Format is: (field_name, Display name, Description, Suggested value)
 		$field_array = array(
 			array(
@@ -657,26 +674,29 @@ class SpecialConnect extends SpecialPage {
 				'auth_dialog_headline',
 				'Auth dialog headline',
 				'Description that appears in the Auth Dialog (30 characters or less)',
-				'',
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_headline'])),
 			),
 			array(
 				'auth_dialog_description',
 				'Auth dialog description',
 				'Description that appears in the Auth Dialog (140 characters or less)',
-				'', //[[MediaWiki:facebook-auth-dialog-description]]
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_description'])),
 			),
 			array(
 				'auth_dialog_perms_explanation',
 				'Explanation for permissions',
-				'Provide an explanation for how your app plans to use extended permissions, if any',
-				'', //[[MediaWiki:facebook-auth-dialog-explanation]]
+				'Provide an explanation for how your app plans to use extended permissions, if any (140 characters or less)',
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_perms_explanation'])),
 			),
+			/*
+			// This extension doesn't use the News Feed
 			array(
 				'description',
 				'News feed description',
 				'Description that appears on News Feed stories',
 				'',
 			),
+			*/
 			array(
 				'daily_active_users',
 				'Daily active users',
@@ -761,6 +781,14 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			
+			foreach ( $fields_with_msgs as $field_name => $msg_name ) {
+				if ( $field == $field_name ) {
+					$title = '<a href="' . Title::newFromText('MediaWiki:' .
+							$fields_with_msgs[$field])->getFullURL() . '">' . $title . '</a>';
+					break;
+				}
+			}
+			
 			$html .= '
 	<tr>
 		<td style="text-align:right; padding:0;">
@@ -788,10 +816,6 @@ class SpecialConnect extends SpecialPage {
 </table><br/>' . "\n";
 		
 		$wgOut->addHTML( $html );
-		
-		// Print the entire array returned from getInfo()
-		#$wgOut->addHTML("<pre>" . print_r($info, true) . "</pre>");
-		
 	}
 	
 	/**

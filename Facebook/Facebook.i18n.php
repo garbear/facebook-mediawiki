@@ -50,6 +50,10 @@ Offers optional authentification based on Facebook groups and the use of FBML in
 	'facebook-log-in'   => 'Log In',
 
 	// Special:Connect
+	'facebook-debug'    => 'Facebook Application Debugger',
+	'facebook-auth-dialog-headline' => '{{SITENAME}}',
+	'facebook-auth-dialog-description' => 'You are enabling Facebook features on Sitename. On the next screen, you will be able to choose a username for yourself.',
+	'facebook-auth-dialog-explanation' => 'Your email address is tied to your account and allows you to change your password. Your email address is kept private.',
 	'facebook-title'    => 'Log in with Facebook',
 	'facebook-welcome'  => 'Welcome, Facebook user!',
 	'facebook-welcome-name' => 'Welcome, $1.',
