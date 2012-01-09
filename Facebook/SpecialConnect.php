@@ -554,6 +554,11 @@ class SpecialConnect extends SpecialPage {
 		
 		$wgOut->setPageTitle(wfMsg('facebook-debug'));
 		
+		// Include the JavaScript that lets us change the application properties
+		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+			$out->addModules( 'ext.facebook.application' );
+		}
+		
 		$app = new FacebookApplication();
 		$info = $app->getInfo();
 		
@@ -739,19 +744,18 @@ class SpecialConnect extends SpecialPage {
 			$icon = false;
 			if ( $correct != '' && version_compare( $wgVersion, '1.17', '>=' ) ) {
 				if ( $info[$field] == $correct ) {
-					$icon = 'tick-32.png';
+					$icon = 'tick';
 				} else {
 					switch ($field) {
 						// Critical errors
 						case 'namespace':
 						case 'deauth_callback_url':
 						case 'privacy_policy_url': // Necessary per Facebook's TOS
-							$icon = 'critical-32.png';
+							$icon = 'critical';
 						default:
-							$icon = 'warning-32.png';
+							$icon = 'warning';
 					}
 				}
-				$icon = "$wgStylePath/common/images/$icon";
 			}
 			
 			$html .= '
@@ -759,13 +763,14 @@ class SpecialConnect extends SpecialPage {
 		<td style="text-align:right; padding:0;">
 			' . ($tip == '' ? '' :
 			'<img class="mw-facebook-tip" id="facebook-tip-' . $field . '" src="' . $wgStylePath .
-				'/common/images/tooltip_icon.png" title="' . $tip . '"> &nbsp;') . '
+				'/common/images/tooltip_icon.png" title="' . $tip . '"/> &nbsp;') . '
 			<b>' . $title .':</b>
 		</td>
 		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
-			<span class="facebook-field-value1">' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
-			' . ($icon ? '&nbsp; <img src="' . $icon . '" style="width:20px; height:22px;">
-			<div class="facebook-field-value2" style="display:none;">' . $correct . '</div>' : '') . '
+			<span>' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
+			' . ($icon ? '&nbsp; <img src="' . $wgStylePath . '/common/images/' . $icon .
+			'-32.png" style="width:20px; height:22px;"/>
+			<div class="facebook-field-' . $icon . '" style="display:none;">' . $correct . '</div>' : '') . '
 		</td>
 	</tr>';
 		}
