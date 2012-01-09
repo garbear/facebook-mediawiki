@@ -78,6 +78,7 @@ $wgExtensionMessagesFiles['FacebookLanguage'] = $dir . 'FacebookLanguage.i18n.ph
 $wgExtensionAliasesFiles['Facebook'] = $dir . 'Facebook.alias.php';
 
 $wgAutoloadClasses['FacebookAPI'] = $dir . 'FacebookAPI.php';
+$wgAutoloadClasses['FacebookApplication'] = $dir . 'FacebookApplication.php';
 $wgAutoloadClasses['FacebookDB'] = $dir . 'FacebookDB.php';
 $wgAutoloadClasses['FacebookHooks'] = $dir . 'FacebookHooks.php';
 $wgAutoloadClasses['FacebookInit'] = $dir . 'FacebookInit.php';
