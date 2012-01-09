@@ -9,9 +9,6 @@
  *        This will be seen by users when they sign up for your site.
  *    3.  Choose an app namespace (something simple, like coffeewiki)
  *    4.  Copy the App ID, Secret and Namespace into this config file.
- *    5.  One more step, under Advanced settings, specify your deauth
- *        callback: http://wiki.example.com/wiki/Special:Connect/Deauth
- *        This will disconnect users when they remove your app.
  * 
  * Optionally, you may customize your application:
  *    A.  Upload icon and logo images. The icon appears in Timeline events.
@@ -19,14 +16,16 @@
  *        Visit the settings, click Advanced, scroll to the bottom and click
  *        the button in the "App Page" field. This will create a new page for
  *        your app. Paste the Page ID for your app below.
- *    C.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
- *        settings). The URL can be found by clicking "Privacy policy" at the
- *        bottom of your wiki's Main Page.
- *    D.  Go through the rest of the settings and fill in as appropriate.
  * 
- * One you have done the above, go to Special:Connect/Debug to verify settings.
+ * The Facebook Application Debugger has been created for you to test your
+ * application's settings. Go to the page Special:Connect/Debug to begin.
  * 
- * It is recommended that, rather than changing the settings in this file, you
+ * If your MediaWiki version is high enough you will see error icons next to
+ * the fields that MediaWiki has detected are not filled in properly. Click on
+ * an icon and MediaWiki will confirm the new setting. No further action is
+ * required on your part; the setting has automatically been saved to Facebook.
+ * 
+ * It is recommended that rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
  * require_once("$IP/extensions/Facebook/Facebook.php");
  */
@@ -36,9 +35,18 @@ $wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
+ * Enables the debug page (Special:Connect/Debug). It is OK to leave this
+ * enabled because only users who are both developers of the application and
+ * admins on the wiki (or admins of the Facebook page below) may view this page.
+ *
+ * Regardless, make sure you visit Special:Connect/Debug at least once.
+ */
+$wgFbAllowDebug = true;
+
+/**
  * Enables Facebook's Open Graph Protocol. This will integrate your wiki into the
- * social graph. To verify that this process is working, go to the Object Debugger:
- * https://developers.facebook.com/tools/debug
+ * social graph. To verify that this process is working, enter an existing page
+ * name into the Oject Debugger on Special:Connect/Debug.
  * 
  * For more info, see: https://developers.facebook.com/docs/opengraph/
  * 
@@ -73,29 +81,18 @@ $wgFbOpenGraphRegisteredObjects = array(
 );
 
 /**
- * Enables the debug page (Special:Connect/Debug). It is ok to leave this
- * enabled because only authorized users may view this page and no critical
- * information is divulged.
- * 
- * Regardless, make sure you visit Special:Connect/Debug at least once.
+ * Allow the use of social plugins in wiki text. To learn more about social
+ * plugins, please see <https://developers.facebook.com/docs/plugins>.
+ *
+ * Open Graph Beta social plugins can also be used.
+ * <https://developers.facebook.com/docs/beta/plugins>
  */
-$wgFbAllowDebug = true;
-
-/**
- * Turns the wiki into a Facebook-only wiki. Additionally, you can hide IP
- * addresses by setting $wgShowIPinHeader to false in LocalSettings.php. This
- * setting has three side-effects:
- *    1.  All users are stripped of the 'createaccount' right. To override this
- *        behavior, see UserGetRights() in FacebookHooks.php.
- *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
- *    3.  The "Log in / create account" links in the personal toolbar are removed.
- */
-$wgFbDisableLogin = false;
+$wgFbSocialPlugins = true;
 
 /**
  * For easier wiki rights management, create a group on Facebook and place the
- * group ID here. The "user_groups" right will automatically be requested from
- * users. Two new implicit groups will be created:
+ * group ID here. The "user_groups" permission will automatically be requested
+ * from users. Two new implicit groups will be created:
  * 
  *    fb-groupie     A member of the specified group
  *    fb-admin       An administrator of the Facebook group
@@ -107,9 +104,20 @@ $wgFbDisableLogin = false;
  * 
  * If you find users are sometimes not being auto-promoted, try requesting
  * the "offline_access" permission using the FacebookPermissions hook.
+ */
+$wgFbUserRightsFromGroup = false;  # Or a quoted group ID
+
+/**
+ * Turns the wiki into a Facebook-only wiki. Additionally, you can hide IP
+ * addresses by setting $wgShowIPinHeader to false in LocalSettings.php. This
+ * setting has three side-effects:
+ *    1.  All users are stripped of the 'createaccount' right. To override this
+ *        behavior, see UserGetRights() in FacebookHooks.php.
+ *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
+ *    3.  The "Log in / create account" links in the personal toolbar are removed.
  * 
- * This setting can also be used in conjunction with $wgFbDisableLogin. To have
- * this group exclusively control access to the wiki, set $wgFbDisableLogin to
+ * This setting can also be used in conjunction with $wgFbUserRightsFromGroup. To
+ * have this group exclusively control access to the wiki, set $wgFbDisableLogin to
  * true and add the following settings to Localsettings.php:
  * 
  * # Disable reading and editing by anonymous users
@@ -123,16 +131,7 @@ $wgFbDisableLogin = false;
  * # But allow all users to read these pages:
  * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
  */
-$wgFbUserRightsFromGroup = false;  # Or a quoted group ID
-
-/**
- * Allow the use of social plugins in wiki text. To learn more about social
- * plugins, please see <https://developers.facebook.com/docs/plugins>.
- * 
- * Open Graph Beta social plugins can also be used.
- * <https://developers.facebook.com/docs/beta/plugins>
- */
-$wgFbSocialPlugins = true;
+$wgFbDisableLogin = false;
 
 /**
  * Shows the real name for all Facebook users in the personal toolbar (in the
@@ -183,3 +182,5 @@ $wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
  * This setting is deprecated and is not used in version 1.17 onward.
  */ 
 $wgFbExtScript = "$wgScriptPath/extensions/Facebook/modules/ext.facebook.js";
+
+
