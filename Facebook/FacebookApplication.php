@@ -44,9 +44,9 @@ class FacebookApplication {
 	 * Constructor
 	 */
 	function __construct() {
-		global $wgFbAppId, $wgFbAppSecret;
+		global $wgFbAppId, $wgFbSecret;
 		$this->id = $wgFbAppId;
-		$this->secret = $wgFbAppSecret;
+		$this->secret = $wgFbSecret;
 	}
 	
 	/**
@@ -65,7 +65,7 @@ class FacebookApplication {
 			return false;
 		
 		// If $wgFbUserRightsFromGroups is set, this should trigger a group check
-		$groups = $fbUser->getMWUser()->getEffectiveGroups();
+		$groups = $fbUser->getMWUser()->getEffectiveGroups(true);
 		if ( !in_array('admin', $groups) && !in_array('fb-admin', $groups) ) {
 			return false;
 		}
@@ -90,7 +90,8 @@ class FacebookApplication {
 			
 			// Calls to an app's properties must be made with an app access token
 			// https://developers.facebook.com/docs/reference/api/application/#application_access_tokens
-			$user_access_token = $facebook->getAccessToken();
+			// The app access token looks like: (APP_ID . '|' . APP_SECRET)
+			$user_access_token = $facebook->getAccessToken(); // Back that AcceSS up
 			$facebook->setAccessToken($this->id . '|' . $this->secret);
 			
 			self::$roles = array(
