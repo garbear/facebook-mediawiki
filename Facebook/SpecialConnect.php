@@ -332,23 +332,18 @@ class SpecialConnect extends SpecialPage {
 			}
 			break;
 		/**
-		 * Special:Connect/Debug allows an administrator to veriy both the
-		 * Facebook application this extension are setup and working correctly.
-		 * This page can only be accessed if $wgFbAllowDebug is true; see
-		 * config.default.php for more information.
-		 * 
-		 * TODO: In the future, this will test the Deauth callback and a bunch
-		 * of other things.
-		 * 
-		 * TODO: Add $wgFbAllowDebug configuration parameter to config.default.php.
+		 * Special:Connect/Debug allows an administrator to verify that both
+		 * the Facebook application this extension are setup and working
+		 * correctly. This page can only be accessed if $wgFbAllowDebug is
+		 * true; see config.default.php for more information.
 		 */
 		case 'Debug':
 			global $wgFbAllowDebug;
-			$wgFbAllowDebug = false; // until this is implemented
 			if ( !empty( $wgFbAllowDebug ) ) {
-				// In the future, class FacebookApplication will be the model
-				$this->sendPage('debugView'); // TODO
-				// no break until this subpage is implemented
+				$app = new FacebookApplication();
+				if ( $app->canEdit() ) {
+					$this->sendPage('debugView');
+				}
 			}
 		/**
 		 * Special:Connect was called with no subpage specified.
@@ -535,11 +530,10 @@ class SpecialConnect extends SpecialPage {
 	 * to verify that the app is set up correctly inside Facebook, and offers
 	 * to automatically fix some of the problems it detects.
 	 * 
-	 * TODO: Implement FacebookApplication.php
 	 * TODO: Finish this function
 	 */
 	private function debugView() {
-		global $wgRequst, $facebook;
+		global $wgRequst;
 		
 		// "Enter a page name to view it as an object in the Open Graph." Render a button that
 		// submits the wpPageName field to Special:Connect/Debug and handle the submission here.
@@ -557,9 +551,7 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		// Do some other stuff with the FacebookApplication class in
-		// FacebookApplication.php (currently unimplemented).
-		// Thow a 'not a Facebook and MediaWiki administrator' if the user isn't authorized
+		// Do some other stuff with the FacebookApplication class
 	}
 	
 	/**

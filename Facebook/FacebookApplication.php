@@ -37,24 +37,97 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * application parameters.
  */
 class FacebookApplication {
+	static $roles;
+	static $info;
+	
+	static $fields = array(
+			
+	);
 	
 	/**
 	 * Constructor
 	 */
 	function __construct() {
-		global $wgFbAppId;
+		global $wgFbAppId, $wgFbAppSecret;
 		$this->id = $wgFbAppId;
+		$this->secret = $wgFbAppSecret;
 	}
 	
-	function canEdit($facebookUser = NULL) {
-		if ( !( $facebookUser instanceof FacebookUser) ) {
-			$facebookUser = new FacebookUser();
+	/**
+	 * Returns true if the specified Facebook user (default to current one) can
+	 * edit properties for the application. The user must be an administrator
+	 * or developer of the app and must also be an administrator of the wiki.
+	 */
+	function canEdit($fbUser = NULL) {
+		global $facebook;
+		if ( !( $fbUser instanceof FacebookUser ) ) {
+			$fbUser = new FacebookUser();
 		}
 		
-		// Check that FB user ID has permission (probably needs to be an admin of the application)
-		// and that $facebookUser->getMWUser() is an admin too
-		// If $wgFbUserRightsFromGroup is true and getMWUser() is not an admin, maybe double check
-		// against the group in case our autopromote didn't do its job.
+		// First, check MediaWiki permissions. Then check with Facebook
+		if ( !$fbUser->getMWUser()->getId() )
+			return false;
+		
+		// If $wgFbUserRightsFromGroups is set, this should trigger a group check
+		$groups = $fbUser->getMWUser()->getEffectiveGroups();
+		if ( !in_array('admin', $groups) && !in_array('fb-admin', $groups) ) {
+			return false;
+		}
+		
+		// Check that the Facebook user has a development role with the application
+		$roles = $this->getRoles();
+		if ( !in_array( $fbUser->getId(), $roles['administrators'] ) &&
+		     !in_array( $fbUser->getId(), $roles['developers'] ) ) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Returns an array containing four roles (administrators, developers, testers
+	 * and insights users), each role being a list of user IDs having that role.
+	 */
+	private function getRoles() {
+		if ( empty( self::$roles ) ) {
+			global $facebook;
+			
+			// Calls to an app's properties must be made with an app access token
+			// https://developers.facebook.com/docs/reference/api/application/#application_access_tokens
+			$user_access_token = $facebook->getAccessToken();
+			$facebook->setAccessToken($this->id . '|' . $this->secret);
+			
+			self::$roles = array(
+					'administrators' => array(),
+					'developers'     => array(),
+					'testers'        => array(),
+					'insights users' => array(),
+			);
+			$result = $facebook->api("/{$this->id}/roles");
+			if ( isset( $result['data'] ) ) {
+				foreach ( $result['data'] as $user ) {
+					self::$roles[$user['role']][] = $user['user'];
+				}
+			}
+			
+			// Restore the user access_token
+			$facebook->setAccessToken($user_access_token);
+		}
+		return self::$roles;
+	}
+	
+	private function getInfo() {
+		if ( empty( $this->roles ) ) {
+			$result = $facebook->api("/{$this->id}/roles");
+			if ( isset( $result['data'] ) ) {
+				$roles = $result['data'];
+			}
+		}
+		return $roles;
+	}
+	
+	function getApplicationRoles() {
+		
 	}
 	
 	function getApplicationInfo() {

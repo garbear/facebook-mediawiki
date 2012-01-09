@@ -7,12 +7,10 @@
  *        https://developers.facebook.com/apps/?action=create
  *    2.  Enter a descriptive name for your wiki in the Site Name field.
  *        This will be seen by users when they sign up for your site.
- *    3.  Choose an app namespace (something simple, like coffee-wiki)
+ *    3.  Choose an app namespace (something simple, like coffeewiki)
  *    4.  Copy the App ID, Secret and Namespace into this config file.
- *    5.  One more step... Inside the developer app scroll down, click the
- *        check next to "Website" and enter your wiki's URL.
- *    6.  I lied, it's another step. Under Advanced settings, specify your
- *        deauth callback: http://wiki.example.com/wiki/Special:Connect/Deauth
+ *    5.  One more step, under Advanced settings, specify your deauth
+ *        callback: http://wiki.example.com/wiki/Special:Connect/Deauth
  *        This will disconnect users when they remove your app.
  * 
  * Optionally, you may customize your application:
@@ -24,6 +22,9 @@
  *    C.  Add a Privacy Policy URL to your app's Contact Info (under Advanced
  *        settings). The URL can be found by clicking "Privacy policy" at the
  *        bottom of your wiki's Main Page.
+ *    D.  Go through the rest of the settings and fill in as appropriate.
+ * 
+ * One you have done the above, go to Special:Connect/Debug to verify settings.
  * 
  * It is recommended that, rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
@@ -72,6 +73,15 @@ $wgFbOpenGraphRegisteredObjects = array(
 );
 
 /**
+ * Enables the debug page (Special:Connect/Debug). It is ok to leave this
+ * enabled because only authorized users may view this page and no critical
+ * information is divulged.
+ * 
+ * Regardless, make sure you visit Special:Connect/Debug at least once.
+ */
+$wgFbAllowDebug = true;
+
+/**
  * Turns the wiki into a Facebook-only wiki. Additionally, you can hide IP
  * addresses by setting $wgShowIPinHeader to false in LocalSettings.php. This
  * setting has three side-effects:
@@ -94,6 +104,9 @@ $wgFbDisableLogin = false;
  * automatically be promoted or demoted when their status is modified from the
  * group page within Facebook. Unfortunately, this has a minor degredation on
  * performance.
+ * 
+ * If you find users are sometimes not being auto-promoted, try requesting
+ * the "offline_access" permission using the FacebookPermissions hook.
  * 
  * This setting can also be used in conjunction with $wgFbDisableLogin. To have
  * this group exclusively control access to the wiki, set $wgFbDisableLogin to
