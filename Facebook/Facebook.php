@@ -72,13 +72,6 @@ if (file_exists( $dir . 'config.php' )) {
 // Install the extension
 $wgExtensionFunctions[] = 'FacebookInit::init';
 
-if( !empty( $wgFbEnablePushToFacebook ) ) {
-	// Need to include it explicitly instead of autoload since it has initialization
-	// code of its own. This should be done after Facebook::init is added to
-	// $wgExtensionFunctions so that Facebook gets fully initialized first.
-	require_once $dir . 'FacebookPushEvent.php';
-}
-
 $wgExtensionMessagesFiles['Facebook'] = $dir . 'Facebook.i18n.php';
 $wgExtensionMessagesFiles['FBPushEvents'] = $dir . 'pushEvents/FBPushEvents.i18n.php';
 $wgExtensionMessagesFiles['FacebookLanguage'] = $dir . 'FacebookLanguage.i18n.php';
