@@ -723,7 +723,7 @@ class SpecialConnect extends SpecialPage {
 	<tr>
 		<td>
 			<a href="' . $info['link'] . '">
-				<img src="' . $info['logo_url'] . '" style="width:75px; height:75px;">
+				<img src="' . $info['logo_url'] . '" style="width:75px; height:75px; margin-right:8px;">
 			</a>
 		</td>
 		<td><div>
