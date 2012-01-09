@@ -51,6 +51,9 @@ class FacebookInit {
 			'remoteExtPath' => 'Facebook/modules',
 		);
 		
+		// Note that the JS SDK depends on the facebook module, not the other
+		// way around. This is because the facebook module installs a hook that
+		// must be called by the JS SDK upon completion.
 		$wgResourceModules['ext.facebook'] = array(
 			'scripts'       => 'ext.facebook.js',
 		) + $moduleInfo;
@@ -58,6 +61,12 @@ class FacebookInit {
 		$wgResourceModules['ext.facebook.sdk'] = array(
 			'scripts'       => 'ext.facebook.sdk.js',
 			'dependencies'  => array( 'ext.facebook' ),
+			'position'      => 'top',
+		) + $moduleInfo;
+		
+		$wgResourceModules['ext.facebook.application'] = array(
+				'scripts'       => 'ext.facebook.application.js',
+				'dependencies'  => array( 'ext.facebook.sdk' ),
 		) + $moduleInfo;
 		
 		// Install all public static functions in class FacebookHooks as MediaWiki hooks

@@ -535,7 +535,7 @@ class SpecialConnect extends SpecialPage {
 	 * to automatically fix some of the problems it detects.
 	 */
 	private function debugView() {
-		global $wgRequest, $wgOut, $wgFbNamespace, $wgFbLogo, $wgEmergencyContact, $wgStylePath;
+		global $wgRequest, $wgOut, $wgFbNamespace, $wgFbLogo, $wgEmergencyContact, $wgStylePath, $wgVersion;
 		
 		// "Enter a page name to view it as an object in the Open Graph." Render a button that
 		// submits the wpPageName field to Special:Connect/Debug and handle the submission here.
@@ -556,7 +556,7 @@ class SpecialConnect extends SpecialPage {
 		
 		// Include the JavaScript that lets us change the application properties
 		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
-			$out->addModules( 'ext.facebook.application' );
+			$wgOut->addModules( 'ext.facebook.application' );
 		}
 		
 		$app = new FacebookApplication();
@@ -730,7 +730,6 @@ class SpecialConnect extends SpecialPage {
 <br/><br/>
 <table>';
 		
-		global $wgVersion;
 		foreach ( $field_array as $item ) {
 			$field   = $item[0]; // field_name
 			$title   = $item[1]; // Display name
