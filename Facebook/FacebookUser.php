@@ -693,7 +693,12 @@ class FacebookUser {
 			return $rights;
 		}
 		
-		$gids = array( $wgFbUserRightsFromGroup ); // TODO: allow multiple groups
+		// It's not documented, but $wgFbUserRightsFromGroup can actually be an array
+		if ( is_array( $wgFbUserRightsFromGroup ) ) {
+			$gids = $wgFbUserRightsFromGroup;
+		} else {
+			$gids = array( $wgFbUserRightsFromGroup );
+		}
 		
 		// Cache the rights for an individual user to prevent hitting Facebook twice
 		static $rights_cache = array();
