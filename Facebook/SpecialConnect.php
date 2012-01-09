@@ -19,18 +19,16 @@
 /**
  * Class SpecialConnect
  * 
- * This class represents the body class for the page Special:Connect.
+ * Special:Connect is where the magic of this extension takes place. All
+ * authentication, adding and removing accounts happens through this special page
+ * (with the small exception of FacebookHooks::UserLoadAfterLoadFromSession).
  * 
- * Currently, this page has one valid subpage at Special:Connect/ChooseName.
- * Visiting the subpage will generate an error; it is only useful when POSTed to.
+ * The entry point of this special page is execute($subPageName). Refer to the
+ * documentation there for a description of how this special page operates.
  */
 class SpecialConnect extends SpecialPage {
-	private $isNewUser = false;
-	private $mEmail = '';
-	private $mRealName = '';
-	
 	/**
-	 * Constructor.
+	 * Constructor. Invoke the super class's constructor with the default arguments.
 	 */
 	function __construct() {
 		global $wgSpecialPageGroups;
@@ -49,6 +47,8 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
+	 * Helper function. Always called when rendering this special page.
+	 * 
 	 * TODO: Don't return to special pages Connect, Userlogin and Userlogout
 	 */
 	private function setReturnTo() {
@@ -98,7 +98,7 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * The controller interacts with the views through these two functions.
+	 * The controller interacts with the views through these three functions.
 	 */
 	public function sendPage($function, $arg = NULL) {
 		global $wgOut;
@@ -150,11 +150,36 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * Performs any necessary execution and outputs the resulting Special page.
+	 * Entry point of the special page.
 	 * 
-	 * If you are editing this page, try to conform to a MVC architecture.
+	 * Special:Connect uses a MVC architecture, with execute() being the
+	 * controller. The control flow happens by switching the subpage's name and
+	 * then moving through a boatload of nested ifs (notice how early returns
+	 * are avoided). Subpages are exclusively used for intermediate stages of the
+	 * connecting process; that is, they are only invoked from Special:Connect
+	 * itself. In the future, AJAX functions will also shorten the connecting
+	 * process by sending the user directly to one of these subpages. Indeed,
+	 * the control structure for this process has already been laid out within
+	 * the login function of ext.facebook.js, but the AJAX calls are currently
+	 * skipped and the user is simply always directed to Special:Connect's main page.
+	 * 
+	 * Now on to the MVC part.
+	 * 
+	 * Function execute() operates on three possible models: the MediaWiki User
+	 * class, FacebookUser and FacebookApplication (TODO). At the end of a
+	 * control path, the process is this: update the model, then call the view
+	 * (which may depend on the model, but only in read-only mode).
+	 * 
+	 * Models are only updated from subpages, not Special:Connect. Subpages are
+	 * the endpoint of any connecting/disconnecting process, and are only valid
+	 * when POSTed to from Special:Connect (or, in the future, AJAX calls acting
+	 * on behalf of Special:Connect). The one exception is if the user is logged
+	 * in to Facebook and has a MediaWiki account, but isn't logged in to
+	 * MediaWiki; they will then be logged in to MediaWiki. Oh, and a second
+	 * exception is that Special:Connect/Debug can be navigated to, but it's
+	 * only for testing purposes.
 	 */
-	public function execute( $par ) {
+	public function execute( $subPageName ) {
 		global $wgUser, $wgRequest;
 		
 		// Setup the session
@@ -165,13 +190,25 @@ class SpecialConnect extends SpecialPage {
 		
 		$this->setReturnTo();
 		
-		switch ( $par ) {
+		switch ( $subPageName ) {
+		/**
+		 * Special:Connect/ChooseName is POSTed to after the new Facebook user
+		 * has chosen their MediaWiki account options (the wpNameChoice param),
+		 * either to connect an existing account (if allowed) or to create a
+		 * new account with the specified options.
+		 * 
+		 * TODO: Verify that the request is a POST, not a GET (currently they
+		 * both do the same thing, I think).
+		 * 
+		 * TODO: Verify the user's status (not logged in, etc).
+		 */
 		case 'ChooseName':
 			if ( $wgRequest->getCheck('wpCancel') ) {
 				$this->sendError('facebook-cancel', 'facebook-canceltext');
 			} else {
 				$choice = $wgRequest->getText('wpNameChoice');
 				try {
+					// The model is updated in manageChooseNamePost()
 					$this->manageChooseNamePost($choice);
 					if ( $choice == 'existing' ) {
 						$this->sendPage('displaySuccessAttachingView');
@@ -179,40 +216,91 @@ class SpecialConnect extends SpecialPage {
 						$this->sendPage('loginSuccessView', true);
 					}
 				} catch (FacebookUserException $e) {
-					// If the title msg is 'connectNewUserView' then we send the view instead of an error
-					if ($e->getTitleMsg() == 'connectNewUserView')
+					// HACK: If the title msg is 'connectNewUserView' then we
+					// send the view instead of an error
+					if ($e->getTitleMsg() == 'connectNewUserView') {
 						$this->sendPage('connectNewUserView', $e->getTextMsg());
-					else
+					} else {
 						$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
+					}
 				}
 			}
 			break;
+		/**
+		 * Special:Connect/LogoutAndContinue does just that -- logs the current
+		 * MediaWiki user out and another MediaWiki user in based on the current
+		 * Facebook credentials. No parameters, so if a non-Facebook users GETs
+		 * this they will be logged out and sent to Special:UserLogin.
+		 * 
+		 * TODO: In the case above, redirect to Special:UserLogout.
+		 */
 		case 'LogoutAndContinue':
+			// Update the model (MediaWiki user)
 			$oldName = $wgUser->logout();
 			$injected_html = ''; // unused
 			wfRunHooks( 'UserLogoutComplete', array(&$wgUser, &$injected_html, $oldName) );
 			
-			$fbUser = new FacebookUser(); // Get the current Facebook user
+			$fbUser = new FacebookUser();
 			if ($fbUser->getMWUser()->getId()) {
+				// Update the model again (Facebook user)
 				$fbUser->login();
 				$this->sendPage('loginSuccessView');
 			} else {
 				$this->sendRedirect('UserLogin');
 			}
 			break;
+		/**
+		 * Special:Connect/MergeAccount takes care of connecting Facebook users
+		 * to existing accounts.
+		 * 
+		 * TODO: Verify this is a POST request
+		 */
 		case 'MergeAccount':
 			try {
+				// The model is updated in manageMergeAccountPost()
 				$this->manageMergeAccountPost();
 				$this->sendPage('displaySuccessAttachingView');
 			} catch (FacebookUserException $e) {
 				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
 			}
 			break;
+		/**
+		 * Special:Connect/Deauth is a callback used by Facebook to notify the
+		 * application that the Facebook user has deauthenticated the app. It
+		 * will never be called directly from the application and always sends
+		 * an error (even to Facebook, but in that case the error is ignored).
+		 */
 		case 'Deauth':
+			// The model is updated in manageDeauthorizePost()
 			$this->manageDeauthorizePost();
 			// Always send an error saying the user shouldn't be here
 			$this->sendError('facebook-reclamation-title-error', 'facebook-reclamation-body-error');
 			break;
+		/**
+		 * Special:Connect/Debug allows an administrator to veriy both the
+		 * Facebook application this extension are setup and working correctly.
+		 * This page can only be accessed if $wgFbAllowDebug is true; see
+		 * config.default.php for more information.
+		 * 
+		 * TODO: In the future, this will test the Deauth callback and a bunch
+		 * of other things.
+		 * 
+		 * TODO: Add $wgFbAllowDebug configuration parameter to config.default.php.
+		 */
+		case 'Debug':
+			global $wgFbAllowDebug;
+			$wgFbAllowDebug = false; // until this is implemented
+			if ( !empty( $wgFbAllowDebug ) ) {
+				// In the future, class FacebookApplication will be the model
+				$this->sendPage('debugView'); // TODO
+				// no break until this subpage is implemented
+			}
+		/**
+		 * Special:Connect was called with no subpage specified.
+		 * 
+		 * TODO: Verify that no subpage was specified, and redirect to
+		 * Special:Connect if an invalid subpage was used.
+		 */
 		default:
 			$fbUser = new FacebookUser();
 			
@@ -274,33 +362,37 @@ class SpecialConnect extends SpecialPage {
 	} // function execute()
 	
 	/**
+	 * Extends the control of execute() for the subpage Special:Connect/ChooseName.
+	 * 
+	 * The model operated upon is FacebookUser. To signal a diferent view should
+	 * be shown, a FacebookUserException is thrown by the model or this function.
+	 * The exception allows the model to be unmodified.
+	 * 
+	 * Note that we kind of cheat: 'connectNewUserView' isn't an error page title,
+	 * but signals that we should go to the connectNewUserView() view.
+	 * 
 	 * @throws FacebookUserException
 	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest;
 		$fbUser = new FacebookUser();
+		
 		switch ($choice) {
 			// Check to see if the user opted to connect an existing account
 			case 'existing':
-				$updatePrefs = array();
-				foreach ($fbUser->getAvailableUserUpdateOptions() as $option) {
-					if ($wgRequest->getText("wpUpdateUserInfo$option", '0') == '1') {
-						$updatePrefs[] = $option;
-					}
-				}
-				$name = $wgRequest->getText('wpExistingName');
-				$password = $wgRequest->getText('wpExistingPassword');
-				$fbUser->attachUser($name, $password, $updatePrefs);
+				// Update the model
+				$fbUser->attachUser($wgRequest->getText('wpExistingName'),
+				                    $wgRequest->getText('wpExistingPassword'), $this->getUpdatePrefs());
 				break;
-				// Check to see if the user selected another valid option
+			// Figure out the username to send to the model
 			case 'nick':
 			case 'first':
 			case 'full':
-				// Get the username from Facebook (Note: not from the form)
+				// Get the username from Facebook (note: not from the form)
 				$username = FacebookUser::getOptionFromInfo($choice . 'name', $fbUser->getUserInfo());
 				// no break
 			case 'manual':
-				// Use manual name if no username is set, even if manual wasn't chosen
+				// Use manual name if no username is set (even if manual wasn't chosen)
 				if ( empty($username) || !FacebookUser::userNameOK($username) )
 					$username = $wgRequest->getText('wpName2');
 				// If no valid username was found, something's not right; ask again
@@ -318,59 +410,84 @@ class SpecialConnect extends SpecialPage {
 					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
 				}
 				
-				// Handle accidental reposts
+				// Handle accidental reposts (TODO: this check should happen in execute()!!!)
 				global $wgUser;
 				if ( $wgUser->isLoggedIn() ) {
 					return;
 				}
 				
-				// Now that we got our username, create the user
-				$domain = $wgRequest->getText( 'wpDomain' );
-				$fbUser->createUser($username, $domain);
+				// Now that we got our username, update the mode
+				$fbUser->createUser($username, $wgRequest->getText( 'wpDomain' )); // wpDomain isn't currently set...
 				break;
+			// Nope
 			default:
 				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
 		}
 	}
 	
 	/**
+	 * Helper function for manageChooseNamePost() and manageMergeAccountPost().
+	 * 
+	 * Returns an array representing the checkboxes specified by wpUpdateUserInfo*OPTION*.
+	 */
+	private function getUpdatePrefs() {
+		global $wgRequest;
+		$updatePrefs = array();
+		foreach (FacebookUser::$availableUserUpdateOptions as $option) {
+			if ( $wgRequest->getText("wpUpdateUserInfo$option", '0') == '1' ) {
+				$updatePrefs[] = $option;
+			}
+		}
+		return $updatePrefs();
+	}
+	
+	/**
+	 * Special:Connect/MergeAccount
+	 * 
+	 * In the future, all of the ***Post() functions should be renamed to
+	 * reflect that they are more about updating the model and less about
+	 * handling the control.
+	 * 
 	 * @throws FacebookUserException
 	 */
 	private function manageMergeAccountPost() {
-		global $wgUser, $wgRequest;
+		global $wgUser;
+		if ( !$wgUser->isLoggedIn() ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
 		
 		$fbUser = new FacebookUser();
 		if ( !$fbUser->isLoggedIn() ) {
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
 		
-		if ( !$wgUser->isLoggedIn() ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
-		}
-		
 		// Make sure both accounts are free in the database
+		// TODO: This should happen inside the model!!!
 		$mwId = $fbUser->getMWUser()->getId();
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		if ( $mwId || count($fb_ids) > 0 ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext'); // TODO: error msg
+			throw new FacebookUserException('facebook-error', 'facebook-errortext'); // TODO: new error msg
 		}
 		
-		$updatePrefs = array();
-		foreach ($fbUser->getAvailableUserUpdateOptions() as $option) {
-			if ($wgRequest->getText("wpUpdateUserInfo$option", '0') == '1') {
-				$updatePrefs[] = $option;
-			}
-		}
-		
-		$fbUser->attachUser($wgUser->getName(), '', $updatePrefs);
+		// Update the model
+		$fbUser->attachUser($wgUser->getName(), '', $this->getUpdatePrefs());
 	}
 	
 	/**
-	 * Disconnect from Facebook.
+	 * Special:Connect/Deauth
+	 * 
+	 * This should only be called by Facebook as a callback for a user
+	 * deauthorizing the application (removing it from their list of apps).
+	 * 
+	 * "Early returns are evil." Maybe this function should be refactored, but
+	 * the current lookup-verify-continue process makes it clear what the error
+	 * is, and besides we aren't returning a value or dealing with different
+	 * control paths.
 	 */
 	private function manageDeauthorizePost() {
 		global $facebook;
 		
+		// Facebook will include a signed_request param to verify authenticity
 		$signed_request = $facebook->getSignedRequest();
 		if ( !$signed_request ) {
 			// Error: signed_request not present or hash mismatch
@@ -390,6 +507,9 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
+		// Successful deauthorization. Notify the user by email, and possibly
+		// ask them to choose a new password
+		
 		// Check to see if password changes are allowed
 		// TODO: Email the user anyway with a notification about the disconnect
 		if ( !$wgAuth->allowPasswordChange() ) {
@@ -402,12 +522,46 @@ class SpecialConnect extends SpecialPage {
 		));
 		$loginForm = new LoginForm($params);
 		
-		// TODO: Update email messages
+		// TODO: Update the messages sent by email
 		if ( $mwUser->mPassword == '' ) {
 			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
 		} else {
 			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
 		}
+	}
+	
+	/**
+	 * Special:Connect/Debug
+	 * 
+	 * This is the only subpage that can be called directly. It allows the user
+	 * to verify that the app is set up correctly inside Facebook, and offers
+	 * to automatically fix some of the problems it detects.
+	 * 
+	 * TODO: Implement FacebookApplication.php
+	 * TODO: Finish this function
+	 */
+	private function debugView() {
+		global $wgRequst, $facebook;
+		
+		// "Enter a page name to view it as an object in the Open Graph." Render a button that
+		// submits the wpPageName field to Special:Connect/Debug and handle the submission here.
+		// TODO: handle the redirect in execute() maybe
+		// The following code is untested
+		$pageName = $wgRequest->getText('wpPageName');
+		if ( $pageName != '' ) {
+			$pageName = 'Main Page';
+			$title = Title::newFromText( $pageName );
+			if ( !( $title instanceof Title ) ) {
+				$title = Title::newMainPage();
+			}
+			$url = 'https://developers.facebook.com/tools/debug/og/object?q=' . urlencode( $title->getFullURL() );
+			$wgOut->redirect( $url );
+			return;
+		}
+		
+		// Do some other stuff with the FacebookApplication class in
+		// FacebookApplication.php (currently unimplemented).
+		// Thow a 'not a Facebook and MediaWiki administrator' if the user isn't authorized
 	}
 	
 	/**
