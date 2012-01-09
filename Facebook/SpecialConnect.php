@@ -750,7 +750,7 @@ class SpecialConnect extends SpecialPage {
 		</div></td>
 	</tr>
 </table>
-<br/><br/>
+<br/>
 <table>';
 		
 		foreach ( $field_array as $item ) {
@@ -813,7 +813,16 @@ class SpecialConnect extends SpecialPage {
 		}
 		
 		$html .= '
-</table><br/>' . "\n";
+</table><br/>';
+		
+		// Add an option to debug Open Graph objects
+		$html .= '
+<form action="' . $this->getTitle('Debug')->getLocalUrl() . '" method="POST" style="padding-left:14px;">
+	<h3>' . wfMsg('facebook-object-debug-title') . '</h3>
+	<label for="wpPageName">' . wfMsg('facebook-object-debug') . '</label><br/>
+	<input name="wpPageName" id="wpPageName" size="60" value="" /> &nbsp;
+	<input type="submit" value="' . wfMsg('facebook-debug') . '" name="Debug" />
+</form><br/><br/>' . "\n";
 		
 		$wgOut->addHTML( $html );
 	}
