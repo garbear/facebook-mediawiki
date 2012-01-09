@@ -40,10 +40,6 @@ class FacebookApplication {
 	static $roles;
 	static $info;
 	
-	static $fields = array(
-			
-	);
-	
 	/**
 	 * Constructor
 	 */
@@ -103,11 +99,15 @@ class FacebookApplication {
 					'testers'        => array(),
 					'insights users' => array(),
 			);
-			$result = $facebook->api("/{$this->id}/roles");
-			if ( isset( $result['data'] ) ) {
-				foreach ( $result['data'] as $user ) {
-					self::$roles[$user['role']][] = $user['user'];
+			try {
+				$result = $facebook->api("/{$this->id}/roles");
+				if ( isset( $result['data'] ) ) {
+					foreach ( $result['data'] as $user ) {
+						self::$roles[$user['role']][] = $user['user'];
+					}
 				}
+			} catch (FacebookApiException $e) {
+				error_log( $e->getMessage() );
 			}
 			
 			// Restore the user access_token
@@ -116,14 +116,34 @@ class FacebookApplication {
 		return self::$roles;
 	}
 	
-	private function getInfo() {
-		if ( empty( $this->roles ) ) {
-			$result = $facebook->api("/{$this->id}/roles");
-			if ( isset( $result['data'] ) ) {
-				$roles = $result['data'];
+	/**
+	 * Requests the specified info fields of the application from Facebook.
+	 * The results are cached: this implies that the array $fields should not
+	 * change if this function is called multiple times.
+	 * 
+	 * The 'id' field will always be returned. If there was an error, this will
+	 * be the only field in the returned array.
+	 */
+	private function getInfo($fields) {
+		if ( empty( self::$info ) ) {
+			global $facebook;
+			
+			// Calls to an app's properties must be made with an app access token
+			// https://developers.facebook.com/docs/reference/api/application/#application_access_tokens
+			$user_access_token = $facebook->getAccessToken();
+			$facebook->setAccessToken($this->id . '|' . $this->secret);
+			
+			try {
+				self::$info = $facebook->api("/{$this->id}?fields=" . implode(',', $fields));
+			} catch (FacebookApiException $e) {
+				error_log( $e->getMessage() );
+				self::$info = array( 'id' => $this->id );
 			}
+			
+			// Restore the user access_token
+			$facebook->setAccessToken($user_access_token);
 		}
-		return $roles;
+		return self::$info;
 	}
 	
 	function getApplicationRoles() {
