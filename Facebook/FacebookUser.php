@@ -25,52 +25,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Thrown when a FacebookUser encounters a problem.
- */
-class FacebookUserException extends Exception
-{
-	protected $titleMsg;
-	protected $textMsg;
-	protected $msgParams;
-
-	/**
-	 * Make a new FacebookUser Exception with the given result.
-	 */
-	public function __construct($titleMsg, $textMsg, $msgParams = NULL) {
-		$this->titleMsg  = $titleMsg;
-		$this->textMsg   = $textMsg;
-		$this->msgParams = $msgParams;
-
-		// In general, $msg and $code are not meant to be used
-		$msg = wfMsg( $this->textMsg );
-		$code = 0;
-
-		parent::__construct($msg, $code);
-	}
-
-	public function getTitleMsg() {
-		return $this->titleMsg;
-	}
-
-	public function getTextMsg() {
-		return $this->textMsg;
-	}
-
-	public function getMsgParams() {
-		return $this->msgParams;
-	}
-
-	public function getType() {
-		return 'Exception';
-	}
-
-	public function __toString() {
-		return wfMsg( $this->textMsg );
-	}
-}
-
-
-/**
  * Class FacebookUser. Whereas User represents a MediaWiki user, this class
  * represents a Facebook user. FacebookUsers can only be constructed from
  * existing MediaWiki users. A FacebookUser is always associated with exactly
@@ -239,7 +193,7 @@ class FacebookUser {
 	 * 
 	 * Post condition: user is logged in to MediaWiki
 	 *
-	 * @throws FacebookUserException
+	 * @throws FacebookModelException
 	 */
 	function attachUser($name, $password, $updatePrefs) {
 		global $wgUser;
@@ -248,7 +202,7 @@ class FacebookUser {
 		// The user must be logged into Facebook before choosing a wiki username
 		if ( !$this->id ) {
 			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+			throw new FacebookModelException('facebook-error', 'facebook-errortext');
 		}
 		
 		// Look up the user by their name
@@ -257,7 +211,7 @@ class FacebookUser {
 		// If the user is logged in, we can skip the password check
 		if ( !($wgUser->isLoggedIn() && is_object($user) && $wgUser->getId() == $user->getId()) ) {
 			if ( !$user->checkPassword($password) ) {
-				throw new FacebookUserException('connectNewUserView', 'wrongpassword');
+				throw new FacebookModelException('connectNewUserView', 'wrongpassword');
 			}
 		}
 		
@@ -283,7 +237,7 @@ class FacebookUser {
 	
 	
 	/**
-	 * @throws FacebookUserException
+	 * @throws FacebookModelException
 	 */
 	function createUser($username, $domain = '') {
 		global $wgUser, $wgAuth;
@@ -292,7 +246,7 @@ class FacebookUser {
 		if ( empty( $username ) || !FacebookUser::userNameOK($username)) {
 			wfDebug("Facebook: Name not OK: '$username'\n");
 			// TODO: Provide an error message that explains that they need to pick a name or the name is taken.
-			throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+			throw new FacebookModelException('connectNewUserView', 'facebook-invalidname');
 		}
 		
 		/// START OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
@@ -300,7 +254,7 @@ class FacebookUser {
 		// Check the restrictions again to make sure that the user can create this account.
 		if ( wfReadOnly() ) {
 			// Special case for readOnlyPage error
-			throw new FacebookUserException(null, null);
+			throw new FacebookModelException(null, null);
 		}
 		
 		global $wgFbDisableLogin;
@@ -309,13 +263,13 @@ class FacebookUser {
 			// then technically no users can create accounts
 			if ( $wgUser->isBlockedFromCreateAccount() ) {
 				wfDebug("Facebook: Blocked user was attempting to create account via Facebook Connect.\n");
-				throw new FacebookUserException('facebook-error', 'facebook-errortext');
+				throw new FacebookModelException('facebook-error', 'facebook-errortext');
 			} else {
 				$titleObj = SpecialPage::getTitleFor( 'Connect' );
 				$permErrors = $titleObj->getUserPermissionsErrors('createaccount', $wgUser, true);
 				if (count($permErrors) > 0) {
 					// Special case for permission errors
-					throw new FacebookUserException($permErrors, 'createaccount');
+					throw new FacebookModelException($permErrors, 'createaccount');
 				}
 			}
 		}
@@ -326,13 +280,13 @@ class FacebookUser {
 		// create a local account and login as any domain user). We only need
 		// to check this for domains that aren't local.
 		if ($domain != '' && $domain != 'local' && !$wgAuth->canCreateAccounts() && !$wgAuth->userExists($username))
-			throw new FacebookUserException('facebook-error', 'wrongpassword');
+			throw new FacebookModelException('facebook-error', 'wrongpassword');
 		
 		// IP-blocking (and open proxy blocking) protection from SpecialUserLogin
 		global $wgEnableSorbs, $wgProxyWhitelist;
 		$ip = wfGetIP();
 		if ($wgEnableSorbs && !in_array($ip, $wgProxyWhitelist) && $wgUser->inSorbsBlacklist($ip))
-			throw new FacebookUserException('facebook-error', 'sorbs_create_account_reason');
+			throw new FacebookModelException('facebook-error', 'sorbs_create_account_reason');
 		
 		// Run a hook to let custom forms make sure that it is okay to proceed with
 		// processing the form. This hook should only check preconditions and should
@@ -347,7 +301,7 @@ class FacebookUser {
 		$user = User::newFromName($username);
 		if ( !$user ) {
 			wfDebug("Facebook: Error creating new user.\n");
-			throw new FacebookUserException('facebook-error', 'facebook-error-creating-user');
+			throw new FacebookModelException('facebook-error', 'facebook-error-creating-user');
 		}
 		// TODO: Make user a Facebook user here: $fbUser = new FacebookUser($user);
 		
@@ -361,7 +315,7 @@ class FacebookUser {
 		if( !wfRunHooks( 'AbortNewAccount', array( $user, &$abortError ) ) ) {
 			// Hook point to add extra creation throttles and blocks
 			wfDebug( "SpecialConnect::createUser: a hook blocked creation\n" );
-			throw new FacebookUserException('facebook-error', 'facebook-error-user-creation-hook-aborted',
+			throw new FacebookModelException('facebook-error', 'facebook-error-user-creation-hook-aborted',
 					array( $abortError ));
 		}
 		*/
@@ -376,7 +330,7 @@ class FacebookUser {
 			}
 			if ( $value >= $wgAccountCreationThrottle ) {
 				// 'acct_creation_throttle_hit' should actually use 'parseinline' not 'parse' in $wgOut->showErrorPage()
-				throw new FacebookUserException('facebook-error', 'acct_creation_throttle_hit',
+				throw new FacebookModelException('facebook-error', 'acct_creation_throttle_hit',
 						array($wgAccountCreationThrottle));
 			}
 			$wgMemc->incr( $key );
@@ -393,7 +347,7 @@ class FacebookUser {
 		// $wgAuth essentially checks to see if these are valid parameters for new users
 		if( !$wgAuth->addUser( $user, $pass, $email, $realName ) ) {
 			wfDebug("Facebook: Error adding new user to database.\n");
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+			throw new FacebookModelException('facebook-error', 'facebook-errortext');
 		}
 		
 		// Add the user to the local database (regardless of whether $wgAuth was used)

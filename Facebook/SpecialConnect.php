@@ -17,6 +17,52 @@
 
 
 /**
+ * Thrown when a FacebookUser or FacebookApplication encounters a problem.
+ */
+class FacebookModelException extends Exception
+{
+	protected $titleMsg;
+	protected $textMsg;
+	protected $msgParams;
+
+	/**
+	 * Make a new FacebookUser Exception with the given result.
+	 */
+	public function __construct($titleMsg, $textMsg, $msgParams = NULL) {
+		$this->titleMsg  = $titleMsg;
+		$this->textMsg   = $textMsg;
+		$this->msgParams = $msgParams;
+
+		// In general, $msg and $code are not meant to be used
+		$msg = wfMsg( $this->titleMsg );
+		$code = 0;
+
+		parent::__construct($msg, $code);
+	}
+
+	public function getTitleMsg() {
+		return $this->titleMsg;
+	}
+
+	public function getTextMsg() {
+		return $this->textMsg;
+	}
+
+	public function getMsgParams() {
+		return $this->msgParams;
+	}
+
+	public function getType() {
+		return 'Exception';
+	}
+
+	public function __toString() {
+		return wfMsg( $this->msg );
+	}
+}
+
+
+/**
  * Class SpecialConnect
  * 
  * Special:Connect is where the magic of this extension takes place. All
@@ -215,7 +261,7 @@ class SpecialConnect extends SpecialPage {
 					} else {
 						$this->sendPage('loginSuccessView', true);
 					}
-				} catch (FacebookUserException $e) {
+				} catch (FacebookModelException $e) {
 					// HACK: If the title msg is 'connectNewUserView' then we
 					// send the view instead of an error
 					if ($e->getTitleMsg() == 'connectNewUserView') {
@@ -260,7 +306,7 @@ class SpecialConnect extends SpecialPage {
 				// The model is updated in manageMergeAccountPost()
 				$this->manageMergeAccountPost();
 				$this->sendPage('displaySuccessAttachingView');
-			} catch (FacebookUserException $e) {
+			} catch (FacebookModelException $e) {
 				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
 			}
 			break;
@@ -365,13 +411,13 @@ class SpecialConnect extends SpecialPage {
 	 * Extends the control of execute() for the subpage Special:Connect/ChooseName.
 	 * 
 	 * The model operated upon is FacebookUser. To signal a diferent view should
-	 * be shown, a FacebookUserException is thrown by the model or this function.
+	 * be shown, a FacebookModelException is thrown by the model or this function.
 	 * The exception allows the model to be unmodified.
 	 * 
 	 * Note that we kind of cheat: 'connectNewUserView' isn't an error page title,
 	 * but signals that we should go to the connectNewUserView() view.
 	 * 
-	 * @throws FacebookUserException
+	 * @throws FacebookModelException
 	 */
 	private function manageChooseNamePost($choice) {
 		global $wgRequest;
@@ -397,7 +443,7 @@ class SpecialConnect extends SpecialPage {
 					$username = $wgRequest->getText('wpName2');
 				// If no valid username was found, something's not right; ask again
 				if (empty($username) || !FacebookUser::userNameOK($username)) {
-					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+					throw new FacebookModelException('connectNewUserView', 'facebook-invalidname');
 				}
 				// no break
 			case 'auto':
@@ -407,7 +453,7 @@ class SpecialConnect extends SpecialPage {
 				}
 				// Just in case the automatically-generated username is a bad egg
 				if ( empty($username) || !FacebookUser::userNameOK($username) ) {
-					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+					throw new FacebookModelException('connectNewUserView', 'facebook-invalidname');
 				}
 				
 				// Handle accidental reposts (TODO: this check should happen in execute()!!!)
@@ -421,7 +467,7 @@ class SpecialConnect extends SpecialPage {
 				break;
 			// Nope
 			default:
-				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
+				throw new FacebookModelException('facebook-invalid', 'facebook-invalidtext');
 		}
 	}
 	
@@ -448,17 +494,17 @@ class SpecialConnect extends SpecialPage {
 	 * reflect that they are more about updating the model and less about
 	 * handling the control.
 	 * 
-	 * @throws FacebookUserException
+	 * @throws FacebookModelException
 	 */
 	private function manageMergeAccountPost() {
 		global $wgUser;
 		if ( !$wgUser->isLoggedIn() ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+			throw new FacebookModelException('facebook-error', 'facebook-errortext');
 		}
 		
 		$fbUser = new FacebookUser();
 		if ( !$fbUser->isLoggedIn() ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+			throw new FacebookModelException('facebook-error', 'facebook-errortext');
 		}
 		
 		// Make sure both accounts are free in the database
@@ -466,7 +512,7 @@ class SpecialConnect extends SpecialPage {
 		$mwId = $fbUser->getMWUser()->getId();
 		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
 		if ( $mwId || count($fb_ids) > 0 ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext'); // TODO: new error msg
+			throw new FacebookModelException('facebook-error', 'facebook-errortext'); // TODO: new error msg
 		}
 		
 		// Update the model
