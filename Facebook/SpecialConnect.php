@@ -24,7 +24,7 @@ class FacebookModelException extends Exception
 	protected $titleMsg;
 	protected $textMsg;
 	protected $msgParams;
-
+	
 	/**
 	 * Make a new FacebookUser Exception with the given result.
 	 */
@@ -32,30 +32,30 @@ class FacebookModelException extends Exception
 		$this->titleMsg  = $titleMsg;
 		$this->textMsg   = $textMsg;
 		$this->msgParams = $msgParams;
-
+		
 		// In general, $msg and $code are not meant to be used
 		$msg = wfMsg( $this->titleMsg );
 		$code = 0;
-
+		
 		parent::__construct($msg, $code);
 	}
-
+	
 	public function getTitleMsg() {
 		return $this->titleMsg;
 	}
-
+	
 	public function getTextMsg() {
 		return $this->textMsg;
 	}
-
+	
 	public function getMsgParams() {
 		return $this->msgParams;
 	}
-
+	
 	public function getType() {
 		return 'Exception';
 	}
-
+	
 	public function __toString() {
 		return wfMsg( $this->msg );
 	}
