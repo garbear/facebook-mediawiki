@@ -17,19 +17,12 @@
 /**
  * ext.facebook.application.js
  * 
- * Contains code that is run on Special:Connect/Debug.
+ * Contains code that is run on Special:Connect/Debug. This page displays
+ * information about the Facebook application specified by $wgFbAppId. It
+ * retrieves info about the app from Facebook and marks problematic settings.
  * 
- * The original plan was to have application parameters be adjusted via the
- * Facebook JS SDK. However, these parameters require an application access
- * token (APP_ID + '|' + APP_SECRET) instead of a user access token. See:
- * https://developers.facebook.com/docs/reference/api/application/#application_access_tokens
- * 
- * Handing this application access token to the client should be done through
- * the MakeGlobalVariablesScript hook instead of the ResourceLoaderGetConfigVars
- * hook because skipping the ResourceLoader allows us to screen the page title
- * and only serve this access token to authenticated users viewing Special:Connect/Debug.
- * 
- * Once that's done, do a normal API POST with {access_token: fbAppAccessToken} as a param.
+ * This module allows the settings to be updated dynamically without reloading
+ * the page.
  */
 
 (function($) {
@@ -37,15 +30,45 @@
 	if (window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw) {
 		$(document).ready(function() {
 			// Make warnings and criticals clickable
-			var icon = $('.facebook-field-warning,.facebook-field-critical').siblings('img').wrap('<a href="#"/>').parent();
+			var icon = $('.facebook-field-warning,.facebook-field-critical').siblings('div').children("a");
 			// Install the click handler
 			icon.click(function(ev) {
-				//var field = $(this).parent().attr('id').substring('facebook-field-'.length);
-				var title = $(this).parent().prev().children('b').text();
-				// Strip the ':' and lower-case the first letter
-				title = title[0].toLowerCase() + title.substring(1, title.length - 1);
-				var correct = $(this).siblings('div').text();
-				alert("The " + title + " does not match the value in MediaWiki: " + correct);
+				var field = $(this).parent().parent().attr('id').substring('facebook-field-'.length);
+				// namespace can't be set outside of Facebook (even though the docs claim it can)
+				if (field == 'namespace') {
+					Alert("The namespace can not be updated from this page. Visit the application's " +
+					      "settings within Facebook or modify $wgFbNamespace.");
+				} else {
+					var title = $(this).parent().parent().prev().children('b').text();
+					// Strip the ':' and lower-case the first letter
+					title = title[0].toLowerCase() + title.substring(1, title.length - 1);
+					var correct = $(this).parent().siblings('div').children('span').text();
+					
+					var id = mw.config.get("fbAppId");
+					var app_access_token = mw.config.get("fbAppAccessToken");
+					if (id && app_access_token) {
+						var doit = confirm("Press OK to to update the " + title + " of your Facebook application to " + correct);
+						if (doit) {
+							FB.api('/' + id + '?' + field + '=' + correct, 'POST', {
+								access_token: app_access_token
+							}, function(response) {
+								if (response && !response.error) {
+									old_div = $("#facebook-field-" + field + ">.facebook-field-current");
+									new_div = old_div.siblings("div");
+									new_div.hide();
+									old_div.fadeOut('slow', function() {
+										new_div.fadeIn('slow');
+									});
+								} else {
+									alert('There was an error processing your request.\n\n' + response.error.message);
+								}
+							});
+							/**/
+						}
+					} else {
+						alert("The " + title + " of your Facebook application does not match the value in MediaWiki: " + correct);
+					}
+				}
 				ev.preventDefault();
 			});
 		});

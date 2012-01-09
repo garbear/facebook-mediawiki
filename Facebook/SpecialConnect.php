@@ -766,14 +766,20 @@ class SpecialConnect extends SpecialPage {
 		<td style="text-align:right; padding:0;">
 			' . ($tip == '' ? '' :
 			'<img class="mw-facebook-tip" id="facebook-tip-' . $field . '" src="' . $wgStylePath .
-				'/common/images/tooltip_icon.png" title="' . $tip . '"/> &nbsp;') . '
+				'/common/images/tooltip_icon.png" title="' . $tip . '" /> &nbsp;') . '
 			<b>' . $title .':</b>
 		</td>
 		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
-			<span>' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
-			' . ($icon ? '&nbsp; <img src="' . $wgStylePath . '/common/images/' . $icon .
-			'-32.png" style="width:22px; height:22px;"/>
-			<div class="facebook-field-' . $icon . '" style="display:none;">' . $correct . '</div>' : '') . '
+			<div class="facebook-field-current">
+				<span>' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
+				' . ($icon ? '&nbsp; ' . ($icon != 'tick' ? '<a href="#">' : '') . '<img src="' . $wgStylePath .
+				'/common/images/' . $icon . '-32.png" style="width:22px; height:22px;" />' . ($icon != 'tick' ?
+				'</a>' : '') : '') . '
+			</div>' . ($icon ? '
+			<div class="facebook-field-' . $icon . '" style="display:none;">
+				<span>' . $correct . '</span>
+				&nbsp; <img src="' . $wgStylePath . '/common/images/tick-32.png" style="width:22px; height:22px;" />
+			</div>' : '') . '
 		</td>
 	</tr>';
 		}

@@ -373,11 +373,25 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * And then this hook was deprecated in 1.17. You know the drill.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
-		global $wgVersion;
+		global $wgVersion, $wgUser;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
 			unset( $vars['fbScript'] ); // not used outside of ResourceLoader
 		}
+		
+		global $wgFbAllowDebug;
+		if ( !empty( $wgFbAllowDebug ) ) {
+			$title = $wgUser->getSkin()->getTitle();
+			if ( $title instanceof Title &&
+					SpecialPage::getTitleFor('Connect', 'Debug')->equals($title) ) {
+				$app = new FacebookApplication();
+				if ( $app->canEdit() ) {
+					global $wgFbAppId, $wgFbSecret;
+					$vars['fbAppAccessToken'] = $wgFbAppId . '|' . $wgFbSecret;
+				}
+			}
+		}
+		
 		return true;
 	}
 	
