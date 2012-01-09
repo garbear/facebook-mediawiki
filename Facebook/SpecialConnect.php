@@ -663,7 +663,7 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'auth_dialog_perms_explanation',
 				'Explanation for permissions',
-				'Description that appears in the Auth Dialog (140 characters or less)',
+				'Provide an explanation for how your app plans to use extended permissions, if any',
 				'', //[[MediaWiki:facebook-auth-dialog-explanation]]
 			),
 			array(
@@ -756,18 +756,16 @@ class SpecialConnect extends SpecialPage {
 			
 			$html .= '
 	<tr>
-		<td style="text-align:right;">
+		<td style="text-align:right; padding:0;">
+			' . ($tip == '' ? '' :
+			'<img class="mw-facebook-tip" id="facebook-tip-' . $field . '" src="' . $wgStylePath .
+				'/common/images/tooltip_icon.png" title="' . $tip . '"> &nbsp;') . '
 			<b>' . $title .':</b>
 		</td>
-		<td class="mw-facebook-tip" id="tip-' . $field . '">
-			' . ($tip == '' ? '' :
-			'<a  id=href="#" style="margin-right:8px;"><img src="' . $wgStylePath .
-					'/common/images/tooltip_icon.png"></a>
-			<div style="display:none;">' . $tip . '</div>') . '
-		</td>
-		<td id="' . $field . '">
-			' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) .
-			($icon ? '<img src="' . $icon . '" style="width:20px; height:20px;">' : '') . '
+		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
+			<span class="facebook-field-value1">' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
+			' . ($icon ? '&nbsp; <img src="' . $icon . '" style="width:20px; height:22px;">
+			<div class="facebook-field-value2" style="display:none;">' . $correct . '</div>' : '') . '
 		</td>
 	</tr>';
 		}
