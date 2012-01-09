@@ -147,9 +147,9 @@ class FacebookApplication {
 				//'auth_dialog_data_help_url', // I don't know what this URL should be
 				'auth_dialog_description', // The description of an app that appears in the Auth Dialog (140)
 				'auth_dialog_headline',    // One line description of an app that appears in the Auth Dialog (30)
-				//'auth_dialog_perms_explanation', // The text to explain why an app needs additional permissions that
-				                                   // appears in the Auth Dialog. If you ask for any extended permissions,
-				                                   // you should provide an explanation for how your app plans to use them.
+				'auth_dialog_perms_explanation', // The text to explain why an app needs additional permissions that
+				                                 // appears in the Auth Dialog. If you ask for any extended permissions,
+				                                 // you should provide an explanation for how your app plans to use them.
 				'contact_email',           // Should probably be $wgEmergencyContact
 				'creator_uid',             // Application creator
 				'deauth_callback_url',     // Deauthorization callback
@@ -166,6 +166,12 @@ class FacebookApplication {
 			
 			try {
 				self::$info = $facebook->api("/{$this->id}?fields=" . implode(',', $fields));
+				// Fill in missing fields with false values
+				foreach ( $fields as $field ) {
+					if ( !isset( self::$info[$field] ) ) {
+						self::$info[$field] = false;
+					}
+				}
 			} catch (FacebookApiException $e) {
 				error_log( $e->getMessage() );
 				self::$info = array( 'id' => $this->id );
