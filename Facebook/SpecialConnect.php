@@ -192,6 +192,7 @@ class SpecialConnect extends SpecialPage {
 			if ( !empty( $this->mReturnToQuery ) )
 				$urlaction .= "&returntoquery=$this->mReturnToQuery";
 		}
+		// TODO: This should be $this->makespecialUrl()...
 		$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl($specialPage, $urlaction));
 	}
 	
@@ -343,8 +344,11 @@ class SpecialConnect extends SpecialPage {
 				$app = new FacebookApplication();
 				if ( $app->canEdit() ) {
 					$this->sendPage('debugView');
+					// Early return here so that we can slide into default
+					return;
 				}
 			}
+			// no break
 		/**
 		 * Special:Connect was called with no subpage specified.
 		 * 
@@ -526,14 +530,12 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Special:Connect/Debug
 	 * 
-	 * This is the only subpage that can be called directly. It allows the user
+	 * This is the only subpage that can be called directly. It allows an admin
 	 * to verify that the app is set up correctly inside Facebook, and offers
 	 * to automatically fix some of the problems it detects.
-	 * 
-	 * TODO: Finish this function
 	 */
 	private function debugView() {
-		global $wgRequst;
+		global $wgRequest, $wgOut, $wgFbNamespace, $wgFbLogo, $wgEmergencyContact, $wgStylePath;
 		
 		// "Enter a page name to view it as an object in the Open Graph." Render a button that
 		// submits the wpPageName field to Special:Connect/Debug and handle the submission here.
@@ -541,7 +543,6 @@ class SpecialConnect extends SpecialPage {
 		// The following code is untested
 		$pageName = $wgRequest->getText('wpPageName');
 		if ( $pageName != '' ) {
-			$pageName = 'Main Page';
 			$title = Title::newFromText( $pageName );
 			if ( !( $title instanceof Title ) ) {
 				$title = Title::newMainPage();
@@ -551,7 +552,234 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		// Do some other stuff with the FacebookApplication class
+		$wgOut->setPageTitle(wfMsg('facebook-debug'));
+		
+		$app = new FacebookApplication();
+		$info = $app->getInfo();
+		
+		// If the request failed, 'id' will be the only field
+		$id = $info['id'];
+		unset($info['id']);
+		
+		if ( empty( $info ) ) {
+			$wgOut->addHTML("No application information could be retrieved from Facebook.");
+			return;
+		}
+		
+		$server = '';
+		// Lookup the server name
+		if( isset( $_SERVER['SERVER_NAME'] ) ) {
+	        $server = $_SERVER['SERVER_NAME'];
+		} elseif( isset( $_SERVER['HOSTNAME'] ) ) {
+	        $server = $_SERVER['HOSTNAME'];
+		} elseif( isset( $_SERVER['HTTP_HOST'] ) ) {
+	        $server = $_SERVER['HTTP_HOST'];
+		} elseif( isset( $_SERVER['SERVER_ADDR'] ) ) {
+	        $server = $_SERVER['SERVER_ADDR'];
+		}
+		
+		// Might as well not show a blank logo
+		if ( !$info['icon_url'] && !empty( $wgFbLogo ) ) {
+			$info['icon_url'] = $wgFbLogo;
+		}
+		
+		// Get a link to the creator's wiki page or Facebook profile page
+		$creatorLink = '';
+		if ( $info['creator_uid'] ) {
+			$creator = new FacebookUser( $info['creator_uid'] );
+			if ( $creator->getMWUser()->getId() ) {
+				$creatorLink = '<a href="' .
+						$creator->getMWUser()->getUserPage()->getFullURL() . '">' .
+						$creator->getMWUser()->getName() . '</a>';
+			} else {
+				$creatorLink = '<span class="mw-facebook-logo"><a ' .
+						'href="https://www.facebook.com/profile.php?id=' .
+						$info['creator_uid'] . '">' . $info['creator_uid'] . '</a></span>';
+			}
+		}
+		
+		// Format is: (field_name, Display name, Description, Suggested value)
+		$field_array = array(
+			array(
+				'namespace',
+				'Namespace',
+				'Namespace for your app used for Open Graph',
+				FacebookAPI::isNamespaceSetup() ? $wgFbNamespace : '',
+			),
+			array(
+				'website_url',
+				'Website URL',
+				'URL of the Main Page',
+				Title::newMainPage()->getFullURL(),
+			),
+				array(
+				'deauth_callback_url',
+				'Deauthorize URL',
+				'Set this to Special:Connect/Deauth',
+				self::getTitleFor('Connect', 'Deauth')->getFullURL(),
+			),
+			array(
+				'privacy_policy_url',
+				'Privacy policy URL',
+				'',
+				Title::newFromText(wfMsg('privacypage'))->getFullURL(),
+			),
+			array(
+				'terms_of_service_url',
+				'Terms of service URL',
+				'',
+				'',
+			),
+			array(
+				'app_domains',
+				'App domains',
+				'Domains and subdomains this app can use (e.g., "example.com" will enable *.example.com)',
+				$server,
+			),
+			array(
+				'contact_email',
+				'Contact email',
+				'Primary email used for important communication related to your app',
+				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
+			),
+			array(
+				'user_support_email',
+				'User support email',
+				'Main contact email for this app',
+				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
+			),
+			array(
+				'auth_dialog_headline',
+				'Auth dialog headline',
+				'Description that appears in the Auth Dialog (30 characters or less)',
+				'',
+			),
+			array(
+				'auth_dialog_description',
+				'Auth dialog description',
+				'Description that appears in the Auth Dialog (140 characters or less)',
+				'', //[[MediaWiki:facebook-auth-dialog-description]]
+			),
+			array(
+				'auth_dialog_perms_explanation',
+				'Explanation for permissions',
+				'Description that appears in the Auth Dialog (140 characters or less)',
+				'', //[[MediaWiki:facebook-auth-dialog-explanation]]
+			),
+			array(
+				'description',
+				'News feed description',
+				'Description that appears on News Feed stories',
+				'',
+			),
+			array(
+				'daily_active_users',
+				'Daily active users',
+				'',
+				'',
+			),
+			array(
+				'weekly_active_users',
+				'Weekly active users',
+				'',
+				'',
+			),
+			array(
+				'monthly_active_users',
+				'Monthly active users',
+				'',
+				'',
+			),
+		);
+		
+		// Build the html
+		$html = '
+<table>
+	<tr>
+		<td>
+			<a href="' . $info['link'] . '">
+				<img src="' . $info['logo_url'] . '" style="width:75px; height:75px;">
+			</a>
+		</td>
+		<td><div>
+			<h3>
+				<a href="' . $info['link'] . '">
+					<span style="padding-left: 19px; background:url(\'' . $info['icon_url'] . '\') no-repeat left center;">
+						' . $info['name'] . '
+					</span>
+				</a>
+			</h3>
+			<div><table>
+				<tr>
+					<td><b>App ID:</b></td>
+					<td>' . $id . '</td>
+				</tr>
+				<tr>
+					<td><b>App creator:</b></td>
+					<td>' . $creatorLink . '</td>
+				</td>
+			</table></div>
+		</div></td>
+	</tr>
+</table>
+<br/><br/>
+<table>';
+		
+		global $wgVersion;
+		foreach ( $field_array as $item ) {
+			$field   = $item[0]; // field_name
+			$title   = $item[1]; // Display name
+			$tip     = $item[2]; // Description
+			$correct = $item[3]; // Suggested value
+			
+			if ( $field == 'app_domains' )
+				continue; // TODO: $field is an array and involves wildcards
+			
+			// The icons we use are included from MW 1.17
+			$icon = false;
+			if ( $correct != '' && version_compare( $wgVersion, '1.17', '>=' ) ) {
+				if ( $info[$field] == $correct ) {
+					$icon = 'tick-32.png';
+				} else {
+					switch ($field) {
+						// Critical errors
+						case 'namespace':
+						case 'deauth_callback_url':
+						case 'privacy_policy_url': // Necessary per Facebook's TOS
+							$icon = 'critical-32.png';
+						default:
+							$icon = 'warning-32.png';
+					}
+				}
+				$icon = "$wgStylePath/common/images/$icon";
+			}
+			
+			$html .= '
+	<tr>
+		<td style="text-align:right;">
+			<b>' . $title .':</b>
+		</td>
+		<td class="mw-facebook-tip" id="tip-' . $field . '">
+			' . ($tip == '' ? '' :
+			'<a  id=href="#" style="margin-right:8px;"><img src="' . $wgStylePath .
+					'/common/images/tooltip_icon.png"></a>
+			<div style="display:none;">' . $tip . '</div>') . '
+		</td>
+		<td id="' . $field . '">
+			' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) .
+			($icon ? '<img src="' . $icon . '" style="width:20px; height:20px;">' : '') . '
+		</td>
+	</tr>';
+		}
+		
+		$html .= '
+</table><br/>' . "\n";
+		
+		$wgOut->addHTML( $html );
+		
+		// Print the entire array returned from getInfo()
+		#$wgOut->addHTML("<pre>" . print_r($info, true) . "</pre>");
+		
 	}
 	
 	/**
@@ -663,7 +891,6 @@ class SpecialConnect extends SpecialPage {
 	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
 		global $wgUser, $wgOut, $wgFbDisableLogin;
 		
-		$titleObj = SpecialPage::getTitleFor( 'Connect' );
 		if ( wfReadOnly() ) {
 			// The wiki is in read-only mode
 			$wgOut->readOnlyPage();
@@ -678,6 +905,7 @@ class SpecialConnect extends SpecialPage {
 				LoginForm::userBlockedMessage();
 				return;
 			} else {
+				$titleObj = SpecialPage::getTitleFor( 'Connect' );
 				$permErrors = $titleObj->getUserPermissionsErrors('createaccount', $wgUser, true);
 				if (count( $permErrors ) > 0) {
 					// Special case for permission errors
