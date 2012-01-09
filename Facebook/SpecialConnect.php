@@ -608,7 +608,7 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'namespace',
 				'Namespace',
-				'Namespace for your app used for Open Graph',
+				'Namespace your app uses for Open Graph',
 				FacebookAPI::isNamespaceSetup() ? $wgFbNamespace : '',
 			),
 			array(
@@ -626,7 +626,7 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'privacy_policy_url',
 				'Privacy policy URL',
-				'',
+				'The Facebook Platform Terms of Service require a privacy policy URL',
 				Title::newFromText(wfMsg('privacypage'))->getFullURL(),
 			),
 			array(
@@ -707,22 +707,25 @@ class SpecialConnect extends SpecialPage {
 			</a>
 		</td>
 		<td><div>
-			<h3>
-				<a href="' . $info['link'] . '">
-					<span style="padding-left: 19px; background:url(\'' . $info['icon_url'] . '\') no-repeat left center;">
-						' . $info['name'] . '
-					</span>
-				</a>
+			<h3 style="float:left;padding:0 !important;">
+				<span style="padding-left: 22px; background:url(\'' . $info['icon_url'] . '\') no-repeat left center;">
+					' . $info['name'] . '
+				</span>
 			</h3>
-			<div><table>
+			<div style="font-size:0.9em;"><table cellpadding="0" cellspacing="0">
 				<tr>
 					<td><b>App ID:</b></td>
-					<td>' . $id . '</td>
+					<td style="padding:0 14px;"><a href="' . $info['link'] . '">' . $id . '</a></td>
 				</tr>
 				<tr>
 					<td><b>App creator:</b></td>
-					<td>' . $creatorLink . '</td>
+					<td style="padding:0 14px;">' . $creatorLink . '</td>
 				</td>
+				<tr>
+					<td colspan="2" style="font-size:0.95em">
+						<a href="https://developers.facebook.com/apps/' . $id . '/summary">(Edit settings)</a>
+					</td>
+				</tr>
 			</table></div>
 		</div></td>
 	</tr>
@@ -751,6 +754,7 @@ class SpecialConnect extends SpecialPage {
 						case 'deauth_callback_url':
 						case 'privacy_policy_url': // Necessary per Facebook's TOS
 							$icon = 'critical';
+							break;
 						default:
 							$icon = 'warning';
 					}
@@ -768,7 +772,7 @@ class SpecialConnect extends SpecialPage {
 		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
 			<span>' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
 			' . ($icon ? '&nbsp; <img src="' . $wgStylePath . '/common/images/' . $icon .
-			'-32.png" style="width:20px; height:22px;"/>
+			'-32.png" style="width:22px; height:22px;"/>
 			<div class="facebook-field-' . $icon . '" style="display:none;">' . $correct . '</div>' : '') . '
 		</td>
 	</tr>';
