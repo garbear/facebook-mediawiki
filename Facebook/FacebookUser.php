@@ -450,6 +450,39 @@ class FacebookUser {
 	}
 	
 	/**
+	 * Disconnects the Facebook user from its MediaWiki account.
+	 */
+	function disconnect() {
+		// Remove the user from the database
+		$rows = FacebookDB::removeFacebookID($this->user);
+		
+		if ( $rows ) {
+			// Successful deauthorization. Notify the user by email, and possibly
+			// ask them to choose a new password
+			
+			// Check to see if password changes are allowed
+			// TODO: Email the user anyway with a notification about the disconnect
+			if ( !$wgAuth->allowPasswordChange() ) {
+				return;
+			}
+			
+			// Remind password attemp
+			$params = new FauxRequest( array (
+					'wpName' => $this->user->getName()
+			));
+			$loginForm = new LoginForm($params);
+			
+			// TODO: Update the messages sent by email
+			//$this->user->load() // called by getName()
+			if ( $this->user->mPassword == '' ) {
+				//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
+			} else {
+				//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
+			}
+		}
+	}
+	
+	/**
 	 * Update a user's settings with the values retrieved from the current
 	 * logged-in Facebook user. Settings are only updated if a different value
 	 * is returned from Facebook and the user's settings allow an update on

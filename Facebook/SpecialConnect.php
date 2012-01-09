@@ -312,15 +312,24 @@ class SpecialConnect extends SpecialPage {
 			break;
 		/**
 		 * Special:Connect/Deauth is a callback used by Facebook to notify the
-		 * application that the Facebook user has deauthenticated the app. It
-		 * will never be called directly from the application and always sends
-		 * an error (even to Facebook, but in that case the error is ignored).
+		 * application that the Facebook user has deauthenticated the app
+		 * (removed it from thier app settings page). If the request for this
+		 * page isn't signed by Facebook, it will redirect to Special:Connect.
 		 */
 		case 'Deauth':
-			// The model is updated in manageDeauthorizePost()
-			$this->manageDeauthorizePost();
-			// Always send an error saying the user shouldn't be here
-			$this->sendError('facebook-reclamation-title-error', 'facebook-reclamation-body-error');
+			// Facebook will include a signed_request param to verify authenticity
+			global $facebook;
+			$signed_request = $facebook->getSignedRequest();
+			if ( $signed_request ) {
+				// Update the model
+				$fbUser = new FacebookUser($signed_request['user_id']);
+				$fbUser->disconnect();
+				// What view should we show to Facebook? It doesn't really matter...
+				$this->setHeaders();
+			} else {
+				// signed_request not present or hash mismatch
+				$this->sendRedirect('Connect');
+			}
 			break;
 		/**
 		 * Special:Connect/Debug allows an administrator to veriy both the
@@ -517,63 +526,6 @@ class SpecialConnect extends SpecialPage {
 		
 		// Update the model
 		$fbUser->attachUser($wgUser->getName(), '', $this->getUpdatePrefs());
-	}
-	
-	/**
-	 * Special:Connect/Deauth
-	 * 
-	 * This should only be called by Facebook as a callback for a user
-	 * deauthorizing the application (removing it from their list of apps).
-	 * 
-	 * "Early returns are evil." Maybe this function should be refactored, but
-	 * the current lookup-verify-continue process makes it clear what the error
-	 * is, and besides we aren't returning a value or dealing with different
-	 * control paths.
-	 */
-	private function manageDeauthorizePost() {
-		global $facebook;
-		
-		// Facebook will include a signed_request param to verify authenticity
-		$signed_request = $facebook->getSignedRequest();
-		if ( !$signed_request ) {
-			// Error: signed_request not present or hash mismatch
-			return;
-		}
-		
-		$fbUser = new FacebookUser($signed_request['user_id']);
-		$mwUser = $fbUser->getMWUser();
-		if ( !$mwUser->getId() ) {
-			// Error: Account wasn't associated with a MediaWiki user
-			return;
-		}
-		
-		$rows = FacebookDB::removeFacebookID($mwUser);
-		if ( !$rows ) {
-			// Error: Associated didn't exist in database
-			return;
-		}
-		
-		// Successful deauthorization. Notify the user by email, and possibly
-		// ask them to choose a new password
-		
-		// Check to see if password changes are allowed
-		// TODO: Email the user anyway with a notification about the disconnect
-		if ( !$wgAuth->allowPasswordChange() ) {
-			return;
-		}
-		
-		// Remind password attemp
-		$params = new FauxRequest( array (
-			'wpName' => $mwUser->getName()
-		));
-		$loginForm = new LoginForm($params);
-		
-		// TODO: Update the messages sent by email
-		if ( $mwUser->mPassword == '' ) {
-			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle', 'facebook-passwordremindertext' );
-		} else {
-			//$loginForm->mailPasswordInternal( $mwUser, true, 'facebook-passwordremindertitle-exist', 'facebook-passwordremindertext-exist' );
-		}
 	}
 	
 	/**
