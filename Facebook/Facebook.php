@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright ï¿½ 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright © 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -27,7 +27,7 @@
  * @file
  * @ingroup Extensions
  * @author Garrett Brown, Sean Colombo
- * @copyright Copyright ï¿½ 2008-2012 Garrett Brown, Sean Colombo
+ * @copyright Copyright © 2008-2012 Garrett Brown, Sean Colombo
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
@@ -40,7 +40,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, January 8, 2012' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, January 7, 2012' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
@@ -71,6 +71,13 @@ if (file_exists( $dir . 'config.php' )) {
 
 // Install the extension
 $wgExtensionFunctions[] = 'FacebookInit::init';
+
+if( !empty( $wgFbEnablePushToFacebook ) ) {
+	// Need to include it explicitly instead of autoload since it has initialization
+	// code of its own. This should be done after Facebook::init is added to
+	// $wgExtensionFunctions so that Facebook gets fully initialized first.
+	require_once $dir . 'FacebookPushEvent.php';
+}
 
 $wgExtensionMessagesFiles['Facebook'] = $dir . 'Facebook.i18n.php';
 $wgExtensionMessagesFiles['FBPushEvents'] = $dir . 'pushEvents/FBPushEvents.i18n.php';
