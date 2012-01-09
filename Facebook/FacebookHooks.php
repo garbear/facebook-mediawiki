@@ -376,7 +376,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		global $wgVersion;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
-			unset( $vars['wgFbScript'] ); // not used outside of ResourceLoader
+			unset( $vars['fbScript'] ); // not used outside of ResourceLoader
 		}
 		return true;
 	}
