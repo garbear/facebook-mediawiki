@@ -460,12 +460,6 @@ class FacebookUser {
 			// Successful deauthorization. Notify the user by email, and possibly
 			// ask them to choose a new password
 			
-			// Check to see if password changes are allowed
-			// TODO: Email the user anyway with a notification about the disconnect
-			if ( !$wgAuth->allowPasswordChange() ) {
-				return;
-			}
-			
 			// Remind password attemp
 			$params = new FauxRequest( array (
 					'wpName' => $this->user->getName()
@@ -533,6 +527,7 @@ class FacebookUser {
 	 */
 	static function getOptionFromInfo($option, $userinfo) {
 		// Lookup table for the names of the settings
+		              /* MediaWiki */     /* Facebook */
 		$params = array('nickname'       => 'username',
 		                'fullname'       => 'name',
 		                'firstname'      => 'first_name',
