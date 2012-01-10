@@ -615,6 +615,8 @@ class SpecialConnect extends SpecialPage {
 		
 		// The values of these fields are pulled from the extension messages
 		$fields_with_msgs = array(
+			'privacy_policy_url'            => 'privacypage',
+			'terms_of_service_url'          => 'facebook-termsofservicepage',
 			'auth_dialog_headline'          => 'facebook-auth-dialog-headline',
 			'auth_dialog_description'       => 'facebook-auth-dialog-description',
 			'auth_dialog_perms_explanation' => 'facebook-auth-dialog-explanation',
@@ -650,7 +652,7 @@ class SpecialConnect extends SpecialPage {
 				'terms_of_service_url',
 				'Terms of service URL',
 				'',
-				'',
+				Title::newFromText(wfMsg('facebook-termsofservicepage'))->getFullURL(),
 			),
 			array(
 				'app_domains',
@@ -781,6 +783,7 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			
+			// If the field's value came from a message, link to the message in NS_MEDIAWIKI
 			foreach ( $fields_with_msgs as $field_name => $msg_name ) {
 				if ( $field == $field_name ) {
 					$title = '<a href="' . Title::newFromText('MediaWiki:' .
