@@ -40,7 +40,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, January 9, 2012' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, Jan 10, 2012' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
@@ -50,7 +50,7 @@ define( 'FACEBOOK_LOCALE', '%LOCALE%');
  */
 $wgExtensionCredits['specialpage'][] = array(
 	'path'           => __FILE__,
-	'name'           => 'Facebook for MediaWiki',
+	'name'           => 'Facebook Open Graph for MediaWiki',
 	'author'         => 'Garrett Brown, Sean Colombo, Tomek Odrobny',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:Facebook',
 	'descriptionmsg' => 'facebook-desc',

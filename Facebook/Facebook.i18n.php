@@ -26,9 +26,8 @@ $messages = array();
 /** English */
 $messages['en'] = array(
 	// Extension name
-	'facebook'   => 'Facebook for MediaWiki',
-	'facebook-desc'     => 'Enables users to login with their Facebook accounts.
-Offers optional authentification based on Facebook groups and the use of FBML in wiki text',
+	'facebook'   => 'Facebook Open Graph for MediaWiki',
+	'facebook-desc'     => '\'\'\'Facebook Open Graph\'\'\' for MediaWiki allows users to log in with their Facebook account and integrates your wiki into Facebook\'s Open Graph. Open Graph social plugins can be used on wiki pages, and you can even manage user rights from within Facebook using Facebook Groups.',
 	// Group containing Facebook Connect users
 	'group-fb-user'           => 'Facebook users',
 	'group-fb-user-member'    => 'Facebook user',
