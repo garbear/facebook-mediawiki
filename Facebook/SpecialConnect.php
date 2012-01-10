@@ -646,13 +646,13 @@ class SpecialConnect extends SpecialPage {
 				'privacy_policy_url',
 				'Privacy policy URL',
 				'The Facebook Platform Terms of Service require a privacy policy URL',
-				Title::newFromText(wfMsg('privacypage'))->getFullURL(),
+				Title::newFromText(wfMsg($fields_with_msgs['privacy_policy_url']))->getFullURL(),
 			),
 			array(
 				'terms_of_service_url',
 				'Terms of service URL',
 				'',
-				Title::newFromText(wfMsg('facebook-termsofservicepage'))->getFullURL(),
+				Title::newFromText(wfMsg($fields_with_msgs['terms_of_service_url']))->getFullURL(),
 			),
 			array(
 				'app_domains',
@@ -787,9 +787,17 @@ class SpecialConnect extends SpecialPage {
 			foreach ( $fields_with_msgs as $field_name => $msg_name ) {
 				if ( $field == $field_name ) {
 					$title = '<a href="' .
-							Title::newFromText($fields_with_msgs[$field], NS_MEDAIWIKI)->getFullURL() .
+							Title::newFromText($fields_with_msgs[$field], NS_MEDIAWIKI)->getFullURL() .
 							'">' . $title . '</a>';
 					break;
+				}
+			}
+			
+			// Also, if the message is a page name, link to the page (in red) if it doesn't exist
+			if ( $field == 'privacy_policy_url' || $field == 'terms_of_service_url' ) {
+				$titleObj = Title::newFromText(wfMsg($fields_with_msgs[$field]));
+				if ( !$titleObj->exists() ) {
+					$info[$field] = '<a href="' . $titleObj->getFullURL() . '" class="new">' . $info[$field] . '</a>';
 				}
 			}
 			
