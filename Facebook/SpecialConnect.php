@@ -786,8 +786,9 @@ class SpecialConnect extends SpecialPage {
 			// If the field's value came from a message, link to the message in NS_MEDIAWIKI
 			foreach ( $fields_with_msgs as $field_name => $msg_name ) {
 				if ( $field == $field_name ) {
-					$title = '<a href="' . Title::newFromText('MediaWiki:' .
-							$fields_with_msgs[$field])->getFullURL() . '">' . $title . '</a>';
+					$title = '<a href="' .
+							Title::newFromText($fields_with_msgs[$field], NS_MEDAIWIKI)->getFullURL() .
+							'">' . $title . '</a>';
 					break;
 				}
 			}
