@@ -562,7 +562,7 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		$wgOut->setPageTitle(wfMsg('facebook-debug'));
+		$wgOut->setPageTitle(wfMsg('facebook-debug-title'));
 		
 		// Include the JavaScript that lets us change the application properties
 		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
@@ -749,8 +749,8 @@ class SpecialConnect extends SpecialPage {
 			</table></div>
 		</div></td>
 	</tr>
-</table>
-<br/>
+</table><br/>
+<p>' . wfMsg ( 'facebook-debug-msg' ) . '</p><br/>
 <table>';
 		
 		foreach ( $field_array as $item ) {
