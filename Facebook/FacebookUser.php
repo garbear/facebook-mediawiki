@@ -99,7 +99,10 @@ class FacebookUser {
 	
 	function logout() {
 		global $facebook;
-		$facebook->destroySession();
+		// Only destroy the session if it's for the current user
+		if ( $this->id && $this->id == $facebook->getUser() ) {
+			$facebook->destroySession();
+		}
 		$this->id = 0;
 		$this->user = new User();
 	}
