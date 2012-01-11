@@ -101,7 +101,9 @@ $messages['en'] = array(
 	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue as $2, you must first log out of {{SITENAME}}.',
     // Special:Connect/Debug
 	'facebook-debug-title' => 'Facebook Application Debugger',
-	'facebook-debug-msg' => 'If a problem is indicated, click the icon to update that setting on Facebook.',
+	'facebook-debug-msg' => 'If a problem with your Facebook application\'s settings is indicated, click the icon to update that setting on Facebook.
+
+To change the default value, follow the link to the interface message on the left.',
 	'facebook-termsofservicepage' => 'Project:Terms of service',
 	'facebook-auth-dialog-headline' => '{{SITENAME}}',
 	'facebook-auth-dialog-description' => 'Welcome to the social experience on {{SITENAME}}. On the next screen, you will be able to choose a username for yourself.',

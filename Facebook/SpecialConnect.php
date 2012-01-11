@@ -751,8 +751,8 @@ class SpecialConnect extends SpecialPage {
 			</table></div>
 		</div></td>
 	</tr>
-</table><br/>
-<p>' . wfMsg ( 'facebook-debug-msg' ) . '</p><br/>
+</table>
+' . wfMsgWikiHtml( 'facebook-debug-msg' ) . '<br/>
 <table>';
 		
 		foreach ( $field_array as $item ) {
@@ -793,13 +793,27 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			
+			
+			
 			// Also, if the message is a page name, link to the page (in red) if it doesn't exist
 			if ( $field == 'privacy_policy_url' || $field == 'terms_of_service_url' ) {
 				$titleObj = Title::newFromText(wfMsg($fields_with_msgs[$field]));
-				if ( !$titleObj->exists() ) {
+				// Don't add a link to an empty $info[$field]
+				if ( !$titleObj->exists() && $info[$field] != '' ) {
 					$info[$field] = '<a href="' . $titleObj->getFullURL() . '" class="new">' . $info[$field] . '</a>';
 				}
 			}
+			
+			// Placeholder indicating particular field is empty
+			if ($info[$field] == '') {
+				$info[$field] = '<em>empty</em>';
+			}
+			
+			$icon_tooltip = array(
+				'tick' => 'OK',
+				'warning' => 'Click to update',
+				'critical' => 'Click to update',
+			);
 			
 			$html .= '
 	<tr>
@@ -811,14 +825,15 @@ class SpecialConnect extends SpecialPage {
 		</td>
 		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
 			<div class="facebook-field-current">
-				<span>' . ($info[$field] == '' ? '<em>empty</em>' : $info[$field] ) . '</span>
+				<span>' . $info[$field] . '</span>
 				' . ($icon ? '&nbsp; ' . ($icon != 'tick' ? '<a href="#">' : '') . '<img src="' . $wgStylePath .
-				'/common/images/' . $icon . '-32.png" style="width:22px; height:22px;" />' . ($icon != 'tick' ?
+				'/common/images/' . $icon . '-32.png" style="width:22px; height:22px;" title="' . $icon_tooltip[$icon] . '" />' . ($icon != 'tick' ?
 				'</a>' : '') : '') . '
 			</div>' . ($icon ? '
 			<div class="facebook-field-' . $icon . '" style="display:none;">
 				<span>' . $correct . '</span>
-				&nbsp; <img src="' . $wgStylePath . '/common/images/tick-32.png" style="width:22px; height:22px;" />
+				&nbsp; <img src="' . $wgStylePath .
+				'/common/images/tick-32.png" style="width:22px; height:22px;" title="' . $icon_tooltip['tick'] . ' " />
 			</div>' : '') . '
 		</td>
 	</tr>';
@@ -831,8 +846,8 @@ class SpecialConnect extends SpecialPage {
 		$html .= '
 <form action="' . $this->getTitle('Debug')->getLocalUrl() . '" method="POST" style="padding-left:14px;">
 	<h3>' . wfMsg('facebook-object-debug-title') . '</h3>
-	<label for="wpPageName">' . wfMsg('facebook-object-debug') . '</label><br/>
-	<input name="wpPageName" id="wpPageName" size="60" value="" /> &nbsp;
+	<label for="wpPageName"><p>' . wfMsg('facebook-object-debug') . '</p></label>
+	<input name="wpPageName" id="wpPageName" size="42" value="" style="font-size:1.75em;" /> &nbsp;
 	<input type="submit" value="' . wfMsg('facebook-debug') . '" name="Debug" />
 </form><br/><br/>' . "\n";
 		
