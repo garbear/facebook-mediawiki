@@ -15,6 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/**
+ * UserLogin --> Connect
+ *
+ * This feaux special page redirects the user to Special:Connect if
+ * $wgFbDisableLogin is set to true.
+ */
+class SpecialUserLoginToConnect extends SpecialRedirectToSpecial {
+	function __construct(){
+		parent::__construct( 'UserLogin', 'Connect', false,
+				array( 'returnto', 'returntoquery' ) );
+	}
+}
+
 /**
  * Class FacebookHooks
  * 
@@ -53,25 +67,30 @@ class FacebookHooks {
 	static function AutopromoteCondition( $cond_type, $args, $user, &$result ) {
 		global $wgFbUserRightsFromGroup;
 		
-		// If there's no group to pull rights from, the user can't be a member
-		$result = false;
-		if ( !empty( $wgFbUserRightsFromGroup ) ) {
-			$types = array(
-				APCOND_FB_INGROUP   => 'member',
-				APCOND_FB_ISADMIN   => 'admin'
-			);
-			$type = $types[$cond_type];
-			switch( $type ) {
-			case 'member':
-			case 'admin':
-				$fbUser = new FacebookUser();
-				// Only check for the currently logged-in user
-				if ($user->getId() && $user->getId() == $fbUser->getMWUser()->getId()) {
-					$rights = $fbUser->getGroupRights();
-					$result = $rights[$type];
+		switch ( $cond_type ) {
+			case APCOND_FB_USER:
+				$ids = FacebookDB::getFacebookIDs($user);
+				$result = count( $ids );
+				break;
+			case APCOND_FB_INGROUP:
+				$type = 'member';
+			case APCOND_FB_ISADMIN:
+				if (empty( $type ))
+					$type = 'admin';
+				// If there's no group to pull rights from, the user can't be a member
+				$result = false;
+				if ( !empty( $wgFbUserRightsFromGroup ) ) {
+					$ids = FacebookDB::getFacebookIDs($user);
+					if ( count( $ids ) ) {
+						// Assume $user doesn't have more than one Facebook ID
+						$fbUser = new FacebookUser( $ids[0] );
+						$rights = $fbUser->getGroupRights();
+						$result = $rights[$type];
+					}
 				}
-			}
+			// end switch
 		}
+		
 		return true;
 	}
 	
@@ -657,17 +676,11 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		if ( !empty( $wgFbDisableLogin) ) {
 			// U can't touch this
 			$aSpecialPages['Userlogin'] = array(
-				'SpecialRedirectToSpecial',
-				'UserLogin',
-				'Connect',
-				false,
-				array( 'returnto', 'returntoquery' ),
+				'SpecialUserLoginToConnect',
 			);
 			// Used in 1.12.x and above
 			$aSpecialPages['CreateAccount'] = array(
-				'SpecialRedirectToSpecial',
-				'CreateAccount',
-				'Connect',
+				'SpecialUserLoginToConnect',
 			);
 		}
 		return true;
@@ -740,7 +753,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		if ( !empty( $wgFbDisableLogin ) ) {
 			// If you would like sysops to still be able to create accounts
 			$whitelistSysops = false;
-			if ( !$whitelistSysops || !in_array( 'sysop', $user->getGroups() ) ) {
+			$groups = $user->getGroups();
+			if ( !$whitelistSysops || !in_array( 'sysop', $groups ) &&
+			                          !in_array( 'fb-admin', $groups ) ) {
 				foreach ( $aRights as $i => $right ) {
 					if ( $right == 'createaccount' ) {
 						unset( $aRights[$i] );

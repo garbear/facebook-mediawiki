@@ -424,9 +424,6 @@ class FacebookUser {
 		$this->user->setOption( 'rememberpassword', 1 ); 
 		//$this->user->setOption( 'skinoverwrite', 1 ); // Wikia code
 		
-		// Mark that the user is a Facebook user
-		$this->user->addGroup('fb-user');
-		
 		// I think this should be done here
 		$this->user->setToken();
 		

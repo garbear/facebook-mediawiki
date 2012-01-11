@@ -93,43 +93,46 @@ $wgFbSocialPlugins = true;
  * For easier wiki rights management, create a group on Facebook and place the
  * group ID here. The "user_groups" permission will automatically be requested
  * from users. Two new implicit groups will be created:
+ *    1.  fb-groupie     A member of the specified group
+ *    2.  fb-admin       An administrator of the Facebook group
  * 
- *    fb-groupie     A member of the specified group
- *    fb-admin       An administrator of the Facebook group
+ * Users will automatically be promoted or demoted when their status is
+ * modified from the group page within Facebook. If you find users are
+ * sometimes not being auto-promoted, try requesting the "offline_access"
+ * permission using the FacebookPermissions hook.
  * 
- * By default, they inherit priveleges from User and Sysop. Users will
- * automatically be promoted or demoted when their status is modified from the
- * group page within Facebook. Unfortunately, this has a minor degredation on
- * performance.
- * 
- * If you find users are sometimes not being auto-promoted, try requesting
- * the "offline_access" permission using the FacebookPermissions hook.
- */
-$wgFbUserRightsFromGroup = false;  # Or a quoted group ID
-
-/**
- * Turns the wiki into a Facebook-only wiki. Additionally, you can hide IP
- * addresses by setting $wgShowIPinHeader to false in LocalSettings.php. This
- * setting has three side-effects:
- *    1.  All users are stripped of the 'createaccount' right. To override this
- *        behavior, see UserGetRights() in FacebookHooks.php.
- *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
- *    3.  The "Log in / create account" links in the personal toolbar are removed.
- * 
- * This setting can also be used in conjunction with $wgFbUserRightsFromGroup. To
- * have this group exclusively control access to the wiki, set $wgFbDisableLogin to
+ * This setting can also be used in conjunction with $wgFbDisableLogin. To have
+ * this group exclusively control access to the wiki, set $wgFbDisableLogin to
  * true and add the following settings to Localsettings.php:
  * 
- * # Disable reading and editing by anonymous users
- * $wgGroupPermissions['*']['edit'] = false;
- * $wgGroupPermissions['*']['read'] = false;
+ * # Inherit priveleges from User and Sysop
+ * $wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
+ * $wgGroupPermissions['fb-admin']   = $wgGroupPermissions['sysop'];
  * 
- * # Reserve normal wiki browsing for only Facebook group members (and admins)
- * $wgGroupPermissions['sysop'] = $wgGroupPermissions['sysop'] + $wgGroupPermissions['user'];
- * $wgGroupPermissions['user'] = $wgGroupPermissions['*'];
+ * # Disable reading and editing by anonymous users
+ * $wgGroupPermissions['user']['read'] = $wgGroupPermissions['*']['read'] = false;
+ * $wgGroupPermissions['user']['edit'] = $wgGroupPermissions['*']['edit'] = false;
  * 
  * # But allow all users to read these pages:
  * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
+ */
+$wgFbUserRightsFromGroup = false;  # Or a quoted group ID, or an array of groups
+
+/**
+ * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
+ *    1.  All users are stripped of the 'createaccount' right. To override this
+ *        behavior for admins, see UserGetRights() in FacebookHooks.php.
+ *    2.  Special:Userlogin and Special:CreateAccount redirect to Special:Connect
+ *    3.  The "Log in / create account" links in the personal toolbar are removed.
+ * 
+ * You can make the wiki exclusively for Facebook users with these four lines:
+ * 
+ * $wgGroupPermissions['fb-user'] = $wgGroupPermissions['user'];
+ * $wgGroupPermissions['user']['read'] = $wgGroupPermissions['*']['read'] = false;
+ * $wgGroupPermissions['user']['edit'] = $wgGroupPermissions['*']['edit'] = false;
+ * $wgWhitelistRead = array('-', 'Special:Connect', 'Special:UserLogin', 'Special:UserLogout');
+ * 
+ * You can also hide IP addresses using $wgShowIPinHeader.
  */
 $wgFbDisableLogin = false;
 

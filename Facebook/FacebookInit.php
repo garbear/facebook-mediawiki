@@ -87,7 +87,9 @@ class FacebookInit {
 		// Set up group autopromote conditions
 		global $wgFbUserRightsFromGroup;
 		if ( !empty( $wgFbUserRightsFromGroup ) ) {
-			global $wgAutopromote;
+			global $wgImplicitGroups, $wgAutopromote;
+			$wgImplicitGroups[] = 'fb-groupie';
+			$wgImplicitGroups[] = 'fb-admin';
 			$wgAutopromote['fb-groupie'] = APCOND_FB_INGROUP;
 			$wgAutopromote['fb-admin']   = APCOND_FB_ISADMIN;
 		}

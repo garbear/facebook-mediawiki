@@ -45,9 +45,7 @@ define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, Jan 10, 2012' );
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
 
-/*
- * Add information about this extension to Special:Version.
- */
+// Add information about this extension to Special:Version.
 $wgExtensionCredits['specialpage'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'Facebook Open Graph for MediaWiki',
@@ -57,15 +55,11 @@ $wgExtensionCredits['specialpage'][] = array(
 	'version'        => MEDIAWIKI_FACEBOOK_VERSION,
 );
 
-/*
- * Initialization of the autoloaders and special extension pages.
- */
+// Load the default config. It's recommended that you override these in LocalSettings.php
 $dir = dirname( __FILE__ ) . '/';
-// Load the default configuration
-// It's recommended that you override these in LocalSettings.php
 include_once $dir . 'config.default.php';
-// If config.php exists, import those settings over the default ones
 if (file_exists( $dir . 'config.php' )) {
+	// If config.php exists, import those settings over the default ones
 	require_once $dir . 'config.php';
 }
 
@@ -91,17 +85,14 @@ $wgAutoloadClasses['ChooseNameTemplate'] = $dir . 'templates/ChooseNameTemplate.
 $wgSpecialPages['Connect'] = 'SpecialConnect';
 
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
+define( 'APCOND_FB_USER',      'fb*u' );
 define( 'APCOND_FB_INGROUP',   'fb*g' );
 define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
-// rt#68127 - Giving basic permissions to other groups might open security holes
-// See <http://trac.wikia-code.com/changeset/27160> and <http://trac.wikia-code.com/changeset/27928> for fix
-$wgGroupPermissions['fb-user']    = array('facebook-user' => true);
-$wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
-$wgGroupPermissions['fb-admin']   = $wgGroupPermissions['sysop'];
-$wgImplicitGroups[] = 'fb-user'; // Hide the fb-user group from Special:Listusers
-$wgImplicitGroups[] = 'fb-groupie';
-$wgImplicitGroups[] = 'fb-admin';
+// Add 'fb-user' group to Facebook users and granted the 'facebook-user' right
+$wgImplicitGroups[] = 'fb-user';
+$wgAutopromote['fb-user'] = APCOND_FB_USER;
+$wgGroupPermissions['fb-user'] = array('facebook-user' => true);
 
 //$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
 //$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
