@@ -19,7 +19,7 @@
 /**
  * UserLogin --> Connect
  *
- * This feaux special page redirects the user to Special:Connect if
+ * This faux special page redirects the user to Special:Connect if
  * $wgFbDisableLogin is set to true.
  */
 class SpecialUserLoginToConnect extends SpecialRedirectToSpecial {
