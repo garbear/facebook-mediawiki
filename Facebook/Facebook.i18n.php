@@ -26,40 +26,28 @@ $messages = array();
 /** English */
 $messages['en'] = array(
 	// Extension name
-	'facebook'   => 'Facebook Open Graph for MediaWiki',
-	'facebook-termsofservicepage' => 'Project:Terms of service',
-	'facebook-desc'     => '\'\'\'Facebook Open Graph\'\'\' for MediaWiki allows users to log in with their Facebook account and integrates your wiki into Facebook\'s Open Graph. Open Graph social plugins can be used on wiki pages, and you can even manage user rights from within Facebook using Facebook Groups.',
+	'facebook' => 'Facebook Open Graph for MediaWiki',
+	'facebook-desc' => '\'\'\'Facebook Open Graph\'\'\' for MediaWiki allows users to log in with their Facebook account and integrates your wiki into Facebook\'s Open Graph. Open Graph social plugins can be used on wiki pages, and you can even manage user rights from within Facebook using Facebook Groups.',
 	// Group containing Facebook Connect users
-	'group-fb-user'           => 'Facebook users',
-	'group-fb-user-member'    => 'Facebook user',
-	'grouppage-fb-user'       => '{{ns:project}}:Facebook users',
+	'group-fb-user' => 'Facebook users',
+	'group-fb-user-member' => 'Facebook user',
+	'grouppage-fb-user' => '{{ns:project}}:Facebook users',
 	// Group for Facebook users beloning to the group specified by $fbUserRightsFromGroup
-	'group-fb-groupie'        => 'Group members',
+	'group-fb-groupie' => 'Group members',
 	'group-fb-groupie-member' => 'Group member',
-	'grouppage-fb-groupie'    => '{{ns:project}}:Group members',
+	'grouppage-fb-groupie' => '{{ns:project}}:Group members',
 	// Admins of the Facebook group
-	'group-fb-admin'          => 'Group admins',
-	'group-fb-admin-member'   => 'Group administrator',
-	'grouppage-fb-admin'      => '{{ns:project}}:Group admins',
+	'group-fb-admin' => 'Group admins',
+	'group-fb-admin-member' => 'Group administrator',
+	'grouppage-fb-admin' => '{{ns:project}}:Group admins',
 	// Personal toolbar
-	'facebook-connect'  => 'Log in with Facebook',
-	'facebook-convert'  => 'Connect this account with Facebook',
-	'facebook-logout'   => 'Logout of Facebook',
-	'facebook-link'     => 'Back to facebook.com',
-	'facebook-or'       => 'OR',
-	'facebook-log-in'   => 'Log In',
-
+	'facebook-connect' => 'Log in with Facebook',
+	'facebook-convert' => 'Connect this account with Facebook',
+	'facebook-log-in' => 'Log In',
+	// Prefix to use for automatically-generated usernames
+	'facebook-usernameprefix' => 'FacebookUser',
 	// Special:Connect
-	'facebook-debug-title'    => 'Facebook Application Debugger',
-	'facebook-debug-msg' => 'If a problem is indicated, click the icon to update that setting on Facebook.',
-	'facebook-auth-dialog-headline' => '{{SITENAME}}',
-	'facebook-auth-dialog-description' => 'Welcome to the social experience on {{SITENAME}}. On the next screen, you will be able to choose a username for yourself.',
-	'facebook-auth-dialog-explanation' => 'Your email address is tied to your account and allows you to change your password. Your email address is kept private.',
-	'facebook-object-debug-title' => 'Open Graph Object Debugger',
-	'facebook-object-debug' => 'Input a page name to view the page in the Open Graph',
-	'facebook-debug' => 'Debug',
-	'facebook-title'    => 'Log in with Facebook',
-	'facebook-welcome'  => 'Welcome, Facebook user!',
+	'facebook-title' => 'Log in with Facebook',
 	'facebook-welcome-name' => 'Welcome, $1.',
 	'facebook-continue-text' => 'Your Facebook account is connected to the username $1. Would you like to log out and continue as this user?',
 	'facebook-continue-button' => 'Continue',
@@ -69,15 +57,6 @@ $messages['en'] = array(
 	'facebook-connect-text' => 'Facebook is enabled for your username. Click the button below to log in to Facebook.',
 	'facebook-only-text' => 'Logging in allows you to explore $1 using your Facebook identity.',
 	'facebook-logout-and-continue' => 'Log out and continue',
-	'facebook-logoutbox' => '$1
-
-This will also log you out of Facebook and all connected sites, including this wiki.',
-	'facebook-listusers-header' => '$1 and $2 privileges are automatically transfered from the officer and admin titles of the Facebook group $3.
-
-For more info, please contact the group creator $4.',
-	// Prefix to use for automatically-generated usernames
-	'facebook-usernameprefix' => 'FacebookUser',
-	// Special:Connect
 	'facebook-error' => 'Verification error',
 	'facebook-errortext' => 'An error occured during verification with Facebook.',
 	'facebook-cancel' => 'Action cancelled',
@@ -86,9 +65,9 @@ For more info, please contact the group creator $4.',
 	'facebook-invalidtext' => 'The selection made on the previous page was invalid.',
 	'facebook-success' => 'Facebook verification succeeded',
 	'facebook-successtext' => 'You have been successfully logged in with Facebook.',
-	'facebook-success-connecting-existing-account' => 'Your facebook account has been connected. To change which events get pushed to your Facebook news feed, please visit your <a href="$1">preferences</a> page.',
-	#'facebook-optional' => 'Optional',
-	#'facebook-required' => 'Required',
+	//'facebook-success-connecting-existing-account' => 'Your facebook account has been connected. To change which events get pushed to your Facebook news feed, please visit your <a href="$1">preferences</a> page.',
+	//'facebook-optional' => 'Optional',
+	//'facebook-required' => 'Required',
 	'facebook-nickname' => 'Nickname',
 	'facebook-fullname' => 'Fullname',
 	'facebook-gender' => 'Gender',
@@ -98,8 +77,7 @@ For more info, please contact the group creator $4.',
 	'facebook-chooselegend' => 'Username choice',
 	'facebook-updatelegend' => 'Update options',
 	'facebook-chooseinstructions' => 'All users need a nickname; you can choose one from the options below.',
-	'facebook-invalidname' => 'The nickname you chose is already taken or not a valid nickname.
-Please chose a different one.',
+	'facebook-invalidname' => 'The nickname you chose is already taken or not a valid nickname. Please chose a different one.',
 	'facebook-choosenick' => 'Your Facebook profile name ($1)',
 	'facebook-choosefirst' => 'Your first name ($1)',
 	'facebook-choosefull' => 'Your full name ($1)',
@@ -110,9 +88,6 @@ Please chose a different one.',
 	'facebook-choosepassword' => 'Password:',
 	'facebook-updateuserinfo' => 'Update the following information:',
 	'facebook-alreadyloggedin-title' => 'Already connected',
-	'facebook-alreadyloggedin' => "'''You are already logged in, $1!'''
-
-If you want to use Facebook Connect to log in in the future, you can [[Special:Connect/Convert|convert your account to use Facebook]].",
 	/*
 	'facebook-convertinstructions' => 'This form lets you change your user account to use an OpenID URL or add more OpenID URLs',
 	'facebook-convertoraddmoreids' => 'Convert to OpenID or add another OpenID URL',
@@ -121,13 +96,28 @@ If you want to use Facebook Connect to log in in the future, you can [[Special:C
 	'facebook-convertyourstext' => 'That is already your OpenID.',
 	'facebook-convertothertext' => 'That is someone else\'s OpenID.',
 	*/
-	'facebook-logged-in-now-connect' => 'You have been logged in to your account, please click the login button to connect it with Facebook.',
-	'facebook-logged-in-now-connect-title' =>  'Almost done!',
-	'facebook-modal-title' => 'Finish your account setup',
-    'facebook-modal-headmsg' => 'Almost done!',
 	'facebook-error-creating-user' => 'Error creating the user in the local database.',
 	'facebook-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
 	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue as $2, you must first log out of {{SITENAME}}.',
+    // Special:Connect/Debug
+	'facebook-debug-title' => 'Facebook Application Debugger',
+	'facebook-debug-msg' => 'If a problem is indicated, click the icon to update that setting on Facebook.',
+	'facebook-termsofservicepage' => 'Project:Terms of service',
+	'facebook-auth-dialog-headline' => '{{SITENAME}}',
+	'facebook-auth-dialog-description' => 'Welcome to the social experience on {{SITENAME}}. On the next screen, you will be able to choose a username for yourself.',
+	'facebook-auth-dialog-explanation' => 'Your email address is tied to your account and allows you to change your password. Your email address is kept private.',
+	'facebook-object-debug-title' => 'Open Graph Object Debugger',
+	'facebook-object-debug' => 'Input a page name to view the page in the Open Graph',
+	'facebook-debug' => 'Debug',
+	// ajaxLoginMerge.tmpl.php
+	'facebook-logged-in-now-connect' => 'You have been logged in to your account, please click the login button to connect it with Facebook.',
+	// ChooseNameTemplate.class.php
+	'facebook-modal-title' => 'Finish your account setup',
+	'facebook-signup-mail' => 'E-mail:',
+	'facebook-msg-for-existing-users' => '<p>Already a Wikia user?</p><br/><br/>
+If you would like to connect this facebook account to an existing Wikia account, please <a class="loginAndConnect" href="$1">login</a> first.',
+	// facebook_customizations.php
+	'facebook-invalid-email' => 'Please provide a valid email address.',
 	// facebook-prefstext
 	'prefs-facebook-prefstext' => 'Facebook',
 	'facebook-link-to-profile' => 'Facebook profile',
@@ -171,23 +161,11 @@ Username: $2
 Password: $3
 
 The replacement password has been sent only to you at this email address.',
-	'facebook-passwordremindertext-exist'	=> 'Hi,
+	'facebook-passwordremindertext-exist' => 'Hi,
 It looks like you\'ve just disconnected your account from Facebook.
 We\'ve kept all of your history, edit points and achievements intact, so don\'t worry!
 
 You can use the same username and password as you did before you connected.',
-	'facebook-msg-for-existing-users' => '<p>Already a Wikia user?</p><br/><br/>
-If you would like to connect this facebook account to an existing Wikia account, please <a class="loginAndConnect" href="$1">login</a> first.',
-	'facebook-invalid-email' => 'Please provide a valid email address.',
-	'facebook-wikia-login-w-facebook' => 'Log in / Sign Up using Facebook',
-	'facebook-wikia-login-or-create' => 'Log in / Create an account',
-	'facebook-wikia-login-bullets' => '<ul><li>Sign up in just a few clicks</li><li>You have control of what goes to your feed</li></ul>',
-	'facebook-fbid-is-already-connected-title' => 'Facebook account is already in use',
-	'facebook-fbid-is-already-connected' => 'The Facebook profile you are attempting to connect to your account is already connected to a different account.
-If you would like to connect your current account to that Facebook profile, please disconnect the Facebook profile from your other username first by visiting the "Facebook" tab of your Preferences page.',
-	'facebook-fbid-connected-to' => 'The username that is currently connected to this Facebook profile is <strong>$1</strong>.',
-	'facebook-connect-next' => 'Next >>',
-	'facebook-signup-mail' => 'E-mail:',
 );
 
 /**
@@ -197,17 +175,12 @@ If you would like to connect your current account to that Facebook profile, plea
  */
 $messages['qqq'] = array(
 	'facebook-desc' => 'Short description of the Facebook extension, shown in [[Special:Version]]. Do not translate or change links.',
-	'facebook-listusers-header' => '$1 is the name of the Bureaucrat group, $2 is the name of the Sysop group.',
-	'facebook-or' => 'This is just the word "OR" in English, used to separate the Facebook login option from the normal login options on the ajaxed login dialog box.',
 	'facebook-email' => '{{Identical|E-mail address}}',
 	'facebook-language' => '{{Identical|Language}}',
 	'facebook-choosepassword' => '{{Identical|Password}}',
-	'facebook-alreadyloggedin' => '$1 is a user name.',
 	'facebook-logged-in-now-connect' => 'This message is shown in a modal dialog along with a Facebook button when the user is trying to login and connect. This is a workaround for popup blockers.',
 	'facebook-prefstext' => 'Facebook preferences tab text above the list of preferences',
 	'facebook-link-to-profile' => 'Appears next to the user\'s name in their Preferences page and this text is made into link to the profile of that user if they are connected.',
-	'facebook-msg-for-existing-users' => 'This is displayed next to the username field in the choose-name form.
-If a user comes to the site and facebook connects, the purpose of this message is to let them know how to procede if they are actually trying to connect their Facebook account to an existing account.',
 	'facebook-connect-next' => 'This text appears on the button in the login-and-connect dialog.
 After a user enters their username/password, this will slide them over to the next screen which is the Facebook login button.'
 );
@@ -216,7 +189,6 @@ After a user enters their username/password, this will slide them over to the ne
  * @author Naudefj
  */
 $messages['af'] = array(
-	'facebook-link' => 'Terug na facebook.com',
 	'facebook-comm' => 'Kommunikasie',
 	'facebook-error' => 'Verifikasiefout',
 	'facebook-invalid' => 'Ongeldige opsie',
@@ -273,17 +245,8 @@ $messages['be-tarask'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Адміністратары групы',
 	'facebook-connect' => 'Увайсьці ў сыстэму праз злучэньне Facebook',
 	'facebook-convert' => 'Злучыць гэты рахунак і Facebook',
-	'facebook-logout' => 'Выйсьці з Facebook',
-	'facebook-link' => 'Вярнуцца на facebook.com',
 	'facebook-title' => 'Злучыць рахунак з Facebook',
-	'facebook-welcome' => 'Вітаем карыстальніка злучэньня Facebook!',
 	'facebook-merge' => 'Аб’яднаць Ваш вікі-рахунак з Вашым ідэнтыфікатарам Facebook',
-	'facebook-logoutbox' => '$1
-	
-Гэта, таксама, выведзе Вас з сыстэмы Facebook і усіх злучаных зь ім сайтаў, уключаючы {{GRAMMAR:вінавальны|{{SITENAME}}}}.',
-	'facebook-listusers-header' => 'Правы $1 і $2 аўтаматычна перанесеныя ад кіраўніка і адміністратара групы Facebook $3.
-
-Для атрыманьня дадатковай інфармацыі, калі ласка, зьвяжыцеся са стваральнікам групы $4.',
 	'facebook-error' => 'Памылка праверкі',
 	'facebook-errortext' => 'Узьнікла памылка падчас праверкі са злучэньнем Facebook.',
 	'facebook-cancel' => 'Дзеяньне адмененае',
@@ -311,9 +274,6 @@ $messages['be-tarask'] = array(
 	'facebook-chooseusername' => 'Імя ўдзельніка:',
 	'facebook-choosepassword' => 'Пароль:',
 	'facebook-updateuserinfo' => 'Зьмяніце наступную асабістую інфармацыю:',
-	'facebook-alreadyloggedin' => "'''Вы ўжо ўвайшлі, $1!'''
-
-Калі Вы жадаеце выкарыстоўваць злучэньне Facebook для ўваходаў у будучыні, Вы можаце [[Special:Connect/Convert|пераўтварыць Ваш рахунак на выкарыстаньне злучэньня Facebook]].",
 	'facebook-error-creating-user' => 'Адбылася памылка падчас стварэньня рахунку карыстальніка ў лякальнай базе зьвестак.',
 	'facebook-error-user-creation-hook-aborted' => 'Перахопнік (пашырэньне) адмяніў стварэньне рахунку з паведамленьнем: $1',
 	'facebook-prefstext' => 'Злучэньне Facebook',
@@ -345,17 +305,8 @@ Kinnig a ra ur gwiriekadur diazezet war strolladoù Facebook hag implij FBML en 
 	'grouppage-fb-admin' => '{{ns:project}}: Merourien ar strollad',
 	'facebook-connect' => 'Kevreañ gant Facebook Connect',
 	'facebook-convert' => "Kevreañ ar c'hont-mañ gant Facebook",
-	'facebook-logout' => 'Digrevreañ eus Facebook',
-	'facebook-link' => 'E facebook.com en-dro',
 	'facebook-title' => 'Kont kevreañ gant Facebook',
-	'facebook-welcome' => "Degemer mat deoc'h-c'hwi implijer Facebook Connect !",
 	'facebook-merge' => 'Kendeuziñ ho kont wiki gant ho ker-anaout Facebook.',
-	'facebook-logoutbox' => "$1
-	
-An dra-se a zigevreo ac'hanoc'h eus Facebook hag eus an holl lec'hiennoù kevreet, ar wiki-mañ en o zouez.",
-	'facebook-listusers-header' => "Treuzkaset ent emgefre eo ar gwirioù $1 ha $2 adalek an titloù merour ha tud karget eus ar strollad Facebook $3
-
-Evit gouzout hiroc'h, kit e darempred gant saver ar strollad $4",
 	'facebook-error' => 'Fazi gwiriañ',
 	'facebook-errortext' => "C'hoarvezet ez eus ur fazi e-ser gwiriañ gant Facebook connect",
 	'facebook-cancel' => 'Ober nullet',
@@ -382,9 +333,6 @@ Trugarez da zibab unan all.',
 	'facebook-chooseusername' => 'Anv implijer :',
 	'facebook-choosepassword' => 'Ger-tremen :',
 	'facebook-updateuserinfo' => 'Hizivaat an titouroù personel da-heul :',
-	'facebook-alreadyloggedin' => "'''Kevreet oc'h dija, $1!'''
-
-Ma fell deoc'h implijout Facebook Connect da gevreañ diwezhatoc'h, e c'hallit [[Special:Connect/Convert|amdreiñ ho kont evit implijout Facebook Connect]].",
 	'facebook-error-creating-user' => "C'hoarvezet ez eus ur fazi e-ser krouiñ an implijer en diaz roadennoù lec'hel.",
 	'facebook-error-user-creation-hook-aborted' => "Ur c'hroc'hed (astenn) en deus distaolet ar c'hrouiñ kontoù gant ar c'hemenn : $1",
 	'facebook-prefstext' => 'Facebook Connect',
@@ -404,7 +352,6 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'group-fb-admin' => 'Administratori grupe',
 	'group-fb-admin-member' => 'Administrator grupe',
 	'facebook-connect' => 'Prijavite se sa Facebook Connect',
-	'facebook-link' => 'Nazad na facebook.com',
 	'facebook-title' => 'Spajanje računa sa Facebook',
 	'facebook-click-to-login' => 'Kliknite da se prijavite na ovu stranicu preko Facebooka',
 	'facebook-click-to-connect-existing' => 'Kliknite da spojite vaš Facebook račun na $1',
@@ -476,17 +423,8 @@ Zudem wird die Authentifizierung basierend auf Facebook-Gruppen und der Einsatz 
 	'grouppage-fb-admin' => '{{ns:project}}:Gruppenadministratoren',
 	'facebook-connect' => 'Anmelden mit Facebook Connect',
 	'facebook-convert' => 'Dieses Konto mit Facebook verknüpfen',
-	'facebook-logout' => 'Aus Facebook abmelden',
-	'facebook-link' => 'Zurück zu de-de.facebook.com',
 	'facebook-title' => 'Konto mit Facebook verknüpfen',
-	'facebook-welcome' => 'Willkommen, Facebook-Connect-Benutzer!',
 	'facebook-merge' => 'Das Wikikonto mit der Facebook-ID verknüpfen',
-	'facebook-logoutbox' => '$1
-
-Dies führt zu einer Abmeldung von Facebook und allen verknüpften Websites, einschließlich dieses Wikis.',
-	'facebook-listusers-header' => 'Die Privilegien $1 und $2 werden automatisch von denen des Gruppenrechteverwalters und Gruppenadministrators der Facebook-Gruppe $3 übertragen.
-
-Für weitere Informationen kann man den Gruppenersteller $4 kontaktieren.',
 	'facebook-usernameprefix' => 'Facebook-Benutzer',
 	'facebook-error' => 'Überprüfungsfehler',
 	'facebook-errortext' => 'Ein Fehler trat während der Überprüfung mit Facebook Connect auf.',
@@ -514,9 +452,6 @@ Bitte einen anderen auswählen.',
 	'facebook-chooseusername' => 'Benutzername:',
 	'facebook-choosepassword' => 'Passwort:',
 	'facebook-updateuserinfo' => 'Die folgenden persönlichen Angaben müssen aktualisiert werden:',
-	'facebook-alreadyloggedin' => "'''Du bist bereits angemeldet, $1!'''
-
-Sofern Facebook Connect für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
 	'facebook-error-creating-user' => 'Fehler beim Erstellen des Benutzers in der lokalen Datenbank.',
 	'facebook-error-user-creation-hook-aborted' => 'Die Schnittstelle einer Softwareerweiterung hat die Benutzerkontoerstellung mit folgender Nachricht abgebrochen: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -529,9 +464,6 @@ Sofern Facebook Connect für künftige Anmeldevorgänge genutzt werden soll, kan
  * @author Kghbln
  */
 $messages['de-formal'] = array(
-	'facebook-alreadyloggedin' => "'''Sie sind bereits angemeldet, $1!'''
-
-Sofern OpenID für künftige Anmeldevorgänge genutzt werden soll, kann das [[Special:Connect/Convert|Benutzerkonto für die Nutzung durch Facebook Connect eingerichtet werden]].",
 );
 
 /** Lower Sorbian (Dolnoserbski)
@@ -551,11 +483,9 @@ $messages['dsb'] = array(
 	'group-fb-admin' => 'Kupkowe administratory',
 	'group-fb-admin-member' => 'Kupkowy administrator',
 	'grouppage-fb-admin' => '{{ns:project}}:Kupkowe administratory',
-	'facebook-link' => 'Slědk k facebook.com',
 	'facebook-conv' => 'Komfortabelnosć',
 	'facebook-fbml' => 'Wobznamjeńska rěc Facebook',
 	'facebook-comm' => 'Komunikacija',
-	'facebook-welcome' => 'Wita, wužywaŕ Facebook Connect!',
 	'facebook-cancel' => 'akcija pśetergnjona',
 	'facebook-invalid' => 'Njepłaśiwa akcija',
 	'facebook-nickname' => 'Pśimě',
@@ -594,14 +524,9 @@ $messages['eo'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Administrantoj de grupo',
 	'facebook-connect' => 'Ensaluti kun Facebook-Konekto',
 	'facebook-convert' => 'Konekti ĉi tiun konton kun Facebook',
-	'facebook-logout' => 'Elsaluti Facebook',
-	'facebook-link' => 'Reveni al facebook.com',
 	'facebook-title' => 'Konekti konton kun Facebook',
 	'facebook-comm' => 'Komunikado',
 	'facebook-merge' => 'Kunigi vian vikikonton kun via Facebook-identigo',
-	'facebook-logoutbox' => '$1
-	
-Ĉi tiu ankaŭ elsaluti vin el Facebook kaj ĉiuj konektitaj retejoj, inkluzivante ĉi tiun vikion.',
 	'facebook-invalid' => 'Malvalida elekto',
 	'facebook-nickname' => 'Kromnomo',
 	'facebook-fullname' => 'Plena nomo',
@@ -644,17 +569,8 @@ Ofrece autenticación basada en grupos de Facebook y usa FBML en texto wiki',
 	'grouppage-fb-admin' => '{{ns:project}}:Administradores de grupo',
 	'facebook-connect' => 'Inicia sesión con Facebook Connect',
 	'facebook-convert' => 'Conectar esta cuenta con Facebook',
-	'facebook-logout' => 'Desconectarse de Facebook',
-	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar esta cuenta con Facebook',
-	'facebook-welcome' => '¡Bienvenido, usuario de Facebook Connect!',
 	'facebook-merge' => 'Fusiona tu wiki cuenta con tu identificador de Facebook',
-	'facebook-logoutbox' => '$1
-	
-Estos también te desconectará de Facebook y de los sitios conectados, incluido este wiki.',
-	'facebook-listusers-header' => 'Los privilegios $1 y $2 son transferidos automáticamente de los títulos de agente y administrador del grupo $3 de Facebook.
-
-Para más información, contacta con el creador del grupo, $4.',
 	'facebook-error' => 'Error de verificación',
 	'facebook-errortext' => 'Se produjo un error durante la verificación con Facebook Connect.',
 	'facebook-cancel' => 'Acción cancelada',
@@ -682,9 +598,6 @@ puedes escoger uno de entre las siguientes opciones.',
 	'facebook-chooseusername' => 'Nombre de usuario:',
 	'facebook-choosepassword' => 'Contraseña:',
 	'facebook-updateuserinfo' => 'Actualiza la siguiente información personal:',
-	'facebook-alreadyloggedin' => "'''¡Ya has ingresado al sistema, $1!'''
-
-Si quieres usar Facebook Connect para ingresar en el futuro, puedes [[Special:Connect/Convert|modificar tu cuenta para utitilzar Facebook Connect]].",
 	'facebook-error-creating-user' => 'Ocurrió un error al crear el usuario en la base de datos local.',
 	'facebook-error-user-creation-hook-aborted' => 'Un gancho (extensión) abortó la creación de la cuenta con el mensaje: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -700,8 +613,6 @@ $messages['eu'] = array(
 	'facebook' => 'Facebook Konexioa',
 	'facebook-connect' => 'Facebook Konexioarekin saioa hasi',
 	'facebook-convert' => 'Kontu hau Facebookekin lotu',
-	'facebook-logout' => 'Facebooketik irten',
-	'facebook-link' => 'facebook.com-era itzuli',
 	'facebook-title' => 'Kontua Facebookekin  lotu',
 	'facebook-comm' => 'Komunikazioa',
 	'facebook-nickname' => 'Ezizena',
@@ -736,8 +647,6 @@ Tarjoaa tunnistautumisen Facebook-ryhmiin pohjautuen ja antaa käyttää FBML-ko
 	'grouppage-fb-admin' => '{{ns:project}}:Ryhmän ylläpitäjät',
 	'facebook-connect' => 'Kirjaudu sisään Facebook Connectin avulla',
 	'facebook-convert' => 'Yhdistä tämä tili Facebookiin',
-	'facebook-logout' => 'Kirjaudu ulos Facebookista',
-	'facebook-link' => 'Takaisin facebook.comiin',
 	'facebook-title' => 'Yhdistä tili Facebookin kanssa',
 	'facebook-click-to-login' => 'Kirjaudu tälle sivustolle Facebookin avulla napsauttamalla',
 	'facebook-choosenick' => 'Facebook-profiilisi nimi ($1)',
@@ -749,9 +658,6 @@ Tarjoaa tunnistautumisen Facebook-ryhmiin pohjautuen ja antaa käyttää FBML-ko
 	'facebook-chooseusername' => 'Käyttäjätunnus',
 	'facebook-choosepassword' => 'Salasana:',
 	'facebook-updateuserinfo' => 'Päivitä seuraavat henkilökohtaiset tiedot:',
-	'facebook-alreadyloggedin' => "'''Olet jo kirjautunut sisään, $1!'''
-
-Jos haluat käyttää Facebook Connectia kirjautuaksesi sisään tulevaisuudessa, voit [[Special:Connect/Convert|muuttaa tilisi käyttämään Facebook Connectia]].",
 	'facebook-error-creating-user' => 'Virhe luotaessa käyttäjää paikalliseen tietokantaan.',
 	'facebook-prefstext' => 'Facebook Connect',
 	'facebook-link-to-profile' => 'Facebook-profiili',
@@ -779,17 +685,8 @@ $messages['fr'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Administrateurs de groupe',
 	'facebook-connect' => 'Se connecter avec Facebook Connect',
 	'facebook-convert' => 'Connecter ce compte avec Facebook',
-	'facebook-logout' => 'Se déconnecter de Facebook',
-	'facebook-link' => 'Retour à Facebook.com',
 	'facebook-title' => 'Connecter un compte avec Facebook',
-	'facebook-welcome' => 'Bienvenue, utilisateur de Facebook Connect !',
 	'facebook-merge' => 'Fusionner votre compte wiki avec votre identifiant Facebook',
-	'facebook-logoutbox' => '$1
-
-Cela permettra également vous déconnecter de Facebook et tous les sites connectés, y compris ce wiki.',
-	'facebook-listusers-header' => 'Les privilèges $1 et $2 sont automatiquement transférés depuis les titres d’administrateurs et responsables du groupe Facebook $3.
-
-Pour plus d’informations, veuillez contacter le créateur du groupe $4.',
 	'facebook-error' => 'Erreur de vérification',
 	'facebook-errortext' => 'Une erreur s’est produite lors de la vérification avec Facebook Connect.',
 	'facebook-cancel' => 'Action annulée',
@@ -816,9 +713,6 @@ Veuillez en choisir un autre.',
 	'facebook-chooseusername' => 'Nom d’utilisateur :',
 	'facebook-choosepassword' => 'Mot de passe :',
 	'facebook-updateuserinfo' => 'Mettre à jour les renseignements personnels suivants :',
-	'facebook-alreadyloggedin' => "'''Vous êtes déjà connecté, $1 !''' 
-
-Si vous souhaitez utiliser Facebook Connect pour vous connecter à l’avenir, vous pouvez [[Special:Connect/Convert|convertir votre compte pour utiliser Facebook Connect]].",
 	'facebook-error-creating-user' => 'Erreur de création de l’utilisateur dans la base de données locale.',
 	'facebook-error-user-creation-hook-aborted' => 'Un crochet (extension) a abandonné la création de compte avec le message : $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -848,17 +742,8 @@ Ofrece unha autenticación baseada en grupos do Facebook e o uso de FBML no text
 	'grouppage-fb-admin' => '{{ns:project}}:Administradores do grupo',
 	'facebook-connect' => 'Identificarse co Facebook Connect',
 	'facebook-convert' => 'Conectar esta conta co Facebook',
-	'facebook-logout' => 'Desconectarse do Facebook',
-	'facebook-link' => 'Volver a facebook.com',
 	'facebook-title' => 'Conectar a conta co Facebook',
-	'facebook-welcome' => 'Benvido, usuario do Facebook Connect!',
 	'facebook-merge' => 'Fusionar a súa conta wiki co ID do Facebook',
-	'facebook-logoutbox' => '$1
-	
-Isto fará que tamén saia do sistema do Facebook e de todos os sitios nos que estea conectado, incluído este wiki.',
-	'facebook-listusers-header' => 'Os privilexios $1 e $2 transfírense automaticamente desde os títulos de administradores e responsables do grupo $3 do Facebook.
-
-Para obter máis información, póñase en contacto co creador do grupo, $4.',
 	'facebook-error' => 'Erro de verificación',
 	'facebook-errortext' => 'Houbo un erro durante a comprobación co Facebook Connect.',
 	'facebook-cancel' => 'Acción cancelada',
@@ -885,9 +770,6 @@ Escolla un diferente.',
 	'facebook-chooseusername' => 'Nome de usuario:',
 	'facebook-choosepassword' => 'Contrasinal:',
 	'facebook-updateuserinfo' => 'Actualice a seguinte información persoal:',
-	'facebook-alreadyloggedin' => "'''Está dentro do sistema, $1!'''
-
-Se quere usar o Facebook Connect para acceder ao sistema no futuro, pode [[Special:Connect/Convert|converter a súa conta para usar o Facebook Connect]].",
 	'facebook-error-creating-user' => 'Erro ao crear o usuario na base de datos local.',
 	'facebook-error-user-creation-hook-aborted' => 'Un hook (extensión) abortou a creación da conta con esta mensaxe: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -917,17 +799,8 @@ Macht e Authentifizierig megli, wu uf Facebook-Gruppe basiert, un dr Yysatz vu F
 	'grouppage-fb-admin' => '{{ns:project}}:Gruppeammanne',
 	'facebook-connect' => 'Aamälde iber Facebook Connect',
 	'facebook-convert' => 'Des Konto mit Facebook verbinde',
-	'facebook-logout' => 'Us Facebook abmälde',
-	'facebook-link' => 'Zruck zue facebook.com',
 	'facebook-title' => 'Konto mit Facebook verbinde',
-	'facebook-welcome' => 'Willchuu, Facebook-Connect-Benutzer!',
 	'facebook-merge' => 'S Wikikonto mit dr Facebook-ID zämmefiere',
-	'facebook-logoutbox' => '$1
-
-Des fiert zuen ere Abmäldig vu Facebook un allne verbundene Websites, mitsamt däm Wiki.',
-	'facebook-listusers-header' => 'D Privilegie $1 un $2 wäre automatisch vu däne vum Gruppeverwalter un Gruppeammann vu dr Facebook-Gruppe $3 ibertrait.
-
-Fir meh Informatione cha mer Kontakt ufnee zum Gruppenaaleger $4.',
 	'facebook-error' => 'Iberpriefigsfähler',
 	'facebook-errortext' => 'E Fähler isch bi dr Iberpriefig mit Facebook Connect ufträtte.',
 	'facebook-cancel' => 'Aktion abbroche',
@@ -954,9 +827,6 @@ Bitte wehl e andere.',
 	'facebook-chooseusername' => 'Benutzername:',
 	'facebook-choosepassword' => 'Passwort:',
 	'facebook-updateuserinfo' => 'Die persenlige Aagabe mien aktualisiert wäre:',
-	'facebook-alreadyloggedin' => "'''Du bisch scho aagmäldet, $1!'''
-
-Wänn Du Facebook Connect fir s Aamälde in Zuechumft wit nutze, no chasch [[Special:Connect/Convert|Dyy Benutzerkonto no Facebook Connect konvertiere]].",
 	'facebook-error-creating-user' => 'Fähler bim Aalege vum Benutzer in dr lokale Datebank.',
 	'facebook-error-user-creation-hook-aborted' => 'D Schnittstell vun ere Softwareerwyterig het s Aalege vum Benutzerkonto abbroche mit däre Nochricht: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -972,8 +842,6 @@ $messages['he'] = array(
 	'group-fb-user' => 'משתמשי Facebook Connect',
 	'group-fb-user-member' => 'משתמש Facebook Connect',
 	'facebook-connect' => 'כניסה עם Facebook Connect',
-	'facebook-logout' => 'יציאה מ־Facebook',
-	'facebook-link' => 'חזרה ל־facebook.com',
 	'facebook-title' => 'קישור חשבון ל־Facebook',
 	'facebook-click-to-login' => 'נא ללחוץ כדי להיכנס לאתר זה דרך Facebook',
 	'facebook-conv' => 'נוחות',
@@ -1027,16 +895,8 @@ $messages['hsb'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Skupinscy administratorojo',
 	'facebook-connect' => 'Přez Facebook Connect přizjewić',
 	'facebook-convert' => 'Tute konto z Facebookom zwjazać',
-	'facebook-logout' => 'Z Facebook wotzjewić',
-	'facebook-link' => 'Wróćo k facebook.com',
 	'facebook-title' => 'Konto z Facebookom zwjazać',
-	'facebook-welcome' => 'Witaj, wužiwarjo Facebook Connect!',
 	'facebook-merge' => 'Twoje wikikonto z twojim Facebook-ID zwjazać',
-	'facebook-logoutbox' => '$1
-
-Přez to wotzjewiš so z Facebook a wšěch zwjazanych sydłow, inkluziwnje tutoho wikija.',
-	'facebook-listusers-header' => 'Prawa $1 a $2 přenošuja so awtomatisce wot titulow zarjadnika a administratora skupiny Facebook $3.
-Za dalše informacije staj so prošu z tworićel skupiny $4 do zwiska.',
 	'facebook-error' => 'Pruwowanski zmylk',
 	'facebook-errortext' => 'Při přepruwowanju přez Facebook Connect je zmylk wustupił.',
 	'facebook-cancel' => 'Akcija přetorhnjena',
@@ -1063,9 +923,6 @@ Prošu wubjer druhe přimjeno.',
 	'facebook-chooseusername' => 'Wužiwarske mjeno:',
 	'facebook-choosepassword' => 'Hesło:',
 	'facebook-updateuserinfo' => 'Zaktualizuj slědowace wosobinske informacije:',
-	'facebook-alreadyloggedin' => "'''Sy hižo přizjewjeny, $1!'''
-
-Jeli chceš Facebook Connect wužiwać, hdyž so přichodnje přizjewiš, móžeš [[Special:Connect/Convert|swoje konto za wužiwanje Facebook Connect konwertować]].",
 	'facebook-error-creating-user' => 'Zmylk při wutworjenju wužiwarja w lokalnej datowej bance.',
 	'facebook-error-user-creation-hook-aborted' => 'Rozšěrjenje přetorhny załoženje konta ze slědowacej zdźělenku: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1094,14 +951,11 @@ $messages['hu'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Csoportadminisztrátorok',
 	'facebook-connect' => 'Bejelentkezés a Facebook Connecttel',
 	'facebook-convert' => 'Fiók összekötése a Facebookkal',
-	'facebook-logout' => 'Kijelentkezés a Facebookról',
-	'facebook-link' => 'Vissza a facebook.com-ra',
 	'facebook-title' => 'Fiók összekötése a Facebookkal',
 	'facebook-click-to-login' => 'Bejelentkezés az oldalra Facebookon keresztül',
 	'facebook-conv' => 'Kényelem',
 	'facebook-fbml' => 'Facebook-jelölőnyelv',
 	'facebook-comm' => 'Kommunikáció',
-	'facebook-welcome' => 'Üdvözöllek, Facebook Connect felhasználó!',
 	'facebook-merge' => 'Wikis fiók összekötése facebookos azonosítóval',
 	'facebook-error' => 'Hiba az ellenőrzés során',
 	'facebook-errortext' => 'Hiba történt a Facebook Connect ellenőrzése közben.',
@@ -1153,17 +1007,8 @@ Offere authentication a base de gruppos de Facebook e le uso de FBML in texto wi
 	'grouppage-fb-admin' => '{{ns:project}}:Administratores del gruppo',
 	'facebook-connect' => 'Aperir session con Facebook Connect',
 	'facebook-convert' => 'Connecter iste conto con Facebook',
-	'facebook-logout' => 'Clauder session de Facebook',
-	'facebook-link' => 'Retornar a facebook.com',
 	'facebook-title' => 'Connecter le conto con Facebook',
-	'facebook-welcome' => 'Benvenite, usator de Facebook Connect!',
 	'facebook-merge' => 'Fusionar tu conto wiki con tu ID de Facebook',
-	'facebook-logoutbox' => '$1
-
-Isto claudera anque tu session de Facebook e de tote le sitos connectite, incluse iste wiki.',
-	'facebook-listusers-header' => 'Le privilegios $1 e $2 es automaticamente transferite ab le titulos de officiero e de administrator del gruppo Facebook $3.
-
-Pro plus informationes, per favor contacta le creator del gruppo, $4.',
 	'facebook-error' => 'Error de verification',
 	'facebook-errortext' => 'Un error occurreva durante le verification con Facebook Connect.',
 	'facebook-cancel' => 'Action cancellate',
@@ -1191,9 +1036,6 @@ Per favor selige un altere.',
 	'facebook-chooseusername' => 'Nomine de usator:',
 	'facebook-choosepassword' => 'Contrasigno:',
 	'facebook-updateuserinfo' => 'Actualisar le sequente informationes personal:',
-	'facebook-alreadyloggedin' => "'''Tu es jam authenticate, $1!'''
-
-Si tu vole usar Facebook Connect pro aperir un session in le futuro, tu pote [[Special:Connect/Convert|converter tu conto pro usar Facebook Connect]].",
 	'facebook-error-creating-user' => 'Error durante le creation del usator in le base de datos local.',
 	'facebook-error-user-creation-hook-aborted' => 'Le interfacie de un extension ha abortate le creation del conto con le message: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1223,17 +1065,8 @@ Memberikan autentikasi berdasarkan grup Facebook dan penggunaan FBML dalam teks 
 	'grouppage-fb-admin' => '{{ns:project}}:Admin grup',
 	'facebook-connect' => 'Masuk dengan Facebook Connect',
 	'facebook-convert' => 'Hubungkan akun ini dengan Facebook',
-	'facebook-logout' => 'Keluar dari Facebook',
-	'facebook-link' => 'Kembali ke facebook.com',
 	'facebook-title' => 'Hubungkan akun dengan Facebook',
-	'facebook-welcome' => 'Selamat datang, pengguna Facebook Connect!',
 	'facebook-merge' => 'Gabungkan akun wiki dengan ID Facebook Anda',
-	'facebook-logoutbox' => '$1
-
-Ini juga akan mengeluarkan Anda dari Facebook dan semua situs terhubung, termasuk wiki ini.',
-	'facebook-listusers-header' => 'Hak $1 dan $2 otomatis dipindahkan dari pejabat dan admin grup Facebook $3.
-
-Untuk info lebih lanjut, hubungi pembuat grup $4.',
 	'facebook-error' => 'Kesalahan verifikasi',
 	'facebook-errortext' => 'Kesalahan terjadi sewaktu verifikasi dengan Facebook Connect.',
 	'facebook-cancel' => 'Tindakan dibatalkan',
@@ -1260,9 +1093,6 @@ Silakan memilih yang berbeda.',
 	'facebook-chooseusername' => 'Nama pengguna:',
 	'facebook-choosepassword' => 'Sandi:',
 	'facebook-updateuserinfo' => 'Perbarui informasi pribadi berikut:',
-	'facebook-alreadyloggedin' => "'''Anda telah masuk, $1!'''
-
-Jika Anda ingin menggunakan Facebook Connect untuk masuk log di masa datang, Anda dapat [[Special:Connect/Convert|mengubah akun Anda untuk menggunakan Facebook Connect]].",
 	'facebook-error-creating-user' => 'Kesalahan saat membuat pengguna dalam basis data lokal.',
 	'facebook-error-user-creation-hook-aborted' => 'Suatu pengait (ekstensi) menggagalkan pembuatan akun dengan pesan: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1278,7 +1108,6 @@ Jika Anda ingin menggunakan Facebook Connect untuk masuk log di masa datang, And
 $messages['it'] = array(
 	'group-fb-groupie' => 'Membri del gruppo',
 	'group-fb-groupie-member' => 'Membri del gruppo',
-	'facebook-link' => 'Torna a facebook.com',
 	'facebook-click-to-login' => 'Fare clic per accedere a questo sito tramite Facebook',
 	'facebook-click-to-connect-existing' => 'Clicca per collegare il tuo account Facebook a $1',
 	'facebook-comm' => 'Comunicazione',
@@ -1318,17 +1147,8 @@ $messages['ja'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:グループの管理者',
 	'facebook-connect' => 'Facebook接続でログイン',
 	'facebook-convert' => 'このアカウントにFacebookで接続',
-	'facebook-logout' => 'Facebookのログアウト',
-	'facebook-link' => 'facebook.comに戻る',
 	'facebook-title' => 'Facebookでアカウントに接続',
-	'facebook-welcome' => 'ようこそ、Facebook接続の利用者さん！',
 	'facebook-merge' => 'FacebookのIDを使用して、ウィキ上の自分のアカウントを統合',
-	'facebook-logoutbox' => '$1
-
-これは、Facebookと、このウィキを含むすべての接続サイトからログアウトします。',
-	'facebook-listusers-header' => '$1と$2の権限は、Facebookグループ$3の役員と管理者から、自動的に転送されました。
-
-詳細情報については、グループの作成者$4に連絡してください。',
 	'facebook-error' => '検証エラー',
 	'facebook-errortext' => 'Facebook接続で認証中にエラーが発生しました。',
 	'facebook-cancel' => '操作がキャンセルされました',
@@ -1355,9 +1175,6 @@ $messages['ja'] = array(
 	'facebook-chooseusername' => '利用者名：',
 	'facebook-choosepassword' => 'パスワード：',
 	'facebook-updateuserinfo' => '以下の個人情報を更新する：',
-	'facebook-alreadyloggedin' => "'''既に$1としてログインしています！'''
-
-将来、Facebook接続を使用してログインしたい場合は、[[Special:Connect/Convert|アカウントをFacebook接続を使用するように変換する]]ことができます。",
 	'facebook-error-creating-user' => 'ローカルのデータベースに利用者を作成する時にエラーが発生しました。',
 	'facebook-error-user-creation-hook-aborted' => 'フック（拡張機能）は、次のメッセージと共にアカウントの作成を中断しました：$1',
 	'facebook-prefstext' => 'Facebook接続',
@@ -1386,8 +1203,6 @@ $messages['lb'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Administrateure vum Grupp',
 	'facebook-connect' => 'Mat Facebook-Connect aloggen',
 	'facebook-convert' => 'Dëse Kont mat Facebook verbannen',
-	'facebook-logout' => 'Ofmellen op Facebook',
-	'facebook-link' => 'Zréck op facebook.com',
 	'facebook-title' => 'Kont mat Facebook verbannen',
 	'facebook-click-to-login' => 'Klickt fir Iech iwwer Facebook op dësem Site anzeloggen',
 	'facebook-click-to-connect-existing' => 'Klickt fir Äre Facebook-Kont mat $1 ze verbannen',
@@ -1398,14 +1213,7 @@ Wann d'Autorisatioun virläit kann dës Wiki esouguer Facebook als E-Mail-Proxy 
 	'facebook-comm' => 'Kommunikatioun',
 	'facebook-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
 Kuckt wie vun Äre Frënn d'Wiki benotzt, a virun allem deelt Är Aktioune mat Äre Frënn iwwer d'Facebook-Newsfeed.",
-	'facebook-welcome' => 'Wëllkomm, Facebook-Connect-Benotzer!',
 	'facebook-merge' => 'Verbannt Äre Wiki-Kont mat Ärer Facebook-ID',
-	'facebook-logoutbox' => '$1
-
-Dëst loggt Iech och aus Facebook eraus an aus allen domat verbonnene Siten, inklusiv dës Wiki.',
-	'facebook-listusers-header' => "D'Rechter $1 a(n) $2 ginn automatesch vum Gestionnaire a vum Administrateur vum Facebook-Grupp $3 transferéiert.
-
-Fir méi Informatiounen, kontaktéiert w.e.g. deen den de Grupp $4 opgemaach huet.",
 	'facebook-usernameprefix' => 'Facebook-Benotzer',
 	'facebook-error' => 'Feeler bei der Iwwerpréifung',
 	'facebook-errortext' => 'Bäi der Iwwerpréifung mat Facebook Connect ass e Feeler geschitt.',
@@ -1433,9 +1241,6 @@ Sicht Iech w.e.g. een Aneren.',
 	'facebook-chooseusername' => 'Benotzernumm:',
 	'facebook-choosepassword' => 'Passwuert:',
 	'facebook-updateuserinfo' => 'Dës perséinlech Informatioun aktualiséieren:',
-	'facebook-alreadyloggedin' => "'''Dir sidd schonn ageloggt, $1!'''
-
-Wann Dir Facebook-Connect benotze wëllt fir Iech an Zukunft anzeloggen, da kënnt Dir [[Special:Connect/Convert|Äre Benotzerkont ëmwandelen Fir Facebook-Connect ze benotzen]].",
 	'facebook-error-creating-user' => 'Feeler beim Uleeë vum Benotzer an der lokaler Datebank.',
 	'facebook-error-user-creation-hook-aborted' => "Eng Erweiderung huet d'Uleeë vum Kont ofgebrach mam Message: $1",
 	'facebook-prefstext' => 'Facebook-Connect',
@@ -1464,17 +1269,8 @@ $messages['mk'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Администратори на група',
 	'facebook-connect' => 'Најава со Facebook Connect',
 	'facebook-convert' => 'Поврзи ја оваа сметка со Facebook',
-	'facebook-logout' => 'Одјава од Facebook',
-	'facebook-link' => 'Назад кон страницата на Facebook',
 	'facebook-title' => 'Поврзи ја сметката преку Facebook',
-	'facebook-welcome' => 'Добредојде, кориснику на Facebook Connect!',
 	'facebook-merge' => 'Спојте ја Вашата вики-сметка со Вашата назнака (ID) на Facebook',
-	'facebook-logoutbox' => '$1
-
-Ова исто така ќе ве одјави од Facebook и сите поврзани мрежни места, вклучувајќи го ова вики.',
-	'facebook-listusers-header' => 'Привилегиите $1 и $2 автоматски преоѓаат од звањата на раководителот и администраторот на Facebook-групата  $3.
-
-За повеќе информации, обратете се кај создавачот на групата - $4.',
 	'facebook-usernameprefix' => 'FacebookUser',
 	'facebook-error' => 'Грешка при потврдувањето',
 	'facebook-errortext' => 'Се појави грешка при потврдувањето во однос на Facebook Connect.',
@@ -1502,9 +1298,6 @@ $messages['mk'] = array(
 	'facebook-chooseusername' => 'Корисничко име:',
 	'facebook-choosepassword' => 'Лозинка:',
 	'facebook-updateuserinfo' => 'Поднови ги следниве лични податоци:',
-	'facebook-alreadyloggedin' => "'''Веќе сте најавени, $1!'''
-
-Ако во иднина сакате да користите Facebook Connect за најава, можете да [[Special:Connect/Convert|ја претворите сметката во таква што користи Facebook Connect]].",
 	'facebook-error-creating-user' => 'Грешка при создавањето на корисникот во локалната база на податоци.',
 	'facebook-error-user-creation-hook-aborted' => 'создавањето на сметката беше прекинато од кука (додаток), со пораката: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1549,17 +1342,8 @@ Maakt het mogelijk om aan te melden met de Facebookgebruiker en FBML te gebruike
 	'grouppage-fb-admin' => '{{ns:project}}:Groepsbeheerders',
 	'facebook-connect' => 'Aanmelden via Facebook Connect',
 	'facebook-convert' => 'Deze gebruiker met Facebook verbinden',
-	'facebook-logout' => 'Afmelden van Facebook',
-	'facebook-link' => 'Terug naar facebookcom',
 	'facebook-title' => 'Gebruiker verbinden met Facebook',
-	'facebook-welcome' => 'Welkom, Facebook Connectgebruiker!',
 	'facebook-merge' => 'Voeg uw wikigebruiker samen met uw Facebookgebruiker',
-	'facebook-logoutbox' => '$1
-
-Hierdoor wordt u ook afgemeld van Facebook en alle gekoppelde sites, inclusief deze wiki.',
-	'facebook-listusers-header' => 'Rechten voor $1 en $2 worden automatisch doorgegeven vanuit de rollen officer en beheerder in de Facebookgroep $3.
-
-Neem alstublieft contact met met de oprichter $4 van de groep voor meer informatie.',
 	'facebook-error' => 'Controlefout',
 	'facebook-errortext' => 'Er is een fout opgetreden tijdens de verificatie via Facebook Connect.',
 	'facebook-cancel' => 'Handeling geannuleerd',
@@ -1586,9 +1370,6 @@ Kies een andere.',
 	'facebook-chooseusername' => 'Gebruikersnaam:',
 	'facebook-choosepassword' => 'Wachtwoord:',
 	'facebook-updateuserinfo' => 'De volgende persoonlijke informatie bijwerken:',
-	'facebook-alreadyloggedin' => "'''U bent al aangemeld, $1!'''
-
-Als u in de toekomst uw Facebook Connect wilt gebruiken om aan te melden, [[Special:Connect/Convert|zet uw gebruiker dan om naar Facebook Connect]].",
 	'facebook-error-creating-user' => 'Er is een fout opgetreden tijdens het aanmaken van de gebruiker in de lokale database.',
 	'facebook-error-user-creation-hook-aborted' => 'Een uitbreiding heeft het aanmaken van de gebruiker beëindigd met het volgende bericht: $1',
 	'facebook-prefstext' => 'Verbinden met Facebook',
@@ -1629,17 +1410,8 @@ Tilbyr autentisering basert på Facebookgrupper og bruken av FBML i wikitekst',
 	'grouppage-fb-admin' => '{{ns:project}}:Gruppeadministratorer',
 	'facebook-connect' => 'Logg inn med Facebook Connect',
 	'facebook-convert' => 'Koble til denne kontoen med Facebook',
-	'facebook-logout' => 'Logg ut av Facebook',
-	'facebook-link' => 'Tilbake til facebook.com',
 	'facebook-title' => 'Koble til konto med Facebook',
-	'facebook-welcome' => 'Velkommen, Facebook Connect-bruker!',
 	'facebook-merge' => 'Slå sammen wikikontoen din med din Facebook-ID',
-	'facebook-logoutbox' => '$1
-
-Dette vil også logge deg ut av Facebook og alle tilkoblede nettsteder, inkludert denne wikien.',
-	'facebook-listusers-header' => '$1- og $2-privilegier blir automatisk overført fra offiser- og admintitler i Facebook-gruppen $3.
-
-For mer info, kontakt en gruppeoppretteren $4.',
 	'facebook-usernameprefix' => 'FacebookBruker',
 	'facebook-error' => 'Bekreftelsesfeil',
 	'facebook-errortext' => 'En feil oppstod under bekreftelse med Facebook Connect.',
@@ -1667,9 +1439,6 @@ Velg et annet.',
 	'facebook-chooseusername' => 'Brukernavn:',
 	'facebook-choosepassword' => 'Passord:',
 	'facebook-updateuserinfo' => 'Oppdater følgende personlige informasjon:',
-	'facebook-alreadyloggedin' => "'''Du er allerede logget inn, $1'''
-
-Om du ønsker å bruke Facebook Connect for å logge inn i fremtiden, kan du [[Special:Connect/Convert|konvertere kontoen din til å bruke Facebook Connect]].",
 	'facebook-error-creating-user' => 'Feil ved opprettelse av brukeren i den lokale databasen.',
 	'facebook-error-user-creation-hook-aborted' => 'En krok (utvidelse) avbrøt kontoopprettelsen med meldingen: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1699,17 +1468,8 @@ Umożliwia uwierzytelnianie w oparciu o grupy Facebooka i wykorzystanie FBML w t
 	'grouppage-fb-admin' => '{{ns:project}}:Administratorzy grupy',
 	'facebook-connect' => 'Zaloguj przy pomocy Facebook Connect',
 	'facebook-convert' => 'Połącz to konto z Facebookiem',
-	'facebook-logout' => 'Wyloguj się z Facebooka',
-	'facebook-link' => 'Powrót na facebook.com',
 	'facebook-title' => 'Połącz konto z Facebookiem',
-	'facebook-welcome' => 'Witaj użytkowniku Facebook Connect!',
 	'facebook-merge' => 'Połącz swoje konto wiki ze swoim identyfikatorem w Facebooku.',
-	'facebook-logoutbox' => '$1
-
-Spowoduje to również wylogowanie z Facebooka i wszystkich połączonych z nim stron, włącznie z tą wiki.',
-	'facebook-listusers-header' => 'Uprawnienia $1 i $2 są automatycznie przenoszone z przywódcy i administratora Facebookowej grupy $3.
-
-Więcej informacji uzyskasz od $4, który utworzył tę grupę.',
 	'facebook-error' => 'Błąd weryfikacji',
 	'facebook-errortext' => 'Wystąpił błąd podczas weryfikacji przez Facebook Connect.',
 	'facebook-cancel' => 'Akcja anulowana',
@@ -1736,9 +1496,6 @@ Wybierz inną nazwę użytkownika.',
 	'facebook-chooseusername' => 'Nazwa użytkownika',
 	'facebook-choosepassword' => 'Hasło',
 	'facebook-updateuserinfo' => 'Aktualizacja następujących danych o użytkowniku',
-	'facebook-alreadyloggedin' => "'''Jesteś już zalogowany jako $1!'''
-
-Jeśli chcesz w przyszłości używać Facebook Connect do logowania się, możesz [[Special:Connect/Convert|przełączyć konto na korzystanie z Facebook Connect]].",
 	'facebook-error-creating-user' => 'Wystąpił błąd podczas tworzenia konta użytkownika w lokalnej bazie danych.',
 	'facebook-error-user-creation-hook-aborted' => 'Hak (rozszerzenie) przerwał tworzenie konta z komunikatem – $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1769,17 +1526,8 @@ A eufr n'autenticassion basà an sle partìe Facebook e l'utilisassion ëd FBML 
 	'grouppage-fb-admin' => '{{ns:project}}:Aministrator ëd la partìa',
 	'facebook-connect' => 'Intré an Facebook Connect',
 	'facebook-convert' => 'Colega sto cont con Facebook',
-	'facebook-logout' => 'Seurt da Facebook',
-	'facebook-link' => 'André a Facebook.com',
 	'facebook-title' => 'Coleghé un cont con Facebook',
-	'facebook-welcome' => 'Bin ëvnù, utent ëd Facebook Connect!',
 	'facebook-merge' => 'Mës-cé sò cont wiki con sò identificativ Facebook',
-	'facebook-logoutbox' => '$1
-
-Sòn a lo farà ëdcò seurte da Facebook e da tùit ij sit colegà, comprèisa sta wiki.',
-	'facebook-listusers-header' => "Ij privilegi ëd $1 e $2 a son automaticament trasferì dai tìtoj d'ufissial e d'aministrator ëd la partìa ëd Facebook $3.
-
-Për savèjne ëd pi, për piasì ch'a contata ël creator dla partìa $4.",
 	'facebook-error' => 'Eror ëd verìfica',
 	'facebook-errortext' => "A l'é capitaje n'eror durant la verìfica con Facebook Connect.",
 	'facebook-cancel' => 'Assion anulà',
@@ -1807,9 +1555,6 @@ Për piasì ch'a na serna n'àutr.",
 	'facebook-chooseusername' => "Stranòm d'utent:",
 	'facebook-choosepassword' => 'Ciav:',
 	'facebook-updateuserinfo' => "Modìfica j'anformassion përsonaj ch'a ven-o:",
-	'facebook-alreadyloggedin' => "'''A l'é già intrà ant ël sistema, $1!'''
-
-S'a veul dovré Facebook Connect për intré ant l'avnì, a peul [[Special:Connect/Convert|convertì sò cont për dovré Facebook Connect]].",
 	'facebook-error-creating-user' => "Eror ant la creassion ëd l'utent ant la base ëd dàit local.",
 	'facebook-error-user-creation-hook-aborted' => "Un gancio (estension) a l'ha fàit abortì la creassion dël cont con ël mëssagi:$1",
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1839,17 +1584,8 @@ $messages['pt'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Administradores de grupos',
 	'facebook-connect' => 'Autenticação com o Facebook Connect',
 	'facebook-convert' => 'Ligar esta conta ao Facebook',
-	'facebook-logout' => 'Sair do Facebook',
-	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
-	'facebook-welcome' => 'Bem-vindo, utilizador do Facebook Connect!',
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
-	'facebook-logoutbox' => '$1
-
-Também sairá do Facebook e de todos os sites ligados, incluindo esta wiki.',
-	'facebook-listusers-header' => 'Os privilégios $1 e $2 são transferidos automaticamente dos títulos de oficial e administrador do grupo $3 do Facebook.
-
-Para mais informações, contacte o criador do grupo, $4.',
 	'facebook-error' => 'Erro de verificação',
 	'facebook-errortext' => 'Ocorreu um erro durante a verificação com o Facebook Connect.',
 	'facebook-cancel' => 'Operação cancelada',
@@ -1876,9 +1612,6 @@ Escolha um diferente, por favor.',
 	'facebook-chooseusername' => 'Nome de utilizador:',
 	'facebook-choosepassword' => 'Palavra-chave:',
 	'facebook-updateuserinfo' => 'Actualize as seguintes informações pessoais:',
-	'facebook-alreadyloggedin' => "'''Já está autenticado, $1!'''
-	
-Se de futuro pretende usar o Facebook Connect para entrar, pode [[Special:Connect/Convert|converter a sua conta para usar o Facebook Connect]].",
 	'facebook-error-creating-user' => 'Ocorreu um erro ao criar o utilizador na base de dados local.',
 	'facebook-error-user-creation-hook-aborted' => "Um ''hook'' (extensão) abortou a criação da conta, com a mensagem: $1",
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1908,17 +1641,8 @@ $messages['pt-br'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Administradores de grupos',
 	'facebook-connect' => 'Autenticação com o Facebook Connect',
 	'facebook-convert' => 'Ligar esta conta ao Facebook',
-	'facebook-logout' => 'Sair do Facebook',
-	'facebook-link' => 'Voltar ao facebook.com',
 	'facebook-title' => 'Ligar conta ao Facebook',
-	'facebook-welcome' => 'Bem-vindo, usuário do Facebook Connect!',
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
-	'facebook-logoutbox' => '$1
-
-Também sairá do Facebook e de todos os sites ligados, incluindo esta wiki.',
-	'facebook-listusers-header' => 'Os privilégios $1 e $2 são transferidos automaticamente dos títulos de responsável e administrador do grupo $3 do Facebook.
-
-Para mais informações, contate o criador do grupo, $4.',
 	'facebook-error' => 'Erro de verificação',
 	'facebook-errortext' => 'Ocorreu um erro durante a verificação com o Facebook Connect.',
 	'facebook-cancel' => 'Operação cancelada',
@@ -1945,9 +1669,6 @@ Escolha um diferente, por favor.',
 	'facebook-chooseusername' => 'Nome de usuário:',
 	'facebook-choosepassword' => 'Senha:',
 	'facebook-updateuserinfo' => 'Atualize as seguintes informações pessoais:',
-	'facebook-alreadyloggedin' => "'''Já está autenticado, $1!'''
-	
-Se de futuro pretende usar o Facebook Connect para entrar, pode [[Special:Connect/Convert|converter a sua conta para usar o Facebook Connect]].",
 	'facebook-error-creating-user' => 'Ocorreu um erro ao criar o usuário na base de dados local.',
 	'facebook-error-user-creation-hook-aborted' => "Um ''hook'' (extensão) abortou a criação da conta, com a mensagem: $1",
 	'facebook-prefstext' => 'Facebook Connect',
@@ -1968,12 +1689,9 @@ $messages['ro'] = array(
 	'group-fb-admin' => 'Administratori de grup',
 	'group-fb-admin-member' => 'Administrator grup',
 	'facebook-connect' => 'Conectare cu Facebook Connect',
-	'facebook-logout' => 'Deconectare de pe Facebook',
-	'facebook-link' => 'Înapoi pe facebook.com',
 	'facebook-click-to-login' => 'Apasă pentru a vă autentifica pe acest site prin Facebook',
 	'facebook-click-to-connect-existing' => 'Apăsaţi pentru a vă conecta contul dvs. Facebook la $1',
 	'facebook-comm' => 'Comunicaţie',
-	'facebook-welcome' => 'Bun venit, utilizator Facebook Connect!',
 	'facebook-error' => 'Eroare la verificare',
 	'facebook-cancel' => 'Acţiune anulată',
 	'facebook-invalid' => 'Opţiune invalidă',
@@ -2018,10 +1736,7 @@ $messages['ru'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Администраторы группы',
 	'facebook-connect' => 'Войти с помощью Facebook Connect',
 	'facebook-convert' => 'Подключить эту учётную запись к Facebook',
-	'facebook-logout' => 'Выход из Facebook',
-	'facebook-link' => 'Вернуться на facebook.com',
 	'facebook-title' => 'Подключение учётной записи к Facebook',
-	'facebook-welcome' => 'Добро пожаловать, участник Facebook Connect!',
 	'facebook-cancel' => 'Действие отменено',
 	'facebook-invalid' => 'Неверный параметр',
 	'facebook-success' => 'Проверка через Facebook закончилась успешно',
@@ -2076,17 +1791,8 @@ $messages['sv'] = array(
 	'grouppage-fb-admin' => '{{ns:project}}:Grupp administratörer',
 	'facebook-connect' => 'Logga in med Facebook Connect',
 	'facebook-convert' => 'Anslut detta konto med Facebook',
-	'facebook-logout' => 'Logga ut från Facebook',
-	'facebook-link' => 'Tillbaka till facebook.com',
 	'facebook-title' => 'Anslut kontot med Facebook',
-	'facebook-welcome' => 'Välkomna, Facebook Connect användare!',
 	'facebook-merge' => 'Koppla din wiki konto med ditt Facebook-ID',
-	'facebook-logoutbox' => '$1 
-
- Detta kommer också att logga ut dig från Facebook och alla anslutna webbplatser, inklusive $1',
-	'facebook-listusers-header' => '$1 och $2 privilegier överförs automatiskt från officerar och administratör titlar i Facebook-gruppen $3. 
-
- För mer info, kontakta gruppen skapare $4.',
 	'facebook-error' => 'Verifieringsfel',
 	'facebook-errortext' => 'Ett fel uppstod under kontroll med Facebook Connect.',
 	'facebook-cancel' => 'Åtgärden avbröts',
@@ -2113,8 +1819,6 @@ $messages['sv'] = array(
 	'facebook-chooseusername' => 'Användarnamn:',
 	'facebook-choosepassword' => 'Lösenord:',
 	'facebook-updateuserinfo' => 'Uppdatera följande personliga uppgifter:',
-	'facebook-alreadyloggedin' => "''' Du redan är inloggad som $1!'' '
-Om du vill använda Facebook Connect för att logga in i framtiden, kan du [[Special:Connect/Convert|konvertera ditt konto för att använda Facebook Connect.]]",
 	'facebook-error-creating-user' => 'Fel vid skapandet av användaren i den lokala databasen.',
 	'facebook-error-user-creation-hook-aborted' => 'En krok (förlängning) aborterade att skapa konto med meddelandet: $1',
 	'facebook-prefstext' => 'Facebook Connect',
@@ -2160,17 +1864,8 @@ Nagbibigay ng pagpapatunay batay sa mga pangkat sa Facebook at ang paggamit ng F
 	'grouppage-fb-admin' => '{{ns:project}}:Mga tagapangasiwa ng pangkat',
 	'facebook-connect' => 'Lumagdang may Ugnay sa Facebook',
 	'facebook-convert' => 'Iugnay ang akawnt na ito sa Facebook',
-	'facebook-logout' => 'Lumabas mula sa Facebook',
-	'facebook-link' => 'Bumalik sa facebook.com',
 	'facebook-title' => 'Iugnay ang akawnt sa Facebook',
-	'facebook-welcome' => 'Maligayang pagdating, tagagamit ng Ugnay sa Facebook!',
 	'facebook-merge' => 'Isanib ang iyong akawnt na pangwiki sa iyong ID na pang-Facebook',
-	'facebook-logoutbox' => '$1
-
-Ilalabas ka rin nito mula sa Facebook at lahat ng nakaugnay na mga sityo, kabilang ang wiking ito.',
-	'facebook-listusers-header' => 'Ang mga pribilehiyong $1 at $2 ay kusang nalilipat mula sa mga pamagat ng opisyal at tagapangasiwa ng pangkat na $3 ng Facebook.
-
-Para sa mas maraming mga kabatiran, mangyaring makipag-ugnayan sa tagapaglikha ng pangkat na $4.',
 	'facebook-usernameprefix' => 'Tagagamit ng Facebook',
 	'facebook-error' => 'Kamalian sa pagpapatunay',
 	'facebook-errortext' => 'Naganap ang isang kamalian habang nagpapatunay sa pamamagitan ng Ugnay sa Facebook.',
@@ -2198,9 +1893,6 @@ Mangyaring pumili ng isang naiiba.',
 	'facebook-chooseusername' => 'Pangalan ng tagagamit:',
 	'facebook-choosepassword' => 'Hudyat:',
 	'facebook-updateuserinfo' => 'Isapanahon ang sumusunod na kabatirang pangsarili:',
-	'facebook-alreadyloggedin' => "'''Nakalagda ka na, $1!'''
-
-Kung nais mong gamitin ang Ugnay sa Facebook upang makalagda ka sa hinaharap, maaari mong [[Special:Connect/Convert|palitan ang iyong akawnt upang gamitin ang Ugnay sa Facebook]].",
 	'facebook-error-creating-user' => 'Kamalian sa paglikha ng tagagamit sa katutubong kalipunan ng dato.',
 	'facebook-error-user-creation-hook-aborted' => 'Isang kawit (dugtong) ang pumigil sa paglikha ng akawnt na may mensaheng: $1',
 	'facebook-prefstext' => 'Ugnay sa Facebook',
