@@ -37,7 +37,12 @@
 			oauth  : true
 		});
 		
-		// Allow this extension to pick up clicks on <fb:login-button>
+		// Allow this extension to pick up clicks on <fb:login-button>. The
+		// "auth.login" event is also fired when stale cookies are refreshed
+		// (like when a user closes the browser and reloads the wiki page).
+		// A side effect is that sometimes users are logged in without
+		// clicking on a login button. If this behaviour isn't desired, more
+		// research is needed...
 		FB.Event.subscribe('auth.login', window.FacebookLogin);
 		
 		$(document).ready(function() {
@@ -53,11 +58,18 @@
 	window.FacebookLogin = function(response) {
 		// Check if the user logged in and fully authorized the app
 		if (response && response.authResponse) {
-			// Build the fallback URL for if the AJAX requests fail
-			var destUrl = window.wgServer + window.wgScript;
-			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(window.wgPageName);
-			if (window.wgPageQuery)
-				destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
+			var compatible = window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw;
+			
+			var gotoSpecialConnect = function() {
+				// Build the fallback URL for if the AJAX requests fail
+				var destUrl = window.wgServer + window.wgScript;
+				destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(window.wgPageName);
+				if (window.wgPageQuery)
+					destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
+			};
+			var refresh = function() {
+				window.location.href = window.location.href;
+			};
 			
 			if (window.wgUserName) {
 				// The user is logged in to MediaWiki
@@ -66,30 +78,76 @@
 					// Check to see if it's the one that just logged in
 					if (window.fbId == response.authResponse.userID) {
 						// User is already logged in to MediaWiki
-						// Hide the login button? For now, reload to re-render XFBML tags
-						window.location.href = window.location.href;
+						// For now, reload to re-render XFBML tags
+						refresh();
 					} else {
 						// MediaWiki user is connected to a Facebook account different
 						// from the one that just logged in
-						// AJAX: Ask if response.authResponse.userID has a MediaWiki account
-						// Yes: Ask to log in as the correct MediaWiki user (if so, redirect to Special:Connect)
-						// "Your username is already connected to a Facebook account. Would you
-						// like to connect your username with this Facebook acount also?" Yes/No
-						// If Yes, post to Special:Connect/LogoutAndConnect
-						// If no, don't do anything, hide prompt
-						window.location.href = destUrl;
+						if (compatible) {
+							/*
+							var type = 'html'; // or text
+							$.ajax({
+								type: "GET",
+								url: mw.util.wikiScript('api'), // or text
+								data: {
+									'action'     : 'ChooseName',
+									'format'     : type,
+									'fbid'       : response.authResponse.userID,
+									'lgpassword' : 'foobar'
+								},
+								dataType: type,
+								success: function(html) {
+									// AJAX: Ask if response.authResponse.userID has a MediaWiki account
+									// If yes, add html to page "Logout and continue"
+									// If no, add html to page "Logout and create new user"
+									alert(html);
+									
+								},
+								error: function() {
+									gotoSpecialConnect(); // Fallback if AJAX fails
+								}
+							});
+							*/
+						}
+						gotoSpecialConnect();
 					}
 				} else {
 					// New connection, get Special:Connect/ConnectExisting form over AJAX and post to Special:Connect/ConnectExisting
-					window.location.href = destUrl; // Fallback if AJAX fails
+					gotoSpecialConnect(); // Fallback if AJAX fails
 				}
 			} else {
-				// User is trying to log in with Facebook 
+				// User is trying to log in with Facebook
 				// Ask the server about the user over AJAX
 				// If the user exists, redirect to destUrl
 				// If the user is new, a ChooseName form will be returned over AJAX
 				// (let the user fill out the form and post to Special:Connect/ChooseName)
-				window.location.href = destUrl; // Fallback if AJAX fails
+				
+				// Don't use 'html' here because ApiMain::$Formats doesn't include it
+				var type = 'text';
+				var url;
+				if (compatible) {
+					url = mw.util.wikiScript('api');
+				} else {
+					url = window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php');
+				}
+				$.ajax({
+					type: 'GET',
+					url: url,
+					data: {
+						'action'     : 'facebookchoosename',
+						'format'     : type,
+						'fbid'       : response.authResponse.userID,
+						'lgpassword' : 'foobar'
+					},
+					dataType: type,
+					success: function(text) {
+						// Add html to page
+						alert(text);
+					},
+					error: function() {
+						gotoSpecialConnect(); // Fallback if AJAX fails
+					}
+				});
 			}
 		}
 	};
@@ -110,4 +168,4 @@
 			}
 		});
 	});
-})(jQuery);
+})(window.jQuery);
