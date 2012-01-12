@@ -82,7 +82,17 @@ $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';
 $wgAutoloadClasses['ChooseNameTemplate'] = $dir . 'templates/ChooseNameTemplate.class.php';
 
+// Special:Connect and accompanying AJAX modules
 $wgSpecialPages['Connect'] = 'SpecialConnect';
+
+$wgAutoloadClasses['ApiFacebookChooseName']        = $dir . 'FacebookAJAX.php';
+$wgAutoloadClasses['ApiFacebookLogoutAndContinue'] = $dir . 'FacebookAJAX.php';
+$wgAutoloadClasses['ApiFacebookMergeAccount']      = $dir . 'FacebookAJAX.php';
+
+#$wgAPIModules['facebookchoosename']        = 'ApiFacebookChooseName';
+#$wgAPIModules['facebooklogoutandcontinue'] = 'ApiFacebookLogoutAndContinue';
+#$wgAPIModules['facebookmergeaccount']      = 'ApiFacebookMergeAccount';
+
 
 // Define new autopromote condition (use quoted text, numbers can cause collisions)
 define( 'APCOND_FB_USER',      'fb*u' );
