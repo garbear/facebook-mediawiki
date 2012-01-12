@@ -582,13 +582,13 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'contact_email',
 				'Contact email',
-				'Primary email used for important communication related to your app',
+				'Primary email used for important communication related to your app ($wgEmergencyContact)',
 				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
 			),
 			array(
 				'user_support_email',
 				'User support email',
-				'Main contact email for this app',
+				'Main contact email for this app ($wgEmergencyContact)',
 				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
 			),
 			array(
