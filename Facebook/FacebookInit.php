@@ -67,6 +67,7 @@ class FacebookInit {
 		$wgResourceModules['ext.facebook.application'] = array(
 				'scripts'       => 'ext.facebook.application.js',
 				'dependencies'  => array( 'ext.facebook.sdk' ),
+				'position'      => 'bottom',
 		) + $moduleInfo;
 		
 		// Install all public static functions in class FacebookHooks as MediaWiki hooks
