@@ -448,7 +448,7 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Strip <p> and </p> tags from a string.
 	 */
-	private function trimPTags($str) {
+	private static function trimPTags($str) {
 		$str = str_replace('<p>', '', $str);
 		$str = str_replace('</p>', '', $str);
 		$str = trim($str);
@@ -594,19 +594,19 @@ class SpecialConnect extends SpecialPage {
 				'auth_dialog_headline',
 				'Auth dialog headline',
 				'Description that appears in the Auth Dialog (30 characters or less)',
-				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_headline'])),
+				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_headline'])),
 			),
 			array(
 				'auth_dialog_description',
 				'Auth dialog description',
 				'Description that appears in the Auth Dialog (140 characters or less)',
-				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_description'])),
+				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_description'])),
 			),
 			array(
 				'auth_dialog_perms_explanation',
 				'Explanation for permissions',
 				'Provide an explanation for how your app plans to use extended permissions, if any (140 characters or less)',
-				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_perms_explanation'])),
+				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_perms_explanation'])),
 			),
 			/*
 			// This extension doesn't use the News Feed
@@ -673,6 +673,7 @@ class SpecialConnect extends SpecialPage {
 ' . wfMsgWikiHtml( 'facebook-debug-msg' ) . '<br/>
 <table>';
 		
+		// Render each setting field of the application as a table row
 		foreach ( $field_array as $item ) {
 			$field   = $item[0]; // field_name
 			$title   = $item[1]; // Display name
@@ -711,8 +712,6 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			
-			
-			
 			// Also, if the message is a page name, link to the page (in red) if it doesn't exist
 			if ( $field == 'privacy_policy_url' || $field == 'terms_of_service_url' ) {
 				$titleObj = Title::newFromText(wfMsg($fields_with_msgs[$field]));
@@ -727,12 +726,14 @@ class SpecialConnect extends SpecialPage {
 				$info[$field] = '<em>empty</em>';
 			}
 			
+			// Associative array, e.g. 'tick-32.png' icon gets 'OK' title text
 			$icon_tooltip = array(
 				'tick' => 'OK',
 				'warning' => 'Click to update',
 				'critical' => 'Click to update',
 			);
 			
+			// Generate the html for the row
 			$html .= '
 	<tr>
 		<td style="text-align:right; padding:0;">
@@ -953,7 +954,7 @@ class SpecialConnect extends SpecialPage {
 		// Let them attach to an existing. If $wgFbDisableLogin is true, then
 		// stand-alone account aren't allowed in the first place
 		if (empty( $wgFbDisableLogin )) {
-			$updateChoices = $this->getUpdateOptions($userinfo);
+			$updateChoices = "<br/>\n" . self::getUpdateOptions($userinfo);
 			
 			// Create the HTML for the "existing account" option
 			$html .= '
@@ -1045,7 +1046,7 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * TODO: Document me
 	 */
-	private function getUpdateOptions($userinfo) {
+	private static function getUpdateOptions($userinfo) {
 		global $wgRequest;
 		
 		// Build an array of attributes to update
@@ -1076,7 +1077,6 @@ class SpecialConnect extends SpecialPage {
 		// Implode the update options into an unordered list
 		$updateChoices = '';
 		if ( count($updateOptions) > 0 ) {
-			$updateChoices .= "<br/>\n";
 			$updateChoices .= wfMsgHtml('facebook-updateuserinfo') . "\n";
 			$updateChoices .= "<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n";
 		}
@@ -1141,7 +1141,7 @@ class SpecialConnect extends SpecialPage {
 		'
 		<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>
 		<div id="mw-facebook-choosename-update">
-			' . $this->getUpdateOptions($userinfo) . '
+			' . "<br/>\n" . self::getUpdateOptions($userinfo) . '
 		</div>';
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '
