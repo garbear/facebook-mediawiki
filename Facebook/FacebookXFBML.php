@@ -31,8 +31,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * be incorporated into the wiki through the use of XFBML.
  * 
  * For help on including these social plugins in your site, please see
- * <http://developers.facebook.com/plugins>. Additionally, for further FBML
- * documentation, please visit <http://developers.facebook.com/docs/reference/fbml>.
+ * <https://developers.facebook.com/docs/plugins/>. The next evolution of Open
+ * Graph is currently in beta; for these new social plugins, see
+ * <https://developers.facebook.com/docs/beta/plugins/>.
  */
 class FacebookXFBML {
 	/**
