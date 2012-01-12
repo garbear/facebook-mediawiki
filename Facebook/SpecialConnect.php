@@ -211,10 +211,10 @@ class SpecialConnect extends SpecialPage {
 					if ( $choice == 'existing' ) {
 						// Handle accidental reposts
 						if ( !$wgUser->isLoggedIn() ) {
-							// Update the model
-							$fbUser = new FacebookUser();
 							$name = $wgRequest->getText('wpExistingName');
 							$password = $wgRequest->getText('wpExistingPassword');
+							// Update the model
+							$fbUser = new FacebookUser();
 							$fbUser->attachUser($name, $password, $this->getUpdatePrefs());
 						}
 						// Send the view
@@ -269,12 +269,20 @@ class SpecialConnect extends SpecialPage {
 		 * TODO: Verify this is a POST request
 		 */
 		case 'MergeAccount':
-			try {
-				// The model is updated in manageMergeAccountPost()
-				$this->manageMergeAccountPost();
-				$this->sendPage('displaySuccessAttachingView');
-			} catch (FacebookUserException $e) {
-				$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
+			if ( !$wgUser->isLoggedIn() ) {
+				// Shouldn't be here
+				$this->sendError('facebook-error', 'facebook-errortext');
+			} else {
+				try {
+					$fbUser = new FacebookUser();
+					// Handle accidental reposts
+					if ( $fbUser->getMWUser()->getId() != $wgUser->getId() ) {
+						$fbUser->attachUser($wgUser->getName(), '', $this->getUpdatePrefs());
+					}
+					$this->sendPage('displaySuccessAttachingView');
+				} catch (FacebookUserException $e) {
+					$this->sendError($e->getTitleMsg(), $e->getTextMsg(), $e->getMsgParams());
+				}
 			}
 			break;
 		/**
@@ -423,7 +431,7 @@ class SpecialConnect extends SpecialPage {
 	}
 	
 	/**
-	 * Helper function for manageChooseNamePost() and manageMergeAccountPost().
+	 * Helper function for Special:Connect/ChooseName and Special:Connect/MergeAccount.
 	 * 
 	 * Returns an array representing the checkboxes specified by wpUpdateUserInfo*OPTION*.
 	 */
@@ -436,38 +444,6 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		return $updatePrefs();
-	}
-	
-	/**
-	 * Special:Connect/MergeAccount
-	 * 
-	 * In the future, all of the ***Post() functions should be renamed to
-	 * reflect that they are more about updating the model and less about
-	 * handling the control.
-	 * 
-	 * @throws FacebookUserException
-	 */
-	private function manageMergeAccountPost() {
-		global $wgUser;
-		if ( !$wgUser->isLoggedIn() ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
-		}
-		
-		$fbUser = new FacebookUser();
-		if ( !$fbUser->isLoggedIn() ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
-		}
-		
-		// Make sure both accounts are free in the database
-		// TODO: This should happen inside the model!!!
-		$mwId = $fbUser->getMWUser()->getId();
-		$fb_ids = FacebookDB::getFacebookIDs($wgUser);
-		if ( $mwId || count($fb_ids) > 0 ) {
-			throw new FacebookUserException('facebook-error', 'facebook-errortext'); // TODO: new error msg
-		}
-		
-		// Update the model
-		$fbUser->attachUser($wgUser->getName(), '', $this->getUpdatePrefs());
 	}
 	
 	/**
