@@ -200,8 +200,6 @@ class SpecialConnect extends SpecialPage {
 		 * 
 		 * TODO: Verify that the request is a POST, not a GET (currently they
 		 * both do the same thing, I think).
-		 * 
-		 * TODO: Verify the user's status (not logged in, etc).
 		 */
 		case 'ChooseName':
 			if ( $wgRequest->getCheck('wpCancel') ) {
@@ -210,10 +208,24 @@ class SpecialConnect extends SpecialPage {
 				$choice = $wgRequest->getText('wpNameChoice');
 				try {
 					// The model is updated in manageChooseNamePost()
-					$this->manageChooseNamePost($choice);
 					if ( $choice == 'existing' ) {
+						// Handle accidental reposts
+						if ( !$wgUser->isLoggedIn() ) {
+							// Update the model
+							$fbUser = new FacebookUser();
+							$name = $wgRequest->getText('wpExistingName');
+							$password = $wgRequest->getText('wpExistingPassword');
+							$fbUser->attachUser($name, $password, $this->getUpdatePrefs());
+						}
+						// Send the view
 						$this->sendPage('displaySuccessAttachingView');
 					} else {
+						// Handle accidental reposts
+						if ( !$wgUser->isLoggedIn() ) {
+							// Update the model (wpDomain isn't currently set...)
+							$fbUser = new FacebookUser();
+							$fbUser->createUser($this->getUsername($choice), $wgRequest->getText('wpDomain'));
+						}
 						$this->sendPage('loginSuccessView', true);
 					}
 				} catch (FacebookUserException $e) {
@@ -370,66 +382,43 @@ class SpecialConnect extends SpecialPage {
 	} // function execute()
 	
 	/**
-	 * Extends the control of execute() for the subpage Special:Connect/ChooseName.
+	 * Figures out the best username to use for the creation of a new user.
 	 * 
-	 * The model operated upon is FacebookUser. To signal a diferent view should
-	 * be shown, a FacebookUserException is thrown by the model or this function.
-	 * The exception allows the model to be unmodified.
-	 * 
-	 * Note that we kind of cheat: 'connectNewUserView' isn't an error page title,
-	 * but signals that we should go to the connectNewUserView() view.
+	 * If $choice isn't an invalid option, a FacebookUserException is thrown to
+	 * signal an error.
 	 * 
 	 * @throws FacebookUserException
 	 */
-	private function manageChooseNamePost($choice) {
+	private function getUsername($choice) {
 		global $wgRequest;
-		$fbUser = new FacebookUser();
-		
 		switch ($choice) {
-			// Check to see if the user opted to connect an existing account
-			case 'existing':
-				// Update the model
-				$fbUser->attachUser($wgRequest->getText('wpExistingName'),
-				                    $wgRequest->getText('wpExistingPassword'), $this->getUpdatePrefs());
-				break;
-			// Figure out the username to send to the model
-			case 'nick':
-			case 'first':
-			case 'full':
-				// Get the username from Facebook (note: not from the form)
-				$username = FacebookUser::getOptionFromInfo($choice . 'name', $fbUser->getUserInfo());
-				// no break
-			case 'manual':
-				// Use manual name if no username is set (even if manual wasn't chosen)
-				if ( empty($username) || !FacebookUser::userNameOK($username) )
-					$username = $wgRequest->getText('wpName2');
-				// If no valid username was found, something's not right; ask again
-				if (empty($username) || !FacebookUser::userNameOK($username)) {
-					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
-				}
-				// no break
-			case 'auto':
-				if ( empty($username) ) {
-					// We got here if and only if $choice is 'auto'
-					$username = FacebookUser::generateUserName();
-				}
-				// Just in case the automatically-generated username is a bad egg
-				if ( empty($username) || !FacebookUser::userNameOK($username) ) {
-					throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
-				}
-				
-				// Handle accidental reposts (TODO: this check should happen in execute()!!!)
-				global $wgUser;
-				if ( $wgUser->isLoggedIn() ) {
-					return;
-				}
-				
-				// Now that we got our username, update the mode
-				$fbUser->createUser($username, $wgRequest->getText( 'wpDomain' )); // wpDomain isn't currently set...
-				break;
-			// Nope
-			default:
-				throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
+		// Figure out the username to send to the model
+		case 'nick':
+		case 'first':
+		case 'full':
+			// Get the username from Facebook (note: not from the form)
+			$username = FacebookUser::getOptionFromInfo($choice . 'name', $fbUser->getUserInfo());
+			if ( !empty( $username ) && FacebookUser::userNameOK($username) ) {
+				return $username;
+			}
+			// no break
+		case 'manual':
+			// Use manual name if no username is set (even if manual wasn't chosen)
+			$username = $wgRequest->getText( 'wpName2' );
+			if ( !empty( $username ) && FacebookUser::userNameOK($username) ) {
+				return $username;
+			}
+			// If no valid username was found, something's not right; ask again
+			throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+		case 'auto':
+			$username = FacebookUser::generateUserName();
+			// Just in case the automatically-generated username is a bad egg
+			if ( !empty($username) && FacebookUser::userNameOK($username) ) {
+				return $username;
+			}
+			throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
+		default:
+			throw new FacebookUserException('facebook-invalid', 'facebook-invalidtext');
 		}
 	}
 	
