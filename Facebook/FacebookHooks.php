@@ -728,7 +728,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			// Only check for password on Special:ChangePassword
 			// TODO: should we use RequestContext::getMain()->getTitle() instead?
 			$title = $wgUser->getSkin()->getTitle();
-			if ( $title instanceof Title && $title->isSpecial('Resetpass') ) {
+			if ($title instanceof Title && $title->isSpecial('Resetpass') || $title->isSpecial('ChangePassword')) {
 				// Check to see if the MediaWiki user has connected via Facebook
 				// before. For a more strict check, we could check if the user
 				// is currently logged in to Facebook
