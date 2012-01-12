@@ -219,6 +219,20 @@ class FacebookUser {
 	}
 	
 	/**
+	 * Attaches the Facebook ID to the current user.
+	 * 
+	 * @throws FacebookUserException
+	 */
+	function attachCurrentUser($updatePrefs) {
+		global $wgUser;
+		if ( !$wgUser->isLoggedIn() ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		$this->attachUserInternal($wgUser, $updatePrefs);
+		$this->login(); // update from Facebook
+	}
+	
+	/**
 	 * Attaches the Facebook ID to an existing wiki account. If the user does
 	 * not exist, or the supplied password does not match, then an exception is
 	 * thrown. Otherwise, the accounts are matched in the database and the new
@@ -241,13 +255,23 @@ class FacebookUser {
 		// Look up the user by their name
 		$user = User::newFromName($name, 'creatable');
 		
-		// If the user is logged in, we can skip the password check
-		if ( !($wgUser->isLoggedIn() && is_object($user) && $wgUser->getId() == $user->getId()) ) {
-			if ( !$user->checkPassword($password) ) {
-				throw new FacebookUserException('connectNewUserView', 'wrongpassword');
-			}
+		// Check to see if the specified user actually exists
+		if ( !( $user instanceof User && $user->getId() ) ) {
+			throw new FacebookUserException('connectNewUserView', 'wrongpassword');
+		}
+		if ( !$user->checkPassword($password) ) {
+			throw new FacebookUserException('connectNewUserView', 'wrongpassword');
 		}
 		
+		// Username checks out. Do the attach
+		$this->attachUserInternal($user, $updatePrefs);
+		$this->login();
+	}
+	
+	/**
+	 * Do the attach.
+	 */
+	private function attachUserInternal($user, $updatePrefs) {
 		// Attach the user to their Facebook account in the database
 		FacebookDB::addFacebookID($user, $this->id);
 		$this->user = $user;
@@ -258,9 +282,6 @@ class FacebookUser {
 				$this->user->setOption("facebookupdate-on-login-$option", '1');
 			}
 		}
-		
-		// Log in the user if they aren't already logged in
-		$this->login();
 		
 		// User has been successfully attached and logged in
 		#wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );

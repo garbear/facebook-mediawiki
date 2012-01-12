@@ -277,7 +277,7 @@ class SpecialConnect extends SpecialPage {
 					$fbUser = new FacebookUser();
 					// Handle accidental reposts
 					if ( $fbUser->getMWUser()->getId() != $wgUser->getId() ) {
-						$fbUser->attachUser($wgUser->getName(), '', $this->getUpdatePrefs());
+						$fbUser->attachCurrentUser( $this->getUpdatePrefs() );
 					}
 					$this->sendPage('displaySuccessAttachingView');
 				} catch (FacebookUserException $e) {
