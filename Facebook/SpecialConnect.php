@@ -443,7 +443,7 @@ class SpecialConnect extends SpecialPage {
 				$updatePrefs[] = $option;
 			}
 		}
-		return $updatePrefs();
+		return $updatePrefs;
 	}
 	
 	/**
