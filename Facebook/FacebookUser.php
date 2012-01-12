@@ -23,6 +23,47 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+/**
+ * Thrown when a FacebookUser encounters a problem.
+ */
+class FacebookUserException extends Exception
+{
+	protected $titleMsg;
+	protected $textMsg;
+	protected $msgParams;
+
+	public function __construct($titleMsg, $textMsg, $msgParams = NULL) {
+		$this->titleMsg  = $titleMsg;
+		$this->textMsg   = $textMsg;
+		$this->msgParams = $msgParams;
+
+		// In general, $msg and $code are not meant to be used
+		$msg = wfMsg( $this->titleMsg );
+		$code = 0;
+
+		parent::__construct($msg, $code);
+	}
+
+	public function getTitleMsg() {
+		return $this->titleMsg;
+	}
+
+	public function getTextMsg() {
+		return $this->textMsg;
+	}
+
+	public function getMsgParams() {
+		return $this->msgParams;
+	}
+
+	public function getType() {
+		return 'Exception';
+	}
+
+	public function __toString() {
+		return wfMsg( $this->msg );
+	}
+}
 
 /**
  * Class FacebookUser. Whereas User represents a MediaWiki user, this class
@@ -106,17 +147,6 @@ class FacebookUser {
 		$this->id = 0;
 		$this->user = new User();
 	}
-	
-	/*
-	static function newFromMWUser($mwUser = NULL) {
-		if ( $mwUser === NULL ) {
-			global $wgUser;
-			$mwUser = $wgUser;
-		}
-		$this->id = FacebookDB::getFacebookIDs( $mwUser );
-		$this->user = FacebookDB::getUser( $facebook->getUser() ); // TODO: cache
-	}
-	*/
 	
 	/**
 	 * Requests information about the user from Facebook.
