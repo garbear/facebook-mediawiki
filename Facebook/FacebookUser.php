@@ -225,11 +225,12 @@ class FacebookUser {
 	 */
 	function attachCurrentUser($updatePrefs) {
 		global $wgUser;
+		
 		if ( !$wgUser->isLoggedIn() ) {
 			throw new FacebookUserException('facebook-error', 'facebook-errortext');
 		}
 		$this->attachUserInternal($wgUser, $updatePrefs);
-		$this->login(); // update from Facebook
+		$this->updateFromFacebook();
 	}
 	
 	/**
@@ -244,13 +245,6 @@ class FacebookUser {
 	 */
 	function attachUser($name, $password, $updatePrefs) {
 		global $wgUser;
-		wfProfileIn(__METHOD__);
-		
-		// The user must be logged into Facebook before choosing a wiki username
-		if ( !$this->id ) {
-			wfDebug("Facebook: aborting in attachUser(): no Facebook ID was reported.\n");
-			throw new FacebookUserException('facebook-error', 'facebook-errortext');
-		}
 		
 		// Look up the user by their name
 		$user = User::newFromName($name, 'creatable');
@@ -270,23 +264,37 @@ class FacebookUser {
 	
 	/**
 	 * Do the attach.
+	 * 
+	 * @throws FacebookUserException
 	 */
 	private function attachUserInternal($user, $updatePrefs) {
+		// The user must be logged into Facebook
+		if ( !$this->id ) {
+			throw new FacebookUserException('facebook-error', 'facebook-errortext');
+		}
+		
+		if ( $this->user->getId() ) {
+			$this->sendError('facebook-error', 'facebook-errortext'); // TODO: new error msg
+		}
+		
+		$fb_ids = FacebookDB::getFacebookIDs($user);
+		if ( count( $fb_ids ) ) {
+			$this->sendError('facebook-error', 'facebook-errortext'); // TODO: new error msg
+		}
+		
 		// Attach the user to their Facebook account in the database
 		FacebookDB::addFacebookID($user, $this->id);
 		$this->user = $user;
 		
 		// Update the user with settings from Facebook
-		if (count($updatePrefs)) {
-			foreach ($updatePrefs as $option) {
+		if ( count( $updatePrefs ) ) {
+			foreach ( $updatePrefs as $option ) {
 				$this->user->setOption("facebookupdate-on-login-$option", '1');
 			}
 		}
 		
-		// User has been successfully attached and logged in
+		// User has been successfully attached
 		#wfRunHooks( 'SpecialConnect::userAttached', array( &$this ) );
-		wfProfileOut(__METHOD__);
-		return true;
 	}
 	
 	
