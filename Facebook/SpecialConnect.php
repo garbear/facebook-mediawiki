@@ -448,7 +448,7 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Strip <p> and </p> tags from a string.
 	 */
-	private static function trimPTags($str) {
+	private function trimPTags($str) {
 		$str = str_replace('<p>', '', $str);
 		$str = str_replace('</p>', '', $str);
 		$str = trim($str);
@@ -594,19 +594,19 @@ class SpecialConnect extends SpecialPage {
 				'auth_dialog_headline',
 				'Auth dialog headline',
 				'Description that appears in the Auth Dialog (30 characters or less)',
-				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_headline'])),
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_headline'])),
 			),
 			array(
 				'auth_dialog_description',
 				'Auth dialog description',
 				'Description that appears in the Auth Dialog (140 characters or less)',
-				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_description'])),
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_description'])),
 			),
 			array(
 				'auth_dialog_perms_explanation',
 				'Explanation for permissions',
 				'Provide an explanation for how your app plans to use extended permissions, if any (140 characters or less)',
-				self::trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_perms_explanation'])),
+				$this->trimPTags(wfMsgWikiHtml($fields_with_msgs['auth_dialog_perms_explanation'])),
 			),
 			/*
 			// This extension doesn't use the News Feed
@@ -954,7 +954,7 @@ class SpecialConnect extends SpecialPage {
 		// Let them attach to an existing. If $wgFbDisableLogin is true, then
 		// stand-alone account aren't allowed in the first place
 		if (empty( $wgFbDisableLogin )) {
-			$updateChoices = "<br/>\n" . self::getUpdateOptions($userinfo);
+			$updateChoices = "<br/>\n" . $this->getUpdateOptions($userinfo);
 			
 			// Create the HTML for the "existing account" option
 			$html .= '
@@ -1046,7 +1046,7 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * TODO: Document me
 	 */
-	private static function getUpdateOptions($userinfo) {
+	private function getUpdateOptions($userinfo) {
 		global $wgRequest;
 		
 		// Build an array of attributes to update
@@ -1141,7 +1141,7 @@ class SpecialConnect extends SpecialPage {
 		'
 		<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>
 		<div id="mw-facebook-choosename-update">
-			' . "<br/>\n" . self::getUpdateOptions($userinfo) . '
+			' . "<br/>\n" . $this->getUpdateOptions($userinfo) . '
 		</div>';
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '
