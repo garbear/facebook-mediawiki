@@ -588,7 +588,7 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'user_support_email',
 				'User support email',
-				'Main contact email for this app ($wgEmergencyContact)',
+				'Requried by Facebook: Main contact email for this app ($wgEmergencyContact)',
 				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
 			),
 			array(
@@ -694,6 +694,7 @@ class SpecialConnect extends SpecialPage {
 						case 'namespace':
 						case 'deauth_callback_url':
 						case 'privacy_policy_url': // Necessary per Facebook's TOS
+						case 'user_support_email': // Required: https://developers.facebook.com/blog/post/630/
 							$icon = 'critical';
 							break;
 						default:
