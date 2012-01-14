@@ -373,7 +373,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 */
 	public static function ResourceLoaderGetConfigVars( &$vars ) {
 		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
-				$wgUser, $facebook;
+				$wgFbAjax, $wgUser, $facebook;
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -385,6 +385,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
+		$vars['fbUseAjax']      = $wgFbAjax;
 		if ( $wgUser->isLoggedIn() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
 			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
@@ -394,7 +395,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		}
 		$scope = FacebookAPI::getPermissions();
 		if ( !empty( $scope ) ) {
-			$vars['fbScope']  = $scope;
+			$vars['fbScope'] = $scope;
 		}
 		return true;
 	}
@@ -406,15 +407,17 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * function is called from BeforePageDisplay via MGVS_hack() to retain
 	 * backward compatability.
 	 * 
-	 * And then this hook was deprecated in 1.17. You know the drill.
+	 * And then this hook was deprecated in 1.17, so it calls the new hook.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
 		global $wgVersion, $wgUser;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
-			unset( $vars['fbScript'] ); // not used outside of ResourceLoader
+			unset( $vars['fbScript'] ); // Obsoleted by ResourceLoader
 		}
 		
+		// We need fbAppAccessToken to be set here instead of loaded through
+		// ResourceLoader. I forget why this is the case, unfortunately.
 		global $wgFbAllowDebug;
 		if ( !empty( $wgFbAllowDebug ) ) {
 			$title = $wgUser->getSkin()->getTitle();

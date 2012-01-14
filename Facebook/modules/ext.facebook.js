@@ -121,8 +121,8 @@
 	 * to Special:Connect with the understanding that this page knows how to
 	 * handle everything we can throw at it.
 	 * 
-	 * formName is the name of a valid API call. If formName is omitted, the
-	 * user will be sent to Special:Connect without showing any form.
+	 * @param formName is the name of a valid API call. If formName is omitted,
+	 * the user will be sent to Special:Connect without showing any form.
 	 */
 	window.getAndShowGetForm = function(formName) {
 		var gotoSpecialConnect = function() {
@@ -134,7 +134,8 @@
 				destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
 			window.location.href = destUrl;
 		};
-		if (!formName) {
+		// If fbUseAjax is false, always go directly to Special:Connect
+		if (!formName || !window.fbUseAjax) {
 			gotoSpecialConnect();
 		} else {
 			FB.api('/me', 'GET', function(info) {
@@ -161,7 +162,6 @@
 						cache: false,
 						// Response is a unit-sized array of html
 						success: function(json_html) {
-							console.log(json_html);
 							if (json_html.length) {
 								// Add the html to the document
 								var form = $('<div/>').html(json_html[0]).hide();
