@@ -41,13 +41,17 @@
 		// "auth.login" event is also fired when stale cookies are refreshed
 		// (like when a user closes the browser and reloads the wiki page).
 		// A side effect is that sometimes users are logged in without
-		// clicking on a login button. If this behaviour isn't desired, more
+		// clicking on a login button. If this behavior isn't desired, more
 		// research is needed...
 		FB.Event.subscribe('auth.login', window.FacebookLogin);
 		
 		$(document).ready(function() {
 			// Attach event to the Login with Facebook button
 			$("#pt-facebook a").click(function(ev) {
+
+				// Load AJAX spinner to get it ready for later on
+				$('<img/>').attr('src', window.loadingSrc).load();
+				
 				FB.login(window.FacebookLogin, {scope: window.fbScope});
 				ev.preventDefault();
 			});
@@ -55,13 +59,32 @@
 		});
 	};
 	
+	// Location of the AJAX loading spinner icon
+	window.loadingSrc = window.stylepath + '/common/images/ajax-loader.gif';
+	
+	/**
+	 * This function is called to log the user into MediaWiki. Three events will
+	 * cause this function to fire:
+	 *    1.  User clicks the "Log in with Facebook" button in the personal URLs toolbar
+	 *    2.  User authenticates the app through a social plugin (e.g. <fb:login-button>)
+	 *    3.  Stale cookies are refreshed and the 'auth.login' is fired. Note that this
+	 *        sometimes happens when loading the wiki in a new browser window. For now,
+	 *        unfortunately, this is indistinguishable from an actual login event.
+	 * 
+	 * The login process tries to proceed via AJAX. Upon any error, the mentality
+	 * is this: send the user to Special:Connect. This special page always knows
+	 * what to do; the AJAX calls here simply attempt to shorten the process.
+	 */
 	window.FacebookLogin = function(response) {
 		// Check if the user logged in and fully authorized the app
 		if (response && response.authResponse) {
+			
+			// Test if the new ResourceLoader is present
 			var compatible = window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw;
 			
 			var gotoSpecialConnect = function() {
 				// Build the fallback URL for if the AJAX requests fail
+				// TODO: Build this URL properly
 				var destUrl = window.wgServer + window.wgScript;
 				destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(window.wgPageName);
 				if (window.wgPageQuery)
@@ -70,6 +93,11 @@
 			var refresh = function() {
 				window.location.href = window.location.href;
 			};
+			
+			// TODO: If we are already on Special:Connect, reload the page
+			
+			// Set up a window above the body content for our AJAX forms
+			$('#fb-root').after('<div id="facebook-ajax-window"/>');
 			
 			if (window.wgUserName) {
 				// The user is logged in to MediaWiki
@@ -120,40 +148,85 @@
 				// Ask the server about the user over AJAX
 				// If the user exists, redirect to destUrl
 				// If the user is new, a ChooseName form will be returned over AJAX
-				// (let the user fill out the form and post to Special:Connect/ChooseName)
 				
-				// Don't use 'html' here because ApiMain::$Formats doesn't include it
-				var type = 'text';
-				var url;
-				if (compatible) {
-					url = mw.util.wikiScript('api');
-				} else {
-					url = window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php');
-				}
-				$.ajax({
-					type: 'GET',
-					url: url,
-					data: {
-						'action'     : 'facebookchoosename',
-						'format'     : type,
-						'fbid'       : response.authResponse.userID,
-						'lgpassword' : 'foobar'
-					},
-					dataType: type,
-					success: function(text) {
-						// Add html to page
-						alert(text);
-					},
-					error: function() {
-						gotoSpecialConnect(); // Fallback if AJAX fails
-					}
-				});
+				// Set up the AJAX call
+				//var url = mw.util.wikiScript('api');
+				var url = window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php');
+				var getForm = function() {
+					// First, get user information to pre-populate the form. We do this
+					// here because the server might not have Facebook access_token yet.
+					FB.api('/me', 'GET', function(info) {
+						if (info && !info.error) {
+							// We got the info. Now, get the form.
+							$.ajax({
+								type: 'POST',
+								url: url,
+								data: {
+									'action'     : 'facebookchoosename',
+									// Don't use 'html' here because ApiMain::$Formats doesn't support it
+									'format'     : 'json', // not 'text'
+									'id'         : response.authResponse.userID,
+									'name'       : info.name,
+									'first_name' : info.first_name,
+									'last_name'  : info.last_name,
+									'username'   : info.username,
+									'gender'     : info.gender,
+									'locale'     : info.locale,
+									'timezone'   : info.timezone,
+									'email'      : info.email,
+								},
+								dataType: 'json',
+								cache: false,
+								// Response is a unit-sized array of html
+								success: function(json_html) {
+									console.log(json_html);
+									if (json_html.length) {
+										// Add the html to the document
+										var form = $('<div/>').html(json_html[0]).hide();
+										var w = $('#facebook-ajax-window');
+										w.append(form);
+										window.addFormListener();
+										
+										// Don't resize the window if form height < ajax icon
+										if (form.height() > 32) {
+											$('#facebook-ajax-window img').fadeOut('slow');
+											w.animate({
+												'height': form.height() + 'px'
+											}, 'slow', 'swing', function() {
+												form.fadeIn('slow');
+												w.css('height', 'inherit');
+											});
+										} else {
+											$('#facebook-ajax-window img').fadeOut('slow', function() {
+												w.css('height', 'inherit');
+												form.fadeIn('slow');
+											});
+										}
+									} else {
+										gotoSpecialConnect(); // Maybe FB user has an account already
+									}
+								},
+								error: function() {
+									gotoSpecialConnect(); // Fallback if AJAX fails
+								}
+							});
+						} else {
+							gotoSpecialConnect(); // Facebook if api(/me) fails
+						}
+					});
+				};
+				
+				// Now start the AJAX process
+				$('#facebook-ajax-window').animate({
+					'height'         : '32px',
+					'padding-bottom' : '20px'
+				}, 'slow', 'swing', getForm).append('<img src="' + window.loadingSrc + '"/>');
 			}
 		}
 	};
 	
 	// Form to connect Facebook with an existing account on Special:Connect
-	$(document).ready(function() {
+	window.addFormListener = function() {
 		$('input[name="wpNameChoice"]').change(function() {
 			var selected;
 			try {
@@ -167,5 +240,9 @@
 				$("#mw-facebook-choosename-update").slideUp('slow');
 			}
 		});
+	};
+	$(document).ready(function() {
+		window.addFormListener();
 	});
+	
 })(window.jQuery);

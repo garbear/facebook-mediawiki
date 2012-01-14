@@ -89,7 +89,7 @@ $wgAutoloadClasses['ApiFacebookChooseName']        = $dir . 'FacebookAJAX.php';
 $wgAutoloadClasses['ApiFacebookLogoutAndContinue'] = $dir . 'FacebookAJAX.php';
 $wgAutoloadClasses['ApiFacebookMergeAccount']      = $dir . 'FacebookAJAX.php';
 
-#$wgAPIModules['facebookchoosename']        = 'ApiFacebookChooseName';
+$wgAPIModules['facebookchoosename']        = 'ApiFacebookChooseName';
 #$wgAPIModules['facebooklogoutandcontinue'] = 'ApiFacebookLogoutAndContinue';
 #$wgAPIModules['facebookmergeaccount']      = 'ApiFacebookMergeAccount';
 
