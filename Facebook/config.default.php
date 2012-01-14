@@ -127,7 +127,7 @@ $wgFbUserRightsFromGroup = false;  # Or a quoted group ID, or an array of groups
  *    3.  The user logs in to a Facebook account associated with a different
  *        wiki account than the one currently logged in.
  */
-$wgFbAjax = false;
+$wgFbAjax = true;
 
 /**
  * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
