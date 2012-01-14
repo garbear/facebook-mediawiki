@@ -48,19 +48,12 @@
 		$(document).ready(function() {
 			// Attach event to the Login with Facebook button
 			$("#pt-facebook a").click(function(ev) {
-
-				// Load AJAX spinner to get it ready for later on
-				$('<img/>').attr('src', window.loadingSrc).load();
-				
 				FB.login(window.FacebookLogin, {scope: window.fbScope});
 				ev.preventDefault();
 			});
 			// TODO: Set the "href" attribute of the login button to destUrl
 		});
 	};
-	
-	// Location of the AJAX loading spinner icon
-	window.loadingSrc = window.stylepath + '/common/images/ajax-loader.gif';
 	
 	/**
 	 * This function is called to log the user into MediaWiki. Three events will
@@ -140,73 +133,55 @@
 		if (!formName) {
 			gotoSpecialConnect();
 		} else {
-			$('#facebook-ajax-window').animate({
-				'height'         : '32px',
-				'padding-bottom' : '20px'
-			}, 'slow', 'swing', function() {
-				// First, get user information to pre-populate the form. We do this
-				// here because the server might not have a Facebook access_token yet.
-				FB.api('/me', 'GET', function(info) {
-					if (info && !info.error) {
-						// We got the info. Now, get the form.
-						$.ajax({
-							type: 'POST',
-							// In MW >= 1.17: url = mw.util.wikiScript('api');
-							url: window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php'),
-							data: {
-								'action'     : formName,
-								'format'     : 'json',
-								'id'         : info.id,
-								'name'       : info.name,
-								'first_name' : info.first_name,
-								'last_name'  : info.last_name,
-								'username'   : info.username,
-								'gender'     : info.gender,
-								'locale'     : info.locale,
-								'timezone'   : info.timezone,
-								'email'      : info.email,
-							},
-							dataType: 'json',
-							cache: false,
-							// Response is a unit-sized array of html
-							success: function(json_html) {
-								console.log(json_html);
-								if (json_html.length) {
-									// Add the html to the document
-									var form = $('<div/>').html(json_html[0]).hide();
-									var w = $('#facebook-ajax-window');
-									w.append(form);
-									if (form == 'facebookchoosename') {
-									    window.addFormListener();
+			FB.api('/me', 'GET', function(info) {
+				if (info && !info.error) {
+					// We got the info. Now, get the form.
+					$.ajax({
+						type: 'POST',
+						// In MW >= 1.17: url = mw.util.wikiScript('api');
+						url: window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php'),
+						data: {
+							'action'     : formName,
+							'format'     : 'json',
+							'id'         : info.id,
+							'name'       : info.name,
+							'first_name' : info.first_name,
+							'last_name'  : info.last_name,
+							'username'   : info.username,
+							'gender'     : info.gender,
+							'locale'     : info.locale,
+							'timezone'   : info.timezone,
+							'email'      : info.email,
+						},
+						dataType: 'json',
+						cache: false,
+						// Response is a unit-sized array of html
+						success: function(json_html) {
+							console.log(json_html);
+							if (json_html.length) {
+								// Add the html to the document
+								var form = $('<div/>').html(json_html[0]).hide();
+								$('#facebook-ajax-window').append(form).animate({
+									'height': form.height() + 'px'
+								}, 'slow', 'swing', function() {
+									form.fadeIn('slow');
+									$(this).css('height', 'inherit');
+									if (formName == 'facebookchoosename') {
+										window.addFormListener();
 									}
-									// Don't resize the window if form height < ajax icon
-									if (form.height() > 32) {
-										$('#facebook-ajax-window img').fadeOut('slow');
-										w.animate({
-											'height': form.height() + 'px'
-										}, 'slow', 'swing', function() {
-											form.fadeIn('slow');
-											w.css('height', 'inherit');
-										});
-									} else {
-										$('#facebook-ajax-window img').fadeOut('slow', function() {
-											w.css('height', 'inherit');
-											form.fadeIn('slow');
-										});
-									}
-								} else {
-									gotoSpecialConnect(); // Fallback if form is empty or error occurs
-								}
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								gotoSpecialConnect(); // Fallback if AJAX fails
+								});
+							} else {
+								gotoSpecialConnect(); // Fallback if form is empty or error occurs
 							}
-						});
-					} else {
-						gotoSpecialConnect(); // Facebook if FB.api('/me') fails
-					}
-				});
-			}).append('<img src="' + window.loadingSrc + '"/>'); // $('#facebook-ajax-window')
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							gotoSpecialConnect(); // Fallback if AJAX fails
+						}
+					});
+				} else {
+					gotoSpecialConnect(); // Facebook if FB.api('/me') fails
+				}
+			});
 		}
 	};
 	
