@@ -147,12 +147,25 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				);
 			}
 			
+			// Include special JavaScript on Special:Connect/Debug
+			$isSpecialConnectDebug = false;
+			$title = $skin->getTitle();
+			global $wgFbAllowDebug;
+			if (!empty($wgFbAllowDebug) && $title instanceof Title && $title->getNamespace() == NS_SPECIAL) {
+				list( $name, $subpage ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
+				if ( $name == 'Connect' && $subpage == 'Debug' ) {
+					$isSpecialConnectDebug = true;
+				}
+			}
+			
 			if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
 				// Include the common jQuery library
 				$out->includeJQuery();
 				$out->addInlineStyle( $style );
 				$out->addScriptFile( $wgFbExtScript );
-			
+				if ( $isSpecialConnectDebug ) {
+					$out->addScriptFile("$wgScriptPath/extensions/Facebook/modules/ext.facebook.application.js");
+				}
 			} else {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 				// Include the most recent 1.7 version
@@ -160,7 +173,11 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				// Add the script file specified by $url
 				$out->addScript( "<script type=\"$wgJsMimeType\" " .
 						"src=\"$wgFbExtScript?$wgStyleVersion\"></script>\n" );
-				
+				if ( $isSpecialConnectDebug ) {
+					$out->addScript( "<script type=\"$wgJsMimeType\" " .
+						"src=\"$wgFbExtScript/extensions/Facebook/modules/" .
+						"ext.facebook.application.js?$wgStyleVersion\"></script>\n" );
+				}
 				// Inserts list of global JavaScript variables if necessary
 				if (self::MGVS_hack( $mgvs_script )) {
 					$out->addInlineScript( $mgvs_script );
