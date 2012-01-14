@@ -90,8 +90,8 @@ $wgAutoloadClasses['ApiFacebookLogoutAndContinue'] = $dir . 'FacebookAJAX.php';
 $wgAutoloadClasses['ApiFacebookMergeAccount']      = $dir . 'FacebookAJAX.php';
 
 $wgAPIModules['facebookchoosename']        = 'ApiFacebookChooseName';
-#$wgAPIModules['facebooklogoutandcontinue'] = 'ApiFacebookLogoutAndContinue';
-#$wgAPIModules['facebookmergeaccount']      = 'ApiFacebookMergeAccount';
+$wgAPIModules['facebookmergeaccount']      = 'ApiFacebookMergeAccount';
+$wgAPIModules['facebooklogoutandcontinue'] = 'ApiFacebookLogoutAndContinue';
 
 
 // Define new autopromote condition (use quoted text, numbers can cause collisions)

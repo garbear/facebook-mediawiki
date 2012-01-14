@@ -372,6 +372,7 @@ class SpecialConnect extends SpecialPage {
 								$this->sendPage('mergeAccountView');
 							} else {
 								// MediaWiki user already associated with Facebook ID
+								// TODO: LogoutAndCreateNewUser form
 								global $wgContLang;
 								$param1 = '[[' . $wgContLang->getNsText( NS_USER ) . ":{$wgUser->getName()}|{$wgUser->getName()}]]";
 								$param2 = $fbUser->getUserInfo('name');
@@ -928,8 +929,6 @@ class SpecialConnect extends SpecialPage {
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		
-		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
-		
 		// Grab the UserName from the cookie if it exists
 		global $wgCookiePrefix;
 		$existingName = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
@@ -948,6 +947,7 @@ class SpecialConnect extends SpecialPage {
 		// Keep track of when the first option visible to the user is checked
 		$checked = false;
 		
+		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
 		if ( $messageKey == '' ) {
 			$messageKey = 'facebook-chooseinstructions';
 		}
@@ -1133,11 +1133,26 @@ class SpecialConnect extends SpecialPage {
 	 * these two.
 	 */
 	private function mergeAccountView() {
-		global $wgOut, $wgUser, $wgSitename;
-		$wgOut->setPageTitle(wfMsg('facebook-merge-title'));
+		global $wgOut;
+		
+		$wgOut->setPageTitle( wfMsg( 'facebook-merge-title' ) );
 		
 		$fbUser = new FacebookUser();
 		$userinfo = $fbUser->getUserInfo();
+		
+		$form = $this->getMergeAccountForm( $userinfo );
+		$wgOut->addHTML($form . "\n<br/>\n");
+		
+		// Render the "Return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		$wgOut->addHTML("<br/>\n");
+	}
+	
+	/**
+	 * Returns the HTML for the ChooseName form.
+	 */
+	public function getMergeAccountForm($userinfo) {
+		global $wgSitename;
 		
 		$html = '
 <form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">
@@ -1164,13 +1179,7 @@ class SpecialConnect extends SpecialPage {
 	</fieldset>
 </form>';
 		
-		$html .= "<br/>\n";
-		
-		$wgOut->addHTML($html);
-		
-		// Render the "Return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
-		$wgOut->addHTML("<br/>\n");
+		return $html;
 	}
 	
 	/**
@@ -1184,24 +1193,44 @@ class SpecialConnect extends SpecialPage {
 	 * not as a wiki user, and then logs into the wiki with the wrong account?
 	 */
 	private function logoutAndContinueView($userId) {
-		global $wgOut, $wgContLang;
+		global $wgOut;
 		
 		$wgOut->setPageTitle(wfMsg('facebook-logout-and-continue'));
 		
+		$fbUser = new FacebookUser();
+		$userinfo = $fbUser->getUserInfo();
+		
+		$form = $this->getLogoutAndContinueForm( $userinfo, $userId );
+		
+		// TODO
+		//$form .= '<p>Not $userId? Log in as a different facebook user...</p>';
+		
+		$wgOut->addHTML( $form . "<br/>\n" );
+		
+		// Render the "Return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+	}
+	
+	/**
+	 * Returns the HTML for the LogoutAndContinue form.
+	 */
+	public function getLogoutAndContinueForm($userinfo, $userId) {
+		global $wgContLang;
+		
 		$html = '';
 		
-		$fbUser = new FacebookUser();
-		$profile = $fbUser->getUserInfo();
-		if ( $profile && isset($profile['first_name']) ) {
-			$html = '
-<p>' . wfMsg('facebook-welcome-name', array('$1' => $profile['first_name'])) . '</p>';
+		// Show a welcome message to the Facebook user who just logged in
+		$firstName = ($userinfo && isset($userinfo['first_name'])) ? $userinfo['first_name'] : '';
+		if ( $firstName != '' ) {
+			$html .= '<p>' . wfMsg('facebook-welcome-name', array('$1' => $firstName)) . "</p>\n";
 		}
 		
 		$username = User::newFromId($userId)->getName();
-		$html .= "\n" . wfMsgExt('facebook-continue-text', 'parse', array(
-				'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
-		);
+		
 		$html .= '
+' . wfMsgExt('facebook-continue-text', 'parse', array(
+	'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
+) . '
 <form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">
 	<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '" />';
 		if ( !empty( $this->mReturnTo ) ) {
@@ -1216,20 +1245,8 @@ class SpecialConnect extends SpecialPage {
 		$html .= '
 </form>';
 		
-		$html .= "<br/>\n";
-		
-		// TODO
-		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
-		
-		$wgOut->addHTML( $html );
-		
-		// Render the "Return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		return $html;
 	}
-	
-	
-	
-	
 	
 	/**
 	 * Success page for attaching Facebook account to a pre-existing MediaWiki

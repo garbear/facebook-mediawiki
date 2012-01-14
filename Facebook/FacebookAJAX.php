@@ -17,28 +17,14 @@
 
 
 /**
- * API module to choose a username for new Facebook users.
+ * Base class for form queries.
+ * 
+ * Subclasses must implement the execute() method.
  */
-class ApiFacebookChooseName extends ApiBase {
+abstract class ApiFacebookFormQuery extends ApiBase {
 	
 	public function __construct( $main, $action ) {
 		parent::__construct( $main, $action );
-	}
-	
-	/**
-	 * If the user exists, return an empty response, just as if an error had
-	 * occured. This will invoke the fallback action, redirecting the user to
-	 * Special:Connect, which is what we want to do anyways. Returning a choose
-	 * name form simply allows us to short-cut the process.
-	 */
-	public function execute() {
-		$params = $this->extractRequestParams();
-		$fbUser = new FacebookUser($params['id']);
-		if ( !$fbUser->getMWUser()->getId() ) {
-			wfLoadExtensionMessages('Facebook');
-			$specialConnect = new SpecialConnect();
-			$this->getResult()->addValue(null, null, $specialConnect->getChooseNameForm($params));
-		}
 	}
 	
 	public function getVersion() {
@@ -47,15 +33,14 @@ class ApiFacebookChooseName extends ApiBase {
 	
 	public function getDescription() {
 		return array(
-			'Retrieve ChooseName form over AJAX.'
+			'Retrieve form over AJAX.'
 		);
 	}
 	
 	/**
 	 * Only 'id' is required. 'id' is used to determine whether the user
-	 * already has an account on the wiki. If not, a form is generated using
-	 * the available info. Note that if no info is passed, "existing", "auto"
-	 * and "manual" will be the only options on the form.
+	 * already has an account on the wiki. The available additional info is
+	 * passed on to the form.
 	 */
 	public function getAllowedParams() {
 		$type_required = array(
@@ -103,5 +88,74 @@ class ApiFacebookChooseName extends ApiBase {
 	 */
 	public function mustBePosted() {
 		return true;
+	}
+}
+
+/**
+ * API module to choose a username for new Facebook users.
+ * 
+ * If the user exists, return an empty response, just as if an error had
+ * occured. This will invoke the fallback action, redirecting the user to
+ * Special:Connect, which is what we want to do anyways. Returning a choose
+ * name form simply allows us to short-cut the process.
+ */
+class ApiFacebookChooseName extends ApiFacebookFormQuery {
+	public function execute() {
+		$params = $this->extractRequestParams();
+		$fbUser = new FacebookUser($params['id']);
+		
+		if ( !$fbUser->getMWUser()->getId() ) {
+			wfLoadExtensionMessages('Facebook');
+			$specialConnect = new SpecialConnect();
+			$this->getResult()->addValue(null, null, $specialConnect->getChooseNameForm($params));
+		}
+	}
+}
+
+/**
+ * API module for existing MediaWiki users to merge their username with a
+ * Facebook account.
+ * 
+ * If the user exists, return an empty response, just as if an error had
+ * occured. This will invoke the fallback action, redirecting the user to
+ * Special:Connect, which is what we want to do anyways. Returning a choose
+ * name form simply allows us to short-cut the process.
+ */
+class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
+	public function execute() {
+		$params = $this->extractRequestParams();
+		$fbUser = new FacebookUser($params['id']);
+		
+		if ( !$fbUser->getMWUser()->getId() ) {
+			wfLoadExtensionMessages('Facebook');
+			$specialConnect = new SpecialConnect();
+			$this->getResult()->addValue(null, null, $specialConnect->getMergeAccountForm($params));
+		}
+	}
+}
+
+/**
+ * To logout-and-continue, or not to logout-and-continue, that is the question.
+ * 
+ * If the logged-in Facebook user doesn't have a MediaWiki account, this api
+ * query will return an empty form and the user will be redirected to
+ * Special:Connect. Because there doesn't exist a LogoutAndCreateNewUser form
+ * (yet), an error message will be shown prompting the user to log out.
+ */
+class ApiFacebookLogoutAndContinue extends ApiFacebookFormQuery {
+	public function execute() {
+		$params = $this->extractRequestParams();
+		$fbUser = new FacebookUser($params['id']);
+		$id = $fbUser->getMWUser()->getId();
+		
+		if ( $id ) {
+			wfLoadExtensionMessages('Facebook');
+			$specialConnect = new SpecialConnect();
+			$this->getResult()->addValue(null, null, $specialConnect->getLogoutAndContinueForm($params, $id));
+		} else {
+			// TODO: Add a LogoutAndCreateNewUser form to SpecialConnect.php. For
+			// now, return an empty response to send user to Special:Connect
+			// (which displays an error message).
+		}
 	}
 }
