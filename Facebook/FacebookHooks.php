@@ -889,20 +889,5 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		}
 		return true;
 	} // initPreferencesExtensionForm hook
-	
-	/**
-	 * Add Facebook HTML to AJAX script.
-	 *
-	public static function afterAjaxLoginHTML( &$html ) {
-		$tmpl = new EasyTemplate( dirname( __FILE__ ) . '/templates/' );
-		wfLoadExtensionMessages('Facebook');
-		if ( !LoginForm::getLoginToken() ) {
-			LoginForm::setLoginToken();
-		}
-		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
-		$tmpl->set( 'fbButtton', FacebookInit::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
-		$html = $tmpl->execute( 'ajaxLoginMerge' );
-		return true;
-	}
 	/**/
 }
