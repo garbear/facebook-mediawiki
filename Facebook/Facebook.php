@@ -80,7 +80,6 @@ $wgAutoloadClasses['FacebookLanguage'] = $dir . 'FacebookLanguage.php';
 $wgAutoloadClasses['FacebookUser'] = $dir . 'FacebookUser.php';
 $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';
-$wgAutoloadClasses['ChooseNameTemplate'] = $dir . 'templates/ChooseNameTemplate.class.php';
 
 // Special:Connect and accompanying AJAX modules
 $wgSpecialPages['Connect'] = 'SpecialConnect';
@@ -99,15 +98,10 @@ define( 'APCOND_FB_USER',      'fb*u' );
 define( 'APCOND_FB_INGROUP',   'fb*g' );
 define( 'APCOND_FB_ISADMIN',   'fb*a' );
 
-// Add 'fb-user' group to Facebook users and granted the 'facebook-user' right
+// Add 'fb-user' group to Facebook users and grant the 'facebook-user' right
 $wgImplicitGroups[] = 'fb-user';
 $wgAutopromote['fb-user'] = APCOND_FB_USER;
 $wgGroupPermissions['fb-user'] = array('facebook-user' => true);
-
-//$wgAjaxExportList[] = 'FacebookInit::disconnectFromFB';
-//$wgAjaxExportList[] = 'SpecialConnect::getLoginButtonModal';
-//$wgAjaxExportList[] = 'SpecialConnect::ajaxModalChooseName'; 
-//$wgAjaxExportList[] = 'SpecialConnect::checkCreateAccount';
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
 $wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
