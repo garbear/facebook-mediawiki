@@ -101,13 +101,17 @@ abstract class ApiFacebookFormQuery extends ApiBase {
  */
 class ApiFacebookChooseName extends ApiFacebookFormQuery {
 	public function execute() {
-		$params = $this->extractRequestParams();
-		$fbUser = new FacebookUser($params['id']);
+		global $wgFbAjax;
 		
-		if ( !$fbUser->getMWUser()->getId() ) {
-			wfLoadExtensionMessages('Facebook');
-			$specialConnect = new SpecialConnect();
-			$this->getResult()->addValue(null, null, $specialConnect->getChooseNameForm($params));
+		if ( !empty( $wgFbAjax ) ) {
+			$params = $this->extractRequestParams();
+			$fbUser = new FacebookUser($params['id']);
+			
+			if ( !$fbUser->getMWUser()->getId() ) {
+				wfLoadExtensionMessages('Facebook');
+				$specialConnect = new SpecialConnect();
+				$this->getResult()->addValue(null, null, $specialConnect->getChooseNameForm($params));
+			}
 		}
 	}
 }
@@ -123,13 +127,17 @@ class ApiFacebookChooseName extends ApiFacebookFormQuery {
  */
 class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
 	public function execute() {
-		$params = $this->extractRequestParams();
-		$fbUser = new FacebookUser($params['id']);
+		global $wgFbAjax;
 		
-		if ( !$fbUser->getMWUser()->getId() ) {
-			wfLoadExtensionMessages('Facebook');
-			$specialConnect = new SpecialConnect();
-			$this->getResult()->addValue(null, null, $specialConnect->getMergeAccountForm($params));
+		if ( !empty( $wgFbAjax ) ) {
+			$params = $this->extractRequestParams();
+			$fbUser = new FacebookUser($params['id']);
+			
+			if ( !$fbUser->getMWUser()->getId() ) {
+				wfLoadExtensionMessages('Facebook');
+				$specialConnect = new SpecialConnect();
+				$this->getResult()->addValue(null, null, $specialConnect->getMergeAccountForm($params));
+			}
 		}
 	}
 }
@@ -144,18 +152,22 @@ class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
  */
 class ApiFacebookLogoutAndContinue extends ApiFacebookFormQuery {
 	public function execute() {
-		$params = $this->extractRequestParams();
-		$fbUser = new FacebookUser($params['id']);
-		$id = $fbUser->getMWUser()->getId();
+		global $wgFbAjax;
 		
-		if ( $id ) {
-			wfLoadExtensionMessages('Facebook');
-			$specialConnect = new SpecialConnect();
-			$this->getResult()->addValue(null, null, $specialConnect->getLogoutAndContinueForm($params, $id));
-		} else {
-			// TODO: Add a LogoutAndCreateNewUser form to SpecialConnect.php. For
-			// now, return an empty response to send user to Special:Connect
-			// (which displays an error message).
+		if ( !empty( $wgFbAjax ) ) {
+			$params = $this->extractRequestParams();
+			$fbUser = new FacebookUser($params['id']);
+			$id = $fbUser->getMWUser()->getId();
+			
+			if ( $id ) {
+				wfLoadExtensionMessages('Facebook');
+				$specialConnect = new SpecialConnect();
+				$this->getResult()->addValue(null, null, $specialConnect->getLogoutAndContinueForm($params, $id));
+			} else {
+				// TODO: Add a LogoutAndCreateNewUser form to SpecialConnect.php. For
+				// now, return an empty response to send user to Special:Connect
+				// (which displays an error message).
+			}
 		}
 	}
 }
