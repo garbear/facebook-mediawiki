@@ -155,6 +155,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				list( $name, $subpage ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
 				if ( $name == 'Connect' && $subpage == 'Debug' ) {
 					$isSpecialConnectDebug = true;
+					// Use $wgFbExtScript as a base
+					$applicationScript = str_replace('ext.facebook.js', 'ext.facebook.application.js',
+							$wgFbExtScript);
 				}
 			}
 			
@@ -164,7 +167,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				$out->addInlineStyle( $style );
 				$out->addScriptFile( $wgFbExtScript );
 				if ( $isSpecialConnectDebug ) {
-					$out->addScriptFile("$wgScriptPath/extensions/Facebook/modules/ext.facebook.application.js");
+					$out->addScriptFile( $applicationScript );
 				}
 			} else {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
@@ -175,8 +178,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 						"src=\"$wgFbExtScript?$wgStyleVersion\"></script>\n" );
 				if ( $isSpecialConnectDebug ) {
 					$out->addScript( "<script type=\"$wgJsMimeType\" " .
-						"src=\"$wgFbExtScript/extensions/Facebook/modules/" .
-						"ext.facebook.application.js?$wgStyleVersion\"></script>\n" );
+						"src=\"$applicationScript?$wgStyleVersion\"></script>\n" );
 				}
 				// Inserts list of global JavaScript variables if necessary
 				if (self::MGVS_hack( $mgvs_script )) {
