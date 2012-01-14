@@ -22,7 +22,7 @@
  * proper code won't be called before it's ready. Be mindful of race conditions.
  */
 
-(function($, mw) {
+(function($) {
 	/**
 	 * After the Facebook JavaScript SDK has been loaded, it looks for
 	 * window.fbAsyncInit and executes the function when found.
@@ -86,8 +86,8 @@
 			} else {
 				// Set up a window above the body content for our AJAX forms
 				$('#fb-root').after('<div id="facebook-ajax-window"/>');
-				// These two tests are basically the same, one just uses the new ResourceLoader
-				if (mw ? !mw.user.anonymous() : window.wgUserName) {
+				
+				if (window.wgUserName) {
 					// The user is logged in to MediaWiki
 					if (window.fbId) {
 						// The MediaWiki user is already connected to a Facebook user.
@@ -211,4 +211,4 @@
 		window.addFormListener();
 	});
 	
-})(window.jQuery, window.mediaWiki);
+})(window.jQuery);
