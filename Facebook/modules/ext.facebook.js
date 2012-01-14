@@ -77,8 +77,12 @@
 			}
 			// Check for repeated clicks
 			else if ($('#facebook-ajax-window').length) {
-				// no params means no form, just goto Special:Connect
-				window.getAndShowGetForm();
+				// Only redirect if the other form had a chance to fully load
+				if (window.formLoaded) {
+					// no params means no form, just go to Special:Connect
+					window.getAndShowGetForm();
+				}
+				// Else, do nothing (other form is still loading, "auth.login" might have fired twice)
 			} else {
 				// Set up a window above the body content for our AJAX forms
 				$('#fb-root').after('<div id="facebook-ajax-window"/>');
@@ -169,6 +173,8 @@
 									if (formName == 'facebookchoosename') {
 										window.addFormListener();
 									}
+									// Set a flag indicating we loaded a form
+									window.formLoaded = true;
 								});
 							} else {
 								gotoSpecialConnect(); // Fallback if form is empty or error occurs
