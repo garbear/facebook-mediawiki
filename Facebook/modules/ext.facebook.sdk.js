@@ -22,11 +22,16 @@
  * 
  * This module carries ext.facebook.js as a dependency because the
  * window.fbAsyncInit hook must be in place before this library is loaded.
+ * 
+ * This script is only needed for MW >= 1.17. For previous versions, the JS SDK
+ * is loaded asynchronously from within the <body>. However, ResourceLoader
+ * modules in the top load queue are run from withing the head, which means we
+ * need a different method for loading the script.
  */
 
-(function($) {
+(function($, mw) {
 	// Check for MediaWiki 1.17+
-	if (window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw) {
+	if (mw) {
 		// Boo. No async loading. ResourceLoader Version 2 Design Specification mentions
 		// a possible future implementation for asynchronous, non-blocking requests that
 		// download, parse and execute the script concurrent to document parsing.
@@ -48,9 +53,9 @@
 		$.getScript(mw.config.get('fbScript'));
 		*/
 		
-		// This has indeed turned in to an epic quest. The above uses an AJAX call,
+		// This has indeed turned into an epic quest. The above uses an AJAX call,
 		// which refuses to cache, period. Instead, we use a cache-friendly version.
-		jQuery.ajax({
+		$.ajax({
 			type     : "GET",
 			url      : mw.config.get('fbScript'),
 			async    : true, // fuck yea hipster kitty
@@ -58,4 +63,4 @@
 			cache    : true
 		});
 	}
-})(jQuery);
+})(window.jQuery, window.mediaWiki);

@@ -147,12 +147,25 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				);
 			}
 			
+			// Include special JavaScript on Special:Connect/Debug
+			$isSpecialConnectDebug = false;
+			$title = $skin->getTitle();
+			global $wgFbAllowDebug;
+			if (!empty($wgFbAllowDebug) && $title instanceof Title && $title->getNamespace() == NS_SPECIAL) {
+				list( $name, $subpage ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
+				if ( $name == 'Connect' && $subpage == 'Debug' ) {
+					$isSpecialConnectDebug = true;
+				}
+			}
+			
 			if ( version_compare( $wgVersion, '1.16', '>=' ) ) {
 				// Include the common jQuery library
 				$out->includeJQuery();
 				$out->addInlineStyle( $style );
 				$out->addScriptFile( $wgFbExtScript );
-			
+				if ( $isSpecialConnectDebug ) {
+					$out->addScriptFile("$wgScriptPath/extensions/Facebook/modules/ext.facebook.application.js");
+				}
 			} else {
 				$out->addScript( '<style type="text/css">' . $style . '</style>' );
 				// Include the most recent 1.7 version
@@ -160,7 +173,11 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 				// Add the script file specified by $url
 				$out->addScript( "<script type=\"$wgJsMimeType\" " .
 						"src=\"$wgFbExtScript?$wgStyleVersion\"></script>\n" );
-				
+				if ( $isSpecialConnectDebug ) {
+					$out->addScript( "<script type=\"$wgJsMimeType\" " .
+						"src=\"$wgFbExtScript/extensions/Facebook/modules/" .
+						"ext.facebook.application.js?$wgStyleVersion\"></script>\n" );
+				}
 				// Inserts list of global JavaScript variables if necessary
 				if (self::MGVS_hack( $mgvs_script )) {
 					$out->addInlineScript( $mgvs_script );
@@ -356,7 +373,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 */
 	public static function ResourceLoaderGetConfigVars( &$vars ) {
 		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
-				$wgUser, $facebook;
+				$wgFbAjax, $wgUser, $facebook;
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -368,16 +385,17 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
-		if ( $wgUser->isLoggedIn() && !$facebook->getUser() ) {
+		$vars['fbUseAjax']      = $wgFbAjax;
+		if ( $wgUser->isLoggedIn() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
-			if ( count($ids) ) {
+			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
 				// Let JavaScript know if the Facebook ID belongs to someone else
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
 		$scope = FacebookAPI::getPermissions();
 		if ( !empty( $scope ) ) {
-			$vars['fbScope']  = $scope;
+			$vars['fbScope'] = $scope;
 		}
 		return true;
 	}
@@ -389,15 +407,17 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * function is called from BeforePageDisplay via MGVS_hack() to retain
 	 * backward compatability.
 	 * 
-	 * And then this hook was deprecated in 1.17. You know the drill.
+	 * And then this hook was deprecated in 1.17, so it calls the new hook.
 	 */
 	public static function MakeGlobalVariablesScript( &$vars ) {
 		global $wgVersion, $wgUser;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
-			unset( $vars['fbScript'] ); // not used outside of ResourceLoader
+			unset( $vars['fbScript'] ); // Obsoleted by ResourceLoader
 		}
 		
+		// We need fbAppAccessToken to be set here instead of loaded through
+		// ResourceLoader. I forget why this is the case, unfortunately.
 		global $wgFbAllowDebug;
 		if ( !empty( $wgFbAllowDebug ) ) {
 			$title = $wgUser->getSkin()->getTitle();
@@ -869,20 +889,5 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		}
 		return true;
 	} // initPreferencesExtensionForm hook
-	
-	/**
-	 * Add Facebook HTML to AJAX script.
-	 *
-	public static function afterAjaxLoginHTML( &$html ) {
-		$tmpl = new EasyTemplate( dirname( __FILE__ ) . '/templates/' );
-		wfLoadExtensionMessages('Facebook');
-		if ( !LoginForm::getLoginToken() ) {
-			LoginForm::setLoginToken();
-		}
-		$tmpl->set( 'loginToken', LoginForm::getLoginToken() );
-		$tmpl->set( 'fbButtton', FacebookInit::getFBButton( 'sendToConnectOnLoginForSpecificForm();', 'fbPrefsConnect' ) );
-		$html = $tmpl->execute( 'ajaxLoginMerge' );
-		return true;
-	}
 	/**/
 }

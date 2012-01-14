@@ -25,52 +25,51 @@
  * the page.
  */
 
-(function($) {
+(function($, mw) {
 	// Check for MediaWiki 1.17+
-	if (window.wgVersion && (parseInt(window.wgVersion.split('.')[1]) || 0) >= 17 && window.mw) {
-		$(document).ready(function() {
-			// Make warnings and criticals clickable
-			var icon = $('.facebook-field-warning,.facebook-field-critical').siblings('div').children("a");
-			// Install the click handler
-			icon.click(function(ev) {
-				var field = $(this).parent().parent().attr('id').substring('facebook-field-'.length);
-				// namespace can't be set outside of Facebook (even though the docs claim it can)
-				if (field == 'namespace') {
-					alert("The namespace can not be updated from this page. Visit the application's " +
-					      "settings from within Facebook or fix $wgFbNamespace.");
-				} else {
-					var title = $(this).parent().parent().prev().children('b').text();
-					// Strip the ':' and lower-case the first letter
-					title = title[0].toLowerCase() + title.substring(1, title.length - 1);
-					var correct = $(this).parent().siblings('div').children('span').text();
-					
-					var id = mw.config.get("fbAppId");
-					var app_access_token = mw.config.get("fbAppAccessToken");
-					if (id && app_access_token) {
-						var doit = confirm("Press OK to to update the " + title + " of your Facebook application to " + correct);
-						if (doit) {
-							FB.api('/' + id + '?' + field + '=' + correct, 'POST', {
-								access_token: app_access_token
-							}, function(response) {
-								if (response && !response.error) {
-									old_div = $("#facebook-field-" + field + ">.facebook-field-current");
-									new_div = old_div.siblings("div");
-									new_div.hide();
-									old_div.fadeOut('slow', function() {
-										new_div.fadeIn('slow');
-									});
-								} else {
-									alert('There was an error processing your request.\n\n' + response.error.message);
-								}
-							});
-						}
-					} else {
-						// If app_access_token wasn't set correctly
-						alert("The " + title + " of your Facebook application does not match the value in MediaWiki: " + correct);
+	$(document).ready(function() {
+		// Make warnings and criticals clickable
+		var icon = $('.facebook-field-warning,.facebook-field-critical').siblings('div').children("a");
+		// Install the click handler
+		icon.click(function(ev) {
+			var field = $(this).parent().parent().attr('id').substring('facebook-field-'.length);
+			// namespace can't be set outside of Facebook (even though the docs claim it can)
+			if (field == 'namespace') {
+				alert("The namespace can not be updated from this page. Visit the application's " +
+				      "settings from within Facebook or fix $wgFbNamespace.");
+			} else {
+				var title = $(this).parent().parent().prev().children('b').text();
+				// Strip the ':' and lower-case the first letter
+				title = title[0].toLowerCase() + title.substring(1, title.length - 1);
+				var correct = $(this).parent().siblings('div').children('span').text();
+				
+				var id = mw ? mw.config.get("fbAppId") : window.fbAppId;
+				var app_access_token = mw ? mw.config.get("fbAppAccessToken") : window.fbAppAccessToken;
+				if (id && app_access_token) {
+					var doit = confirm("Press OK to to update the " + title + " of your Facebook application to " + correct);
+					// Make sure the FB object has been loaded from Facebook
+					if (doit && FB) {
+						FB.api('/' + id + '?' + field + '=' + correct, 'POST', {
+							access_token: app_access_token
+						}, function(response) {
+							if (response && !response.error) {
+								old_div = $("#facebook-field-" + field + ">.facebook-field-current");
+								new_div = old_div.siblings("div");
+								new_div.hide();
+								old_div.fadeOut('slow', function() {
+									new_div.fadeIn('slow');
+								});
+							} else {
+								alert('There was an error processing your request.\n\n' + response.error.message);
+							}
+						});
 					}
+				} else {
+					// If app_access_token wasn't set correctly
+					alert("The " + title + " of your Facebook application does not match the value in MediaWiki: " + correct);
 				}
-				ev.preventDefault();
-			});
+			}
+			ev.preventDefault();
 		});
-	}
-})(jQuery);
+	});
+})(window.jQuery, window.mediaWiki);

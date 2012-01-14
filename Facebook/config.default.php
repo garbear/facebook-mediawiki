@@ -119,6 +119,17 @@ $wgFbSocialPlugins = true;
 $wgFbUserRightsFromGroup = false;  # Or a quoted group ID, or an array of groups
 
 /**
+ * To streamline the Connecting process, AJAX is used to fetch forms when the
+ * user logs in to Facebook via a login button or when the Facebook cookies are
+ * refreshed. This occurs in the following situations:
+ *    1.  The Facebook user is new to MediaWiki.
+ *    2.  The user is logged in to MediaWiki and is asked to merge accounts.
+ *    3.  The user logs in to a Facebook account associated with a different
+ *        wiki account than the one currently logged in.
+ */
+$wgFbAjax = true;
+
+/**
  * Turns the wiki into a Facebook-only wiki. This setting has three side-effects:
  *    1.  All users are stripped of the 'createaccount' right. To override this
  *        behavior for admins, see UserGetRights() in FacebookHooks.php.
@@ -139,10 +150,6 @@ $wgFbDisableLogin = false;
 /**
  * Shows the real name for all Facebook users in the personal toolbar (in the
  * upper right) instead of their wiki username.
- * 
- * I recommend not using this. People are more emotionally attached to things
- * they "own", and owning their own username will draw people into your wiki
- * while allowing them to express themselves.
  */
 $wgFbUseRealName = false;
 

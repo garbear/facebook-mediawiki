@@ -207,7 +207,6 @@ class SpecialConnect extends SpecialPage {
 			} else {
 				$choice = $wgRequest->getText('wpNameChoice');
 				try {
-					// The model is updated in manageChooseNamePost()
 					if ( $choice == 'existing' ) {
 						// Handle accidental reposts
 						if ( !$wgUser->isLoggedIn() ) {
@@ -373,6 +372,7 @@ class SpecialConnect extends SpecialPage {
 								$this->sendPage('mergeAccountView');
 							} else {
 								// MediaWiki user already associated with Facebook ID
+								// TODO: LogoutAndCreateNewUser form
 								global $wgContLang;
 								$param1 = '[[' . $wgContLang->getNsText( NS_USER ) . ":{$wgUser->getName()}|{$wgUser->getName()}]]";
 								$param2 = $fbUser->getUserInfo('name');
@@ -674,6 +674,7 @@ class SpecialConnect extends SpecialPage {
 ' . wfMsgWikiHtml( 'facebook-debug-msg' ) . '<br/>
 <table>';
 		
+		// Render each setting field of the application as a table row
 		foreach ( $field_array as $item ) {
 			$field   = $item[0]; // field_name
 			$title   = $item[1]; // Display name
@@ -713,8 +714,6 @@ class SpecialConnect extends SpecialPage {
 				}
 			}
 			
-			
-			
 			// Also, if the message is a page name, link to the page (in red) if it doesn't exist
 			if ( $field == 'privacy_policy_url' || $field == 'terms_of_service_url' ) {
 				$titleObj = Title::newFromText(wfMsg($fields_with_msgs[$field]));
@@ -729,12 +728,14 @@ class SpecialConnect extends SpecialPage {
 				$info[$field] = '<em>empty</em>';
 			}
 			
+			// Associative array, e.g. 'tick-32.png' icon gets 'OK' title text
 			$icon_tooltip = array(
 				'tick' => 'OK',
 				'warning' => 'Click to update',
 				'critical' => 'Click to update',
 			);
 			
+			// Generate the html for the row
 			$html .= '
 	<tr>
 		<td style="text-align:right; padding:0;">
@@ -769,7 +770,9 @@ class SpecialConnect extends SpecialPage {
 	<label for="wpPageName"><p>' . wfMsg('facebook-object-debug') . '</p></label>
 	<input name="wpPageName" id="wpPageName" size="42" value="" style="font-size:1.75em;" /> &nbsp;
 	<input type="submit" value="' . wfMsg('facebook-debug') . '" name="Debug" />
-</form><br/><br/>' . "\n";
+</form>';
+		
+		$html .= "\n<br/><br/>\n";
 		
 		$wgOut->addHTML( $html );
 	}
@@ -830,6 +833,10 @@ class SpecialConnect extends SpecialPage {
 		// TODO: Add a returnto link
 	}
 	
+	/**
+	 * Returns the color scheme of the wiki, either 'light' or 'dark', for the
+	 * purpose of rendering social plugins on Special:Connect.
+	 */
 	private function getColorScheme() {
 		$skins = array();
 		$darkSkins = array();
@@ -879,8 +886,11 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * The user is logged in to Facebook, but not MediaWiki. The Facebook user
 	 * is new to MediaWiki.
+	 * 
+	 * If $messageKey is left blank, and a hook doesn't modify its value, then
+	 * the 'facebook-chooseinstructions' message will be used.
 	 */
-	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
+	private function connectNewUserView($messagekey = '') {
 		global $wgUser, $wgOut, $wgFbDisableLogin;
 		
 		if ( wfReadOnly() ) {
@@ -914,20 +924,38 @@ class SpecialConnect extends SpecialPage {
 			return;
 		}
 		
-		// Connect to the Facebook API
 		$fbUser = new FacebookUser();
 		$userinfo = $fbUser->getUserInfo();
-		
-		// Keep track of when the first option visible to the user is checked
-		$checked = false;
 		
 		// Outputs the canonical name of the special page at the top of the page
 		$this->outputHeader();
 		
-		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
-		$wgOut->addWikiMsg( $messagekey );
+		// Grab the UserName from the cookie if it exists
+		global $wgCookiePrefix;
+		$existingName = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
 		
-		$html = '
+		$form = $this->getChooseNameForm($userinfo, $messagekey, $existingName);
+		
+		$wgOut->addHTML($form . "\n\n");
+	}
+	
+	/**
+	 * Returns the HTML for the ChooseName form.
+	 */
+	public function getChooseNameForm($userinfo, $messageKey = '', $existingName = '') {
+		global $wgFbDisableLogin;
+		
+		// Keep track of when the first option visible to the user is checked
+		$checked = false;
+		
+		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
+		if ( $messageKey == '' ) {
+			$messageKey = 'facebook-chooseinstructions';
+		}
+		
+		$html = wfMsgWikiHtml( $messageKey );
+		
+		$html .= '
 <form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
 	<fieldset id="mw-facebook-choosename">
 		<legend>' . wfMsg('facebook-chooselegend') . '</legend>
@@ -935,11 +963,7 @@ class SpecialConnect extends SpecialPage {
 		// Let them attach to an existing. If $wgFbDisableLogin is true, then
 		// stand-alone account aren't allowed in the first place
 		if (empty( $wgFbDisableLogin )) {
-			// Grab the UserName from the cookie if it exists
-			global $wgCookiePrefix;
-			$name = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
-			
-			$updateChoices = $this->getUpdateOptions();
+			$updateChoices = "<br/>\n" . $this->getUpdateOptions($userinfo);
 			
 			// Create the HTML for the "existing account" option
 			$html .= '
@@ -951,7 +975,7 @@ class SpecialConnect extends SpecialPage {
 					<label for="wpNameChoiceExisting">' . wfMsg('facebook-chooseexisting') . '</label>
 					<div id="mw-facebook-choosename-update" class="fbInitialHidden">
 						<label for="wpExistingName">' . wfMsgHtml('facebook-chooseusername') . '</label>
-						<input name="wpExistingName" size="20" value="' . $name . '" id="wpExistingName" />&nbsp;
+						<input name="wpExistingName" size="20" value="' . $existingName . '" id="wpExistingName" />&nbsp;
 						<label for="wpExistingPassword">' . wfMsgHtml('facebook-choosepassword') . '</label>
 						<input name="wpExistingPassword" size="20" value="" type="password" id="wpExistingPassword" /><br/>
 						' . $updateChoices . '
@@ -1023,22 +1047,20 @@ class SpecialConnect extends SpecialPage {
 			</tr>
 		</table>
 	</fieldset>
-</form>' . "\n\n";
-		$wgOut->addHTML($html);
+</form>';
+		
+		return $html;
 	}
 	
 	/**
 	 * TODO: Document me
 	 */
-	private function getUpdateOptions() {
+	private function getUpdateOptions($userinfo) {
 		global $wgRequest;
-		
-		$fbUser = new FacebookUser();
-		$userinfo = $fbUser->getUserInfo();
 		
 		// Build an array of attributes to update
 		$updateOptions = array();
-		foreach ($fbUser->getAvailableUserUpdateOptions() as $option) {
+		foreach (FacebookUser::$availableUserUpdateOptions as $option) {
 			
 			// Translate the MW parameter into a FB parameter
 			$value = FacebookUser::getOptionFromInfo($option, $userinfo);
@@ -1064,7 +1086,6 @@ class SpecialConnect extends SpecialPage {
 		// Implode the update options into an unordered list
 		$updateChoices = '';
 		if ( count($updateOptions) > 0 ) {
-			$updateChoices .= "<br/>\n";
 			$updateChoices .= wfMsgHtml('facebook-updateuserinfo') . "\n";
 			$updateChoices .= "<ul>\n" . implode("\n", $updateOptions) . "\n</ul>\n";
 		}
@@ -1113,8 +1134,26 @@ class SpecialConnect extends SpecialPage {
 	 * these two.
 	 */
 	private function mergeAccountView() {
-		global $wgOut, $wgUser, $wgSitename;
-		$wgOut->setPageTitle(wfMsg('facebook-merge-title'));
+		global $wgOut;
+		
+		$wgOut->setPageTitle( wfMsg( 'facebook-merge-title' ) );
+		
+		$fbUser = new FacebookUser();
+		$userinfo = $fbUser->getUserInfo();
+		
+		$form = $this->getMergeAccountForm( $userinfo );
+		$wgOut->addHTML($form . "\n<br/>\n");
+		
+		// Render the "Return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		$wgOut->addHTML("<br/>\n");
+	}
+	
+	/**
+	 * Returns the HTML for the ChooseName form.
+	 */
+	public function getMergeAccountForm($userinfo) {
+		global $wgSitename;
 		
 		$html = '
 <form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">
@@ -1126,7 +1165,7 @@ class SpecialConnect extends SpecialPage {
 		'
 		<input type="submit" value="' . wfMsg( 'facebook-merge-title' ) . '" /><br/>
 		<div id="mw-facebook-choosename-update">
-			' . $this->getUpdateOptions() . '
+			' . "<br/>\n" . $this->getUpdateOptions($userinfo) . '
 		</div>';
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '
@@ -1139,13 +1178,9 @@ class SpecialConnect extends SpecialPage {
 		}
 		$html .= '
 	</fieldset>
-</form><br/>';
+</form>';
 		
-		$wgOut->addHTML($html);
-		
-		// Render the "Return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
-		$wgOut->addHTML("<br/>\n");
+		return $html;
 	}
 	
 	/**
@@ -1159,24 +1194,44 @@ class SpecialConnect extends SpecialPage {
 	 * not as a wiki user, and then logs into the wiki with the wrong account?
 	 */
 	private function logoutAndContinueView($userId) {
-		global $wgOut, $wgContLang;
+		global $wgOut;
 		
 		$wgOut->setPageTitle(wfMsg('facebook-logout-and-continue'));
 		
+		$fbUser = new FacebookUser();
+		$userinfo = $fbUser->getUserInfo();
+		
+		$form = $this->getLogoutAndContinueForm( $userinfo, $userId );
+		
+		// TODO
+		//$form .= '<p>Not $userId? Log in as a different facebook user...</p>';
+		
+		$wgOut->addHTML( $form . "<br/>\n" );
+		
+		// Render the "Return to" text retrieved from the URL
+		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+	}
+	
+	/**
+	 * Returns the HTML for the LogoutAndContinue form.
+	 */
+	public function getLogoutAndContinueForm($userinfo, $userId) {
+		global $wgContLang;
+		
 		$html = '';
 		
-		$fbUser = new FacebookUser();
-		$profile = $fbUser->getUserInfo();
-		if ( $profile && isset($profile['first_name']) ) {
-			$html = '
-<p>' . wfMsg('facebook-welcome-name', array('$1' => $profile['first_name'])) . '</p>';
+		// Show a welcome message to the Facebook user who just logged in
+		$firstName = ($userinfo && isset($userinfo['first_name'])) ? $userinfo['first_name'] : '';
+		if ( $firstName != '' ) {
+			$html .= '<p>' . wfMsg('facebook-welcome-name', array('$1' => $firstName)) . "</p>\n";
 		}
 		
 		$username = User::newFromId($userId)->getName();
-		$html .= "\n" . wfMsgExt('facebook-continue-text', 'parse', array(
-				'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
-		);
+		
 		$html .= '
+' . wfMsgExt('facebook-continue-text', 'parse', array(
+	'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
+) . '
 <form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">
 	<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '" />';
 		if ( !empty( $this->mReturnTo ) ) {
@@ -1189,20 +1244,10 @@ class SpecialConnect extends SpecialPage {
 			}
 		}
 		$html .= '
-</form><br/>' . "\n";
+</form>';
 		
-		// TODO
-		//$html .= '<p>Not $user? Log in as a different facebook user...</p>';
-		
-		$wgOut->addHTML( $html );
-		
-		// Render the "Return to" text retrieved from the URL
-		$wgOut->returnToMain(false, $this->mReturnTo, $this->mReturnToQuery);
+		return $html;
 	}
-	
-	
-	
-	
 	
 	/**
 	 * Success page for attaching Facebook account to a pre-existing MediaWiki
