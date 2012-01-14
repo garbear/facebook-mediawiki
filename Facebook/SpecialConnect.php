@@ -884,8 +884,11 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * The user is logged in to Facebook, but not MediaWiki. The Facebook user
 	 * is new to MediaWiki.
+	 * 
+	 * If $messageKey is left blank, and a hook doesn't modify its value, then
+	 * the 'facebook-chooseinstructions' message will be used.
 	 */
-	private function connectNewUserView($messagekey = 'facebook-chooseinstructions') {
+	private function connectNewUserView($messagekey = '') {
 		global $wgUser, $wgOut, $wgFbDisableLogin;
 		
 		if ( wfReadOnly() ) {
@@ -926,13 +929,12 @@ class SpecialConnect extends SpecialPage {
 		$this->outputHeader();
 		
 		// If a different $messagekey was passed (like 'wrongpassword'), use it instead
-		$wgOut->addWikiMsg( $messagekey );
 		
 		// Grab the UserName from the cookie if it exists
 		global $wgCookiePrefix;
 		$existingName = isset($_COOKIE["{$wgCookiePrefix}UserName"]) ? trim($_COOKIE["{$wgCookiePrefix}UserName"]) : '';
 		
-		$form = $this->getChooseNameForm($userinfo, $existingName);
+		$form = $this->getChooseNameForm($userinfo, $messagekey, $existingName);
 		
 		$wgOut->addHTML($form . "\n\n");
 	}
@@ -940,13 +942,19 @@ class SpecialConnect extends SpecialPage {
 	/**
 	 * Returns the HTML for the ChooseName form.
 	 */
-	public function getChooseNameForm($userinfo, $existingName = '') {
+	public function getChooseNameForm($userinfo, $messageKey = '', $existingName = '') {
 		global $wgFbDisableLogin;
 		
 		// Keep track of when the first option visible to the user is checked
 		$checked = false;
 		
-		$html = '
+		if ( $messageKey == '' ) {
+			$messageKey = 'facebook-chooseinstructions';
+		}
+		
+		$html = wfMsgWikiHtml( $messageKey );
+		
+		$html .= '
 <form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
 	<fieldset id="mw-facebook-choosename">
 		<legend>' . wfMsg('facebook-chooselegend') . '</legend>
