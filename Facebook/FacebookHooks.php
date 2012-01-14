@@ -368,9 +368,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
-		if ( $wgUser->isLoggedIn() && !$facebook->getUser() ) {
+		if ( $wgUser->isLoggedIn() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
-			if ( count($ids) ) {
+			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
 				// Let JavaScript know if the Facebook ID belongs to someone else
 				$vars['fbId'] = strval( $ids[0] );
 			}
