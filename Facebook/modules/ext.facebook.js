@@ -116,6 +116,38 @@
 	};
 	
 	/**
+	 * Calling this function will send the user to Special:Connect with the
+	 * current page name as a returnto parameter. This function is used as a
+	 * fallback if the AJAX requests in getAndShowGetForm() fail.
+	 * 
+	 * Backporting code from mediawiki.util.js allows us to maintain
+	 * compatibility with MW 1.16, as well as to remove the dependency on the
+	 * mediawiki.util module.
+	 */
+	window.gotoSpecialConnect = function() {
+		// Backported from mediawiki.util.js
+		function rawurlencode(str) {
+			return encodeURIComponent(str)
+			.replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28')
+			.replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/~/g, '%7E');
+		}
+		function wikiUrlencode(str) {
+			return rawurlencode( str )
+			.replace(/%20/g, '_').replace(/%3A/g, ':').replace(/%2F/g, '/');
+		}
+		
+		var url = window.wgScript + '?title=' + wikiUrlencode('Special:Connect');
+		
+		// Dont return to these page names (English only, sorry)
+		if (window.wgPageName.indexOf('Special:Connect') != 0 &&
+	        window.wgPageName.indexOf('Special:UserLogin') != 0 &&
+	        window.wgPageName.indexOf('Special:UserLogout') != 0) {
+			url += '&returnto=' + rawurlencode(window.wgPageName);
+		}
+		window.location.href = url;
+	};
+	
+	/**
 	 * Uses the MediaWiki API to retrieve a form over AJAX and show it to the
 	 * user. In all cases, if anything goes wrong, we simply redirect the user
 	 * to Special:Connect with the understanding that this page knows how to
@@ -125,26 +157,16 @@
 	 * the user will be sent to Special:Connect without showing any form.
 	 */
 	window.getAndShowGetForm = function(formName) {
-		var gotoSpecialConnect = function() {
-			// Build the fallback URL for if the AJAX requests fail
-			// TODO: Build this URL properly
-			var destUrl = window.wgServer + window.wgScript;
-			destUrl += "?title=Special:Connect&returnto=" + encodeURIComponent(window.wgPageName);
-			if (window.wgPageQuery)
-				destUrl += "&returntoquery=" + encodeURIComponent(window.wgPageQuery);
-			window.location.href = destUrl;
-		};
 		// If fbUseAjax is false, always go directly to Special:Connect
 		if (!formName || !window.fbUseAjax) {
-			gotoSpecialConnect();
+			window.gotoSpecialConnect();
 		} else {
 			FB.api('/me', 'GET', function(info) {
 				if (info && !info.error) {
 					// We got the info. Now, get the form.
 					$.ajax({
 						type: 'POST',
-						// In MW >= 1.17: url = mw.util.wikiScript('api');
-						url: window.wgScriptPath + '/' + 'api' + (window.wgScriptExtension || '.php'),
+						url: window.wgScriptPath + '/api' + (window.wgScriptExtension || '.php'),
 						data: {
 							'action'     : formName,
 							'format'     : 'json',
@@ -177,15 +199,15 @@
 									window.formLoaded = true;
 								});
 							} else {
-								gotoSpecialConnect(); // Fallback if form is empty or error occurs
+								window.gotoSpecialConnect(); // Fallback if form is empty or error occurs
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
-							gotoSpecialConnect(); // Fallback if AJAX fails
+							window.gotoSpecialConnect(); // Fallback if AJAX fails
 						}
 					});
 				} else {
-					gotoSpecialConnect(); // Facebook if FB.api('/me') fails
+					window.gotoSpecialConnect(); // Facebook if FB.api('/me') fails
 				}
 			});
 		}
