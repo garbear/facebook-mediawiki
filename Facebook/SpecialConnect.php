@@ -677,6 +677,27 @@ class SpecialConnect extends SpecialPage {
 ' . wfMsgWikiHtml( 'facebook-debug-msg' ) . '<br/>
 <table>';
 		
+		// The icons we use are included in MW 1.17 (use bits.wikimedia.org if not available)
+		if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+			$icon_base = $wgStylePath;
+		} else {
+			$icon_base = 'http://bits.wikimedia.org/skins-1.18';
+		}
+		$icons = array(
+			'ok' => array(
+				'tooltip' => 'OK',
+				'src' => $icon_base . '/common/images/tick-32.png',
+			),
+			'warning' => array(
+				'tooltip' => 'Click to update',
+				'src' => $icon_base . '/common/images/warning-32.png',
+			),
+			'error' => array(
+				'tooltip' => 'Click to update',
+				'src' => $icon_base . '/common/images/critical-32.png',
+			),
+		);
+		
 		// Render each setting field of the application as a table row
 		foreach ( $field_array as $item ) {
 			$field   = $item[0]; // field_name
@@ -687,11 +708,10 @@ class SpecialConnect extends SpecialPage {
 			if ( $field == 'app_domains' )
 				continue; // TODO: $field is an array and involves wildcards
 			
-			// The icons we use are included from MW 1.17
 			$icon = false;
-			if ( $correct != '' && version_compare( $wgVersion, '1.17', '>=' ) ) {
+			if ( $correct != '' ) {
 				if ( $info[$field] == $correct ) {
-					$icon = 'tick';
+					$icon = 'ok';
 				} else {
 					switch ($field) {
 						// Critical errors
@@ -699,7 +719,7 @@ class SpecialConnect extends SpecialPage {
 						case 'deauth_callback_url':
 						case 'privacy_policy_url': // Necessary per Facebook's TOS
 						case 'user_support_email': // Required: https://developers.facebook.com/blog/post/630/
-							$icon = 'critical';
+							$icon = 'error';
 							break;
 						default:
 							$icon = 'warning';
@@ -731,13 +751,6 @@ class SpecialConnect extends SpecialPage {
 				$info[$field] = '<em>empty</em>';
 			}
 			
-			// Associative array, e.g. 'tick-32.png' icon gets 'OK' title text
-			$icon_tooltip = array(
-				'tick' => 'OK',
-				'warning' => 'Click to update',
-				'critical' => 'Click to update',
-			);
-			
 			// Generate the html for the row
 			$html .= '
 	<tr>
@@ -750,14 +763,14 @@ class SpecialConnect extends SpecialPage {
 		<td class="facebook-field" id="facebook-field-' . $field . '" style="padding:0 0 0 16px; height:22px;">
 			<div class="facebook-field-current">
 				<span>' . $info[$field] . '</span>
-				' . ($icon ? '&nbsp; ' . ($icon != 'tick' ? '<a href="#">' : '') . '<img src="' . $wgStylePath .
-				'/common/images/' . $icon . '-32.png" style="width:22px; height:22px;" title="' . $icon_tooltip[$icon] . '" />' . ($icon != 'tick' ?
+				' . ($icon ? '&nbsp; ' . ($icon != 'ok' ? '<a href="#">' : '') . '<img src="' . $icons[$icon]['src'] .
+				'" style="width:22px; height:22px;" title="' . $icons[$icon]['tooltip'] . '" />' . ($icon != 'ok' ?
 				'</a>' : '') : '') . '
 			</div>' . ($icon ? '
 			<div class="facebook-field-' . $icon . '" style="display:none;">
 				<span>' . $correct . '</span>
-				&nbsp; <img src="' . $wgStylePath .
-				'/common/images/tick-32.png" style="width:22px; height:22px;" title="' . $icon_tooltip['tick'] . ' " />
+				&nbsp; <img src="' . $icons['ok']['src'] . '" style="width:22px; height:22px;" title="' .
+				$icons['ok']['tooltip'] . ' " />
 			</div>' : '') . '
 		</td>
 	</tr>';

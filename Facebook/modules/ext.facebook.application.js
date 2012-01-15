@@ -29,7 +29,7 @@
 	// Check for MediaWiki 1.17+
 	$(document).ready(function() {
 		// Make warnings and criticals clickable
-		var icon = $('.facebook-field-warning,.facebook-field-critical').siblings('div').children("a");
+		var icon = $('.facebook-field-warning,.facebook-field-error').siblings('div').children("a");
 		// Install the click handler
 		icon.click(function(ev) {
 			var field = $(this).parent().parent().attr('id').substring('facebook-field-'.length);
