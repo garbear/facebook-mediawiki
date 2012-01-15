@@ -315,8 +315,8 @@ class FacebookUser {
 		
 		// Check the restrictions again to make sure that the user can create this account.
 		if ( wfReadOnly() ) {
-			// Special case for readOnlyPage error
-			throw new FacebookUserException(null, null);
+			// Indicate readOnlyPage error
+			throw new FacebookUserException('readonlypage', null);
 		}
 		
 		global $wgFbDisableLogin;

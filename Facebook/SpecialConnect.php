@@ -120,8 +120,8 @@ class SpecialConnect extends SpecialPage {
 		// Special case: $titleMsg is a list of permission errors
 		if ( is_array( $titleMsg ) )
 			$wgOut->showPermissionsErrorPage( $titleMsg, $textMsg );
-		// Special case: read only error, all parameters are null
-		else if ( is_null( $titleMsg ) && is_null( $textMsg ) )
+		// Special case: read only error
+		else if ( $titleMsg == 'readonlypage' )
  			$wgOut->readOnlyPage();
 		// General cases: normal error page
 		else if ($msgParams)
