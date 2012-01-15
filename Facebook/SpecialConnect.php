@@ -407,6 +407,7 @@ class SpecialConnect extends SpecialPage {
 		case 'first':
 		case 'full':
 			// Get the username from Facebook (note: not from the form)
+			$fbUser = new FacebookUser();
 			$username = FacebookUser::getOptionFromInfo($choice . 'name', $fbUser->getUserInfo());
 			if ( !empty( $username ) && FacebookUser::userNameOK($username) ) {
 				return $username;
