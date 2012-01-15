@@ -87,8 +87,8 @@ class SpecialConnect extends SpecialPage {
 		
 		$title = Title::newFromText($this->mReturnTo);
 		if ($title instanceof Title) {
-			$this->mResolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
-			if (in_array( $this->mResolvedReturnTo, array('userlogout', 'signup', 'connect') )) {
+			$resolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
+			if (in_array( $resolvedReturnTo, array('userlogout', 'signup', 'connect') )) {
 				$titleObj = Title::newMainPage();
 				$this->mReturnTo = $titleObj->getText();
 				$this->mReturnToQuery = '';
@@ -141,9 +141,9 @@ class SpecialConnect extends SpecialPage {
 		
 		$urlaction = '';
 		if ( !empty( $this->mReturnTo ) ) {
-			$urlaction = "returnto=$this->mReturnTo";
+			$urlaction = 'returnto=' . $this->mReturnTo;
 			if ( !empty( $this->mReturnToQuery ) )
-				$urlaction .= "&returntoquery=$this->mReturnToQuery";
+				$urlaction .= '&returntoquery=' . $this->mReturnToQuery;
 		}
 		// TODO: This should be $this->makespecialUrl()...
 		$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl($specialPage, $urlaction));
@@ -316,18 +316,20 @@ class SpecialConnect extends SpecialPage {
 				$app = new FacebookApplication();
 				if ( $app->canEdit() ) {
 					$this->sendPage('debugView');
-					// Early return here so that we can slide into default
-					return;
+					break;
 				}
 			}
 			// no break
 		/**
 		 * Special:Connect was called with no subpage specified.
-		 * 
-		 * TODO: Verify that no subpage was specified, and redirect to
-		 * Special:Connect if an invalid subpage was used.
 		 */
 		default:
+			// If $subPageName was invalid, redirect to Special:Connect with no subpage
+			if ( !empty( $subPageName ) ) {
+				$this->sendRedirect('Connect');
+				break;
+			}
+			
 			$fbUser = new FacebookUser();
 			
 			// Try fetching /me to see if our Facebook session is valid
