@@ -68,12 +68,46 @@ class FacebookXFBML {
 				// Don't recursively parse $innertext
 				return "<fb:serverfbml{$attrs}>$innertext</fb:serverfbml>";
 			default:
-				// Allow other tags by default
+				// Always add the colorscheme parameter to XFBML tags. According to the docs,
+				// only some plugins use colorscheme. However, <fb:add-to-timeline> and
+				// <fb:login-button> are two exceptions that support colorscheme even though
+				// the docs don't mention this. Thus, we always include this parameter and
+				// assume it will be safely ignored by the tags that don't support it.
+				if ( !isset( $args['colorscheme'] ) ) {
+					// Render using the skin of the user saving the page.
+					global $wgUser;
+					$args['colorscheme'] = self::getColorScheme($wgUser->getSkin()->getSkinName());
+				}
 				$attrs = self::implodeAttrs( $args );
 				return "<{$tag}{$attrs}>" . $parser->recursiveTagParse( $innertext ) . "</$tag>";
 		}
 		// Strip the tag entirely
 		return '';
+	}
+	
+	/**
+	 * Returns the color scheme of the skin, either 'light' or 'dark', for the
+	 * colorscheme parameter of social plugins. All skins default to 'light'
+	 * unless explicitly challenged by the XFBMLSkinColorScheme hook.
+	 * 
+	 * Social plugins are themed upon saving the page according to the skin of
+	 * the user making the edit. If your site uses multiple light/dark skins,
+	 * install Extension:MagicNoCache and include __NOCACHE__ on the pages with
+	 * social plugins.
+	 */
+	static $darkSkins = NULL;
+	public static function getColorScheme($skinName) {
+		if ( self::$darkSkins === NULL ) {
+			self::$darkSkins = array();
+			$skins = array();
+			wfRunHooks( 'XFBMLSkinColorScheme', array( &$skins ) );
+			foreach ( $skins as $skin => $value ) {
+				if ( $value == 'dark' ) {
+					self::$darkSkins[] = $skin;
+				}
+			}
+		}
+		return in_array( $skinName, self::$darkSkins ) ? 'dark' : 'light';
 	}
 	
 	/**

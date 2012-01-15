@@ -85,7 +85,6 @@ class SpecialConnect extends SpecialPage {
 			unset( $aReturnToQuery );
 		}
 		
-		// TODO: 302 redirect if returnto is a bad page
 		$title = Title::newFromText($this->mReturnTo);
 		if ($title instanceof Title) {
 			$this->mResolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
@@ -820,7 +819,8 @@ class SpecialConnect extends SpecialPage {
 		}
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
 				'" max-rows="3" scope="' . FacebookAPI::getPermissions() . '" colorscheme="' .
-				$this->getColorScheme() . '"></fb:login-button><br/><br/><br/>' . "\n";
+				FacebookXFBML::getColorScheme( $this->getSkin()->getSkinName() ) .
+				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .
@@ -831,26 +831,6 @@ class SpecialConnect extends SpecialPage {
 		$wgOut->addHTML($html);
 		
 		// TODO: Add a returnto link
-	}
-	
-	/**
-	 * Returns the color scheme of the wiki, either 'light' or 'dark', for the
-	 * purpose of rendering social plugins on Special:Connect.
-	 */
-	private function getColorScheme() {
-		$skins = array();
-		$darkSkins = array();
-		wfRunHooks( 'SpecialConnectColorScheme', array( &$skins ) );
-		
-		foreach ($skins as $skin => $value) {
-			if ( $value == 'dark' ) {
-				$darkSkins[] = $skin;
-			}
-		}
-		if ( in_array( $this->getSkin()->getSkinName(), $darkSkins ) ) {
-			return 'dark';
-		}
-		return 'light';
 	}
 	
 	/**
@@ -871,7 +851,8 @@ class SpecialConnect extends SpecialPage {
 		
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
 				'" max-rows="3" scope="' . FacebookAPI::getPermissions() . '" colorscheme="' .
-				$this->getColorScheme() . '"></fb:login-button><br/><br/><br/>' . "\n";
+				FacebookXFBML::getColorScheme( $this->getSkin()->getSkinName() ) .
+				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
 		$html .= '<fb:like href="' . Title::newMainPage()->getFullURL() . '" send="false" width="' .
