@@ -19,7 +19,7 @@
  * Class FacebookInit
  * 
  * This class initializes the extension, and contains the core non-hook,
- * non-authentification code.
+ * non-authentication code.
  */
 class FacebookInit {
 	/**

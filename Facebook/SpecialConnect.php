@@ -286,7 +286,7 @@ class SpecialConnect extends SpecialPage {
 		/**
 		 * Special:Connect/Deauth is a callback used by Facebook to notify the
 		 * application that the Facebook user has deauthenticated the app
-		 * (removed it from thier app settings page). If the request for this
+		 * (removed it from their app settings page). If the request for this
 		 * page isn't signed by Facebook, it will redirect to Special:Connect.
 		 */
 		case 'Deauth':
@@ -356,7 +356,7 @@ class SpecialConnect extends SpecialPage {
 						$this->sendPage('loginSuccessView');
 					}
 				} else {
-					// The user is logged in to Facbook and MediaWiki
+					// The user is logged in to Facebook and MediaWiki
 					if ( $mwId == $wgUser->getId() ) {
 						// MediaWiki user belongs to the Facebook account
 						$this->sendRedirect('UserLogin'); // Nothing to see here, move along
@@ -587,7 +587,7 @@ class SpecialConnect extends SpecialPage {
 			array(
 				'user_support_email',
 				'User support email',
-				'Requried by Facebook: Main contact email for this app ($wgEmergencyContact)',
+				'Required by Facebook: Main contact email for this app ($wgEmergencyContact)',
 				!empty( $wgEmergencyContact ) ? $wgEmergencyContact : '',
 			),
 			array(

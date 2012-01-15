@@ -311,7 +311,7 @@ class FacebookUser {
 			throw new FacebookUserException('connectNewUserView', 'facebook-invalidname');
 		}
 		
-		/// START OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
+		/// START OF TYPICAL VALIDATIONS AND RESTRICTIONS ON ACCOUNT-CREATION. ///
 		
 		// Check the restrictions again to make sure that the user can create this account.
 		if ( wfReadOnly() ) {
@@ -371,7 +371,7 @@ class FacebookUser {
 		// NOTE: Currently this is commented out because it seems that most wikis might have a
 		// handful of restrictions that won't be needed on Facebook Connections. For instance,
 		// requiring a CAPTCHA or age-verification, etc. Having a Facebook account as a pre-
-		// requisitie removes the need for that.
+		// requisite removes the need for that.
 		/*
 		$abortError = '';
 		if( !wfRunHooks( 'AbortNewAccount', array( $user, &$abortError ) ) ) {
@@ -398,7 +398,7 @@ class FacebookUser {
 			$wgMemc->incr( $key );
 		}
 		
-		/// END OF TYPICAL VALIDATIONS AND RESTRICITONS ON ACCOUNT-CREATION. ///
+		/// END OF TYPICAL VALIDATIONS AND RESTRICTIONS ON ACCOUNT-CREATION. ///
 		
 		// Fill in the info we know
 		$userinfo = $this->getUserInfo();
@@ -433,7 +433,7 @@ class FacebookUser {
 		// Attach the user to their Facebook account in the database.
 		// This must be done up here, because somewhere after this (I'm not too
 		// sure where) the data must be in the database before copy-to-local is
-		// done for sharded setups.
+		// done for shared setups.
 		FacebookDB::addFacebookID($user, $this->id);
 		$this->user = $user;
 		
@@ -483,7 +483,7 @@ class FacebookUser {
 		// Default to automatically login Facebook users
 		// TODO: Don't remember password for Facebook users! If their access_token is
 		// invalidated, we need to get a new one by having them click "login" again
-		$this->user->setOption( 'rememberpassword', 1 ); 
+		$this->user->setOption( 'rememberpassword', 1 );
 		//$this->user->setOption( 'skinoverwrite', 1 ); // Wikia code
 		
 		// I think this should be done here
@@ -519,7 +519,7 @@ class FacebookUser {
 			// Successful deauthorization. Notify the user by email, and possibly
 			// ask them to choose a new password
 			
-			// Remind password attemp
+			// Remind password attempt
 			$params = new FauxRequest( array (
 					'wpName' => $this->user->getName()
 			));
@@ -548,7 +548,7 @@ class FacebookUser {
 		// Keep track of whether any settings were modified
 		$mod = false;
 		
-		// Connect to the Facebook API and retrieve the user's info 
+		// Connect to the Facebook API and retrieve the user's info
 		$userinfo = $this->getUserInfo();
 		// Update the following options if the user's settings allow it
 		foreach (self::$availableUserUpdateOptions as $option) {

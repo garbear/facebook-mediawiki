@@ -154,7 +154,7 @@ class FacebookXFBML {
 	}
 	
 	/**
-	 * Returns the availabe XFBML tags. For help on including these in your
+	 * Returns the available XFBML tags. For help on including these in your
 	 * site, please see <http://developers.facebook.com/plugins>. Additionally,
 	 * you may wish to check out <http://developers.facebook.com/docs/reference/fbml>.
 	 * 
@@ -165,7 +165,7 @@ class FacebookXFBML {
 	 * <http://developers.facebook.com/docs/reference/javascript/FB.XFBML.parse>,
 	 * from direct perusal of the JS SDK source code at
 	 * <http://github.com/facebook/connect-js/blob/master/src/xfbml/xfbml.js#L255>
-	 * and, because the JS SDK on GitHub seems to have been abondoned by Facebook
+	 * and, because the JS SDK on GitHub seems to have been abandoned by Facebook
 	 * in June 2010, from the live version of the JS code at
 	 * <http://connect.facebook.net/en_US/all.js> (hint: grep for "_tagInfos:").
 	 */

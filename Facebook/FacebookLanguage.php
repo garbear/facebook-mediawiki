@@ -10,12 +10,12 @@
  * if we just searched for a facebook locale which started with the MediaWiki language code, we could attempt to deliver en_PI (Pirate English)
  * and there would be false-negatives in the other direction also (such as chr -> ck_US being missed).
  *
- * Relevant documentaion:
+ * Relevant documentation:
  *	- Tutorial in making the Facebook popups from Facebook be internationalized: http://developers.facebook.com/blog/post/264
  *	- XML of Facebook's languages: http://www.facebook.com/translations/FacebookLocales.xml
  *	- Overview of where Facebook's lang-codes come from: http://wiki.developers.facebook.com/index.php/Facebook_Locales
- *	- MediaWiki i18n: http://www.mediawiki.org/wiki/Internationalisation
- *	- List which has MediaWiki fallback languages all on the same page: http://www.mediawiki.org/wiki/Localisation_statistics (will be helpful in building the mapping).
+ *	- MediaWiki i18n: http://www.mediawiki.org/wiki/Internationalization
+ *	- List which has MediaWiki fallback languages all on the same page: http://www.mediawiki.org/wiki/Localization_statistics (will be helpful in building the mapping).
  *	- Comments in /languages/Names.php in MediaWiki has comments next to each mapping which should help. It is approximately RFC 3066
  */
 
@@ -100,7 +100,7 @@ class FacebookLanguage{
 	 * http://www.facebook.com/translations/FacebookLocales.xml
 	 * at the last time that this code was updated.  This is a manual process, so if FacebookLocales.xml changes,
 	 * we will most likely be out of sync until someone brings this to our attention).
-	 */ 
+	 */
 	public static function isValidFacebookLocale($locale){
 		return in_array($locale, self::$allFbLocales);
 	}
@@ -144,7 +144,7 @@ class FacebookLanguage{
 			}
 		}
 
-		// Look through each of the MediaWiki langauges.
+		// Look through each of the MediaWiki languages.
 		foreach(array_keys($wgLanguageNames) as $lang){
 			if( !isset($langMapping[$lang]) ){
 				$passed = false;

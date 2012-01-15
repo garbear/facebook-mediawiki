@@ -32,7 +32,7 @@ $messages['en'] = array(
 	'group-fb-user' => 'Facebook users',
 	'group-fb-user-member' => 'Facebook user',
 	'grouppage-fb-user' => '{{ns:project}}:Facebook users',
-	// Group for Facebook users beloning to the group specified by $fbUserRightsFromGroup
+	// Group for Facebook users belonging to the group specified by $fbUserRightsFromGroup
 	'group-fb-groupie' => 'Group members',
 	'group-fb-groupie-member' => 'Group member',
 	'grouppage-fb-groupie' => '{{ns:project}}:Group members',
@@ -58,7 +58,7 @@ $messages['en'] = array(
 	'facebook-only-text' => 'Logging in allows you to explore $1 using your Facebook identity.',
 	'facebook-logout-and-continue' => 'Log out and continue',
 	'facebook-error' => 'Verification error',
-	'facebook-errortext' => 'An error occured during verification with Facebook.',
+	'facebook-errortext' => 'An error occurred during verification with Facebook.',
 	'facebook-cancel' => 'Action cancelled',
 	'facebook-canceltext' => 'The previous action was cancelled by the user.',
 	'facebook-invalid' => 'Invalid option',
@@ -99,7 +99,7 @@ $messages['en'] = array(
 	'facebook-error-creating-user' => 'Error creating the user in the local database.',
 	'facebook-error-user-creation-hook-aborted' => 'A hook (extension) aborted the account creation with the message: $1',
 	'facebook-error-wrong-id' => 'Your username, $1, is connected to a different Facebook account. If you would like to continue as $2, you must first log out of {{SITENAME}}.',
-    // Special:Connect/Debug
+	// Special:Connect/Debug
 	'facebook-debug-title' => 'Facebook Application Debugger',
 	'facebook-debug-msg' => 'If a problem with your Facebook application\'s settings is indicated, click the icon to update that setting on Facebook.
 
@@ -123,20 +123,20 @@ If you would like to connect this facebook account to an existing Wikia account,
 	// facebook-prefstext
 	'prefs-facebook-prefstext' => 'Facebook',
 	'facebook-link-to-profile' => 'Facebook profile',
-	'facebook-prefsheader' => 'By default, some events will push items to your Facebook feed. You can customise these now, or later at any time in your preferences.',
+	'facebook-prefsheader' => 'By default, some events will push items to your Facebook feed. You can customize these now, or later at any time in your preferences.',
 	// From MediaWiki Translatewiki
 	#'facebook-prefsheader' => "To control which events will push an item to your Facebook news feed, <a id='facebookPushEventBar_show' href='#'>show preferences</a> <a id='facebookPushEventBar_hide' href='#' style='display:none'>hide preferences</a>",
 	'facebook-prefs-can-be-updated' => 'You can update these any time by visiting the "$1" tab of your preferences page.',
 	'facebook-prefs-show' => 'Show feed preferences >>',
-    'facebook-prefs-hide' => 'Hide feed preferences >>',
+	'facebook-prefs-hide' => 'Hide feed preferences >>',
 	'facebook-prefs-post' => 'Post to my Facebook News Feed when I:',
 	'prefs-facebook-event-prefstext' => 'News Feeds',
 	'prefs-facebook-status-prefstext' => 'Status',
-    'facebook-connect-msg' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
+	'facebook-connect-msg' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
 Check your <a href='$1'>preferences</a> to control which events appear in your Facebook feed.",
-    'facebook-connect-msg-sync-profile' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
+	'facebook-connect-msg-sync-profile' => "Congratulations! Your Wikia and Facebook accounts are now connected.<br/>
 Check your <a href='$1'>preferences</a> to control which events appear in your Facebook feed. Sync your <a href='$2'>Wikia profile</a> with Facebook.",
-    'facebook-connect-error-msg' => "We're sorry, we couldn't complete your connection without permission to post to your Facebook account. After setup you have [[w:c:help:Help:Facebook_Connect#Sharing_with_your_Facebook_activity_feed|full control]] of what's posted to your news feed. Please try again.",
+	'facebook-connect-error-msg' => "We're sorry, we couldn't complete your connection without permission to post to your Facebook account. After setup you have [[w:c:help:Help:Facebook_Connect#Sharing_with_your_Facebook_activity_feed|full control]] of what's posted to your news feed. Please try again.",
 	'facebook-disconnect-link' => 'You can also <a id="facebookDisconnect" href="#"> disconnect your account from Facebook.</a>
 You will able continue using your account as normal, with your history (edits, points, achievements) intact.',
 	'facebook-disconnect-done' => 'Disconnecting <span id="facebookDisconnectDone">... done!</span>',
@@ -149,11 +149,11 @@ We have emailed a new password to use with you account - you can log in with the
 
 
 To login go to: $1',
-    'facebook-reclamation-title-error' => 'Disconnecting from Facebook',
+	'facebook-reclamation-title-error' => 'Disconnecting from Facebook',
 	'facebook-reclamation-body-error' => 'There was an error disconnecting your account from Facebook or your account is already disconnected.',
-    'facebook-unknown-error' => 'Unknown error, please try again or contact with us.',          
+	'facebook-unknown-error' => 'Unknown error, please try again or contact with us.',
 	'facebook-passwordremindertitle' => 'Your Wikia account is now disconnected from Facebook!',
-    'facebook-passwordremindertitle-exist' => 'Your account is now disconnected from Facebook!',
+	'facebook-passwordremindertitle-exist' => 'Your account is now disconnected from Facebook!',
 	'facebook-passwordremindertext' => 'Hi,
 It looks like you\'ve just disconnected your account from Facebook. We\'ve kept all of your history, edit points and achievements intact, so don\'t worry!
 

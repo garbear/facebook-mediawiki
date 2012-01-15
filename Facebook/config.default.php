@@ -105,7 +105,7 @@ $wgFbSocialPlugins = true;
  * this group exclusively control access to the wiki, set $wgFbDisableLogin to
  * true and add the following settings to Localsettings.php:
  * 
- * # Inherit priveleges from User and Sysop
+ * # Inherit privileges from User and Sysop
  * $wgGroupPermissions['fb-groupie'] = $wgGroupPermissions['user'];
  * $wgGroupPermissions['fb-admin']   = $wgGroupPermissions['sysop'];
  * 

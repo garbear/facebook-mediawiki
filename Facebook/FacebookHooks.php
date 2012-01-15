@@ -407,7 +407,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * 
 	 * This hook was added in MediaWiki 1.14. If we are not 1.14 or later, this
 	 * function is called from BeforePageDisplay via MGVS_hack() to retain
-	 * backward compatability.
+	 * backward compatibility.
 	 * 
 	 * And then this hook was deprecated in 1.17, so it calls the new hook.
 	 */
@@ -437,7 +437,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	}
 	
 	/**
-	 * Hack: Run MakeGlobalVariablesScript for backwards compatability.
+	 * Hack: Run MakeGlobalVariablesScript for backwards compatibility.
 	 * The MakeGlobalVariablesScript hook was added to MediaWiki 1.14 in revision 38397:
 	 * http://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/includes/Skin.php?view=log&pathrev=38397
 	 */

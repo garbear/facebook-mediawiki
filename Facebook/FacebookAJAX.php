@@ -95,7 +95,7 @@ abstract class ApiFacebookFormQuery extends ApiBase {
  * API module to choose a username for new Facebook users.
  * 
  * If the user exists, return an empty response, just as if an error had
- * occured. This will invoke the fallback action, redirecting the user to
+ * occurred. This will invoke the fallback action, redirecting the user to
  * Special:Connect, which is what we want to do anyways. Returning a choose
  * name form simply allows us to short-cut the process.
  */
@@ -121,7 +121,7 @@ class ApiFacebookChooseName extends ApiFacebookFormQuery {
  * Facebook account.
  * 
  * If the user exists, return an empty response, just as if an error had
- * occured. This will invoke the fallback action, redirecting the user to
+ * occurred. This will invoke the fallback action, redirecting the user to
  * Special:Connect, which is what we want to do anyways. Returning a choose
  * name form simply allows us to short-cut the process.
  */
