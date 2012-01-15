@@ -332,8 +332,9 @@ class SpecialConnect extends SpecialPage {
 			
 			$fbUser = new FacebookUser();
 			
-			// Try fetching /me to see if our Facebook session is valid
-			if ( !$fbUser->isLoggedIn($ping = true) ) {
+			// Our Facebook session might be stale. If this becomes a problem, use
+			// $fbUser->isLoggedIn($ping = true) to force a refresh of the state
+			if ( !$fbUser->isLoggedIn() ) {
 				// The user isn't logged in to Facebook
 				if ( !$wgUser->isLoggedIn() ) {
 					// The user isn't logged in to Facebook or MediaWiki
