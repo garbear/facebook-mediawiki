@@ -155,29 +155,26 @@ class SpecialConnect extends SpecialPage {
 	 * Special:Connect uses a MVC architecture, with execute() being the
 	 * controller. The control flow happens by switching the subpage's name and
 	 * then moving through a boatload of nested ifs (notice how early returns
-	 * are avoided). Subpages are exclusively used for intermediate stages of the
+	 * are avoided). Subpages are exclusively used for secondary stages of the
 	 * connecting process; that is, they are only invoked from Special:Connect
-	 * itself. In the future, AJAX functions will also shorten the connecting
-	 * process by sending the user directly to one of these subpages. Indeed,
-	 * the control structure for this process has already been laid out within
-	 * the login function of ext.facebook.js, but the AJAX calls are currently
-	 * skipped and the user is simply always directed to Special:Connect's main page.
+	 * itself. AJAX functions can also streamline the connecting process by
+	 * sending the user directly to one of these subpages. A similar control
+	 * structure has been laid out in the login function of ext.facebook.js.
 	 * 
 	 * Now on to the MVC part.
 	 * 
 	 * Function execute() operates on three possible models: the MediaWiki User
-	 * class, FacebookUser and FacebookApplication (TODO). At the end of a
-	 * control path, the process is this: update the model, then call the view
-	 * (which may depend on the model, but only in read-only mode).
+	 * class, FacebookUser and FacebookApplication. At the end of a control path,
+	 * the process is this: update the model, then call the view (which may depend
+	 * on the model, but strictly on a read-only basis).
 	 * 
 	 * Models are only updated from subpages, not Special:Connect. Subpages are
 	 * the endpoint of any connecting/disconnecting process, and are only valid
-	 * when POSTed to from Special:Connect (or, in the future, AJAX calls acting
-	 * on behalf of Special:Connect). The one exception is if the user is logged
-	 * in to Facebook and has a MediaWiki account, but isn't logged in to
-	 * MediaWiki; they will then be logged in to MediaWiki. Oh, and a second
-	 * exception is that Special:Connect/Debug can be navigated to, but it's
-	 * only for testing purposes.
+	 * when POSTed to from Special:Connect or AJAX calls acting on behalf of
+	 * Special:Connect. The one exception is if the user is logged in to Facebook
+	 * and has a MediaWiki account, but isn't logged in to MediaWiki; they will
+	 * then be logged in to MediaWiki. Oh, and a second exception is that
+	 * Special:Connect/Debug can be navigated to, but it's only for testing purposes.
 	 */
 	public function execute( $subPageName ) {
 		global $wgUser, $wgRequest;
