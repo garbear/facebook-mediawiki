@@ -189,89 +189,12 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		
 		// Add Open Graph tags to articles
 		global $wgFbOpenGraph;
-		$title = $skin->getTitle();
-		if ( !empty( $wgFbOpenGraph ) && ( $title instanceof Title ) ) {
-			global $wgFbAppId, $wgFbPageId, $wgFbNamespace, $wgFbOpenGraphRegisteredObjects,
-					$wgSitename, $wgLogo, $wgServer, $wgLanguageCode;
-			
-			// fb:app_id
-			$out->addHeadItem('fb:app_id',
-				'<meta property="fb:app_id" content="' . $wgFbAppId . '" />' . "\n");
-			
-			// fb:page_id
-			if ( !empty( $wgFbPageId ) && $wgPageId != 'YOUR_PAGE_ID' ) {
-				$out->addHeadItem('fb:page_id',
-					'<meta property="fb:page_id" content="' . $wgFbPageId . '" />' . "\n");
-			}
-			
-			// og:type
-			if ( $title->canExist() ) {
-				// Don't consider NS_SPECIAL and NS_MEDIA to be articles
-				$object = 'article'; // TODO: dynamically determine this
-			} else {
-				$object = null;
-			}
-			if ( !empty( $object ) ) {
-				if (FacebookAPI::isNamespaceSetup() && !empty($wgFbOpenGraphRegisteredObjects) &&
-						!empty($wgFbOpenGraphRegisteredObjects[$object]) ) {
-					$og_type = $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredObjects[$object];
-				} else {
-					$og_type = $object;
+		if ( !empty( $wgFbOpenGraph ) ) {
+			$object = OpenGraphObject::newFromTitle( $skin->getTitle() );
+			if ( $object ) {
+				foreach ( $object->getProperties() as $property => $content ) {
+					$out->addHeadItem($property, "<meta property=\"$property\" content=\"$content\" />\n");
 				}
-				$out->addHeadItem('og:type',
-					'<meta property="og:type" content="' . $og_type . '" />' . "\n");
-			}
-			
-			// og:site_name
-			$out->addHeadItem('og:site_name',
-				'<meta property="og:site_name" content="' . $wgSitename . '" />' . "\n");
-			
-			// og:title
-			$titleStr = $title->getPrefixedText();
-			//$ns = ($title->getNsText() != '' ? $title->getNsText() . ':' : '');
-			$out->addHeadItem('og:title',
-				'<meta property="og:title" content="' . $titleStr . '" />' . "\n");
-			
-			// og:url
-			$basePage = Title::newFromText( $titleStr ); // no additional params
-			if ( $basePage instanceof Title ) {
-				$url = $basePage->getFullURL();
-			} else {
-				// Just use the URL of the page we're currently viewing
-				global $wgRequest;
-				$url = $wgRequest->getFullRequestURL();
-			}
-			$out->addHeadItem('og:url',
-				'<meta property="og:url" content="' . $url . '" />' . "\n");
-			
-			// og:description
-			/*
-			 * TODO. This algorithm should work for vector. Start inside the rendered
-			 * page body, <div id="bodyContent">. Next, enter the actual body content,
-			 * <div class="mw-content-ltr">. Then, skip all tags that are not <p>. Now
-			 * that we have come to the actual page content, obtain the first sentence
-			 * inside the <p> tag and strip away all html tags.
-			 */
-			#$description = '';
-			#$out->addHeadItem('og:description',
-			#		'<meta property="og:description" content="' . $description . '" />' . "\n");
-			
-			// og:image - TODO: use first image on page, otherwise default to $wgLogo
-			$out->addHeadItem('og:image',
-				'<meta property="og:image" content="' . $wgServer . $wgLogo . '" />' . "\n");
-			
-			// og:locale
-			$locale = FacebookLanguage::getFbLocaleForLangCode( $wgLanguageCode );
-			$out->addHeadItem('og:locale',
-				'<meta property="og:locale" content="' . $locale . '" />' . "\n");
-			
-			// og:updated_time
-			if ( $title->canExist() ) {
-				// Don't add timestamp to NS_SPECIAL or NS_MEDIA
-				$article = new Article( $title, 0 );
-				$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
-				$out->addHeadItem('og:updated_time',
-					'<meta property="og:updated_time" content="' . $timestamp . '" />' . "\n");
 			}
 		}
 		

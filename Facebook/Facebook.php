@@ -79,6 +79,7 @@ $wgAutoloadClasses['FacebookInit'] = $dir . 'FacebookInit.php';
 $wgAutoloadClasses['FacebookLanguage'] = $dir . 'FacebookLanguage.php';
 $wgAutoloadClasses['FacebookUser'] = $dir . 'FacebookUser.php';
 $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
+$wgAutoloadClasses['OpenGraphObject'] = $dir . 'FacebookOpenGraph.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';
 
 // Special:Connect and accompanying AJAX modules
