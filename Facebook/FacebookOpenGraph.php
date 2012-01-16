@@ -140,6 +140,11 @@ class OpenGraphArticleObject extends OpenGraphObject {
 	function __construct( $title ) {
 		global $wgVersion, $wgSitename, $wgServer, $wgLogo;
 		
+		// Talk pages redirect to subject pages
+		if ( $title->isTalkPage() ) {
+			$title = $title->getSubjectPage();
+		}
+		
 		$pageName = $title->getPrefixedText();
 		if ( version_compare( $wgVersion, '1.18', '>=' ) ) {
 			// Title::getPageLanguage() is since 1.18
