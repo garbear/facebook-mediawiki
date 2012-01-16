@@ -48,11 +48,11 @@ abstract class OpenGraphObject {
 		global $wgFbAppId, $wgFbPageId;
 		
 		// fb:app_id
-		$properties['fb:app_id'] = $wgFbAppId;
+		$this->properties['fb:app_id'] = $wgFbAppId;
 		
 		// fb:page_id
 		if ( !empty( $wgFbPageId ) && $wgPageId != 'YOUR_PAGE_ID' ) {
-			$properties['fb:page_id'] = $wgFbPageId;
+			$this->properties['fb:page_id'] = $wgFbPageId;
 		}
 	}
 	
