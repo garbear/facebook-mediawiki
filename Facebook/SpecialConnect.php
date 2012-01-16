@@ -145,8 +145,17 @@ class SpecialConnect extends SpecialPage {
 			if ( !empty( $this->mReturnToQuery ) )
 				$urlaction .= '&returntoquery=' . $this->mReturnToQuery;
 		}
-		// TODO: This should be $this->makespecialUrl()...
-		$wgOut->redirect($wgUser->getSkin()->makeSpecialUrl($specialPage, $urlaction));
+		
+		// Compatiblity with MW < 1.18
+		global $wgVersion;
+		if ( version_compare( $wgVersion, '1.18', '>=' ) ) {
+			$skin = $this->getSkin();
+		} else {
+			global $wgUser;
+			$skin = $wgUser->getSkin();
+		}
+		
+		$wgOut->redirect($skin->makeSpecialUrl($specialPage, $urlaction));
 	}
 	
 	/**
@@ -831,9 +840,19 @@ class SpecialConnect extends SpecialPage {
 			// TODO
 			$html .= '<p>' . wfMsg( 'facebook-connect-text' ) . "<br/><br/></p>\n";
 		}
+		
+		// Compatiblity with MW < 1.18
+		global $wgVersion;
+		if ( version_compare( $wgVersion, '1.18', '>=' ) ) {
+			$skin = $this->getSkin();
+		} else {
+			global $wgUser;
+			$skin = $wgUser->getSkin();
+		}
+		
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
 				'" max-rows="3" scope="' . FacebookAPI::getPermissions() . '" colorscheme="' .
-				FacebookXFBML::getColorScheme( $this->getSkin()->getSkinName() ) .
+				FacebookXFBML::getColorScheme( $skin->getSkinName() ) .
 				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
@@ -863,9 +882,18 @@ class SpecialConnect extends SpecialPage {
 		<h2>' . wfMsg( 'userlogin' ) . '</h2>
 		<p>' . wfMsg( 'facebook-only-text', $wgSitename ) . '<br/><br/></p>' . "\n";
 		
+		// Compatiblity with MW < 1.18
+		global $wgVersion;
+		if ( version_compare( $wgVersion, '1.18', '>=' ) ) {
+			$skin = $this->getSkin();
+		} else {
+			global $wgUser;
+			$skin = $wgUser->getSkin();
+		}
+		
 		$html .= '<fb:login-button show-faces="true" width="' . $loginFormWidth .
 				'" max-rows="3" scope="' . FacebookAPI::getPermissions() . '" colorscheme="' .
-				FacebookXFBML::getColorScheme( $this->getSkin()->getSkinName() ) .
+				FacebookXFBML::getColorScheme( $skin->getSkinName() ) .
 				'"></fb:login-button><br/><br/><br/>' . "\n";
 		
 		// Add a pretty Like box to entice the user to log in
