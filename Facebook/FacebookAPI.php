@@ -88,12 +88,13 @@ class FacebookAPI extends Facebook {
 	 * Generates the Facebook permissions required for this application
 	 * dependent on the MediaWiki configuration parameters.
 	 */
-	static function getPermissions() {
+	static $scope = NULL;
+	public static function getPermissions() {
 		global $wgEnableEmail, $wgFbUserRightsFromGroup, $wgFbOpenGraph,
 				$wgFbOpenGraphRegisteredActions;
 		
-		static $scope = array();
-		if (empty( $scope ) ) {
+		if ( self::$scope === NULL ) {
+			$scope = array();
 			if ( !empty( $wgEnableEmail ) ) {
 				$scope[] = 'email';
 			}
@@ -104,7 +105,8 @@ class FacebookAPI extends Facebook {
 				$scope[] = 'publish_actions';
 			}
 			wfRunHooks( 'FacebookPermissions', array( &$scope ) );
+			self::$scope = $scope;
 		}
-		return implode( ',', $scope );
+		return implode( ',', self::$scope );
 	}
 }
