@@ -107,7 +107,7 @@ $wgFbOpenGraphRegisteredObjects = array(
  *    protect => article, image
  *    upload  => image
  * 
- * (If you have creative ideas for additional actions, please:
+ * (If you have ideas for additional actions, feel free to:
  *    Post a message to: http://www.mediawiki.org/wiki/Extension_talk:Facebook
  *    Or contact me on GitHub: https://github.com/garbear/)
  */
@@ -121,14 +121,11 @@ $wgFbOpenGraphRegisteredObjects = array(
 #);
 
 /**
- * (Note: this parameter currently has no effect and the {{#opengraph}} parser
- * hook is still a work-in-progress.)
- * 
  * Here you can define custom objects and actions for your wiki.
  * 
  * Custom objects allow your wiki to more deeply integrate into the social graph.
  * For example, let's say the Star Wars wiki registered the "spaceship" object
- * on Facebook and included the parser hook {{#opengraph|type=spaceship}} on the
+ * on Facebook and included the parser hook <opengraph type="spaceship"/> on the
  * Millennium Falcon page (http://starwars.wikia.com/wiki/Millennium_Falcon).
  * Now, in the Open Graph, this url represents a spaceship instead of an article.
  * 
@@ -146,16 +143,20 @@ $wgFbOpenGraphRegisteredObjects = array(
  * When sufficient connects are made, the user's Timeline will feature a Report
  * showcasing their interactions with your app.
  * 
- * (I am currently looking for ideas on how to integrate custom actions into
- * the wiki. Maybe a list of actions in the "views" or "actions" toolbar. Maybe
- * a checkbox e.g. "Drive the Millennium Falcon!" shown when the user edits the
- * wiki page. Maybe a new parser hook like {{#opengraph|action=drive}}. Post on
- * the extension's talk page or hit me up on GitHub if you have ideas. Until
- * then, your only option is to wait for Facebook to design a <fb:action> social
- * plugin or extend <fb:like> to replace "like" with a custom action.)
+ * Actions can be placed in your wiki using the same <opengraph> tag:
+ * <opengraph action="drive">Drive the {{PAGENAME}}!</opengraph>. For more
+ * in-depth documentation on the <opengraph> tag, refer to:
+ * http://www.mediawiki.org/wiki/Extension:Facebook.
+ * 
+ * (If you have ideas on how to integrate custom actions into the wiki, you
+ * know the drill, let me know through the links above. Maybe a list of actions
+ * in the "views" or "actions" toolbar. Maybe a checkbox e.g. "Drive the
+ * Millennium Falcon!" shown when the user edits the wiki page. Or maybe
+ * Facebook will design a <fb:action> social plugin or extend <fb:like> to
+ * replace "like" with a custom action.)
  * 
  * The asterisk '*' matches all custom (non-article and non-image) objects.
- * Again, check the Object Debugger for any errors.
+ * Again, check the Object Debugger for any errors. 
  * 
  * If your wiki monetizes advertising, action specs can be used in ad targeting
  * to reach out to people based on their actions. For more information see:
