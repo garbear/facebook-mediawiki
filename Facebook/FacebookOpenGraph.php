@@ -92,20 +92,71 @@ class FacebookOpenGraph {
 			self::registerProperties($parser->getTitle(), $args);
 		}
 		
-		// For now, we don't support actions
+		// TODO: Insert a placeholder so that actions can be placed above type definitions on the page
 		if ( $action != '' ) {
-			// return $action . ': ' . $parser->recursiveTagParse( $innertext, $frame );
+			// See if the action is available for the object type
+			$actions = self::getActions(self::newObjectFromTitle($parser->getTitle()));
+			if ( count( $actions ) && in_array( $action, $actions ) ) {
+				return '<a href="#' . $action . '">' . $parser->recursiveTagParse( $innertext, $frame ) . '</a>';
+			}
 		}
 		return '';
 	}
 	
 	/**
 	 * Given a page title, returns the Open Graph representation.
+	 * 
+	 * TODO: Cache objects using their title object as a key. This will need to
+	 * be done in such a way that registerProperties() invalidates the cache
+	 * (because it might change an object's properties).
+	 * 
 	 * @param Title $title
 	 * @return OpenGraphObject|NULL
 	 */
 	public static function newObjectFromTitle($title) {
 		return OpenGraphObject::newFromTitle( $title );
+	}
+	
+	/**
+	 * Returns the actions that are registered for the given object.
+	 */
+	static $customObjects = NULL;
+	public static function getActions($openGraphObject) {
+		$actions = array();
+		
+		// Invert the array the first time through
+		if ( self::$customObjects === NULL ) {
+			self::$customObjects = array();
+			global $wgFbOpenGraphCustomActions;
+			foreach ( $wgFbOpenGraphCustomActions as $action => $objects ) {
+				if ( is_string( $objects ) ) {
+					$objects = array( $objects );
+				}
+				if ( is_array( $objects ) ) {
+					foreach ( $objects as $object ) {
+						if ( !isset( self::$customObjects[$object] ) ) {
+							self::$customObjects[$object] = array( $action );
+						} else {
+							self::$customObjects[$object][] = $action;
+						}
+					}
+				}
+			}
+		}
+		
+		if ( $openGraphObject ) {
+			$type = $openGraphObject->getType();
+			// Start with actions matching the specified object
+			if ( isset( self::$customObjects[$type] ) ) {
+				$actions = self::$customObjects[$type];
+			}
+			// Merge in actions matching all objects ('*')
+			if ( isset( self::$customObjects['*'] ) ) {
+				$actions = array_merge( self::$customObjects['*'], $actions );
+			}
+		}
+		
+		return $actions;
 	}
 	
 	/**
@@ -282,14 +333,11 @@ abstract class OpenGraphObject {
 	}
 	
 	/**
-	 * Returns the translated type of the object.
-	 * 
-	 * If a namespace has been defined and $wgFbOpenGraphRegisteredObjects
-	 * contains a map for the object type, the resulting type will be
-	 * NAMESPAPCE:TYPE. Otherwise, the generic type is used.
+	 * Returns the type of the object, minus the preceeding namespace.
 	 */
 	public function getType() {
-		return $this->properties['og:type'];
+		$parts = explode( ':', $this->properties['og:type'], 2 );
+		return count( $parts ) >= 2 ? $parts[1] : $parts[0];
 	}
 	
 	/**
