@@ -103,10 +103,9 @@ $wgFbSocialPlugins = true;
  *    1.  fb-groupie     A member of the specified group
  *    2.  fb-admin       An administrator of the Facebook group
  * 
- * Users will automatically be promoted or demoted when their status is
- * modified from the group page within Facebook. If you find users are
- * sometimes not being auto-promoted, try requesting the "offline_access"
- * permission using the FacebookPermissions hook.
+ * The user's group membership status will be checked on each page load. They
+ * will automatically be promoted or demoted when their status is modified from
+ * the group page within Facebook.
  * 
  * This setting can also be used in conjunction with $wgFbDisableLogin. To have
  * this group exclusively control access to the wiki, set $wgFbDisableLogin to
