@@ -187,17 +187,6 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			}
 		}
 		
-		// Add Open Graph tags to articles
-		global $wgFbOpenGraph;
-		if ( !empty( $wgFbOpenGraph ) ) {
-			$object = OpenGraphObject::newFromTitle( $skin->getTitle() );
-			if ( $object ) {
-				foreach ( $object->getProperties() as $property => $content ) {
-					$out->addHeadItem($property, "<meta property=\"$property\" content=\"$content\" />\n");
-				}
-			}
-		}
-		
 		return true;
 	} // BeforePageDisplay hook
 	
@@ -228,6 +217,18 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			#             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		}
 		return $fbScript;
+	}
+	
+	/**
+	 * Register the <opengraph> tag with the parser.
+	 */
+	public static function LanguageGetMagic( array &$magicWords, $langCode ) {
+		$tag = FacebookOpenGraph::GetTag( $langCode );
+		if ( $tag != '' ) {
+			// 0 == not case sensitive
+			$magicWords[$tag] = array( 0, $tag );
+		}
+		return true;
 	}
 	
 	/**
@@ -341,7 +342,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			unset( $vars['fbScript'] ); // Obsoleted by ResourceLoader
 		}
 		
-		// We need fbAppAccessToken to be set here instead of loaded through
+		// We want fbAppAccessToken to be set here instead of loaded through
 		// ResourceLoader. I forget why this is the case, unfortunately.
 		global $wgFbAllowDebug;
 		if ( !empty( $wgFbAllowDebug ) ) {
@@ -379,14 +380,41 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	}
 	
 	/**
+	 * Add the Open Graph meta tags to the current page.
+	 * 
+	 * This hook is used instead of BeforePageDisplay, (I quote from mediawiki.org,)
+	 * "to make it easier on parser caching."
+	 */
+	public static function ParserAfterTidy(&$parser, &$text) {
+		global $wgFbOpenGraph, $wgOut;
+		if ( !empty( $wgFbOpenGraph ) ) {
+			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
+			if ( $object ) {
+				foreach ( $object->getProperties() as $property => $content ) {
+					$parser->mOutput->addHeadItem("<meta property=\"$property\" content=\"$content\" />\n", $property);
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Installs a parser hook for every tag reported by FacebookXFBML::availableTags().
 	 * Accomplishes this by asking FacebookXFBML to create a hook function that then
 	 * redirects to FacebookXFBML::parserHook().
+	 *
+	 * Secondly, this function installs a parser hook for our <opengraph> tag.
 	 */
 	public static function ParserFirstCallInit( &$parser ) {
+		// XFBML tags (for example, <fb:login-button>)
 		$pHooks = FacebookXFBML::availableTags();
 		foreach( $pHooks as $tag ) {
-			$parser->setHook( $tag, FacebookXFBML::createParserHook( $tag ));
+			$parser->setHook( $tag, FacebookXFBML::createParserHook( $tag ) );
+		}
+		// Open Graph tag (for example, <opengraph type="article">)
+		$tag = FacebookOpenGraph::GetTag();
+		if ( $tag != '' ) {
+			$parser->setHook( $tag, 'FacebookOpenGraph::parserHook' );
 		}
 		return true;
 	}

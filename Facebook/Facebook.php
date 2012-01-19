@@ -77,9 +77,9 @@ $wgAutoloadClasses['FacebookDB'] = $dir . 'FacebookDB.php';
 $wgAutoloadClasses['FacebookHooks'] = $dir . 'FacebookHooks.php';
 $wgAutoloadClasses['FacebookInit'] = $dir . 'FacebookInit.php';
 $wgAutoloadClasses['FacebookLanguage'] = $dir . 'FacebookLanguage.php';
+$wgAutoloadClasses['FacebookOpenGraph'] = $dir . 'FacebookOpenGraph.php';
 $wgAutoloadClasses['FacebookUser'] = $dir . 'FacebookUser.php';
 $wgAutoloadClasses['FacebookXFBML'] = $dir . 'FacebookXFBML.php';
-$wgAutoloadClasses['OpenGraphObject'] = $dir . 'FacebookOpenGraph.php';
 $wgAutoloadClasses['SpecialConnect'] = $dir . 'SpecialConnect.php';
 
 // Special:Connect and accompanying AJAX modules
@@ -105,7 +105,7 @@ $wgAutopromote['fb-user'] = APCOND_FB_USER;
 $wgGroupPermissions['fb-user'] = array('facebook-user' => true);
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
-$wgFbHooksToAddImmediately = array( 'SpecialPage_initList' );
+$wgFbHooksToAddImmediately = array( 'SpecialPage_initList', 'LanguageGetMagic' );
 foreach( $wgFbHooksToAddImmediately as $hookName ) {
 	$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 }
