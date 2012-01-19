@@ -9,7 +9,7 @@
  *        This will be seen by users when they sign up for your site.
  *    3.  Choose an app namespace (something simple, like coffeewiki)
  *    4.  Copy the App ID, Secret and Namespace into this config file.
- *    5.  Make sure you set the Death Callback. See Special:Connect/Debug.
+ *    5.  Make sure you set the Death Callback. See $wgFbAllowDebug below.
  * 
  * Optionally, you may customize your application:
  *    A.  Upload icon and logo images. The icon appears in Timeline events.
@@ -17,18 +17,8 @@
  *        Visit the settings, click Advanced, scroll to the bottom and click
  *        the button in the "App Page" field. This will create a new page for
  *        your app. Paste the Page ID for your app below.
- *    C.  Customize auth dialog messages. See Special:Connect/Debug.
- * 
- * Special:Connect/Debug
- * 
- * How awesome is the extension's author? He made a program that configures
- * your Facebook application for you. Visit Special:Connect/Debug to begin.
- * The extension will detect fields that aren't filled in properly and will
- * warn you or indicate an error. Click on the warning/error icon and MediaWiki
- * will confirm the new setting. No further action is required on your part;
- * the setting has automatically been saved to Facebook. You must have admin
- * rights on the wiki and be listed as a Developer or Admin of the Facebook
- * application to use this special page.
+ *    C.  Customize auth dialog messages. See $wgFbAllowDebug below.
+ *    D.  Defined Open Graph objects and actions. See $wgFbOpenGraph below.
  * 
  * It is recommended that rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
@@ -40,11 +30,24 @@ $wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
- * Enables the debug page (Special:Connect/Debug). It is OK to leave this
- * enabled because only users who are both developers of the application and
- * admins on the wiki (or admins of the Facebook page below) may view this page.
- *
- * Regardless, make sure you visit Special:Connect/Debug at least once.
+ * Special:Connect/Debug
+ * 
+ * This extension includes a program that configures your Facebook application
+ * for you (how awesome is that?). Visit Special:Connect/Debug to begin. The
+ * extension will detect fields that aren't filled in properly and will warn
+ * you or indicate an error. Click on the warning/error icon and MediaWiki will
+ * confirm the new setting. No further action is required on your part; the
+ * setting has automatically been saved to Facebook.
+ * 
+ * The most important setting is the Deauth Callback. When a user removes your
+ * application from their Facebook settings, the Death Callback lets Facebook
+ * disconnect the user's accounts in the MediaWiki database.
+ * 
+ * It is OK to leave this special page enabled. To view this special page you
+ * must have admin rights on the wiki (or be an admin of the Facebook group
+ * below) AND be listed as a Developer or Admin of the Facebook application.
+ * Set $wgFbAllowDebug to false to disable Special:Connect/Debug. Regardless,
+ * make sure you visit this page at least once.
  */
 $wgFbAllowDebug = true;
 
@@ -61,19 +64,52 @@ $wgFbAllowDebug = true;
 $wgFbOpenGraph = true;
 
 /**
- * If you have registered Open Graph actions and objects for the supported types
- * below, you can define them here. Registration can be done from the Open Graph
- * dashboard in your app's settings. If you are completely clueless, you can
- * leave these values undefined and this extension will "do the right thing" (TM).
+ * By default, this extension will use generic Open Graph object types for your
+ * wiki. Wiki pages will be of type "article" and images will be of type
+ * "image". If you register these objects in your application's Open Graph
+ * Dashboard, define them here. This will cause object types to be prefixed
+ * with your app's namespace.
  * 
- * If you registered and defined everything correctly, the Object Debugger above
- * should not show any errors.
+ * (To my knowledge, there is currently no difference between type "article" and
+ * type "NAMESPACE:article". The only difference I can find is a small bug; when
+ * you define Open Graph actions below, the actions ignore some built-in objects
+ * including article and image. Thus, the actions must be connected to your
+ * custom article and image objects. This behavior was observed on the first day
+ * Open Graph went live: Jan. 18, 2012. If Facebook fixes this bug I'll update
+ * the documentation in the next version of the extension.)
  * 
- * $wgFbOpenGraphActions currently has no effect. In the future, it will allow
- * actions to be pushed to a user's timeline.
+ * If you registered and defined everything correctly, the Object Debugger on
+ * Special:Connect/Debug should not show any errors.
  * 
- * If you have more ideas for Facebook Actions, please contact me on GitHub. I'm
- * open to creative suggestions. https://github.com/garbear
+ * The image type is not yet implemented (only articles for now).
+ */
+$wgFbOpenGraphRegisteredObjects = array(
+#	'article' => 'article', # Uncomment after registering "article" object in the Open Graph Dashboard
+#	'image'   => 'image',   # Not implemented yet
+);
+
+/**
+ * (Note: this parameter currently has no effect. In the future, it will allow
+ * actions to be pushed to a user's Timeline.)
+ * 
+ * When you register Open Graph actions for the objects above, it will be
+ * possible to push these actions to a user's Timeline. Actions can only be
+ * published for their Connected Object Types; therefore, this setting only
+ * takes effect when the objects are defined in $wgFbOpenGraphRegisteredObjects.
+ * 
+ * When you register these actions in the Open Graph Dashboard, connect them to
+ * objects in this way:
+ * 
+ *    edit    => article
+ *    tweak   => article
+ *    discuss => article
+ *    watch   => article, image
+ *    protect => article, image
+ *    upload  => image
+ * 
+ * (If you have creative ideas for additional actions, please:
+ *    Post a message to: http://www.mediawiki.org/wiki/Extension_talk:Facebook
+ *    Or contact me on GitHub: https://github.com/garbear/)
  */
 #$wgFbOpenGraphRegisteredActions = array(
 #	'edit'    => 'edit',
@@ -83,16 +119,59 @@ $wgFbOpenGraph = true;
 #	'protect' => 'protect',
 #	'upload'  => 'upload',
 #);
-$wgFbOpenGraphRegisteredObjects = array(
-#	'article' => 'article', # Uncomment this after registering an "article" object in the Dev App
-);
+
+/**
+ * (Note: this parameter currently has no effect and the {{#opengraph}} parser
+ * hook is still a work-in-progress.)
+ * 
+ * Here you can define custom objects and actions for your wiki.
+ * 
+ * Custom objects allow your wiki to more deeply integrate into the social graph.
+ * For example, let's say the Star Wars wiki registered the "spaceship" object
+ * on Facebook and included the parser hook {{#opengraph|type=spaceship}} on the
+ * Millennium Falcon page (http://starwars.wikia.com/wiki/Millennium_Falcon).
+ * Now, in the Open Graph, this url represents a spaceship instead of an article.
+ * 
+ * Custom actions allow your users to interact with objects in creative and
+ * meaningful ways. In the example above, let's say the Star Wars wiki defines
+ * the "drive" action in the Open Graph Dashboard and connects it to the
+ * spaceship and landspeeder objects, and then specifies the relationship here:
+ * 
+ * $wgFbOpenGraphCustomActions['drive'] => array('spaceship', 'landspeeder');
+ * 
+ * When this action-object connection is made, the user's private activity log
+ * (and maybe their friends' new feeds) will say "USER drove the [[Millennium
+ * Falcon]]" with a link to the wiki page. Assuming you define some aggregations,
+ * a Timeline View for your app will be visible at the top of the user's Timeline.
+ * When sufficient connects are made, the user's Timeline will feature a Report
+ * showcasing their interactions with your app.
+ * 
+ * (I am currently looking for ideas on how to integrate custom actions into
+ * the wiki. Maybe a list of actions in the "views" or "actions" toolbar. Maybe
+ * a checkbox e.g. "Drive the Millennium Falcon!" shown when the user edits the
+ * wiki page. Maybe a new parser hook like {{#opengraph|action=drive}}. Post on
+ * the extension's talk page or hit me up on GitHub if you have ideas. Until
+ * then, your only option is to wait for Facebook to design a <fb:action> social
+ * plugin or extend <fb:like> to replace "like" with a custom action.)
+ * 
+ * The asterisk '*' matches all custom (non-article and non-image) objects.
+ * Again, check the Object Debugger for any errors.
+ * 
+ * If your wiki monetizes advertising, action specs can be used in ad targeting
+ * to reach out to people based on their actions. For more information see:
+ * https://developers.facebook.com/docs/reference/ads-api/action-specs-custom/
+ */
+#$wgFbOpenGraphCustomActions = array(
+#	'drive' => array('spaceship', 'landspeeder'),
+#	'want' => array('*'),
+#);
 
 /**
  * Allow the use of social plugins in wiki text. To learn more about social
- * plugins, please see <https://developers.facebook.com/docs/plugins>.
+ * plugins, please see: https://developers.facebook.com/docs/plugins/.
  *
- * Open Graph Beta social plugins can also be used.
- * <https://developers.facebook.com/docs/beta/plugins>
+ * Open Graph social plugins can also be used:
+ * https://developers.facebook.com/docs/opengraph/plugins/.
  */
 $wgFbSocialPlugins = true;
 
