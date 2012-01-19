@@ -9,6 +9,7 @@
  *        This will be seen by users when they sign up for your site.
  *    3.  Choose an app namespace (something simple, like coffeewiki)
  *    4.  Copy the App ID, Secret and Namespace into this config file.
+ *    5.  Make sure you set the Death Callback. See Special:Connect/Debug.
  * 
  * Optionally, you may customize your application:
  *    A.  Upload icon and logo images. The icon appears in Timeline events.
@@ -16,14 +17,18 @@
  *        Visit the settings, click Advanced, scroll to the bottom and click
  *        the button in the "App Page" field. This will create a new page for
  *        your app. Paste the Page ID for your app below.
+ *    C.  Customize auth dialog messages. See Special:Connect/Debug.
  * 
- * The Facebook Application Debugger has been created for you to test your
- * application's settings. Go to the page Special:Connect/Debug to begin.
+ * Special:Connect/Debug
  * 
- * If your MediaWiki version is high enough you will see error icons next to
- * the fields that MediaWiki has detected are not filled in properly. Click on
- * an icon and MediaWiki will confirm the new setting. No further action is
- * required on your part; the setting has automatically been saved to Facebook.
+ * How awesome is the extension's author? He made a program that configures
+ * your Facebook application for you. Visit Special:Connect/Debug to begin.
+ * The extension will detect fields that aren't filled in properly and will
+ * warn you or indicate an error. Click on the warning/error icon and MediaWiki
+ * will confirm the new setting. No further action is required on your part;
+ * the setting has automatically been saved to Facebook. You must have admin
+ * rights on the wiki and be listed as a Developer or Admin of the Facebook
+ * application to use this special page.
  * 
  * It is recommended that rather than changing the settings in this file, you
  * instead override them in LocalSettings.php by adding new settings after
@@ -71,13 +76,15 @@ $wgFbOpenGraph = true;
  * open to creative suggestions. https://github.com/garbear
  */
 #$wgFbOpenGraphRegisteredActions = array(
-#	'edit'   => 'edit',
-#	'tweak'  => 'tweak', # for a minor edit
-#	'watch'  => 'watch',
-#	'upload' => 'upload',
+#	'edit'    => 'edit',
+#	'tweak'   => 'tweak', # for a minor edit
+#	'discuss' => 'discuss',
+#	'watch'   => 'watch',
+#	'protect' => 'protect',
+#	'upload'  => 'upload',
 #);
 $wgFbOpenGraphRegisteredObjects = array(
-	#'article' => 'article', # Uncomment this after registering an "article" object in the Dev App
+#	'article' => 'article', # Uncomment this after registering an "article" object in the Dev App
 );
 
 /**
