@@ -93,8 +93,9 @@
 						// The MediaWiki user is already connected to a Facebook user.
 						// Check to see if it's the one that just logged in.
 						if (window.fbId == response.authResponse.userID) {
-							// User is already logged in to MediaWiki. For now, reload
-							// to re-render XFBML tags.
+							// User is already logged in to MediaWiki. For now, reload to
+							// re-render XFBML tags and have the server pick up the new session.
+							// TODO: Update the session over AJAX and call FB.XFBML.parse();
 							window.location.href = window.location.href;
 						} else {
 							// MediaWiki user is connected to a Facebook account that is
@@ -214,6 +215,7 @@
 	};
 	
 	// Form to connect Facebook with an existing account on Special:Connect
+	// This hides the update options until the user clicks the "existing account" radio button
 	window.addFormListener = function() {
 		$('input[name="wpNameChoice"]').change(function() {
 			var selected;

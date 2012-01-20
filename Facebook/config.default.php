@@ -162,12 +162,18 @@ $wgFbUseRealName = false;
 
 /**
  * Another personal toolbar option: always show a button to log in with
- * Facebook. By default, this button is only shown to anonymous users.
+ * Facebook. By default, this button is only shown to anonymous users. If your
+ * wiki enables pushing to a user's Timeline, you should set this to true.
  * 
- * This button simply links to Special:Connect. If you would like to let users
- * convert their usernames to Facebook-enabled accounts, consider linking to
- * Special:Connect from the Main Page instead of showing this button on every
- * page.
+ * A valid Facebook session (aka access_token) is required to log the Facebook
+ * user in and publish to their Timeline. This session expires about two hours
+ * after the user has left your wiki, but is usually refreshed when the user
+ * returns (this is why pages sometimes load twice - so the server can pick up
+ * the new session). If the user changes their Facebook password or logs out of
+ * Facebook, the session can only be restored by having them click a Login button
+ * (either in the personal toolbar or a <fb:login-button> plugin). If the session
+ * expires, the user will continue to browse the wiki using their wiki username,
+ * but Timeline events will be disabled.
  */
 $wgFbAlwaysShowLogin = false;
 

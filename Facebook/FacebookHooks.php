@@ -313,8 +313,10 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbUseAjax']      = $wgFbAjax;
 		if ( $wgUser->isLoggedIn() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
+			// If the Facebook session is invalid, let the client know who we expect
+			// to click "Log in with Facebook". Otherwise, if we have have a valid
+			// session but for *someone else*, let the client know this as well.
 			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
-				// Let JavaScript know if the Facebook ID belongs to someone else
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
@@ -338,7 +340,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		global $wgVersion, $wgUser;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
-			unset( $vars['fbScript'] ); // Obsoleted by ResourceLoader
+			unset( $vars['fbScript'] ); // Made obsolete by ResourceLoader
 		}
 		
 		// We need fbAppAccessToken to be set here instead of loaded through
