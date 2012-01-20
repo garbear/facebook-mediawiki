@@ -150,6 +150,8 @@
 	        window.wgPageName.indexOf('Special:UserLogin') != 0 &&
 	        window.wgPageName.indexOf('Special:UserLogout') != 0) {
 			url += '&returnto=' + rawurlencode(window.wgPageName);
+			// Disabled: 'returntoquery' used to be set to wgPageQuery.
+			// See FacebookHooks::ResourceLoaderGetConfigVars()
 		}
 		window.location.href = url;
 	};

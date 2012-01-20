@@ -298,8 +298,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * Adds several Facebook variables to the page:
 	 */
 	public static function ResourceLoaderGetConfigVars( &$vars ) {
-		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
-				$wgFbAjax, $wgUser, $facebook;
+		global $wgRequest, $wgVersion, $wgFbAppId, $wgFbSocialPlugins, $wgFbAjax, $wgUser;
+		/*
+		// Disabled (ext.facebook.js still uses wgPageName, but not wgPageQuery)
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -307,12 +308,13 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			}
 			$vars['wgPageQuery'] = wfUrlencode( wfArrayToCGI( $query ) );
 		}
-		$vars['wgStyleVersion'] = $wgStyleVersion;
+		*/
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
 		$vars['fbUseAjax']      = $wgFbAjax;
 		if ( $wgUser->isLoggedIn() ) {
+			global $facebook;
 			$ids = FacebookDB::getFacebookIDs($wgUser);
 			// If the Facebook session is invalid, let the client know who we expect
 			// to click "Log in with Facebook". Otherwise, if we have have a valid
