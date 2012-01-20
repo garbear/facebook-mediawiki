@@ -677,13 +677,18 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * reset their passwords and give themselves a valid password to log in
 	 * without Facebook. This only works if the user specifies a blank password
 	 * and hasn't already given themselves one.
-	 *
+	 * 
 	 * To that effect, you may want to modify the 'resetpass-wrong-oldpass' msg.
-	 *
+	 * 
 	 * Before version 1.14, MediaWiki used Special:Preferences to reset
 	 * passwords instead of Special:ChangePassword, so this hook won't get
 	 * called and Facebook users won't be able to give themselves a password
 	 * unless they request one over email.
+	 * 
+	 * TODO: A potential security flaw is exposed for users who run untrusted
+	 * JavaScript code. Because no password exists, JavaScript could set a new
+	 * password without the user's knowledge. To guard against this, we need to
+	 * send the user an email and preemptively generate a password reset token.
 	 */
 	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
 		global $wgUser;
