@@ -314,8 +314,10 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbUseAjax']      = $wgFbAjax;
 		if ( $wgUser->isLoggedIn() ) {
 			$ids = FacebookDB::getFacebookIDs($wgUser);
+			// If the Facebook session is invalid, let the client know who we expect
+			// to click "Log in with Facebook". Otherwise, if we have have a valid
+			// session but for *someone else*, let the client know this as well.
 			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
-				// Let JavaScript know if the Facebook ID belongs to someone else
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}
@@ -339,7 +341,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		global $wgVersion, $wgUser;
 		if ( version_compare( $wgVersion, '1.17', '<' ) ) {
 			self::ResourceLoaderGetConfigVars( $vars );
-			unset( $vars['fbScript'] ); // Obsoleted by ResourceLoader
+			unset( $vars['fbScript'] ); // Made obsolete by ResourceLoader
 		}
 		
 		// We want fbAppAccessToken to be set here instead of loaded through
@@ -578,25 +580,44 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	}
 	
 	/**
-	 * Adds the class "mw-userlink" to links belonging to Connect accounts on
-	 * the page Special:ListUsers.
-	 *
+	 * Show the real name of users on Special:ListUsers if $wgFbUseRealName is
+	 * true. The local database is queried first for two reasons: performance
+	 * (each Facebook lookup is done separately) and an OAuth access_token may
+	 * be required to query the Facebook user's name (our access token is
+	 * usually only valid for the currently-logged-in user).
+	 */
 	static function SpecialListusersFormatRow( &$item, $row ) {
-		global $fbSpecialUsers;
-		
-		// Only modify Facebook Connect users
-		if ( !empty( $fbSpecialUsers ) &&
-				count(FacebookDB::getFacebookIDs(User::newFromName($row->user_name)))) {
-			// Look to see if class="..." appears in the link
-			$regs = array();
-			preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
-			if (count( $regs )) {
-				// If so, append " mw-userlink" to the end of the class list
-				$item = $regs[1] . "class=$regs[2]$regs[3] mw-userlink$regs[2]" . $regs[4];
-			} else {
-				// Otherwise, stick class="mw-userlink" into the link just before the '>'
-				preg_match( '/^([^>]*)(.*)/', $item, $regs );
-				$item = $regs[1] . ' class="mw-userlink"' . $regs[2];
+		global $wgFbUseRealName, $wgFbLogo;
+		if ( !empty( $wgFbUseRealName ) ) {
+			$user = User::newFromId( $row->user_id );
+			$fb_ids = FacebookDB::getFacebookIDs( $user );
+			if ( count( $fb_ids ) ) {
+				// Start with the real name in the database
+				$name = $user->getRealName();
+				if ( empty( $name ) ) {
+					// Ask Facebook for the real name
+					$fbUser = new FacebookUser($fb_ids[0]);
+					$name = $fbUser->getUserInfo('name');
+				}
+				// Make sure we were able to get a name from the database or Facebook
+				if ( !empty( $name ) ) {
+					// Instead of regexes, we know the text so just search for it
+					$item = str_replace( ">{$row->user_name}</a>", ">{$name}</a>", $item );
+				}
+				// Add a pretty Facebook logo next to Facebook users
+				if ( !empty( $wgFbLogo ) ) {
+					// Look to see if class="..." appears in the link
+					$regs = array();
+					preg_match( '/^([^>]*?)class=(["\'])([^"]*)\2(.*)/', $item, $regs );
+					if (count( $regs )) {
+						// If so, append "mw-facebook-logo" to the end of the class list
+						$item = $regs[1] . "class=$regs[2]$regs[3] mw-facebook-logo$regs[2]" . $regs[4];
+					} else {
+						// Otherwise, stick class="mw-facebook-logo" into the link just before the '>'
+						preg_match( '/^([^>]*)(.*)/', $item, $regs );
+						$item = $regs[1] . ' class="mw-facebook-logo"' . $regs[2];
+					}
+				}
 			}
 		}
 		return true;
@@ -686,13 +707,18 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * reset their passwords and give themselves a valid password to log in
 	 * without Facebook. This only works if the user specifies a blank password
 	 * and hasn't already given themselves one.
-	 *
+	 * 
 	 * To that effect, you may want to modify the 'resetpass-wrong-oldpass' msg.
-	 *
+	 * 
 	 * Before version 1.14, MediaWiki used Special:Preferences to reset
 	 * passwords instead of Special:ChangePassword, so this hook won't get
 	 * called and Facebook users won't be able to give themselves a password
 	 * unless they request one over email.
+	 * 
+	 * TODO: A potential security flaw is exposed for users who run untrusted
+	 * JavaScript code. Because no password exists, JavaScript could set a new
+	 * password without the user's knowledge. To guard against this, we need to
+	 * send the user an email and preemptively generate a password reset token.
 	 */
 	public static function UserComparePasswords( $hash, $password, $userId, &$result ) {
 		global $wgUser;
