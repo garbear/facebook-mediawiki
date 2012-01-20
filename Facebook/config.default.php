@@ -154,8 +154,9 @@ $wgFbAjax = true;
 $wgFbDisableLogin = false;
 
 /**
- * Shows the real name for all Facebook users in the personal toolbar (in the
- * upper right) instead of their wiki username.
+ * Shows the real name instead of the wiki username for all Facebook users in
+ * the personal toolbar (in the upper right) and on Special:ListUsers. Note
+ * that changelogs still use wiki usernames.
  */
 $wgFbUseRealName = false;
 
