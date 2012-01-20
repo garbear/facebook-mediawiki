@@ -77,16 +77,21 @@ class FacebookOpenGraph {
 		
 		if ( count( $args ) ) {
 			foreach ( $args as $key => $value ) {
+				// Expand template arguments
+				$value = trim( $parser->replaceVariables( $value, $frame ) );
 				// Check if $value is a wiki link
-				$url = '';
-				if (substr($value, 0, 2) == '[[' && substr($value, strlen($value)-2, 2) == ']]') {
-					$pageName = substr( $value, 2, strlen($value) - 4 );
-					$title = Title::newFromText( $pageName );
-					if ( $title instanceof Title ) {
-						$url = $title->getFullURL();
+				if ( substr($value, 0, 2) == '[[' ) {
+					$resolved = $parser->replaceInternalLinks( $value );
+					$parser->replaceLinkHolders( $resolved );
+					preg_match( '/^<a\b[^<>]*?\bhref=("[^"]*"|\'[^\']*\')/', $resolved, $matches );
+					if ( count( $matches ) >= 2 ) {
+						global $wgServer;
+						// strip quotes
+						$matches[1] = substr( $matches[1], 1, strlen( $matches[1] ) - 2 );
+						$url = $wgServer . $matches[1];
 					}
 				}
-				$value = ( $url != '' ? $url : $parser->recursiveTagParse( $value, $frame ) );
+				$value = !empty( $url ) ? $url : $parser->recursiveTagParse( $value, $frame );
 				$args[$key] = htmlspecialchars( $value );
 			}
 			self::registerProperties($parser->getTitle(), $args);
@@ -97,7 +102,8 @@ class FacebookOpenGraph {
 			// See if the action is available for the object type
 			$actions = self::getActions(self::newObjectFromTitle($parser->getTitle()));
 			if ( count( $actions ) && in_array( $action, $actions ) ) {
-				return '<a href="#' . $action . '">' . $parser->recursiveTagParse( $innertext, $frame ) . '</a>';
+				$innertext = htmlspecialchars( $parser->replaceVariables( $innertext, $frame ) );
+				return '<a href="#' . $action . '">' . $innertext . '</a>';
 			}
 		}
 		return '';
@@ -128,16 +134,18 @@ class FacebookOpenGraph {
 		if ( self::$customObjects === NULL ) {
 			self::$customObjects = array();
 			global $wgFbOpenGraphCustomActions;
-			foreach ( $wgFbOpenGraphCustomActions as $action => $objects ) {
-				if ( is_string( $objects ) ) {
-					$objects = array( $objects );
-				}
-				if ( is_array( $objects ) ) {
-					foreach ( $objects as $object ) {
-						if ( !isset( self::$customObjects[$object] ) ) {
-							self::$customObjects[$object] = array( $action );
-						} else {
-							self::$customObjects[$object][] = $action;
+			if ( !empty( $wgFbOpenGraphCustomActions ) ) {
+				foreach ( $wgFbOpenGraphCustomActions as $action => $objects ) {
+					if ( is_string( $objects ) ) {
+						$objects = array( $objects );
+					}
+					if ( is_array( $objects ) ) {
+						foreach ( $objects as $object ) {
+							if ( !isset( self::$customObjects[$object] ) ) {
+								self::$customObjects[$object] = array( $action );
+							} else {
+								self::$customObjects[$object][] = $action;
+							}
 						}
 					}
 				}
