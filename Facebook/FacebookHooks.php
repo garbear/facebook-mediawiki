@@ -392,6 +392,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	public static function ParserAfterTidy(&$parser, &$text) {
 		global $wgFbOpenGraph, $wgOut;
 		if ( !empty( $wgFbOpenGraph ) ) {
+			
+			$parser->disableCache();
+			
 			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
 			if ( $object ) {
 				if ( $object->needsDescription() ) {
@@ -541,16 +544,20 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
 	 */
 	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
-		global $wgFbOpenGraph, $wgFbNamespace;
+		global $wgFbOpenGraph, $wgFbNamespace, $wgFbOpenGraphRegisteredObjects;
 		// If there are no Open Graph tags, we can skip this step
 		if ( !empty( $wgFbOpenGraph ) ) {
 			$head = '<head prefix="og: http://ogp.me/ns#';
 			// I think this is for the fb:app_id and fp:page_id meta tags (see link),
 			// but your guess is as good as mine
-			// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
+			// https://developers.facebook.com/docs/opengraph/objects/builtin/
 			$head .= ' fb: http://ogp.me/ns/fb#';
 			if ( FacebookAPI::isNamespaceSetup() ) {
 				$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
+			}
+			// Use article prefix for built-in type (when $wgFbOpenGraphRegisteredObjects['article'] is empty)
+			if (empty($wgFbOpenGraphRegisteredObjects) || empty($wgFbOpenGraphRegisteredObjects['article'])) {
+				$head .= ' article: http://ogp.me/ns/article#';
 			}
 			$head .= '">';
 			

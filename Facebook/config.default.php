@@ -78,7 +78,7 @@ $wgFbOpenGraph = true;
  * The image type is not yet implemented (only articles for now).
  */
 $wgFbOpenGraphRegisteredObjects = array(
-#	'article' => 'article', # Set these to the object's name if you register it in the Open Graph Dashboard
+#	'article' => 'article', # Comment out to use the built-in type
 #	'image'   => 'image',   # Not implemented yet
 );
 
