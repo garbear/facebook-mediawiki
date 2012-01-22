@@ -32,9 +32,12 @@ class FacebookTimeline {
 	 * Install the hooks for Timeline events.
 	 */
 	public static function init() {
-		$hooks = FacebookInit::enumMethods( 'FacebookTimelineHooks' );
-		foreach( $hooks as $hookName ) {
-			$wgHooks[$hookName][] = "FacebookTimelineHooks::$hookName";
+		global $wgFbOpenGraph, $wgFbOpenGraphRegisteredActions;
+		if ( !empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions) ) {
+			$hooks = FacebookInit::enumMethods( 'FacebookTimelineHooks' );
+			foreach( $hooks as $hookName ) {
+				$wgHooks[$hookName][] = "FacebookTimelineHooks::$hookName";
+			}
 		}
 	}
 }

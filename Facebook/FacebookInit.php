@@ -79,8 +79,8 @@ class FacebookInit {
 			}
 		}
 		
-		// Install FacebookTimeline hooks (disabled for now)
-		//FacebookTimeline::init();
+		// Install FacebookTimeline hooks
+		FacebookTimeline::init();
 		
 		// Default to pull new info from Facebook
 		global $wgDefaultUserOptions;
