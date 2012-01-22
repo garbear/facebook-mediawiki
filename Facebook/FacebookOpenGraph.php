@@ -100,7 +100,8 @@ class FacebookOpenGraph {
 		// TODO: Insert a placeholder so that actions can be placed above type definitions on the page
 		if ( $action != '' ) {
 			// See if the action is available for the object type
-			$actions = self::getActions(self::newObjectFromTitle($parser->getTitle()));
+			$object = self::newObjectFromTitle( $parser->getTitle() );
+			$actions = $object->getCustomActions();
 			if ( count( $actions ) && in_array( $action, $actions ) ) {
 				$innertext = htmlspecialchars( $parser->replaceVariables( $innertext, $frame ) );
 				return '<a href="#' . $action . '">' . $innertext . '</a>';
@@ -124,47 +125,35 @@ class FacebookOpenGraph {
 	}
 	
 	/**
-	 * Returns the actions that are registered for the given object.
+	 * Inverts the $wgFbOpenGraphCustomActions array. Instead of
+	 * action => array( objects ) we now have object => array( actions ).
+	 * 
+	 * Only returns objects defined in this array. If a custom object is
+	 * registered with Facebook, but not connected to an action and/or specified
+	 * by $wgFbOpenGraphCustomActions, it can still be used on a page.
 	 */
-	static $customObjects = NULL;
-	public static function getActions($openGraphObject) {
-		$actions = array();
+	private static $customObjects = NULL;
+	public static function getActionObjects() {
+		global $wgFbOpenGraphCustomActions;
 		
-		// Invert the array the first time through
-		if ( self::$customObjects === NULL ) {
+		if ( self::$customObjects === NULL && !empty( $wgFbOpenGraphCustomActions ) ) {
 			self::$customObjects = array();
-			global $wgFbOpenGraphCustomActions;
-			if ( !empty( $wgFbOpenGraphCustomActions ) ) {
-				foreach ( $wgFbOpenGraphCustomActions as $action => $objects ) {
-					if ( is_string( $objects ) ) {
-						$objects = array( $objects );
-					}
-					if ( is_array( $objects ) ) {
-						foreach ( $objects as $object ) {
-							if ( !isset( self::$customObjects[$object] ) ) {
-								self::$customObjects[$object] = array( $action );
-							} else {
-								self::$customObjects[$object][] = $action;
-							}
+			foreach ( $wgFbOpenGraphCustomActions as $action => $objects ) {
+				if ( is_string( $objects ) ) {
+					$objects = array( $objects );
+				}
+				if ( is_array( $objects ) ) {
+					foreach ( $objects as $object ) {
+						if ( !isset( self::$customObjects[$object] ) ) {
+							self::$customObjects[$object] = array( $action );
+						} else {
+							self::$customObjects[$object][] = $action;
 						}
 					}
 				}
 			}
 		}
-		
-		if ( $openGraphObject ) {
-			$type = $openGraphObject->getType();
-			// Start with actions matching the specified object
-			if ( isset( self::$customObjects[$type] ) ) {
-				$actions = self::$customObjects[$type];
-			}
-			// Merge in actions matching all objects ('*')
-			if ( isset( self::$customObjects['*'] ) ) {
-				$actions = array_merge( self::$customObjects['*'], $actions );
-			}
-		}
-		
-		return $actions;
+		return self::$customObjects;
 	}
 	
 	/**
@@ -369,6 +358,28 @@ abstract class OpenGraphObject {
 				$this->properties[$name] = $value;
 			}
 		}
+	}
+	
+	/**
+	 * Returns the actions that are registered for the object by
+	 * $wgFbOpenGraphCustomActions.
+	 */
+	public function getCustomActions() {
+		$actions = array();
+		$customObjects = FacebookOpenGraph::getActionObjects();
+		
+		// Start with actions matching the specified object
+		$type = $this->getType();
+		if ( isset( $customObjects[$type] ) ) {
+			$actions = $customObjects[$type];
+		}
+		
+		// Merge in actions matching all objects ('*')
+		if ( isset( $customObjects['*'] ) ) {
+			$actions = array_merge( $customObjects['*'], $actions );
+		}
+		
+		return $actions;
 	}
 	
 	/**
