@@ -29,11 +29,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FacebookTimeline {
 	/**
-	 * Install the hooks for Timeline events.
+	 * Install hooks for the Timeline events.
 	 */
 	public static function init() {
 		global $wgFbOpenGraph, $wgFbOpenGraphRegisteredActions;
-		if ( !empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions) ) {
+		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
 			$hooks = FacebookInit::enumMethods( 'FacebookTimelineHooks' );
 			foreach( $hooks as $hookName ) {
 				$wgHooks[$hookName][] = "FacebookTimelineHooks::$hookName";
@@ -53,13 +53,13 @@ class FacebookTimelineHooks {
 	 * @author Garrett Brown
 	 * @author Sean Colombo
 	 */
-	public static function AchievementsNotification($user, $badg) {
+	public static function AchievementsNotification($user, $badge) {
 		global $wgSitename;
-		
-		if ( $badg->getTypeId() != BADGE_WELCOME ) {
-			$name = $badg->getName();
-			$img  = $badg->getPictureUrl();
-			$desc = $badg->getPersonalGivenFor();
+		/*
+		if ( $badge->getTypeId() != BADGE_WELCOME ) {
+			$name = $badge->getName();
+			$img  = $badge->getPictureUrl();
+			$desc = $badge->getPersonalGivenFor();
 			$title = Title::makeTitle( NS_USER, $user->getName() );
 			$params = array(
 				'$ACHIE_NAME'  => $name,
@@ -70,7 +70,7 @@ class FacebookTimelineHooks {
 			);
 			FacebookPushEvent::pushEvent('facebook-msg-OnAchBadge', $params, 'FBPush_OnAchBadge');
 		}
-		
+		*/
 		return true;
 	}
 	
@@ -81,6 +81,7 @@ class FacebookTimelineHooks {
 	 */
 	public static function ArticleAfterVote($user_id, &$page, $vote) {
 		global $wgSitename;
+		/*
 		$article = Article::newFromID( $page );
 		$params = array(
 			'$ARTICLENAME' => $article->getTitle()->getText(),
@@ -92,6 +93,7 @@ class FacebookTimelineHooks {
 			'$ARTICLE_OBJ' => $article,
 		);
 		FacebookPushEvent::pushEvent('facebook-msg-OnRateArticle', $params, 'FBPush_OnRateArticle' );
+		*/
 		return true;
 	}
 	
@@ -103,7 +105,7 @@ class FacebookTimelineHooks {
 	public static function ArticleSave(&$article, &$user, &$text, &$summary, $minor,
 			$watchthis, /*unused*/ $section, &$flags, &$status) {
 		global $wgContentNamespaces, $wgSitename;
-		
+		/*
 		if ( in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
 			$matches = array();
 			$expr = "/\[\[\s*(video):.*?\]\]/i";
@@ -120,7 +122,7 @@ class FacebookTimelineHooks {
 				FacebookPushEvent::pushEvent('facebook-msg-OnAddVideo', $params, 'FBPush_OnAddVideo');
 			}
 		}
-		
+		*/
 		return true;
 	}
 	
@@ -132,7 +134,7 @@ class FacebookTimelineHooks {
 	public static function ArticleSaveComplete(&$article, &$user, $text, $summary, $minoredit,
 			$watchthis, /*unused*/ $section, &$flags, $revision, &$status, $baseRevId, &$redirect) {
 		global $wgSitename;
-		
+		/*
 		// Blog post
 		if ( strlen( $article->getId() ) ) {
 			// Only push if it's a newly created article
@@ -150,7 +152,7 @@ class FacebookTimelineHooks {
 				}
 			}
 		}
-		
+		/**
 		// Article comment
 		global $wgEnableArticleCommentsExt;
 		if ( !empty( $wgEnableArticleCommentsExt ) ) {
@@ -169,7 +171,7 @@ class FacebookTimelineHooks {
 				FacebookPushEvent::pushEvent('facebook-msg-OnArticleComment', $params, 'FBPush_OnArticleComment');
 			}
 		}
-		
+		/**
 		// Blog comment
 		if( defined('NS_BLOG_ARTICLE_TALK') && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE_TALK ) {
 			$title_explode = explode('/', $article->getTitle()->getText());
@@ -185,7 +187,7 @@ class FacebookTimelineHooks {
 			);
 			FacebookPushEvent::pushEvent('facebook-msg-OnBlogComment', $params, 'FBPush_OnBlogComment');
 		}
-		
+		/**
 		// Large edit
 		global $wgContentNamespaces;
 		// Make sure something has changed
@@ -212,7 +214,7 @@ class FacebookTimelineHooks {
 				}
 			}
 		}
-		
+		/**
 		// Add image
 		if ( $article->getTitle()->getNamespace() == NS_FILE ) {
 			$img = wfFindFile( $article->getTitle()->getText() );
@@ -220,7 +222,7 @@ class FacebookTimelineHooks {
 				self::uploadNews($img, $img->title->getText(), $img->title->getFullUrl('?ref=fbfeed&fbtype=addimage'));
 			}
 		}
-		
+		/**/
 		return true;
 	}
 	
@@ -231,10 +233,12 @@ class FacebookTimelineHooks {
 	 */
 	public static function UploadComplete(&$image) {
 		global $wgServer, $wgSitename;
+		/*
 		$localFile = $image->getLocalFile();
 		if ( $localFile->mLocalFile->media_type == 'BITMAP' ) {
 			self::uploadNews($localFile, $localFile->getTitle(), $localFile->getTitle()->getFullUrl('?ref=fbfeed&fbtype=addimage'));
 		}
+		*/
 		return true;
 	}
 	
@@ -245,7 +249,7 @@ class FacebookTimelineHooks {
 	 */
 	private static function uploadNews($image, $name, $url) {
 		global $wgSitename;
-		
+		/*
 		$is = new imageServing( array(), 90 );
 		$thumb_url = $is->getThumbnails( array( $image ) );
 		$thumb_url = array_pop( $thumb_url );
@@ -258,7 +262,7 @@ class FacebookTimelineHooks {
 			'$EVENTIMG'    => $thumb_url,
 		);
 		FacebookPushEvent::pushEvent('facebook-msg-OnAddImage', $params, 'FBPush_OnAddImage');
-		
+		*/
 		return true;
 	}
 	
@@ -277,6 +281,13 @@ class FacebookTimelineHooks {
 	}
 	
 	/**
+	 * 
+	 */
+	public static function UnwatchArticleComplete(&$user, &$article) {
+		return true;
+	}
+	
+	/**
 	 * Pushes an item to the Facebook user's Timeline when they add an article
 	 * to their watchlist.
 	 * @author Garrett Brown
@@ -284,7 +295,6 @@ class FacebookTimelineHooks {
 	 */
 	public static function WatchArticleComplete(&$user, &$article) {
 		global $wgSitename, $wgRequest;
-		
 		/*
 		if ( $wgRequest->getVal( 'action', '' ) != 'submit' ) {
 			if ( $article->getTitle()->getFirstRevision() ) {
@@ -298,8 +308,7 @@ class FacebookTimelineHooks {
 				FacebookPushEvent::pushEvent('facebook-msg-OnWatchArticle', $params, 'FBPush_OnWatchArticle');
 			}
 		}
-		*/
-		
+		/**
 		global $facebook;
 		if ( self::getAction('watch') ) {
 			if ( $facebook->getUser() ) {
@@ -312,7 +321,7 @@ class FacebookTimelineHooks {
 				} catch ( FacebookApiException $e ) { }
 			}
 		}
-		
+		/**/
 		return true;
 	}
 }
