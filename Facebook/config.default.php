@@ -64,19 +64,13 @@ $wgFbAllowDebug = true;
 $wgFbOpenGraph = true;
 
 /**
- * By default, this extension will use generic Open Graph object types for your
- * wiki. Wiki pages will be of type "article" and images will be of type
- * "image". This isn't necessary, but if you register these objects in your
- * application's Open Graph Dashboard, define them here. This will cause object
- * types to be prefixed with your app's namespace.
+ * By default, built-in Open Graph object types will be used for articles and
+ * images on the wiki. If you register custom object types for these wiki items
+ * in the Open Graph Dashboard, define them here.
  * 
- * (To my knowledge, there is currently no difference between type "article" and
- * type "NAMESPACE:article". The only difference I can find is a small bug; when
- * you define Open Graph actions below, the actions ignore some built-in objects
- * including article and image. Thus, the actions must be connected to your
- * custom article and image objects. This behavior was observed on the first day
- * Open Graph went live: Jan. 18, 2012. If Facebook fixes this bug I'll update
- * the documentation in the next version of the extension.)
+ * There are not many differences between built-in objects and custom objects.
+ * One exception is that custom objects' types are preceeded by your namespace,
+ * "NAMESPACE:article" as opposed to just "article".
  * 
  * If you registered and defined everything correctly, the Object Debugger on
  * Special:Connect/Debug should not show any errors.
