@@ -66,9 +66,9 @@ $wgFbOpenGraph = true;
 /**
  * By default, this extension will use generic Open Graph object types for your
  * wiki. Wiki pages will be of type "article" and images will be of type
- * "image". If you register these objects in your application's Open Graph
- * Dashboard, define them here. This will cause object types to be prefixed
- * with your app's namespace.
+ * "image". This isn't necessary, but if you register these objects in your
+ * application's Open Graph Dashboard, define them here. This will cause object
+ * types to be prefixed with your app's namespace.
  * 
  * (To my knowledge, there is currently no difference between type "article" and
  * type "NAMESPACE:article". The only difference I can find is a small bug; when
@@ -84,32 +84,24 @@ $wgFbOpenGraph = true;
  * The image type is not yet implemented (only articles for now).
  */
 $wgFbOpenGraphRegisteredObjects = array(
-#	'article' => 'article', # Uncomment after registering "article" object in the Open Graph Dashboard
+#	'article' => 'article', # Set these to the object's name if you register it in the Open Graph Dashboard
 #	'image'   => 'image',   # Not implemented yet
 );
 
 /**
- * (Note: this parameter currently has no effect. In the future, it will allow
- * actions to be pushed to a user's Timeline.)
- * 
- * When you register Open Graph actions for the objects above, it will be
+ * If you register Open Graph actions for the objects above, it will be
  * possible to push these actions to a user's Timeline. Actions can only be
  * published for their Connected Object Types; therefore, this setting only
  * takes effect when the objects are defined in $wgFbOpenGraphRegisteredObjects.
  * 
  * When you register these actions in the Open Graph Dashboard, connect them to
  * objects in this way:
- * 
  *    edit    => article
  *    tweak   => article
  *    discuss => article
  *    watch   => article, image
  *    protect => article, image
  *    upload  => image
- * 
- * (If you have ideas for additional actions, feel free to:
- *    Post a message to: http://www.mediawiki.org/wiki/Extension_talk:Facebook
- *    Or contact me on GitHub: https://github.com/garbear/)
  */
 #$wgFbOpenGraphRegisteredActions = array(
 #	'edit'    => 'edit',
@@ -144,19 +136,21 @@ $wgFbOpenGraphRegisteredObjects = array(
  * showcasing their interactions with your app.
  * 
  * Actions can be placed in your wiki using the same <opengraph> tag:
- * <opengraph action="drive">Drive the {{PAGENAME}}!</opengraph>. For more
- * in-depth documentation on the <opengraph> tag, refer to:
- * http://www.mediawiki.org/wiki/Extension:Facebook.
+ * <opengraph action="drive">Drive the {{PAGENAME}}!</opengraph>
+ * For further documentation on the <opengraph> tag, refer to:
+ * http://www.mediawiki.org/wiki/Extension:Facebook
  * 
- * (If you have ideas on how to integrate custom actions into the wiki, you
- * know the drill, let me know through the links above. Maybe a list of actions
- * in the "views" or "actions" toolbar. Maybe a checkbox e.g. "Drive the
- * Millennium Falcon!" shown when the user edits the wiki page. Or maybe
- * Facebook will design a <fb:action> social plugin or extend <fb:like> to
- * replace "like" with a custom action.)
+ * (If you are a developer, consider integrating these custom actions into your
+ * wiki. Maybe put a list of actions in the "views" or "actions" toolbar, or
+ * maybe show a checkbox e.g. "Drive the Millennium Falcon!" when a user edits
+ * the wiki page. Here's a hint:
+ *    $object = FacebookOpenGraph::newObjectFromTitle( $titleObject );
+ *    $actions = $object->getCustomActions();
+ * If you're not a developer, bug Facebook to design a <fb:action> social
+ * plugin or extend <fb:like> to replace "like" with a custom action.)
  * 
  * The asterisk '*' matches all custom (non-article and non-image) objects.
- * Again, check the Object Debugger for any errors. 
+ * Again, check the Object Debugger for any errors.
  * 
  * If your wiki monetizes advertising, action specs can be used in ad targeting
  * to reach out to people based on their actions. For more information see:
