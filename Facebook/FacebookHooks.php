@@ -394,6 +394,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		if ( !empty( $wgFbOpenGraph ) ) {
 			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
 			if ( $object ) {
+				if ( $object->needsDescription() ) {
+					$object->setDescriptionFromText( $text );
+				}
 				foreach ( $object->getProperties() as $property => $content ) {
 					$parser->mOutput->addHeadItem("<meta property=\"$property\" content=\"$content\" />\n", $property);
 				}

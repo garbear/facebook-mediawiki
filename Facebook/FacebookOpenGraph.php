@@ -445,24 +445,98 @@ class OpenGraphArticleObject extends OpenGraphObject {
 			$this->properties['og:image'] = $wgServer . $wgLogo;
 		}
 		
-		// og:description
-		if ( !isset( $override['og:description'] ) ) {
-			/*
-			 * TODO. This algorithm should work for vector: Start inside the rendered
-			 * page body, <div id="bodyContent">. Next, enter the actual body content,
-			 * <div class="mw-content-ltr">. Then, skip all tags that are not <p>. Now
-			 * that we have come to the actual page content, strip away all the html
-			 * tags and take the first 200 or so characters. Backtrack to find the end
-			 * of the last complete sentence and omit the remaining partial sentence.
-			 *
-			 * Perhaps this should be done in the BeforePageDisplay hook.
-			 */
-			$this->properties['og:description']  = '';
-		}
+		// og:description (defer until setDescriptionFromText())
 		
 		// Set properties with values found in the <opengraph> parser hook.
 		$this->setProperties( $override, false );
 		
 		parent::__construct();
+	}
+	
+	/**
+	 * Extracts a description from the article's text.
+	 * 
+	 * This function separates $text into its HTML sibling nodes. It then
+	 * searches for the first <p> sibling and returns the first sentence (up to
+	 * 300 chars) or multiple sentences to gaurantee at least 40 characters.
+	 */
+	public function setDescriptionFromText($text) {
+		
+		while ( $text != '' ) {
+			// Look for the next opening tag
+			preg_match( '/<([:A-Z_a-z0-9][:A-Z_a-z-.0-9]*)[^>]*>/', $text, $matches );
+			if ( count( $matches ) >= 2 ) {
+				$tag = $matches[1];
+				// No need to search the text again
+				$text = substr( $text, strpos( $text, $matches[0] ) + strlen( $matches[0] ) );
+				$self_terminated = substr_compare( $matches[0], '/>', -2, 2 ) === 0;
+				if ( !$self_terminated ) {
+					// Look for the closing tag
+					$endpos = 0;
+					$stack = array( $tag );
+					while ( count ( $stack ) ) {
+						preg_match( '@</?' . $tag . '[^>]*>@', $text, $matches, 0, $endpos );
+						if ( count( $matches ) ) {
+							$endpos = strpos( $text, $matches[0], $endpos ) + strlen( $matches[0] );
+							// Three cases - close tag, self-terminated or open tag
+							if ( substr( $matches[0], 1, 1 ) == '/' ) {
+								array_pop( $stack );
+							} else if ( substr_compare( $matches[0], '/>', -2, 2 ) === 0 ) {
+								continue;
+							} else {
+								array_push( $stack, $tag );
+							}
+						} else {
+							// No closing tag found, use the whole string
+							$endpos = strlen( $text );
+							break;
+						}
+					}
+					// Got the entire contents of the first tag
+					if ( $tag == 'p' ) {
+						$content = trim( strip_tags( substr( $text, 0, $endpos ) ) );
+						// Look for at least five words (~25 characters)
+						if ( strlen( $content ) > 25 ) {
+							// But don't be verbose
+							if ( strlen( $content ) > 300 ) {
+								$content = substr( $content, 0, 300 );
+							}
+							// Recompose to > 40 chars with as few sentences as possible
+							$sentences = explode( '.', $content );
+							$content = '';
+							while ( strlen( $content ) < 40 && count( $sentences ) ) {
+								// If it's the last sentence, strip the partial word
+								if ( count( $sentences ) == 1 && strlen( $sentences[0] ) > 1 ) {
+									$pos = strrpos( $sentences[0], ' ' );
+									if ( $pos !== false ) {
+										$sentences[0] = substr( $sentences[0], 0, $pos );
+									}
+								} else {
+									$sentences[0] .= '.';
+								}
+								$content .= array_shift( $sentences );
+							}
+							// Check again to see if we still have enough words
+							if ( strlen( $content ) > 25 ) {
+								$this->properties['og:description'] = $content;
+								break; // (return)
+							}
+						}
+					}
+					// Go on to the next tag
+					$text = substr( $text, $endpos );
+				}
+			} else {
+				// No more tags
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Returns true if no description has been set.
+	 */
+	public function needsDescription() {
+		return empty( $this->properties['og:description'] );
 	}
 }
