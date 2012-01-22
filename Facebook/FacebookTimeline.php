@@ -263,6 +263,20 @@ class FacebookTimelineHooks {
 	}
 	
 	/**
+	 * getAction()
+	 */
+	private static function getAction($action) {
+		global $wgFbNamespace, $wgFbOpenGraphRegisteredActions;
+		if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraph ) ) {
+			if ( !empty( $wgFbOpenGraphRegisteredActions ) &&
+					!empty( $wgFbOpenGraphRegisteredActions[$action] ) ) {
+				return $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredActions[$action];
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Pushes an item to the Facebook user's Timeline when they add an article
 	 * to their watchlist.
 	 * @author Garrett Brown
@@ -271,6 +285,7 @@ class FacebookTimelineHooks {
 	public static function WatchArticleComplete(&$user, &$article) {
 		global $wgSitename, $wgRequest;
 		
+		/*
 		if ( $wgRequest->getVal( 'action', '' ) != 'submit' ) {
 			if ( $article->getTitle()->getFirstRevision() ) {
 				$params = array(
@@ -281,6 +296,20 @@ class FacebookTimelineHooks {
 					'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
 				);
 				FacebookPushEvent::pushEvent('facebook-msg-OnWatchArticle', $params, 'FBPush_OnWatchArticle');
+			}
+		}
+		*/
+		
+		global $facebook;
+		if ( self::getAction('watch') ) {
+			if ( $facebook->getUser() ) {
+				echo "Here!\n";
+				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+				try {
+					$facebook->api( '/me/' . self::getAction('watch'), 'POST', array(
+							$object->getType() => $object->getUrl(),
+					) );
+				} catch ( FacebookApiException $e ) { }
 			}
 		}
 		
