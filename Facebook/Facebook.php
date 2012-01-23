@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright ï¿½ 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -27,7 +27,7 @@
  * @file
  * @ingroup Extensions
  * @author Garrett Brown, Sean Colombo
- * @copyright Copyright © 2008-2012 Garrett Brown, Sean Colombo
+ * @copyright Copyright ï¿½ 2008-2012 Garrett Brown, Sean Colombo
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
@@ -40,7 +40,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, Jan 16, 2012' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0-beta, Jan 20, 2012' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
