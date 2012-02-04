@@ -64,12 +64,36 @@ $wgFbAllowDebug = true;
 $wgFbOpenGraph = true;
 
 /**
+ * If you register Open Graph actions for the objects below, it will be possible
+ * to push these actions to a user's Timeline. Actions can only be published
+ * for their Connected Object Types; therefore, when you register these actions
+ * in the Open Graph Dashboard, connect them to objects in this way:
+ *    edit    => article
+ *    tweak   => article
+ *    discuss => article
+ *    watch   => article, image
+ *    protect => article, image
+ *    upload  => image
+ */
+$wgFbOpenGraphRegisteredActions = array(
+#	'edit'    => 'edit',    # uncomment if you register these actions...
+#	'tweak'   => 'tweak',   # for a minor edit
+#	'discuss' => 'discuss', # edit a talk page
+#	'watch'   => 'watch',
+#	'protect' => 'protect',
+#	'upload'  => 'upload',
+);
+
+/**
  * By default, built-in Open Graph object types will be used for articles and
  * images on the wiki. If you register custom object types for these wiki items
- * in the Open Graph Dashboard, define them here.
+ * in the Open Graph Dashboard, define them here. Is this necessary? Probably
+ * not; however, early versions of Facebook's Object Dashboard only let you
+ * connect the actions above to custom objects, not built-ins like article and
+ * image, so this setting remains on a "just in case" basis.
  * 
- * There are not many differences between built-in objects and custom objects.
- * One exception is that custom objects' types are preceeded by your namespace,
+ * I haven't found many differences between built-in objects and custom objects.
+ * One exception is that custom objects' types are preceeded by your namespace:
  * "NAMESPACE:article" as opposed to just "article".
  * 
  * If you registered and defined everything correctly, the Object Debugger on
@@ -83,30 +107,6 @@ $wgFbOpenGraphRegisteredObjects = array(
 );
 
 /**
- * If you register Open Graph actions for the objects above, it will be
- * possible to push these actions to a user's Timeline. Actions can only be
- * published for their Connected Object Types; therefore, this setting only
- * takes effect when the objects are defined in $wgFbOpenGraphRegisteredObjects.
- * 
- * When you register these actions in the Open Graph Dashboard, connect them to
- * objects in this way:
- *    edit    => article
- *    tweak   => article
- *    discuss => article
- *    watch   => article, image
- *    protect => article, image
- *    upload  => image
- */
-#$wgFbOpenGraphRegisteredActions = array(
-#	'edit'    => 'edit',
-#	'tweak'   => 'tweak', # for a minor edit
-#	'discuss' => 'discuss',
-#	'watch'   => 'watch',
-#	'protect' => 'protect',
-#	'upload'  => 'upload',
-#);
-
-/**
  * Here you can define custom objects and actions for your wiki.
  * 
  * Custom objects allow your wiki to more deeply integrate into the social graph.
@@ -117,10 +117,9 @@ $wgFbOpenGraphRegisteredObjects = array(
  * 
  * Custom actions allow your users to interact with objects in creative and
  * meaningful ways. In the example above, let's say the Star Wars wiki defines
- * the "drive" action in the Open Graph Dashboard and connects it to the
- * spaceship and landspeeder objects, and then specifies the relationship here:
- * 
- * $wgFbOpenGraphCustomActions['drive'] => array('spaceship', 'landspeeder');
+ * the "drive" action and connects it to the spaceship and landspeeder objects
+ * in the Open Graph Dashboard, and then specifies the relationship here:
+ *    $wgFbOpenGraphCustomActions['drive'] => array('spaceship', 'landspeeder');
  * 
  * When this action-object connection is made, the user's private activity log
  * (and maybe their friends' new feeds) will say "USER drove the [[Millennium
@@ -134,26 +133,24 @@ $wgFbOpenGraphRegisteredObjects = array(
  * For further documentation on the <opengraph> tag, refer to:
  * http://www.mediawiki.org/wiki/Extension:Facebook
  * 
- * (If you are a developer, consider integrating these custom actions into your
- * wiki. Maybe put a list of actions in the "views" or "actions" toolbar, or
- * maybe show a checkbox e.g. "Drive the Millennium Falcon!" when a user edits
- * the wiki page. Here's a hint:
- *    $object = FacebookOpenGraph::newObjectFromTitle( $titleObject );
- *    $actions = $object->getCustomActions();
- * If you're not a developer, bug Facebook to design a <fb:action> social
- * plugin or extend <fb:like> to replace "like" with a custom action.)
+ * If your wiki monetizes advertising, action specs can be used in ad targeting
+ * to reach out to people based on their actions. For more information see:
+ * https://developers.facebook.com/docs/reference/ads-api/action-specs-custom/
  * 
  * The asterisk '*' matches all custom (non-article and non-image) objects.
  * Again, check the Object Debugger for any errors.
  * 
- * If your wiki monetizes advertising, action specs can be used in ad targeting
- * to reach out to people based on their actions. For more information see:
- * https://developers.facebook.com/docs/reference/ads-api/action-specs-custom/
+ * Developer's cheat sheet:
+ *    $object = FacebookOpenGraph::newObjectFromTitle( $titleObject );
+ *    $actions = $object->getCustomActions();
+ * 
+ * If you're not a developer, pester Facebook to design a <fb:action> social
+ * plugin or extend <fb:like> to replace "like" with a custom action.
  */
-#$wgFbOpenGraphCustomActions = array(
+$wgFbOpenGraphCustomActions = array(
 #	'drive' => array('spaceship', 'landspeeder'),
 #	'want' => array('*'),
-#);
+);
 
 /**
  * Allow the use of social plugins in wiki text. To learn more about social
