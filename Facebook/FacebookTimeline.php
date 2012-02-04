@@ -28,7 +28,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * Inspired by FacebookHooks.php, this class contains entry points for Timeline
  * events. Hooks are established in FacebookInit::init().
  */
-class FacebookTimelineHooks {
+class FacebookTimeline {
 	/**
 	 * AchievementsNotification hook.
 	 * @author Garrett Brown
