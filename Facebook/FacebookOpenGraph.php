@@ -326,7 +326,7 @@ abstract class OpenGraphObject {
 	 * user's Graph.
 	 */
 	public function getUrl() {
-		return $this->propertes['og:url'];
+		return $this->properties['og:url'];
 	}
 	
 	/**
