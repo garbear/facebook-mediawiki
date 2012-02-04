@@ -80,7 +80,13 @@ class FacebookInit {
 		}
 		
 		// Install FacebookTimeline hooks
-		FacebookTimeline::init();
+		global $wgFbOpenGraphRegisteredActions;
+		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
+			$hooks = FacebookInit::enumMethods( 'FacebookTimeline' );
+			foreach( $hooks as $hookName ) {
+				$wgHooks[$hookName][] = "FacebookTimeline::$hookName";
+			}
+		}
 		
 		// Default to pull new info from Facebook
 		global $wgDefaultUserOptions;

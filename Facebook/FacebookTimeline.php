@@ -25,27 +25,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 
 /**
- * Class FacebookTimeline
- */
-class FacebookTimeline {
-	/**
-	 * Install hooks for the Timeline events.
-	 */
-	public static function init() {
-		global $wgFbOpenGraph, $wgFbOpenGraphRegisteredActions;
-		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
-			$hooks = FacebookInit::enumMethods( 'FacebookTimelineHooks' );
-			foreach( $hooks as $hookName ) {
-				$wgHooks[$hookName][] = "FacebookTimelineHooks::$hookName";
-			}
-		}
-	}
-}
-
-
-/**
  * Inspired by FacebookHooks.php, this class contains entry points for Timeline
- * events.
+ * events. Hooks are established in FacebookInit::init().
  */
 class FacebookTimelineHooks {
 	/**
