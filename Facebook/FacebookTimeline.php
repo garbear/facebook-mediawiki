@@ -30,6 +30,21 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class FacebookTimeline {
 	/**
+	 * Given a possible action defined in $wgFbOpenGraphRegisteredActions,
+	 * this function translates the action into the proper Open Graph ID
+	 * (which usually looks like NAMESPACE:action).
+	 */
+	private static function getAction($action) {
+		global $wgFbOpenGraph, $wgFbNamespace, $wgFbOpenGraphRegisteredActions;
+		if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraph ) &&
+				!empty( $wgFbOpenGraphRegisteredActions ) &&
+				!empty( $wgFbOpenGraphRegisteredActions[$action] ) ) {
+			return $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredActions[$action];
+		}
+		return false;
+	}
+	
+	/**
 	 * AchievementsNotification hook.
 	 * @author Garrett Brown
 	 * @author Sean Colombo
@@ -245,20 +260,6 @@ class FacebookTimeline {
 		FacebookPushEvent::pushEvent('facebook-msg-OnAddImage', $params, 'FBPush_OnAddImage');
 		*/
 		return true;
-	}
-	
-	/**
-	 * getAction()
-	 */
-	private static function getAction($action) {
-		global $wgFbNamespace, $wgFbOpenGraphRegisteredActions;
-		if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraph ) ) {
-			if ( !empty( $wgFbOpenGraphRegisteredActions ) &&
-					!empty( $wgFbOpenGraphRegisteredActions[$action] ) ) {
-				return $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredActions[$action];
-			}
-		}
-		return false;
 	}
 	
 	/**
