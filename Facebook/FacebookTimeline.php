@@ -263,47 +263,81 @@ class FacebookTimeline {
 	}
 	
 	/**
-	 * 
+	 * Pushes an item to the Facebook user's Timeline when they add an article
+	 * to their watchlist.
 	 */
-	public static function UnwatchArticleComplete(&$user, &$article) {
+	public static function WatchArticleComplete(&$user, &$article) {
+		global $facebook;
+		$id = $facebook->getUser();
+		if ( $id && self::getAction('watch') ) {
+			$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+			try {
+				// Publish the action
+				$facebook->api( "/$id/" . self::getAction('watch'), 'POST', array(
+						$object->getType() => $object->getUrl(),
+				) );
+			} catch ( FacebookApiException $e ) {
+				// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+			}
+		}
 		return true;
 	}
 	
 	/**
-	 * Pushes an item to the Facebook user's Timeline when they add an article
-	 * to their watchlist.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
+	 * Remove the watch action from the user's Timeline when they unwatch an
+	 * article.
 	 */
-	public static function WatchArticleComplete(&$user, &$article) {
-		global $wgSitename, $wgRequest;
-		/*
-		if ( $wgRequest->getVal( 'action', '' ) != 'submit' ) {
-			if ( $article->getTitle()->getFirstRevision() ) {
-				$params = array(
-					'$ARTICLENAME' => $article->getTitle()->getText(),
-					'$WIKINAME'    => $wgSitename,
-					'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=watcharticle'),
-					'$EVENTIMG'    => 'following.png',
-					'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
-				);
-				FacebookPushEvent::pushEvent('facebook-msg-OnWatchArticle', $params, 'FBPush_OnWatchArticle');
-			}
-		}
-		/**
+	public static function UnwatchArticleComplete(&$user, &$article) {
 		global $facebook;
 		if ( self::getAction('watch') ) {
-			if ( $facebook->getUser() ) {
-				echo "Here!\n";
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getId() == $user->getId()) {
 				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
 				try {
-					$facebook->api( '/me/' . self::getAction('watch'), 'POST', array(
-							$object->getType() => $object->getUrl(),
-					) );
-				} catch ( FacebookApiException $e ) { }
+					self::removeAction( 'watch', $object );
+				} catch ( FacebookApiException $e ) {
+					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+				}
 			}
 		}
-		/**/
 		return true;
+	}
+	
+	/**
+	 * Sometimes an action may expire (such as when the user unlikes an
+	 * article). This function requests data from Facebook and removes all
+	 * occurrences of the action-object connection.
+	 * 
+	 * The limit is currently set at 5000. If the limit is lowered to a more
+	 * practical number, the actions will be obtained recursively.
+	 * 
+	 * @throws FacebookApiException
+	 */
+	private static function removeAction($action, $object, $limit = 5000, $offset = 0, $accumulatedActions = NULL) {
+		global $facebook;
+		$actions = $facebook->api( '/' . $facebook->getUser() . '/' . self::getAction( $action ) .
+				"?offset=$offset&limit=$limit" );
+		
+		if ( isset( $actions['data'] ) ) {
+			if ( $accumulatedActions ) {
+				$accumulatedActions = array_merge( $accumulatedActions, $actions['data'] );
+			} else {
+				$accumulatedActions = $actions['data'];
+			}
+		}
+		
+		if ( isset( $actions['data'] ) && count ( $actions['data'] ) == $limit ) {
+			self::removeAction($action, $object,  $limit, $offset + $limit, $accumulatedActions);
+		} else if ( !empty( $accumulatedActions ) ) {
+			// Base case: we got all the actions
+			foreach ( $accumulatedActions as $action ) {
+				if ( isset($action['data']) && isset($action['data'][$object->getType()]) ) {
+					if ( $action['data'][$object->getType()]['url'] == $object->getUrl() ) {
+						$facebook->api( '/' . $action['id'], 'DELETE' );
+					}
+				}
+			}
+		}
+		
 	}
 }
