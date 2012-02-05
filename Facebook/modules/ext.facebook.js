@@ -112,9 +112,15 @@
 						// New connection, show a MergeAccount form
 						// 
 						// 2/5/12 - This is showing erratic behavior when the page first
-						// loads. For now, send all traffic directly to Special:Connect
-						//window.getAndShowGetForm('facebookmergeaccount');
+						// loads. For now, send all traffic directly to Special:Connect.
+						// It seems the root cause is that the AJAX request actually
+						// syncs the Facebook session to the server when it requests the
+						// form. If this is the cause, we can use it to our advantage.
+						// TODO: In FacebookInit::init(), only instantiate the Facebook
+						// API if it isn't an AJAX request. Then, in the AJAX form classes,
+						// instantiate the API *after* we compute the state of authentication.
 						window.getAndShowGetForm();
+						//window.getAndShowGetForm('facebookmergeaccount');
 					}
 				} else {
 					// User is trying to log in with Facebook. If the user exists, they will
