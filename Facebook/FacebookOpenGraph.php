@@ -63,8 +63,8 @@ class FacebookOpenGraph {
 	 * TODO: actions
 	 */
 	public static function parserHook($innertext, array $args, Parser $parser, PPFrame $frame) {
-		global $wgFbOpenGraph;
-		if ( empty( $wgFbOpenGraph ) ) {
+		global $wgFbOpenGraph, $wgFbOpenGraphCustomObjects;
+		if ( empty( $wgFbOpenGraph ) || empty( $wgFbOpenGraphCustomObjects ) ) {
 			return ''; // Open Graph is disabled for this wiki
 		}
 		
