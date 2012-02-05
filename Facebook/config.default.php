@@ -68,20 +68,25 @@ $wgFbOpenGraph = true;
  * to push these actions to a user's Timeline. Actions can only be published
  * for their Connected Object Types; therefore, when you register these actions
  * in the Open Graph Dashboard, connect them to objects in this way:
- *    edit    => article
- *    tweak   => article
- *    discuss => article
- *    watch   => article, image
- *    protect => article, image
- *    upload  => image
+ *    edit    = article
+ *    tweak   = article
+ *    discuss = article
+ *    watch   = article, image
+ *    protect = article, image
+ *    upload  = image
+ * 
+ * You can rename an action by specifying a different value; leave an action
+ * commented to disable it. "Tweak" is used when the minor edit box is checked
+ * or the edit is less than a MIN_CHARS_TO_EDIT constant you can define
+ * (default 10). If "tweak" isn't defined, "edit" will be used instead.
  */
 $wgFbOpenGraphRegisteredActions = array(
-#	'edit'    => 'edit',    # uncomment if you register these actions...
-#	'tweak'   => 'tweak',   # for a minor edit
-#	'discuss' => 'discuss', # edit a talk page
+#	'edit'    => 'edit',    # Uncomment each action you register...
+#	'tweak'   => 'tweak',   # Minor edit
+#	'discuss' => 'discuss', # Edit a talk page
 #	'watch'   => 'watch',
 #	'protect' => 'protect',
-#	'upload'  => 'upload',
+#	'upload'  => 'upload',  # Not implemented yet
 );
 
 /**

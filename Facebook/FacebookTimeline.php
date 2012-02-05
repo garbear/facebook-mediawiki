@@ -163,7 +163,8 @@ class FacebookTimeline {
 		if ( self::getAction( 'edit' ) || self::getAction( 'discuss' ) ) {
 			$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
 			
-			if ( $object->getType() == 'blog' && strlen( $article->getId() ) ) {
+			// Blog object
+			if ( $object->getType() == 'blog' ) {
 				// Blog post
 				if ( self::getAction( 'edit' ) && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE ) {
 					// Only push if it's a newly created article
@@ -196,50 +197,60 @@ class FacebookTimeline {
 				}
 			}
 			
-			/*
-			// Article comment
-			global $wgEnableArticleCommentsExt;
-			if ( !empty( $wgEnableArticleCommentsExt ) ) {
-				if ( $article->getTitle()->getNamespace() == NS_TALK && ($flags & EDIT_NEW) ) {
-					$title = explode('/', $article->getTitle()->getText());
-					$title = $title[0];
-					$title = Title::newFromText($title);
-					$id = $article->getId();
-					$params = array(
-						'$ARTICLENAME' => $title->getText(),
-						'$WIKINAME'    => $wgSitename,
-						'$ARTICLE_URL' => $title->getFullURL('ref=fbfeed&fbtype=articlecomment'),
-						'$EVENTIMG'    => 'comment.png',
-						'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
-					);
-					FacebookPushEvent::pushEvent('facebook-msg-OnArticleComment', $params, 'FBPush_OnArticleComment');
+			// Article object
+			if ( $object->getType() == 'article' ) {
+				// Subject page
+				global $wgContentNamespaces;
+				if ( self::getAction('edit') && in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
+					// Make sure something has changed
+					if ( !is_null( $revision ) ) {
+						// Do not push reverts
+						$baseRevision = Revision::newFromId( $baseRevId );
+						if ( !$baseRevision || $revision->getTextId() != $baseRevision->getTextId() ) {
+							// Check for minor edit action first
+							if ( !defined('MIN_CHARS_TO_EDIT') ) {
+								define('MIN_CHARS_TO_EDIT', 10);
+							}
+							if ( self::getAction('tweak') && ( $minoredit ||
+									(strlen( $text ) - strlen( $article->getRawText() ) <= MIN_CHARS_TO_EDIT) ) ) {
+								$fbUser = new FacebookUser();
+								if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+									try {
+										// Publish the action
+										$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('tweak'), 'POST', array(
+												$object->getType() => $object->getUrl(),
+										));
+									} catch ( FacebookApiException $e ) {
+										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+									}
+								}
+							} else if ( self::getAction('edit') ) {
+								$fbUser = new FacebookUser();
+								if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+									try {
+										// Publish the action
+										$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('edit'), 'POST', array(
+												$object->getType() => $object->getUrl(),
+										));
+									} catch ( FacebookApiException $e ) {
+										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+									}
+								}
+							}
+						}
+					}
 				}
-			}
-			*/
-			
-			/*
-			// Large edit
-			global $wgContentNamespaces;
-			// Make sure something has changed
-			if ( !is_null( $revision ) ) {
-				if ( in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
-					// Do not push reverts
-					$baseRevision = Revision::newFromId( $baseRevId );
-					if ( !$baseRevision || $revision->getTextId() != $baseRevision->getTextId() ) {
-						$diff = 0;
-						$wNewCount = strlen( $text );
-						$wOldCount = strlen( $article->getRawText() );
-						$countDiff = $wNewCount - $wOldCount;
-						if ( $countDiff > FacebookPushEvent::$MIN_CHARS_TO_PUSH ) {
-							$params = array(
-								'$ARTICLENAME' => $article->getTitle()->getText(),
-								'$WIKINAME'    => $wgSitename,
-								'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=largeedit'),
-								'$EVENTIMG'    => 'edits.png',
-								'$SUMMART'     => $summary,
-								'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article, $text))
-							);
-							FacebookPushEvent::pushEvent('facebook-msg-OnLargeEdit', $params, 'FBPush_OnLargeEdit');
+				// Talk page
+				else if ( self::getAction('discuss') && $article->getTitle()->isTalkPage() ) {
+					$fbUser = new FacebookUser();
+					if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+						try {
+							// Publish the action
+							$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('discuss'), 'POST', array(
+									$object->getType() => $object->getUrl(),
+							));
+						} catch ( FacebookApiException $e ) {
+							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
