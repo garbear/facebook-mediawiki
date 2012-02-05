@@ -52,7 +52,7 @@ class FacebookLanguage{
 		$langMapping = $wgMemc->get($memkey);
 		if(!$langMapping){
 			$langMapping = array();
-			wfLoadExtensionMessages('FacebookLanguage');
+			//wfLoadExtensionMessages('FacebookLanguage'); // Deprecated since 1.16
 			$rawMappingText = wfMsg( self::$messageKey );
 
 			// Split the message by line.
@@ -115,7 +115,7 @@ class FacebookLanguage{
 		
 		// Split the message by line.
 		$langMapping = array();
-		wfLoadExtensionMessages('FacebookLanguage');
+		//wfLoadExtensionMessages('FacebookLanguage'); // Deprecated since 1.16
 		$rawMappingText = wfMsg( self::$messageKey );
 		$lines = explode("\n", $rawMappingText);
 		foreach($lines as $line){

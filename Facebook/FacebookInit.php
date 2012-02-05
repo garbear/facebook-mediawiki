@@ -64,6 +64,12 @@ class FacebookInit {
 			'position'      => 'top',
 		) + $moduleInfo;
 		
+		$wgResourceModules['ext.facebook.actions'] = array(
+			'scripts'       => 'ext.facebook.actions.js',
+			'dependencies'  => array( 'ext.facebook.sdk' ),
+			'position'      => 'bottom',
+		) + $moduleInfo;
+		
 		$wgResourceModules['ext.facebook.application'] = array(
 				'scripts'       => 'ext.facebook.application.js',
 				'dependencies'  => array( 'ext.facebook.sdk' ),
@@ -76,6 +82,15 @@ class FacebookInit {
 		foreach( $hooks as $hookName ) {
 			if (!in_array( $hookName, $wgFbHooksToAddImmediately )) {
 				$wgHooks[$hookName][] = "FacebookHooks::$hookName";
+			}
+		}
+		
+		// Install FacebookTimeline hooks
+		global $wgFbOpenGraphRegisteredActions;
+		if (!empty($wgFbOpenGraph) && !empty($wgFbOpenGraphRegisteredActions)) {
+			$hooks = FacebookInit::enumMethods( 'FacebookTimeline' );
+			foreach( $hooks as $hookName ) {
+				$wgHooks[$hookName][] = "FacebookTimeline::$hookName";
 			}
 		}
 		

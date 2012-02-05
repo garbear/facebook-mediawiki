@@ -30,10 +30,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * This class allows FBML (Facebook Markup Language, an extension to HTML) to
  * be incorporated into the wiki through the use of XFBML.
  * 
- * For help on including these social plugins in your site, please see
- * <https://developers.facebook.com/docs/plugins/>. The next evolution of Open
- * Graph is currently in beta; for these new social plugins, see
- * <https://developers.facebook.com/docs/beta/plugins/>.
+ * For help on including these social plugins in your site, please see:
+ * https://developers.facebook.com/docs/plugins/
+ * 
+ * New Open Graph social plugins can also be used. For these, see:
+ * https://developers.facebook.com/docs/opengraph/plugins/
  */
 class FacebookXFBML {
 	/**
@@ -175,14 +176,14 @@ class FacebookXFBML {
 			return array( );
 		}
 		$tags = array('fb:activity',            # https://developers.facebook.com/docs/reference/plugins/activity
-		                                        # https://developers.facebook.com/docs/reference/plugins/activity2 (Open Graph beta version)
+		                                        # https://developers.facebook.com/docs/reference/plugins/activity2 (Open Graph version)
 		              'fb:add-profile-tab',     # Not in docs (deprecated?)
 		              'fb:add-to-timeline',     # https://developers.facebook.com/docs/reference/plugins/add-to-timeline
 		              'fb:bookmark',            # Not in docs (deprecated?)
 		              'fb:comments',            # https://developers.facebook.com/docs/reference/plugins/comments
 		              'fb:connect-bar',         # Not in docs (deprecated?)
 		              'fb:facepile',            # https://developers.facebook.com/docs/reference/plugins/facepile
-		                                        # https://developers.facebook.com/docs/reference/plugins/facepile2 (Open Graph beta version)
+		                                        # https://developers.facebook.com/docs/reference/plugins/facepile2 (Open Graph version)
 		              'fb:fan',                 # Not in docs (deprecated?)
 		              'fb:friendpile',          # Clone of fb:facepile, not in docs (deprecated?)
 		                                        # According to Facebook, fb:friendpile is a legal-friendly version of fb:facepile
@@ -196,7 +197,7 @@ class FacebookXFBML {
 		              //'fb:pronoun',           # Removed from the JS SDK
 		              'fb:question',            # Very new, not in docs (possibly still in testing)
 		              'fb:recommendations',     # https://developers.facebook.com/docs/reference/plugins/recommendations
-		                                        # https://developers.facebook.com/docs/reference/plugins/recommendations2 (Open Graph beta version)
+		                                        # https://developers.facebook.com/docs/reference/plugins/recommendations2 (Open Graph version)
 		              'fb:recommendations-bar', # https://developers.facebook.com/docs/reference/plugins/recommendationsbar
 		              'fb:registration',        # https://developers.facebook.com/docs/plugins/registration
 		              'fb:send',                # https://developers.facebook.com/docs/reference/plugins/send

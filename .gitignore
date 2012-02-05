@@ -2,3 +2,6 @@
 .settings
 .buildpath
 .project
+
+# Copy of config.default.php
+config.php

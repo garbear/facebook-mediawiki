@@ -187,17 +187,6 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			}
 		}
 		
-		// Add Open Graph tags to articles
-		global $wgFbOpenGraph;
-		if ( !empty( $wgFbOpenGraph ) ) {
-			$object = OpenGraphObject::newFromTitle( $skin->getTitle() );
-			if ( $object ) {
-				foreach ( $object->getProperties() as $property => $content ) {
-					$out->addHeadItem($property, "<meta property=\"$property\" content=\"$content\" />\n");
-				}
-			}
-		}
-		
 		return true;
 	} // BeforePageDisplay hook
 	
@@ -228,6 +217,18 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			#             '&xfbml=' . (!empty( $wgFbSocialPlugins ) ? '1' : '0');
 		}
 		return $fbScript;
+	}
+	
+	/**
+	 * Register the <opengraph> tag with the parser.
+	 */
+	public static function LanguageGetMagic( array &$magicWords, $langCode ) {
+		$tag = FacebookOpenGraph::GetTag( $langCode );
+		if ( $tag != '' ) {
+			// 0 == not case sensitive
+			$magicWords[$tag] = array( 0, $tag );
+		}
+		return true;
 	}
 	
 	/**
@@ -297,8 +298,9 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * Adds several Facebook variables to the page:
 	 */
 	public static function ResourceLoaderGetConfigVars( &$vars ) {
-		global $wgRequest, $wgStyleVersion, $wgVersion, $wgFbAppId, $wgFbSocialPlugins,
-				$wgFbAjax, $wgUser, $facebook;
+		global $wgRequest, $wgVersion, $wgFbAppId, $wgFbSocialPlugins, $wgFbAjax, $wgUser;
+		/*
+		// Disabled (ext.facebook.js still uses wgPageName, but not wgPageQuery)
 		if (!isset($vars['wgPageQuery'])) {
 			$query = $wgRequest->getValues();
 			if (isset($query['title'])) {
@@ -306,12 +308,13 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			}
 			$vars['wgPageQuery'] = wfUrlencode( wfArrayToCGI( $query ) );
 		}
-		$vars['wgStyleVersion'] = $wgStyleVersion;
+		*/
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
 		$vars['fbUseAjax']      = $wgFbAjax;
 		if ( $wgUser->isLoggedIn() ) {
+			global $facebook;
 			$ids = FacebookDB::getFacebookIDs($wgUser);
 			// If the Facebook session is invalid, let the client know who we expect
 			// to click "Log in with Facebook". Otherwise, if we have have a valid
@@ -343,7 +346,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			unset( $vars['fbScript'] ); // Made obsolete by ResourceLoader
 		}
 		
-		// We need fbAppAccessToken to be set here instead of loaded through
+		// We want fbAppAccessToken to be set here instead of loaded through
 		// ResourceLoader. I forget why this is the case, unfortunately.
 		global $wgFbAllowDebug;
 		if ( !empty( $wgFbAllowDebug ) ) {
@@ -381,14 +384,47 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	}
 	
 	/**
+	 * Add the Open Graph meta tags to the current page.
+	 * 
+	 * This hook is used instead of BeforePageDisplay, (I quote from mediawiki.org,)
+	 * "to make it easier on parser caching."
+	 */
+	public static function ParserAfterTidy(&$parser, &$text) {
+		global $wgFbOpenGraph, $wgOut;
+		if ( !empty( $wgFbOpenGraph ) ) {
+			
+			$parser->disableCache();
+			
+			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
+			if ( $object ) {
+				if ($object instanceof OpenGraphArticleObject && $object->needsDescription()) {
+					$object->setDescriptionFromText( $text );
+				}
+				foreach ( $object->getProperties() as $property => $content ) {
+					$parser->mOutput->addHeadItem("<meta property=\"$property\" content=\"$content\" />\n", $property);
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Installs a parser hook for every tag reported by FacebookXFBML::availableTags().
 	 * Accomplishes this by asking FacebookXFBML to create a hook function that then
 	 * redirects to FacebookXFBML::parserHook().
+	 *
+	 * Secondly, this function installs a parser hook for our <opengraph> tag.
 	 */
 	public static function ParserFirstCallInit( &$parser ) {
+		// XFBML tags (for example, <fb:login-button>)
 		$pHooks = FacebookXFBML::availableTags();
 		foreach( $pHooks as $tag ) {
-			$parser->setHook( $tag, FacebookXFBML::createParserHook( $tag ));
+			$parser->setHook( $tag, FacebookXFBML::createParserHook( $tag ) );
+		}
+		// Open Graph tag (for example, <opengraph type="article">)
+		$tag = FacebookOpenGraph::GetTag();
+		if ( $tag != '' ) {
+			$parser->setHook( $tag, 'FacebookOpenGraph::parserHook' );
 		}
 		return true;
 	}
@@ -415,7 +451,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 */
 	public static function PersonalUrls( &$personal_urls, &$title ) {
 		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		
 		// Transmogrify usernames into real names
 		if ( $wgUser->isLoggedIn() && !empty( $wgFbUseRealName ) ) {
@@ -508,16 +544,20 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * https://developers.facebook.com/docs/beta/opengraph/tutorial/
 	 */
 	static function SkinTemplateOutputPageBeforeExec(&$skin, &$tpl) {
-		global $wgFbOpenGraph, $wgFbNamespace;
+		global $wgFbOpenGraph, $wgFbNamespace, $wgFbOpenGraphRegisteredObjects;
 		// If there are no Open Graph tags, we can skip this step
 		if ( !empty( $wgFbOpenGraph ) ) {
 			$head = '<head prefix="og: http://ogp.me/ns#';
 			// I think this is for the fb:app_id and fp:page_id meta tags (see link),
 			// but your guess is as good as mine
-			// https://developers.facebook.com/docs/beta/opengraph/objects/builtin/
+			// https://developers.facebook.com/docs/opengraph/objects/builtin/
 			$head .= ' fb: http://ogp.me/ns/fb#';
 			if ( FacebookAPI::isNamespaceSetup() ) {
 				$head .= " $wgFbNamespace: http://ogp.me/ns/fb/$wgFbNamespace#";
+			}
+			// Use article prefix for built-in type (when $wgFbOpenGraphRegisteredObjects['article'] is empty)
+			if (empty($wgFbOpenGraphRegisteredObjects) || empty($wgFbOpenGraphRegisteredObjects['article'])) {
+				$head .= ' article: http://ogp.me/ns/article#';
 			}
 			$head .= '">';
 			
@@ -533,7 +573,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 *
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
 		global $wgRequest, $wgUser, $wgServer, $facebook;
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		$pref = Title::newFromText('Preferences', NS_SPECIAL);
 		if ($wgRequest->getVal('fbconnected', '') == 1) {
 			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
@@ -787,7 +827,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	static function initPreferencesExtensionForm( $user, &$preferences ) {
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
 		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/Facebook/prefs.js?{$wgStyleVersion}\"></script>\n");
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		$prefsection = 'facebook-prefstext';
 		
 		$id = FacebookDB::getFacebookIDs($user, DB_MASTER);
