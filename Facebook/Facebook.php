@@ -67,7 +67,6 @@ if (file_exists( $dir . 'config.php' )) {
 $wgExtensionFunctions[] = 'FacebookInit::init';
 
 $wgExtensionMessagesFiles['Facebook'] = $dir . 'Facebook.i18n.php';
-$wgExtensionMessagesFiles['FBPushEvents'] = $dir . 'pushEvents/FBPushEvents.i18n.php';
 $wgExtensionMessagesFiles['FacebookLanguage'] = $dir . 'FacebookLanguage.i18n.php';
 $wgExtensionAliasesFiles['Facebook'] = $dir . 'Facebook.alias.php';
 

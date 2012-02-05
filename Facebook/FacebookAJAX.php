@@ -108,7 +108,7 @@ class ApiFacebookChooseName extends ApiFacebookFormQuery {
 			$fbUser = new FacebookUser($params['id']);
 			
 			if ( !$fbUser->getMWUser()->getId() ) {
-				wfLoadExtensionMessages('Facebook');
+				// wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 				$specialConnect = new SpecialConnect();
 				$this->getResult()->addValue(null, null, $specialConnect->getChooseNameForm($params));
 			}
@@ -134,7 +134,7 @@ class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
 			$fbUser = new FacebookUser($params['id']);
 			
 			if ( !$fbUser->getMWUser()->getId() ) {
-				wfLoadExtensionMessages('Facebook');
+				//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 				$specialConnect = new SpecialConnect();
 				$this->getResult()->addValue(null, null, $specialConnect->getMergeAccountForm($params));
 			}
@@ -160,7 +160,7 @@ class ApiFacebookLogoutAndContinue extends ApiFacebookFormQuery {
 			$id = $fbUser->getMWUser()->getId();
 			
 			if ( $id ) {
-				wfLoadExtensionMessages('Facebook');
+				//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 				$specialConnect = new SpecialConnect();
 				$this->getResult()->addValue(null, null, $specialConnect->getLogoutAndContinueForm($params, $id));
 			} else {

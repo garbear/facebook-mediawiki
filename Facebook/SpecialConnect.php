@@ -102,7 +102,7 @@ class SpecialConnect extends SpecialPage {
 	public function sendPage($function, $arg = NULL) {
 		global $wgOut;
 		// Setup the page for rendering
-		wfLoadExtensionMessages( 'Facebook' );
+		//wfLoadExtensionMessages( 'Facebook' ); // Deprecated since 1.16
 		$this->setHeaders();
 		$wgOut->disallowUserJs();  # just in case...
 		$wgOut->setRobotPolicy( 'noindex,nofollow' );

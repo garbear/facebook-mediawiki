@@ -64,7 +64,7 @@ class FacebookPushEvent {
 		global $wgFbPushEventClasses, $wgUser;
 		wfProfileIn( __METHOD__ );
 		
-		wfLoadExtensionMessages( 'Facebook' );
+		//wfLoadExtensionMessages( 'Facebook' ); // Deprecated since 1.16
 		$id = FacebookDB::getFacebookIDs( $wgUser );
 		if( count( $id ) > 0 ) {			
 			if ( !empty( $wgFbPushEventClasses ) ) {

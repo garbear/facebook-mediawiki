@@ -451,7 +451,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 */
 	public static function PersonalUrls( &$personal_urls, &$title ) {
 		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		
 		// Transmogrify usernames into real names
 		if ( $wgUser->isLoggedIn() && !empty( $wgFbUseRealName ) ) {
@@ -573,7 +573,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 *
 	public static function SkinTemplatePageBeforeUserMsg(&$msg) {
 		global $wgRequest, $wgUser, $wgServer, $facebook;
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		$pref = Title::newFromText('Preferences', NS_SPECIAL);
 		if ($wgRequest->getVal('fbconnected', '') == 1) {
 			$id = FacebookDB::getFacebookIDs($wgUser, DB_MASTER);
@@ -827,7 +827,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	static function initPreferencesExtensionForm( $user, &$preferences ) {
 		global $wgOut, $wgJsMimeType, $wgExtensionsPath, $wgStyleVersion, $wgBlankImgUrl;
 		$wgOut->addScript("<script type=\"{$wgJsMimeType}\" src=\"{$wgExtensionsPath}/Facebook/prefs.js?{$wgStyleVersion}\"></script>\n");
-		wfLoadExtensionMessages('Facebook');
+		//wfLoadExtensionMessages('Facebook'); // Deprecated since 1.16
 		$prefsection = 'facebook-prefstext';
 		
 		$id = FacebookDB::getFacebookIDs($user, DB_MASTER);

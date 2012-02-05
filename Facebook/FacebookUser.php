@@ -670,7 +670,7 @@ class FacebookUser {
 	static function getUserNamePrefix() {
 		static $default = NULL;
 		if ( is_null( $default ) && empty( self::$userNamePrefix ) ) {
-			wfLoadExtensionMessages( 'Facebook' );
+			//wfLoadExtensionMessages( 'Facebook' ); // Deprecated since 1.16
 			$default = wfMsg('facebook-usernameprefix');
 			self::setUserNamePrefix( $default );
 		}
