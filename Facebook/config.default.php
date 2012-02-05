@@ -72,7 +72,10 @@ $wgFbOpenGraph = true;
  * Optionally, you can register a custom object type for articles. It will then
  * be used instead of the built-in type. (As far as I can tell, the only
  * difference is that custom objects are preceeded by your namespace:
- * "NAMESPACE:article" as opposed to just "article".)
+ * "NAMESPACE:article" as opposed to just "article.")
+ * 
+ * Depending on the extensions you have installed, several other object types
+ * are available. These include "blog" and "badge."
  * 
  * If you registered and defined everything correctly, the Object Debugger on
  * Special:Connect/Debug should not show any errors.
@@ -80,8 +83,6 @@ $wgFbOpenGraph = true;
 $wgFbOpenGraphRegisteredObjects = array(
 #	'article' => 'article', # Comment out to use your custom type
 #	'file'    => 'file',
-#	'blog'    => 'blog',    # Used by an extension on Wikia. Only takes effect
-#	                        # if you have the same extension installed.
 );
 
 /**
@@ -100,7 +101,8 @@ $wgFbOpenGraphRegisteredObjects = array(
  * commented to disable it. The "tweak" action is used when the minor edit box
  * is checked or an edit is less than the MIN_CHARS_TO_EDIT constant (default 10):
  *    define('MIN_CHARS_TO_EDIT', 10);
- * If "tweak" isn't defined, "edit" will be used instead.
+ * If "tweak" isn't defined, "edit" will be used instead. Extension-dependent
+ * actions inlude "rate" (articles) and "earn" (badges).
  */
 $wgFbOpenGraphRegisteredActions = array(
 #	'edit'    => 'edit',    # Uncomment each action you register...

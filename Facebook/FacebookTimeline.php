@@ -46,50 +46,54 @@ class FacebookTimeline {
 	
 	/**
 	 * AchievementsNotification hook.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
 	 */
 	public static function AchievementsNotification($user, $badge) {
-		global $wgSitename;
-		/*
-		if ( $badge->getTypeId() != BADGE_WELCOME ) {
-			$name = $badge->getName();
-			$img  = $badge->getPictureUrl();
-			$desc = $badge->getPersonalGivenFor();
-			$title = Title::makeTitle( NS_USER, $user->getName() );
-			$params = array(
-				'$ACHIE_NAME'  => $name,
-				'$ARTICLE_URL' => $title->getFullUrl("ref=fbfeed&fbtype=achbadge"),
-				'$WIKINAME'    => $wgSitename,
-				'$EVENTIMG'    => $img,
-				'$DESC'        => $desc
-			);
-			FacebookPushEvent::pushEvent('facebook-msg-OnAchBadge', $params, 'FBPush_OnAchBadge');
+		global $facebook;
+		if ( $badge->getTypeId() != BADGE_WELCOME && self::getAction( 'earn' ) ) {
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+				// TODO: Need to implement FacebookOpenGraph::newObjectFromBadge()
+				// This requires each badge to have a URL that Facebook can scrape for meta tags
+				$object = false && FacebookOpenGraph::newObjectFromBadge( $badge );
+				if ( $object ) {
+					try {
+						// Publish the action
+						$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('earn'), 'POST', array(
+								$object->getType() => $object->getUrl(),
+						));
+					} catch ( FacebookApiException $e ) {
+						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					}
+				}
+			}
 		}
-		*/
 		return true;
 	}
 	
 	/**
-	 * Adds an event to the Facebook user's Timeline when they rate an article.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
+	 * Add an action to the user's Timeline when they rate an article.
 	 */
 	public static function ArticleAfterVote($user_id, &$page, $vote) {
-		global $wgSitename;
-		/*
-		$article = Article::newFromID( $page );
-		$params = array(
-			'$ARTICLENAME' => $article->getTitle()->getText(),
-			'$WIKINAME'    => $wgSitename,
-			'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=ratearticle'),
-			'$RATING'      => $vote,
-			'$EVENTIMG'    => 'rating.png',
-			'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article)),
-			'$ARTICLE_OBJ' => $article,
-		);
-		FacebookPushEvent::pushEvent('facebook-msg-OnRateArticle', $params, 'FBPush_OnRateArticle' );
-		*/
+		global $facebook;
+		if ( self::getAction( 'rate' ) ) {
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getId() == $user_id ) {
+				$article = Article::newFromID( $page );
+				if ( $article instanceof Article ) {
+					$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+					if ( $object ) {
+						try {
+							// Publish the action
+							$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('rate'), 'POST', array(
+									$object->getType() => $object->getUrl(),
+							));
+						} catch ( FacebookApiException $e ) {
+							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						}
+					}
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -121,35 +125,6 @@ class FacebookTimeline {
 				}
 			}
 		}
-		return true;
-	}
-	
-	/**
-	 * Adds an event to the Facebook user's Timeline when they add a video to the site.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
-	 */
-	public static function ArticleSave(&$article, &$user, &$text, &$summary, $minor,
-			$watchthis, /*unused*/ $section, &$flags, &$status) {
-		global $wgContentNamespaces, $wgSitename;
-		/*
-		if ( in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
-			$matches = array();
-			$expr = "/\[\[\s*(video):.*?\]\]/i";
-			$wNewCount = preg_match_all( $expr, $newText, $matches );
-			$wOldCount = preg_match_all( $expr,  $article->getRawText(), $matches );
-			$countDiff = $wNewCount - $wOldCount;
-			if ($countDiff > 0) {
-				$params = array(
-					'$ARTICLENAME' => $article->getTitle()->getText(),
-					'$WIKINAME'    => $wgSitename,
-					'$ARTICLE_URL' => $article->getTitle()->getFullURL("ref=fbfeed&fbtype=addvideo"),
-					'$EVENTIMG'    => 'video.png'
-				);
-				FacebookPushEvent::pushEvent('facebook-msg-OnAddVideo', $params, 'FBPush_OnAddVideo');
-			}
-		}
-		*/
 		return true;
 	}
 	
@@ -273,7 +248,7 @@ class FacebookTimeline {
 	public static function UploadComplete(&$image) {
 		global $facebook;
 		if ( self::getAction( 'upload' ) ) {
-			// Because I don't know what version mLocalFile became getLocalFile()
+			// Because I don't know what version mLocalFile turned into getLocalFile()
 			try {
 				if ( $image->getLocalFile()->fileExists ) {
 					$file = $image->getLocalFile();
@@ -306,30 +281,6 @@ class FacebookTimeline {
 				}
 			}
 		}
-		return true;
-	}
-	
-	/**
-	 * Called from ArticleSaveComplete() and UploadComplete().
-	 * @author Garrett Brown
-	 * @author Sean Colombo
-	 */
-	private static function uploadNews($image, $name, $url) {
-		global $wgSitename;
-		/*
-		$is = new imageServing( array(), 90 );
-		$thumb_url = $is->getThumbnails( array( $image ) );
-		$thumb_url = array_pop( $thumb_url );
-		$thumb_url = $thumb_url['url'];
-		$params = array(
-			'$IMGNAME'     => $name,
-			'$ARTICLE_URL' => $url, // Internal use
-			'$WIKINAME'    => $wgSitename,
-			'$IMG_URL'     => $url,
-			'$EVENTIMG'    => $thumb_url,
-		);
-		FacebookPushEvent::pushEvent('facebook-msg-OnAddImage', $params, 'FBPush_OnAddImage');
-		*/
 		return true;
 	}
 	
