@@ -480,12 +480,6 @@ class FacebookUser {
 			$this->user->setOption($prefName, $wgRequest->getCheck($prefName) ? '1' : '0');
 		}
 		
-		// Default to automatically login Facebook users
-		// TODO: Don't remember password for Facebook users! If their access_token is
-		// invalidated, we need to get a new one by having them click "login" again
-		$this->user->setOption( 'rememberpassword', 1 );
-		//$this->user->setOption( 'skinoverwrite', 1 ); // Wikia code
-		
 		// I think this should be done here
 		$this->user->setToken();
 		
