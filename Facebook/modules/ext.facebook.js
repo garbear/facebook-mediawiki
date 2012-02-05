@@ -110,7 +110,11 @@
 						}
 					} else {
 						// New connection, show a MergeAccount form
-						window.getAndShowGetForm('facebookmergeaccount');
+						// 
+						// 2/5/12 - This is showing erratic behavior when the page first
+						// loads. For now, send all traffic directly to Special:Connect
+						//window.getAndShowGetForm('facebookmergeaccount');
+						window.getAndShowGetForm();
 					}
 				} else {
 					// User is trying to log in with Facebook. If the user exists, they will
