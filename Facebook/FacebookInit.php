@@ -64,6 +64,12 @@ class FacebookInit {
 			'position'      => 'top',
 		) + $moduleInfo;
 		
+		$wgResourceModules['ext.facebook.actions'] = array(
+			'scripts'       => 'ext.facebook.actions.js',
+			'dependencies'  => array( 'ext.facebook.sdk' ),
+			'position'      => 'bottom',
+		) + $moduleInfo;
+		
 		$wgResourceModules['ext.facebook.application'] = array(
 				'scripts'       => 'ext.facebook.application.js',
 				'dependencies'  => array( 'ext.facebook.sdk' ),

@@ -59,8 +59,6 @@ class FacebookOpenGraph {
 	 * when clicked, adds an action to the Facebook user's Timeline with the
 	 * wiki page as the target object. If no action is given, $innertext is
 	 * discarded.
-	 * 
-	 * TODO: actions
 	 */
 	public static function parserHook($innertext, array $args, Parser $parser, PPFrame $frame) {
 		global $wgFbOpenGraph, $wgFbOpenGraphCustomObjects;
@@ -103,8 +101,14 @@ class FacebookOpenGraph {
 			$object = self::newObjectFromTitle( $parser->getTitle() );
 			$actions = $object->getCustomActions();
 			if ( count( $actions ) && in_array( $action, $actions ) ) {
+				// Let the page know it should load the actions module
+				if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
+					global $wgOut;
+					$wgOut->addModules( 'ext.facebook.actions' );
+				}
+				
 				$innertext = htmlspecialchars( $parser->replaceVariables( $innertext, $frame ) );
-				return '<a href="#' . $action . '">' . $innertext . '</a>';
+				return '<a href="#" class="mw-facebook-logo opengraph-action opengraph-action-' . $action . '">' . $innertext . '</a>';
 			}
 		}
 		return '';
@@ -408,15 +412,17 @@ abstract class OpenGraphObject {
 		$actions = array();
 		$customObjects = FacebookOpenGraph::getActionObjects();
 		
-		// Start with actions matching the specified object
-		$type = $this->getType();
-		if ( isset( $customObjects[$type] ) ) {
-			$actions = $customObjects[$type];
-		}
-		
-		// Merge in actions matching all objects ('*')
-		if ( isset( $customObjects['*'] ) ) {
-			$actions = array_merge( $customObjects['*'], $actions );
+		if ( !empty( $customObjects ) ) {
+			// Start with actions matching the specified object
+			$type = $this->getType();
+			if ( isset( $customObjects[$type] ) ) {
+				$actions = $customObjects[$type];
+			}
+			
+			// Merge in actions matching all objects ('*')
+			if ( isset( $customObjects['*'] ) ) {
+				$actions = array_merge( $customObjects['*'], $actions );
+			}
 		}
 		
 		return $actions;
