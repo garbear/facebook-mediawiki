@@ -234,21 +234,19 @@ abstract class OpenGraphObject {
 		
 		if ( $title instanceof Title ) {
 			// Blog articles are used by an extension on Wikia
-			if (defined('NS_BLOG_ARTICLE') && $title->getNamespace() == NS_BLOG_ARTICLE) {
-				/*
-				// TODO: Can blogs have talk pages?
+			if ((defined('NS_BLOG_ARTICLE') && $title->getNamespace() == NS_BLOG_ARTICLE) ||
+					(defined('NS_BLOG_ARTICLE_TALK') && $title->getNamespace() == NS_BLOG_ARTICLE_TALK)) {
+				global $wgServer, $wgUser;
+				
+				// Talk pages redirect to subject pages
 				if ( $title->isTalkPage() ) {
 					// TODO: Parse subject page to extract <opengraph> attributes
 					$title = $title->getSubjectPage();
 				}
-				*/
-				
-				global $wgServer, $wgUser;
 				
 				// Use a custom image for blog posts
 				$image = $wgServer . '/index.php?action=ajax&rs=FacebookPushEvent::showImage&time=' . time() .
 							'&fb_id=' . $wgUser->getId() . '&event=FBPush_OnAddBlogPost&img=blogpost.png';
-				
 				$parameters = array(
 						'og:type'  => $this->translateType('blog'),
 						'og:image' => $image

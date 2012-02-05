@@ -160,101 +160,100 @@ class FacebookTimeline {
 			$watchthis, /*unused*/ $section, &$flags, $revision, &$status, $baseRevId, &$redirect) {
 		global $facebook;
 		
-		$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
-		
-		// Blog post
-		if ( $object->getType() == 'blog' && self::getAction( 'blog' ) && strlen( $article->getId() ) ) {
-			// Only push if it's a newly created article
-			if ( $flags & EDIT_NEW ) {
-				$fbUser = new FacebookUser();
-				if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
-					try {
-						// Publish the action
-						$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('blog'), 'POST', array(
-								$object->getType() => $object->getUrl(),
-						));
-					} catch ( FacebookApiException $e ) {
-						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+		if ( self::getAction( 'edit' ) || self::getAction( 'discuss' ) ) {
+			$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+			
+			if ( $object->getType() == 'blog' && strlen( $article->getId() ) ) {
+				// Blog post
+				if ( self::getAction( 'edit' ) && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE ) {
+					// Only push if it's a newly created article
+					if ( $flags & EDIT_NEW ) {
+						$fbUser = new FacebookUser();
+						if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+							try {
+								// Publish the action
+								$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('edit'), 'POST', array(
+										$object->getType() => $object->getUrl(),
+								));
+							} catch ( FacebookApiException $e ) {
+								// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							}
+						}
+					}
+				// Blog comment
+				} else if (self::getAction('discuss') && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE_TALK) {
+					$fbUser = new FacebookUser();
+					if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+						try {
+							// Publish the action
+							$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('discuss'), 'POST', array(
+									$object->getType() => $object->getUrl(),
+							));
+						} catch ( FacebookApiException $e ) {
+							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						}
 					}
 				}
 			}
-		}
-		
-		/*
-		// Article comment
-		global $wgEnableArticleCommentsExt;
-		if ( !empty( $wgEnableArticleCommentsExt ) ) {
-			if ( $article->getTitle()->getNamespace() == NS_TALK && ($flags & EDIT_NEW) ) {
-				$title = explode('/', $article->getTitle()->getText());
-				$title = $title[0];
-				$title = Title::newFromText($title);
-				$id = $article->getId();
-				$params = array(
-					'$ARTICLENAME' => $title->getText(),
-					'$WIKINAME'    => $wgSitename,
-					'$ARTICLE_URL' => $title->getFullURL('ref=fbfeed&fbtype=articlecomment'),
-					'$EVENTIMG'    => 'comment.png',
-					'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
-				);
-				FacebookPushEvent::pushEvent('facebook-msg-OnArticleComment', $params, 'FBPush_OnArticleComment');
+			
+			/*
+			// Article comment
+			global $wgEnableArticleCommentsExt;
+			if ( !empty( $wgEnableArticleCommentsExt ) ) {
+				if ( $article->getTitle()->getNamespace() == NS_TALK && ($flags & EDIT_NEW) ) {
+					$title = explode('/', $article->getTitle()->getText());
+					$title = $title[0];
+					$title = Title::newFromText($title);
+					$id = $article->getId();
+					$params = array(
+						'$ARTICLENAME' => $title->getText(),
+						'$WIKINAME'    => $wgSitename,
+						'$ARTICLE_URL' => $title->getFullURL('ref=fbfeed&fbtype=articlecomment'),
+						'$EVENTIMG'    => 'comment.png',
+						'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
+					);
+					FacebookPushEvent::pushEvent('facebook-msg-OnArticleComment', $params, 'FBPush_OnArticleComment');
+				}
 			}
-		}
-		*/
-		
-		/*
-		// Blog comment
-		if( defined('NS_BLOG_ARTICLE_TALK') && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE_TALK ) {
-			$title_explode = explode('/', $article->getTitle()->getText());
-			$title = Title::newFromText($title_explode[0] . '/' . $title_explode[1], NS_BLOG_ARTICLE);
-			$id = $article->getId();
-			$params = array(
-				'$WIKINAME'      => $wgSitename,
-				'$BLOG_POST_URL' => $title->getFullURL(),
-				'$BLOG_PAGENAME' =>	$title_explode[0] . '/' . $title_explode[1],
-				'$ARTICLE_URL'   => $title->getFullURL('ref=fbfeed&fbtype=blogcomment'), // Internal use
-				'$EVENTIMG'      => 'blogpost.png',
-				'$TEXT'          => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
-			);
-			FacebookPushEvent::pushEvent('facebook-msg-OnBlogComment', $params, 'FBPush_OnBlogComment');
-		}
-		*/
-		
-		/**
-		// Large edit
-		global $wgContentNamespaces;
-		// Make sure something has changed
-		if ( !is_null( $revision ) ) {
-			if ( in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
-				// Do not push reverts
-				$baseRevision = Revision::newFromId( $baseRevId );
-				if ( !$baseRevision || $revision->getTextId() != $baseRevision->getTextId() ) {
-					$diff = 0;
-					$wNewCount = strlen( $text );
-					$wOldCount = strlen( $article->getRawText() );
-					$countDiff = $wNewCount - $wOldCount;
-					if ( $countDiff > FacebookPushEvent::$MIN_CHARS_TO_PUSH ) {
-						$params = array(
-							'$ARTICLENAME' => $article->getTitle()->getText(),
-							'$WIKINAME'    => $wgSitename,
-							'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=largeedit'),
-							'$EVENTIMG'    => 'edits.png',
-							'$SUMMART'     => $summary,
-							'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article, $text))
-						);
-						FacebookPushEvent::pushEvent('facebook-msg-OnLargeEdit', $params, 'FBPush_OnLargeEdit');
+			*/
+			
+			/*
+			// Large edit
+			global $wgContentNamespaces;
+			// Make sure something has changed
+			if ( !is_null( $revision ) ) {
+				if ( in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
+					// Do not push reverts
+					$baseRevision = Revision::newFromId( $baseRevId );
+					if ( !$baseRevision || $revision->getTextId() != $baseRevision->getTextId() ) {
+						$diff = 0;
+						$wNewCount = strlen( $text );
+						$wOldCount = strlen( $article->getRawText() );
+						$countDiff = $wNewCount - $wOldCount;
+						if ( $countDiff > FacebookPushEvent::$MIN_CHARS_TO_PUSH ) {
+							$params = array(
+								'$ARTICLENAME' => $article->getTitle()->getText(),
+								'$WIKINAME'    => $wgSitename,
+								'$ARTICLE_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=largeedit'),
+								'$EVENTIMG'    => 'edits.png',
+								'$SUMMART'     => $summary,
+								'$TEXT'        => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article, $text))
+							);
+							FacebookPushEvent::pushEvent('facebook-msg-OnLargeEdit', $params, 'FBPush_OnLargeEdit');
+						}
 					}
 				}
 			}
-		}
-		/**
-		// Add image
-		if ( $article->getTitle()->getNamespace() == NS_FILE ) {
-			$img = wfFindFile( $article->getTitle()->getText() );
-			if ( !empty( $img ) && $img->media_type == 'BITMAP' ) {
-				self::uploadNews($img, $img->title->getText(), $img->title->getFullUrl('?ref=fbfeed&fbtype=addimage'));
+			/**
+			// Add image
+			if ( $article->getTitle()->getNamespace() == NS_FILE ) {
+				$img = wfFindFile( $article->getTitle()->getText() );
+				if ( !empty( $img ) && $img->media_type == 'BITMAP' ) {
+					self::uploadNews($img, $img->title->getText(), $img->title->getFullUrl('?ref=fbfeed&fbtype=addimage'));
+				}
 			}
+			/**/
 		}
-		/**/
 		return true;
 	}
 	
