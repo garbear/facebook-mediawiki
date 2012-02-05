@@ -94,6 +94,35 @@ class FacebookTimeline {
 	}
 	
 	/**
+	 * Action for protecting an article. Protect actions don't expire, but if
+	 * the user updates the protection status of a page, a new protect action
+	 * will be pushed to their Timeline and the old protect actions for the
+	 * page will be removed.
+	 */
+	public static function ArticleProtectComplete(&$article, &$user, $protect, $reason, $moveonly = false) {
+		global $facebook;
+		// $protect might be a boolean, or array( [edit] => *group* [move] => *group* )
+		$unprotect = is_array($protect) && empty($protect['edit']) && empty($protect['edit']);
+		if ( $protect && !$unprotect && self::getAction( 'protect' ) ) {
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+				try {
+					// Expire old protect actions
+					self::removeAction( 'protect', $object );
+					// Publish the action
+					$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('protect'), 'POST', array(
+							$object->getType() => $object->getUrl(),
+					));
+				} catch ( FacebookApiException $e ) {
+					echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Adds an event to the Facebook user's Timeline when they add a video to the site.
 	 * @author Garrett Brown
 	 * @author Sean Colombo
@@ -268,16 +297,18 @@ class FacebookTimeline {
 	 */
 	public static function WatchArticleComplete(&$user, &$article) {
 		global $facebook;
-		$id = $facebook->getUser();
-		if ( $id && self::getAction('watch') ) {
-			$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
-			try {
-				// Publish the action
-				$facebook->api( "/$id/" . self::getAction('watch'), 'POST', array(
-						$object->getType() => $object->getUrl(),
-				) );
-			} catch ( FacebookApiException $e ) {
-				// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+		if ( self::getAction( 'watch' ) ) {
+			$fbUser = new FacebookUser();
+			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+				try {
+					// Publish the action
+					$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('watch'), 'POST', array(
+							$object->getType() => $object->getUrl(),
+					));
+				} catch ( FacebookApiException $e ) {
+					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+				}
 			}
 		}
 		return true;
@@ -289,9 +320,9 @@ class FacebookTimeline {
 	 */
 	public static function UnwatchArticleComplete(&$user, &$article) {
 		global $facebook;
-		if ( self::getAction('watch') ) {
+		if ( self::getAction( 'watch' ) ) {
 			$fbUser = new FacebookUser();
-			if ( $fbUser->getMWUser()->getId() == $user->getId()) {
+			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
 				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
 				try {
 					self::removeAction( 'watch', $object );
@@ -310,6 +341,9 @@ class FacebookTimeline {
 	 * 
 	 * The limit is currently set at 5000. If the limit is lowered to a more
 	 * practical number, the actions will be obtained recursively.
+	 * 
+	 * Precondition: User is logged in to Facebook and MediaWiki, and the
+	 * Facebook ID matches the one associated with the MediaWiki account.
 	 * 
 	 * @throws FacebookApiException
 	 */
