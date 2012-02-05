@@ -397,7 +397,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			
 			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
 			if ( $object ) {
-				if ( $object->needsDescription() ) {
+				if ($object instanceof OpenGraphArticleObject && $object->needsDescription()) {
 					$object->setDescriptionFromText( $text );
 				}
 				foreach ( $object->getProperties() as $property => $content ) {

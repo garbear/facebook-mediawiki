@@ -125,6 +125,16 @@ class FacebookOpenGraph {
 	}
 	
 	/**
+	 * Given a file, returns the Open Graph representation.
+	 * 
+	 * @param File $file
+	 * @return OpenGraphObject|NULL
+	 */
+	public static function newObjectFromFile($file) {
+		return OpenGraphObject::newFromFile( $file );
+	}
+	
+	/**
 	 * Inverts the $wgFbOpenGraphCustomActions array. Instead of
 	 * action => array( objects ) we now have object => array( actions ).
 	 * 
@@ -225,6 +235,23 @@ abstract class OpenGraphObject {
 	}
 	
 	/**
+	 * Given a file, returns the Open Graph representation.
+	 * 
+	 * @return OpenGraphObject|NULL
+	 */
+	public static function newFromFile($file) {
+		global $wgFbOpenGraphRegisteredObjects;
+		// Make sure $wgFbOpenGraphRegisteredObjects['file'] is defined
+		// possible TODO: switch on $file->getMediaType() so we can support different
+		// file types and return new OpenGraph[File|Image|Media]Object( $file );
+		if ( !empty( $wgFbOpenGraphRegisteredObjects ) &&
+				isset( $wgFbOpenGraphRegisteredObjects['file'] ) ) {
+			return new OpenGraphFileObject( $file );
+		}
+		return NULL;
+	}
+	
+	/**
 	 * Given a page title, returns the Open Graph representation.
 	 * @param Title $title
 	 * @return OpenGraphObject|NULL
@@ -246,6 +273,16 @@ abstract class OpenGraphObject {
 						'og:type'        => 'website',
 						'og:description' => $wgSitename . ' (' . $wgContentLanguage . ')',
 				) );
+			}
+			
+			// File
+			if ( $title->getNamespace() == NS_FILE ) {
+				//$file = wfLocalFile( $title );
+				$file = wfFindFile( $title );
+				if ( !empty( $file ) && $file->exists() ) {
+					return self::newFromFile( $file );
+				}
+				return NULL;
 			}
 			
 			// Blog articles are used by an extension on Wikia
@@ -292,19 +329,6 @@ abstract class OpenGraphObject {
 				return new OpenGraphArticleObject( $title, $parameters );
 			}
 		}
-		return NULL;
-	}
-	
-	/**
-	 * TODO: Given an image, returns the Open Graph representation.
-	 *
-	 * When this function is implemented, it may be renamed to newFromMedia()
-	 * or newFromFile().
-	 *
-	 * @return OpenGraphObject|NULL
-	 */
-	public static function newFromFile($item) {
-		// TODO: return new OpenGraph[File|Image|Media]Object( $title );
 		return NULL;
 	}
 	
@@ -406,10 +430,13 @@ abstract class OpenGraphObject {
 	 */
 	protected function translateType( $generic ) {
 		global $wgFbNamespace, $wgFbOpenGraphRegisteredObjects;
-		
-		if ( FacebookAPI::isNamespaceSetup() && !empty( $wgFbOpenGraphRegisteredObjects ) &&
-				!empty( $wgFbOpenGraphRegisteredObjects[$generic] ) ) {
-			return $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredObjects[$generic];
+		if ( FacebookAPI::isNamespaceSetup() ) {
+			if (!empty($wgFbOpenGraphRegisteredObjects) && isset($wgFbOpenGraphRegisteredObjects[$generic])) {
+				return $wgFbNamespace . ':' . $wgFbOpenGraphRegisteredObjects[$generic];
+			} else {
+				// "article" is special because it's a built-in type
+				return $generic == 'article' ? $generic : $wgFbNamespace . ':' . $generic;
+			}
 		}
 		return $generic;
 	}
@@ -421,13 +448,13 @@ class OpenGraphArticleObject extends OpenGraphObject {
 	
 	public static function getBuiltinProperties() {
 		return array_merge( array(
-			'og:type',
-			'og:url',
-			'og:updated_time',
-			'og:locale',
-			'og:title',
-			'og:image',
-			'og:description',
+				'og:type',
+				'og:url',
+				'og:updated_time',
+				'og:locale',
+				'og:title',
+				'og:image',
+				'og:description',
 		), parent::getBuiltinProperties() );
 	}
 	
@@ -482,13 +509,12 @@ class OpenGraphArticleObject extends OpenGraphObject {
 	
 	/**
 	 * Extracts a description from the article's text.
-	 * 
+	 *
 	 * This function separates $text into its HTML sibling nodes. It then
 	 * searches for the first <p> sibling and returns the first sentence (up to
 	 * 300 chars) or multiple sentences to gaurantee at least 40 characters.
 	 */
 	public function setDescriptionFromText($text) {
-		
 		while ( $text != '' ) {
 			// Look for the next opening tag
 			preg_match( '/<([:A-Z_a-z0-9][:A-Z_a-z-.0-9]*)[^>]*>/', $text, $matches );
@@ -565,5 +591,69 @@ class OpenGraphArticleObject extends OpenGraphObject {
 	 */
 	public function needsDescription() {
 		return empty( $this->properties['og:description'] );
+	}
+}
+
+class OpenGraphFileObject extends OpenGraphObject {
+	
+	private $defaultType = 'file';
+	
+	public static function getBuiltinProperties() {
+		return array_merge( array(
+				'og:type',
+				'og:url',
+				'og:updated_time',
+				'og:locale',
+				'og:title',
+				'og:image',
+				'og:description',
+		), parent::getBuiltinProperties() );
+	}
+	
+	function __construct( $file ) {
+		$title = $file->getTitle();
+		
+		// og:type
+		$this->properties['og:type'] = $this->translateType( $this->defaultType );
+		
+		// og:url
+		$this->properties['og:url'] = $title->getFullURL();
+		
+		// og:updated_time
+		$article = new Article( $title, 0 );
+		$timestamp = $article->getTimestamp( TS_UNIX, $article->getTimestamp() );
+		$this->properties['og:updated_time'] = $timestamp;
+		
+		// og:locale
+		global $wgVersion;
+		if ( version_compare( $wgVersion, '1.18', '>=' ) ) {
+			// Title::getPageLanguage() is since 1.18
+			$langCode = $title->getPageLanguage()->getCode();
+		} else {
+			global $wgContLang;
+			$langCode = $wgContLang->getCode();
+		}
+		$this->properties['og:locale'] = FacebookLanguage::getFbLocaleForLangCode($langCode);
+		
+		// og:title
+		$this->properties['og:title'] = $file->getName();
+		
+		// og:image
+		if ( $file->getMediaType() == MEDIATYPE_BITMAP ) {
+			$this->properties['og:image'] = $file->getCanonicalUrl();
+		} else {
+			global $wgServer;
+			$this->properties['og:image'] = $wgServer . $file->iconThumb()->url;
+		}
+		
+		// og:description
+		// TODO: This crashes MediaWiki because messages cannot be loaded or some bullshit
+		// The problem is that message decoding calls MessageCache::parse(), which calls
+		// message decoding, which again calls MessageCache::parse(). To provide reentrancy,
+		// MessageCache::parse() violates its signature by returning a string instead of an
+		// object. You dirty little bastard, you.
+		//$this->properties['og:description'] = $file->getLongDesc();
+		
+		parent::__construct();
 	}
 }

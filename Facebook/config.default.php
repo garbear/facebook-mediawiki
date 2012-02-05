@@ -64,21 +64,43 @@ $wgFbAllowDebug = true;
 $wgFbOpenGraph = true;
 
 /**
- * If you register Open Graph actions for the objects below, it will be possible
- * to push these actions to a user's Timeline. Actions can only be published
- * for their Connected Object Types; therefore, when you register these actions
- * in the Open Graph Dashboard, connect them to objects in this way:
+ * Wiki pages are represented in the Open Graph as "articles," a built-in type
+ * provisioned by Facebook. To include files uploaded to your wiki in the Open
+ * Graph, register "file" as a custom object for your application in the Open
+ * Graph Dashboard and define it here.
+ * 
+ * Optionally, you can register a custom object type for articles. It will then
+ * be used instead of the built-in type. (As far as I can tell, the only
+ * difference is that custom objects are preceeded by your namespace:
+ * "NAMESPACE:article" as opposed to just "article".)
+ * 
+ * If you registered and defined everything correctly, the Object Debugger on
+ * Special:Connect/Debug should not show any errors.
+ */
+$wgFbOpenGraphRegisteredObjects = array(
+#	'article' => 'article', # Comment out to use your custom type
+#	'file'    => 'file',
+#	'blog'    => 'blog',    # Used by an extension on Wikia. Only takes effect
+#	                        # if you have the same extension installed.
+);
+
+/**
+ * If you register Open Graph actions for the following object types, it will
+ * be possible to push these actions to a user's Timeline. Actions can only be
+ * published for their Connected Object Types; therefore, when you register
+ * these actions in the Open Graph Dashboard, connect them to objects in this way:
  *    edit    = article
  *    tweak   = article
  *    discuss = article
- *    watch   = article, image
- *    protect = article, image
- *    upload  = image
+ *    watch   = article, file
+ *    protect = article, file
+ *    upload  = file
  * 
  * You can rename an action by specifying a different value; leave an action
- * commented to disable it. "Tweak" is used when the minor edit box is checked
- * or the edit is less than a MIN_CHARS_TO_EDIT constant you can define
- * (default 10). If "tweak" isn't defined, "edit" will be used instead.
+ * commented to disable it. The "tweak" action is used when the minor edit box
+ * is checked or an edit is less than the MIN_CHARS_TO_EDIT constant (default 10):
+ *    define('MIN_CHARS_TO_EDIT', 10);
+ * If "tweak" isn't defined, "edit" will be used instead.
  */
 $wgFbOpenGraphRegisteredActions = array(
 #	'edit'    => 'edit',    # Uncomment each action you register...
@@ -86,31 +108,7 @@ $wgFbOpenGraphRegisteredActions = array(
 #	'discuss' => 'discuss', # Edit a talk page
 #	'watch'   => 'watch',
 #	'protect' => 'protect',
-#	'upload'  => 'upload',  # Not implemented yet
-);
-
-/**
- * By default, built-in Open Graph object types will be used for the objects
- * below on the wiki. If you register custom object types for these wiki items
- * in the Open Graph Dashboard, define them here. Is this necessary? Probably
- * not; however, early versions of Facebook's Object Dashboard only let you
- * connect the actions above to custom objects, not built-ins like article and
- * image, so this setting remains on a "just in case" basis.
- * 
- * The only difference I have discovered between built-in objects and custom
- * objects is that custom objects' types are preceeded by your namespace
- * ("NAMESPACE:article" as opposed to just "article").
- * 
- * If you registered and defined everything correctly, the Object Debugger on
- * Special:Connect/Debug should not show any errors.
- * 
- * The image type is not yet implemented (only articles for now).
- */
-$wgFbOpenGraphRegisteredObjects = array(
-#	'article' => 'article', # Comment out to use your custom type
-#	'image'   => 'image',   # Not implemented yet
-#	'blog'    => 'blog',    # Used by an extension on Wikia. Only takes effect
-#	                          if you have the same extension installed.
+#	'upload'  => 'upload',
 );
 
 /**

@@ -107,15 +107,17 @@ class FacebookTimeline {
 			$fbUser = new FacebookUser();
 			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
 				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
-				try {
-					// Expire old protect actions
-					self::removeAction( 'protect', $object );
-					// Publish the action
-					$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('protect'), 'POST', array(
-							$object->getType() => $object->getUrl(),
-					));
-				} catch ( FacebookApiException $e ) {
-					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+				if ( $object ) {
+					try {
+						// Expire old protect actions
+						self::removeAction( 'protect', $object );
+						// Publish the action
+						$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('protect'), 'POST', array(
+								$object->getType() => $object->getUrl(),
+						));
+					} catch ( FacebookApiException $e ) {
+						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					}
 				}
 			}
 		}
@@ -157,14 +159,14 @@ class FacebookTimeline {
 	 * supported, tested, or perhaps even fully implemented.
 	 */
 	public static function ArticleSaveComplete(&$article, &$user, $text, $summary, $minoredit,
-			$watchthis, /*unused*/ $section, &$flags, $revision, &$status, $baseRevId, &$redirect) {
+			$watchthis, /*unused*/ $section, &$flags, $revision, &$status, $baseRevId, &$redirect = true) {
 		global $facebook;
 		
 		if ( self::getAction( 'edit' ) || self::getAction( 'discuss' ) ) {
 			$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
 			
 			// Blog object
-			if ( $object->getType() == 'blog' ) {
+			if ( $object && $object->getType() == 'blog' ) {
 				// Blog post
 				if ( self::getAction( 'edit' ) && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE ) {
 					// Only push if it's a newly created article
@@ -198,7 +200,7 @@ class FacebookTimeline {
 			}
 			
 			// Article object
-			if ( $object->getType() == 'article' ) {
+			if ( $object && $object->getType() == 'article' ) {
 				// Subject page
 				global $wgContentNamespaces;
 				if ( self::getAction('edit') && in_array( $article->getTitle()->getNamespace(), $wgContentNamespaces ) ) {
@@ -221,7 +223,7 @@ class FacebookTimeline {
 												$object->getType() => $object->getUrl(),
 										));
 									} catch ( FacebookApiException $e ) {
-										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+										// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 									}
 								}
 							} else if ( self::getAction('edit') ) {
@@ -233,7 +235,7 @@ class FacebookTimeline {
 												$object->getType() => $object->getUrl(),
 										));
 									} catch ( FacebookApiException $e ) {
-										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+										// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 									}
 								}
 							}
@@ -250,37 +252,60 @@ class FacebookTimeline {
 									$object->getType() => $object->getUrl(),
 							));
 						} catch ( FacebookApiException $e ) {
-							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
 			}
-			/**
-			// Add image
-			if ( $article->getTitle()->getNamespace() == NS_FILE ) {
-				$img = wfFindFile( $article->getTitle()->getText() );
-				if ( !empty( $img ) && $img->media_type == 'BITMAP' ) {
-					self::uploadNews($img, $img->title->getText(), $img->title->getFullUrl('?ref=fbfeed&fbtype=addimage'));
-				}
+			
+			// Media object
+			if ( $object && $object->getType() == 'file' ) {
+				// Called when a user edits the summary of an image
+				// Currently, we don't do anything here
 			}
-			/**/
 		}
 		return true;
 	}
 	
 	/**
-	 * Pushes an item to Facebook News Feed when the user adds an Image to the site.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
+	 * Adds an action to the user's Timeline when they upload an image.
 	 */
 	public static function UploadComplete(&$image) {
-		global $wgServer, $wgSitename;
-		/*
-		$localFile = $image->getLocalFile();
-		if ( $localFile->mLocalFile->media_type == 'BITMAP' ) {
-			self::uploadNews($localFile, $localFile->getTitle(), $localFile->getTitle()->getFullUrl('?ref=fbfeed&fbtype=addimage'));
+		global $facebook;
+		if ( self::getAction( 'upload' ) ) {
+			// Because I don't know what version mLocalFile became getLocalFile()
+			try {
+				if ( $image->getLocalFile()->fileExists ) {
+					$file = $image->getLocalFile();
+				} else {
+					$file = false;
+				}
+			} catch ( Exception $e ) {
+				if ( $image->mLocalFile->fileExists ) {
+					$file = $image->mLocalFile;
+				} else {
+					$file = false;
+				}
+			}
+			
+			if ( $file ) {
+				$fbUser = new FacebookUser();
+				global $wgUser;
+				if ( $fbUser->getMWUser()->getId() == $wgUser->getId() ) {
+					$object = FacebookOpenGraph::newObjectFromFile( $file );
+					if ( $object ) {
+						try {
+							// Publish the action
+							$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('upload'), 'POST', array(
+									$object->getType() => $object->getUrl(),
+							));
+						} catch ( FacebookApiException $e ) {
+							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						}
+					}
+				}
+			}
 		}
-		*/
 		return true;
 	}
 	
@@ -318,13 +343,15 @@ class FacebookTimeline {
 			$fbUser = new FacebookUser();
 			if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
 				$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
-				try {
-					// Publish the action
-					$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('watch'), 'POST', array(
-							$object->getType() => $object->getUrl(),
-					));
-				} catch ( FacebookApiException $e ) {
-					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+				if ( $object ) {
+					try {
+						// Publish the action
+						$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('watch'), 'POST', array(
+								$object->getType() => $object->getUrl(),
+						));
+					} catch ( FacebookApiException $e ) {
+						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					}
 				}
 			}
 		}
