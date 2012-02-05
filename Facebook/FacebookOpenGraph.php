@@ -233,16 +233,25 @@ abstract class OpenGraphObject {
 		global $wgFbNamespace;
 		
 		if ( $title instanceof Title ) {
+			// Talk pages redirect to subject pages
+			if ( $title->isTalkPage() ) {
+				// TODO: Parse subject page to extract <opengraph> attributes
+				$title = $title->getSubjectPage();
+			}
+			
+			// Use built-in type "website" for main page
+			if ( $title->isMainPage() ) {
+				global $wgSitename, $wgContentLanguage;
+				return new OpenGraphArticleObject( $title, array(
+						'og:type'        => 'website',
+						'og:description' => $wgSitename . ' (' . $wgContentLanguage . ')',
+				) );
+			}
+			
 			// Blog articles are used by an extension on Wikia
 			if ((defined('NS_BLOG_ARTICLE') && $title->getNamespace() == NS_BLOG_ARTICLE) ||
 					(defined('NS_BLOG_ARTICLE_TALK') && $title->getNamespace() == NS_BLOG_ARTICLE_TALK)) {
 				global $wgServer, $wgUser;
-				
-				// Talk pages redirect to subject pages
-				if ( $title->isTalkPage() ) {
-					// TODO: Parse subject page to extract <opengraph> attributes
-					$title = $title->getSubjectPage();
-				}
 				
 				// Use a custom image for blog posts
 				$image = $wgServer . '/index.php?action=ajax&rs=FacebookPushEvent::showImage&time=' . time() .
@@ -256,18 +265,6 @@ abstract class OpenGraphObject {
 			
 			// Don't consider NS_SPECIAL and NS_MEDIA to be articles
 			if ( $title->canExist() ) {
-				// Talk pages redirect to subject pages
-				if ( $title->isTalkPage() ) {
-					// TODO: Parse subject page to extract <opengraph> attributes
-					$title = $title->getSubjectPage();
-				}
-				/*
-				// Strip parameters from the title's URL
-				$baseTitle = Title::newFromText( $title->getPrefixedText() );
-				if ( $baseTitle instanceof Title ) {
-					$title = $baseTitle;
-				}
-				*/
 				
 				$parameters = FacebookOpenGraph::resolveTitle( $title );
 				
