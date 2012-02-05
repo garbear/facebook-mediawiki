@@ -85,16 +85,16 @@ $wgFbOpenGraphRegisteredActions = array(
 );
 
 /**
- * By default, built-in Open Graph object types will be used for articles and
- * images on the wiki. If you register custom object types for these wiki items
+ * By default, built-in Open Graph object types will be used for the objects
+ * below on the wiki. If you register custom object types for these wiki items
  * in the Open Graph Dashboard, define them here. Is this necessary? Probably
  * not; however, early versions of Facebook's Object Dashboard only let you
  * connect the actions above to custom objects, not built-ins like article and
  * image, so this setting remains on a "just in case" basis.
  * 
- * I haven't found many differences between built-in objects and custom objects.
- * One exception is that custom objects' types are preceeded by your namespace:
- * "NAMESPACE:article" as opposed to just "article".
+ * The only difference I have discovered between built-in objects and custom
+ * objects is that custom objects' types are preceeded by your namespace
+ * ("NAMESPACE:article" as opposed to just "article").
  * 
  * If you registered and defined everything correctly, the Object Debugger on
  * Special:Connect/Debug should not show any errors.
@@ -102,8 +102,10 @@ $wgFbOpenGraphRegisteredActions = array(
  * The image type is not yet implemented (only articles for now).
  */
 $wgFbOpenGraphRegisteredObjects = array(
-#	'article' => 'article', # Comment out to use the built-in type
+#	'article' => 'article', # Comment out to use your custom type
 #	'image'   => 'image',   # Not implemented yet
+#	'blog'    => 'blog',    # Used by an extension on Wikia. Only takes effect
+#	                          if you have the same extension installed.
 );
 
 /**

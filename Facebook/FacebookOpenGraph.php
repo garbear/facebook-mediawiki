@@ -233,6 +233,29 @@ abstract class OpenGraphObject {
 		global $wgFbNamespace;
 		
 		if ( $title instanceof Title ) {
+			// Blog articles are used by an extension on Wikia
+			if (defined('NS_BLOG_ARTICLE') && $title->getNamespace() == NS_BLOG_ARTICLE) {
+				/*
+				// TODO: Can blogs have talk pages?
+				if ( $title->isTalkPage() ) {
+					// TODO: Parse subject page to extract <opengraph> attributes
+					$title = $title->getSubjectPage();
+				}
+				*/
+				
+				global $wgServer, $wgUser;
+				
+				// Use a custom image for blog posts
+				$image = $wgServer . '/index.php?action=ajax&rs=FacebookPushEvent::showImage&time=' . time() .
+							'&fb_id=' . $wgUser->getId() . '&event=FBPush_OnAddBlogPost&img=blogpost.png';
+				
+				$parameters = array(
+						'og:type'  => $this->translateType('blog'),
+						'og:image' => $image
+				);
+				return new OpenGraphArticleObject( $title, $parameters );
+			}
+			
 			// Don't consider NS_SPECIAL and NS_MEDIA to be articles
 			if ( $title->canExist() ) {
 				// Talk pages redirect to subject pages
@@ -268,10 +291,8 @@ abstract class OpenGraphObject {
 				}
 				
 				// Need to prepend the custom type with the namespace
-				if ( isset( $parameters['og:type'] ) ) {
-					if ( FacebookAPI::isNamespaceSetup() ) {
-						$parameters['og:type'] = $wgFbNamespace . ':' . $parameters['og:type'];
-					}
+				if ( isset( $parameters['og:type'] ) && FacebookAPI::isNamespaceSetup() ) {
+					$parameters['og:type'] = $wgFbNamespace . ':' . $parameters['og:type'];
 				}
 				return new OpenGraphArticleObject( $title, $parameters );
 			}

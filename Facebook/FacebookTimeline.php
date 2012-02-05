@@ -115,7 +115,7 @@ class FacebookTimeline {
 							$object->getType() => $object->getUrl(),
 					));
 				} catch ( FacebookApiException $e ) {
-					echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 				}
 			}
 		}
@@ -152,32 +152,35 @@ class FacebookTimeline {
 	}
 	
 	/**
-	 * ArticleSaveComplete hook.
-	 * @author Garrett Brown
-	 * @author Sean Colombo
+	 * Hook for various kinds of actions related to article edits. Some actions
+	 * included here are specific to extensions in use by Wikia and are not
+	 * supported, tested, or perhaps even fully implemented.
 	 */
 	public static function ArticleSaveComplete(&$article, &$user, $text, $summary, $minoredit,
 			$watchthis, /*unused*/ $section, &$flags, $revision, &$status, $baseRevId, &$redirect) {
-		global $wgSitename;
-		/*
+		global $facebook;
+		
+		$object = FacebookOpenGraph::newObjectFromTitle( $article->getTitle() );
+		
 		// Blog post
-		if ( strlen( $article->getId() ) ) {
+		if ( $object->getType() == 'blog' && self::getAction( 'blog' ) && strlen( $article->getId() ) ) {
 			// Only push if it's a newly created article
 			if ( $flags & EDIT_NEW ) {
-				if (defined('NS_BLOG_ARTICLE') && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE) {
-					$params = array(
-						'$WIKINAME'      => $wgSitename,
-						'$BLOG_POST_URL' => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=blogpost'),
-						'$BLOG_PAGENAME' => $article->getTitle()->getText(),
-						'$ARTICLE_URL'   => $article->getTitle()->getFullURL('ref=fbfeed&fbtype=blogpost'), // Internal use
-						'$EVENTIMG'      => 'blogpost.png',
-						'$TEXT'          => FacebookPushEvent::shortenText(FacebookPushEvent::parseArticle($article))
-					);
-					FacebookPushEvent::pushEvent('facebook-msg-OnAddBlogPost', $params, 'FBPush_OnAddBlogPost');
+				$fbUser = new FacebookUser();
+				if ( $fbUser->getMWUser()->getId() == $user->getId() ) {
+					try {
+						// Publish the action
+						$facebook->api('/' . $fbUser->getId() . '/' . self::getAction('blog'), 'POST', array(
+								$object->getType() => $object->getUrl(),
+						));
+					} catch ( FacebookApiException $e ) {
+						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					}
 				}
 			}
 		}
-		/**
+		
+		/*
 		// Article comment
 		global $wgEnableArticleCommentsExt;
 		if ( !empty( $wgEnableArticleCommentsExt ) ) {
@@ -196,7 +199,9 @@ class FacebookTimeline {
 				FacebookPushEvent::pushEvent('facebook-msg-OnArticleComment', $params, 'FBPush_OnArticleComment');
 			}
 		}
-		/**
+		*/
+		
+		/*
 		// Blog comment
 		if( defined('NS_BLOG_ARTICLE_TALK') && $article->getTitle()->getNamespace() == NS_BLOG_ARTICLE_TALK ) {
 			$title_explode = explode('/', $article->getTitle()->getText());
@@ -212,6 +217,8 @@ class FacebookTimeline {
 			);
 			FacebookPushEvent::pushEvent('facebook-msg-OnBlogComment', $params, 'FBPush_OnBlogComment');
 		}
+		*/
+		
 		/**
 		// Large edit
 		global $wgContentNamespaces;
