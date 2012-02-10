@@ -344,7 +344,7 @@ class SpecialConnect extends SpecialPage {
 							
 							$this->sendError('facebook-error', 'badaccess-groups', array(
 									$wgLang->commaList( $groupsList ),
-									count( $groups ),
+									count( $groupsList ),
 							));
 						}
 					} else {
