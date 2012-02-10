@@ -102,6 +102,7 @@ class FacebookOpenGraph {
 			$actions = $object->getCustomActions();
 			if ( count( $actions ) && in_array( $action, $actions ) ) {
 				// Let the page know it should load the actions module
+				global $wgVersion;
 				if ( version_compare( $wgVersion, '1.17', '>=' ) ) {
 					global $wgOut;
 					$wgOut->addModules( 'ext.facebook.actions' );
