@@ -111,6 +111,7 @@ To change the default value, follow the link to the interface message on the lef
 	'facebook-object-debug-title' => 'Open Graph Object Debugger',
 	'facebook-object-debug' => 'Input a page name to view the page in the Open Graph',
 	'facebook-debug' => 'Debug',
+	'facebook-error-application' => 'You must be listed as an administrator or a developer for your application. Visit the roles tab in your app\'s Facebook settings.',
 	// ajaxLoginMerge.tmpl.php
 	'facebook-logged-in-now-connect' => 'You have been logged in to your account, please click the login button to connect it with Facebook.',
 	// ChooseNameTemplate.class.php

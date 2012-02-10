@@ -322,8 +322,36 @@ class SpecialConnect extends SpecialPage {
 				$app = new FacebookApplication();
 				if ( $app->canEdit() ) {
 					$this->sendPage('debugView');
-					break;
+				} else {
+					// Something went wrong
+					$fbUser = new FacebookUser();
+					
+					// First, check MediaWiki permissions. Then check with Facebook
+					if ( $fbUser->getMWUser()->getId() ) {
+						// If $wgFbUserRightsFromGroups is set, this should trigger a group check
+						$groups = $fbUser->getMWUser()->getEffectiveGroups();
+						if ( in_array('admin', $groups) || in_array('fb-admin', $groups) ) {
+							$this->sendError('facebook-error', 'facebook-error-application'); // roles
+						} else {
+							global $wgLang, $wgFbUserRightsFromGroup;
+							
+							$groupArray = array( 'sysop' );
+							if ( !empty( $wgFbUserRightsFromGroup ) ) {
+								$groupArray[] = 'fb-admin';
+							}
+							
+							$groupsList = array_map( array('User', 'makeGroupLinkWiki'), $groupArray );
+							
+							$this->sendError('facebook-error', 'badaccess-groups', array(
+									$wgLang->commaList( $groupsList ),
+									count( $groups ),
+							));
+						}
+					} else {
+						$this->sendError('facebook-error', 'facebook-errortext'); // Not logged in
+					}
 				}
+				break;
 			}
 			// no break
 		/**
