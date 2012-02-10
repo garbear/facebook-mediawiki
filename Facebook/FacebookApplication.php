@@ -66,7 +66,7 @@ class FacebookApplication {
 		
 		// If $wgFbUserRightsFromGroups is set, this should trigger a group check
 		$groups = $fbUser->getMWUser()->getEffectiveGroups();
-		if ( !in_array('admin', $groups) && !in_array('fb-admin', $groups) ) {
+		if ( !in_array('sysop', $groups) && !in_array('fb-admin', $groups) ) {
 			return false;
 		}
 		
