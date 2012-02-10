@@ -271,7 +271,7 @@ abstract class OpenGraphObject {
 			}
 			
 			// Use built-in type "website" for main page
-			if ( $title->isMainPage() ) {
+			if ( $title->equals( Title::newMainPage() ) ) {
 				global $wgSitename, $wgContentLanguage;
 				return new OpenGraphArticleObject( $title, array(
 						'og:type'        => 'website',
