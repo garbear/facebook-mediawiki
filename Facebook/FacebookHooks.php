@@ -298,7 +298,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	 * Adds several Facebook variables to the page:
 	 */
 	public static function ResourceLoaderGetConfigVars( &$vars ) {
-		global $wgRequest, $wgVersion, $wgFbAppId, $wgFbSocialPlugins, $wgFbAjax, $wgUser;
+		global $wgRequest, $wgVersion, $wgFbAppId, $wgFbSocialPlugins, $wgFbStreamlineLogin, $wgUser;
 		/*
 		// Disabled (ext.facebook.js still uses wgPageName, but not wgPageQuery)
 		if (!isset($vars['wgPageQuery'])) {
@@ -312,7 +312,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		$vars['fbScript']       = self::getFbScript();
 		$vars['fbAppId']        = $wgFbAppId;
 		$vars['fbUseXFBML']     = $wgFbSocialPlugins;
-		$vars['fbUseAjax']      = $wgFbAjax;
+		$vars['fbUseAjax']      = $wgFbStreamlineLogin;
 		if ( $wgUser->isLoggedIn() ) {
 			global $facebook;
 			$ids = FacebookDB::getFacebookIDs($wgUser);
