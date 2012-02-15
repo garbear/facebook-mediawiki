@@ -103,6 +103,10 @@
 							// accomplished by posting the access_token to an AJAX method that
 							// calls $facebook->setPersistentData('access_token', $access_token);
 							//window.location.href = window.location.href;
+							
+							// Because we don't reload, acknowledge the login by hiding the
+							// "Log in with Facebook" button
+							$('#pt-facebook').hide('slow');
 						} else {
 							// MediaWiki user is connected to a Facebook account that is
 							// different from the one that just logged in.
