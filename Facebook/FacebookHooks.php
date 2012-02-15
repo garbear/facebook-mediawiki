@@ -316,10 +316,37 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		if ( $wgUser->isLoggedIn() ) {
 			global $facebook;
 			$ids = FacebookDB::getFacebookIDs($wgUser);
-			// If the Facebook session is invalid, let the client know who we expect
-			// to click "Log in with Facebook". Otherwise, if we have have a valid
-			// session but for *someone else*, let the client know this as well.
-			if (count($ids) && (!$facebook->getUser() || $facebook->getUser() != $ids[0])) {
+			// If the user is logged in, let the JavaScript code know who the
+			// account belongs to. The primary reason for this is so that if a
+			// user logs in to Facebook with a different account, we can show
+			// the "facebooklogoutandcontinue" form.
+			// 
+			// Previously, if the user was logged in and had a valid Facebook
+			// session, we would skip this step with the mentality that it was
+			// unnecessary as the JavaScript code would obviously already know
+			// the Facebook ID. However, this created a problem that can be
+			// reproduced as follows:
+			//    1. Log in to MediaWiki with a valid Facebook session
+			//    2. In another tab, log out of Facebook and then log in again
+			//       as the same user, creating a different session
+			//    3. Now reload the MediaWiki page. The server will see a valid
+			//       session and skip the fbId variable. However, the client
+			//       will fire the Facebook Login event because a new session
+			//       was picked up, even though the user was also logged in the
+			//       last time the page loaded.
+			// Now, because the JavaScript can't find the fbId variable, it
+			// assumes that the MediaWiki account isn't connected to a Facebook
+			// account and shows the "facebookmergeaccount" form. However, when
+			// this form is retrieved, the new session is synchronized to the
+			// server and the AJAX request is invalid because you can't merge
+			// an account that is already connected to a Facebook user.
+			// 
+			// In and of itself, we skip this extra check and always include
+			// the fbId variable.
+			// 
+			// There must be a prize for finding bugs like this one. Because
+			// seriously, I deserve it.
+			if ( count( $ids ) ) {
 				$vars['fbId'] = strval( $ids[0] );
 			}
 		}

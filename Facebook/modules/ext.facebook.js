@@ -102,6 +102,9 @@
 							// if the server needs a valid access_token immediately, it can be
 							// accomplished by posting the access_token to an AJAX method that
 							// calls $facebook->setPersistentData('access_token', $access_token);
+							// It also might be the case where an AJAX call, even without
+							// explicitly setting the access token, causes this to happen by
+							// automatically synchronizing the new cookie state with the server.
 							//window.location.href = window.location.href;
 							
 							// Because we don't reload, acknowledge the login by hiding the
@@ -114,17 +117,7 @@
 						}
 					} else {
 						// New connection, show a MergeAccount form
-						// 
-						// 2/5/12 - This is showing erratic behavior when the page first
-						// loads. For now, send all traffic directly to Special:Connect.
-						// It seems the root cause is that the AJAX request actually
-						// syncs the Facebook session to the server when it requests the
-						// form. If this is the cause, we can use it to our advantage.
-						// TODO: In FacebookInit::init(), only instantiate the Facebook
-						// API if it isn't an AJAX request. Then, in the AJAX form classes,
-						// instantiate the API *after* we compute the state of authentication.
-						window.getAndShowGetForm();
-						//window.getAndShowGetForm('facebookmergeaccount');
+						window.getAndShowGetForm('facebookmergeaccount');
 					}
 				} else {
 					// User is trying to log in with Facebook. If the user exists, they will
