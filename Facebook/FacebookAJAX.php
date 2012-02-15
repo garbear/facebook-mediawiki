@@ -101,9 +101,9 @@ abstract class ApiFacebookFormQuery extends ApiBase {
  */
 class ApiFacebookChooseName extends ApiFacebookFormQuery {
 	public function execute() {
-		global $wgFbAjax;
+		global $wgFbStreamlineLogin;
 		
-		if ( !empty( $wgFbAjax ) ) {
+		if ( !empty( $wgFbStreamlineLogin ) ) {
 			$params = $this->extractRequestParams();
 			$fbUser = new FacebookUser($params['id']);
 			
@@ -127,9 +127,9 @@ class ApiFacebookChooseName extends ApiFacebookFormQuery {
  */
 class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
 	public function execute() {
-		global $wgFbAjax;
+		global $wgFbStreamlineLogin;
 		
-		if ( !empty( $wgFbAjax ) ) {
+		if ( !empty( $wgFbStreamlineLogin ) ) {
 			$params = $this->extractRequestParams();
 			$fbUser = new FacebookUser($params['id']);
 			
@@ -152,9 +152,9 @@ class ApiFacebookMergeAccount extends ApiFacebookFormQuery {
  */
 class ApiFacebookLogoutAndContinue extends ApiFacebookFormQuery {
 	public function execute() {
-		global $wgFbAjax;
+		global $wgFbStreamlineLogin;
 		
-		if ( !empty( $wgFbAjax ) ) {
+		if ( !empty( $wgFbStreamlineLogin ) ) {
 			$params = $this->extractRequestParams();
 			$fbUser = new FacebookUser($params['id']);
 			$id = $fbUser->getMWUser()->getId();
