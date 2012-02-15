@@ -114,53 +114,6 @@ $wgFbOpenGraphRegisteredActions = array(
 );
 
 /**
- * Here you can define custom objects and actions for your wiki.
- * 
- * By setting $wgFbOpenGraphCustomObjects to true, you can enable custom
- * objects on your wiki. Custom objects allow your wiki to more deeply
- * integrate into the social graph. For example, let's say the Star Wars wiki
- * registered the "spaceship" object on Facebook and included the parser hook
- * <opengraph type="spaceship"/> on the Millennium Falcon page
- * (http://starwars.wikia.com/wiki/Millennium_Falcon). Now, in the Open Graph,
- * this url represents a spaceship instead of an article.
- * 
- * Custom actions allow your users to interact with objects in creative and
- * meaningful ways. In the example above, let's say the Star Wars wiki defines
- * the "drive" action and connects it to the spaceship and landspeeder objects
- * in the Open Graph Dashboard, and then specifies the relationship here:
- *    $wgFbOpenGraphCustomActions['drive'] => array('spaceship', 'landspeeder');
- * 
- * When this action-object connection is made, the user's private activity log
- * (and maybe their friends' new feeds) will say "USER drove the [[Millennium
- * Falcon]]" with a link to the wiki page. Assuming you define some aggregations,
- * a Timeline View for your app will be visible at the top of the user's Timeline.
- * When sufficient connects are made, the user's Timeline will feature a Report
- * showcasing their interactions with your app.
- * 
- * Actions can be placed in your wiki using the same <opengraph> tag:
- * <opengraph action="drive">Drive the {{PAGENAME}}!</opengraph>
- * For further documentation on the <opengraph> tag, refer to:
- * http://www.mediawiki.org/wiki/Extension:Facebook. The actions you registered
- * in $wgFbOpenGraphRegisteredActions can't be used with custom objects.
- * 
- * If your wiki monetizes advertising, action specs can be used in ad targeting
- * to reach out to people based on their actions. For more information see:
- * https://developers.facebook.com/docs/reference/ads-api/action-specs-custom/
- * 
- * Developer's cheat sheet:
- *    $object = FacebookOpenGraph::newObjectFromTitle( $titleObject );
- *    $actions = $object->getCustomActions();
- * 
- * If you're not a developer, pester Facebook to design a <fb:action> social
- * plugin or extend <fb:like> to replace "like" with a custom action.
- */
-$wgFbOpenGraphCustomObjects = false; # set to true to enable the <opengraph> tag
-$wgFbOpenGraphCustomActions = array(
-#	'drive' => array('spaceship', 'landspeeder'), # For example
-#	'want' => array('*'),                         # Matches all custom (non-article and non-file) objects
-);
-
-/**
  * Allow the use of social plugins in wiki text. To learn more about social
  * plugins, please see: https://developers.facebook.com/docs/plugins/.
  *
