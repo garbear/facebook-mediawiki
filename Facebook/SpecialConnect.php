@@ -101,12 +101,16 @@ class SpecialConnect extends SpecialPage {
 	 */
 	public function sendPage($function, $arg = NULL) {
 		global $wgOut;
+		
 		// Setup the page for rendering
 		//wfLoadExtensionMessages( 'Facebook' ); // Deprecated since 1.16
 		$this->setHeaders();
 		$wgOut->disallowUserJs();  # just in case...
-		$wgOut->setRobotPolicy( 'noindex,nofollow' );
+		// Disable page caching (this was messing with users visiting Special:Connect/Debug)
+		$wgOut->setRobotPolicy( 'index,follow' );
+		$wgOut->enableClientCache( false );
 		$wgOut->setArticleRelated( false );
+		
 		// Call the specified function to continue generating the page
 		if (is_null($arg)) {
 			$this->$function();
@@ -330,7 +334,7 @@ class SpecialConnect extends SpecialPage {
 					if ( $fbUser->getMWUser()->getId() ) {
 						// If $wgFbUserRightsFromGroups is set, this should trigger a group check
 						$groups = $fbUser->getMWUser()->getEffectiveGroups();
-						if ( in_array('admin', $groups) || in_array('fb-admin', $groups) ) {
+						if ( in_array('sysop', $groups) || in_array('fb-admin', $groups) ) {
 							$this->sendError('facebook-error', 'facebook-error-application'); // roles
 						} else {
 							global $wgLang, $wgFbUserRightsFromGroup;
@@ -352,6 +356,8 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 				break;
+			} else {
+				die('$wgFbAllowDebug is true. make it false');
 			}
 			// no break
 		/**
