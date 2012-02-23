@@ -55,13 +55,13 @@ class FacebookApplication {
 	 * or developer of the app and must also be an administrator of the wiki.
 	 */
 	function canEdit($fbUser = NULL) {
-		global $facebook;
+		global $facebook, $wgUser;
 		if ( !( $fbUser instanceof FacebookUser ) ) {
 			$fbUser = new FacebookUser();
 		}
 		
 		// First, check MediaWiki permissions. Then check with Facebook
-		if ( !$fbUser->getMWUser()->getId() )
+		if ( $fbUser->getMWUser()->getId() == 0 || $fbUser->getMWUser()->getId() != $wgUser->getId() )
 			return false;
 		
 		// If $wgFbUserRightsFromGroups is set, this should trigger a group check
