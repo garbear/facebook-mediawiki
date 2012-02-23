@@ -356,8 +356,6 @@ class SpecialConnect extends SpecialPage {
 					}
 				}
 				break;
-			} else {
-				die('$wgFbAllowDebug is true. make it false');
 			}
 			// no break
 		/**
