@@ -107,7 +107,7 @@ class SpecialConnect extends SpecialPage {
 		$this->setHeaders();
 		$wgOut->disallowUserJs();  # just in case...
 		// Disable page caching (this was messing with users visiting Special:Connect/Debug)
-		$wgOut->setRobotPolicy( 'index,follow' );
+		$wgOut->setRobotPolicy( 'noindex,nofollow' );
 		$wgOut->enableClientCache( false );
 		$wgOut->setArticleRelated( false );
 		
