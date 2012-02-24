@@ -110,7 +110,7 @@ class FacebookHooks {
 .mw-facebook-logo {
 	background-image: url($wgFbLogo) !important;
 	background-repeat: no-repeat !important;
-	background-position: left top !important;
+	background-position: left center !important;
 	padding-left: 19px !important;
 }
 
