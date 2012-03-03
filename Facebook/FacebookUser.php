@@ -79,13 +79,6 @@ class FacebookUser {
 	static private $userNamePrefix;
 	
 	/**
-	 * Returns the list of user options that can be updated by facebook on each login.
-	 */
-	public function getAvailableUserUpdateOptions() {
-		return self::$availableUserUpdateOptions;
-	}
-	
-	/**
 	 * Constructor: Create this object from a Facebook ID. If the ID isn't
 	 * specified or is 0, the currently logged-in user will be used.
 	 */
@@ -449,7 +442,7 @@ class FacebookUser {
 		
 		// Store which fields should be auto-updated from Facebook when the user logs in.
 		$updateFormPrefix = 'wpUpdateUserInfo';
-		foreach ($this->getAvailableUserUpdateOptions() as $option) {
+		foreach (self::$availableUserUpdateOptions as $option) {
 			/*
 			if ($wgRequest->getVal($updateFormPrefix . $option, '') != '') {
 				$user->setOption("facebook-update-on-login-$option", 1);
