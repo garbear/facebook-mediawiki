@@ -352,7 +352,21 @@ class SpecialConnect extends SpecialPage {
 							));
 						}
 					} else {
-						$this->sendError('facebook-error', 'facebook-errortext'); // Not logged in
+						// Facebook user is not logged in or is not connected to a MediaWiki user
+						// Show special instructions to MediaWiki administrators
+						$isAdmin = false;
+						if ( $wgUser->isLoggedIn() ) {
+							$groups = $wgUser->getEffectiveGroups();
+							if ( in_array('sysop', $groups) || in_array('fb-admin', $groups) ) {
+								$isAdmin = true;
+							}
+						}
+						if ( $isAdmin ) {
+							$this->sendError('facebook-error', 'facebook-error-needs-convert');
+						} else {
+							// Generic validation error
+							$this->sendError('facebook-error', 'facebook-errortext');
+						}
 					}
 				}
 				break;
