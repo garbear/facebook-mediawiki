@@ -40,7 +40,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0.1-stable, Feb 23, 2012' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0.2-stable, March 27, 2012' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
