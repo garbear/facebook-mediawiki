@@ -441,22 +441,18 @@ class FacebookUser {
 		*/
 		
 		// Store which fields should be auto-updated from Facebook when the user logs in.
+		global $wgRequest;
 		$updateFormPrefix = 'wpUpdateUserInfo';
 		foreach (self::$availableUserUpdateOptions as $option) {
-			/*
 			if ($wgRequest->getVal($updateFormPrefix . $option, '') != '') {
 				$user->setOption("facebook-update-on-login-$option", 1);
 			} else {
 				$user->setOption("facebook-update-on-login-$option", 0);
 			}
-			*/
-			// Default all values to true. TODO: Remove this line, defaults are
-			// taken care of by $wgDefaultUserOptions in FacebookInit
-			$this->user->setOption("facebook-update-on-login-$option", 1);
 		}
 		
 		// Process the FacebookPushEvent preference checkboxes if Push Events are enabled
-		global $wgFbEnablePushToFacebook, $wgRequest;
+		global $wgFbEnablePushToFacebook;
 		if( !empty( $wgFbEnablePushToFacebook ) ) {
 			global $wgFbPushEventClasses;
 			if ( !empty( $wgFbPushEventClasses ) ) {
