@@ -424,8 +424,12 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 			
 			$object = FacebookOpenGraph::newObjectFromTitle( $parser->getTitle() );
 			if ( $object ) {
-				if ($object instanceof OpenGraphArticleObject && $object->needsDescription()) {
-					$object->setDescriptionFromText( $text );
+				if ( $object instanceof OpenGraphArticleObject ) {
+					if ( $object->needsDescription() )
+						$object->setDescriptionFromText( $text );
+					// Always search the page for an image. If one isn't found,
+					// the fallback is the site logo.
+					$object->setImageFromText( $text );
 				}
 				foreach ( $object->getProperties() as $property => $content ) {
 					$parser->mOutput->addHeadItem("<meta property=\"$property\" content=\"$content\" />\n", $property);

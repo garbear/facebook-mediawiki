@@ -501,7 +501,7 @@ class OpenGraphArticleObject extends OpenGraphObject {
 		
 		// og:image
 		if ( !isset( $override['og:image'] ) ) {
-			// TODO: attempt to use first image on page, otherwise default to $wgLogo
+			// Default to $wgLogo. This can be overridden with setImageFromText().
 			global $wgServer, $wgLogo;
 			$this->properties['og:image'] = $wgServer . $wgLogo;
 		}
@@ -598,6 +598,14 @@ class OpenGraphArticleObject extends OpenGraphObject {
 	 */
 	public function needsDescription() {
 		return empty( $this->properties['og:description'] );
+	}
+	
+	/**
+	 * Extracts the first linked image from the article's text.
+	 */
+	public function setImageFromText($text) {
+		// TODO: parse page text for the URL of the first <img> tag
+		// $this->properties['og:image'] = $absolute_url;
 	}
 }
 
