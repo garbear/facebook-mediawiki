@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright � 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright © 2008-2012 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -1906,10 +1906,45 @@ Mangyaring pumili ng isang naiiba.',
 );
 
 /** Ukrainian (Українська)
- * @author Тест
+ * @author Oleksa Stasevych
  */
 $messages['uk'] = array(
-	'facebook-email' => 'Адреса електронної пошти',
+	'facebook' => 'Facebook',
+	'facebook-desc' => 'Дозволяє учасникам [[Special:Connect|під’єднуватись]] за допомогою власних облікових записів у [http://www.facebook.com Facebook]. Пропонує автентифікацію на основі груп Facebook, а також використання FBML у вікі-тексті.',
+	'group-fb-user' => 'Учасники, під’єднаний через Facebook',
+	'group-fb-user-member' => 'Учасник, під’єднаний через Facebook',
+	'grouppage-fb-user' => '{{ns:project}}:Учасники, під’єднані через Facebook',
+	'group-fb-groupie' => 'Члени групи',
+	'group-fb-groupie-member' => 'Член групи',
+	'grouppage-fb-groupie' => '{{ns:project}}:Члени групи',
+	'group-fb-officer' => 'Службовці групи',
+	'group-fb-officer-member' => 'Службовець групи',
+	'grouppage-fb-officer' => '{{ns:project}}:Службовці групи',
+	'group-fb-admin' => 'Група адміністраторів',
+	'group-fb-admin-member' => 'Адміністратор групи',
+	'grouppage-fb-admin' => '{{ns:project}}:Адміністратори групи',
+	'facebook-connect' => 'Вхід за допомогою Facebook Connect',
+	'facebook-convert' => 'Під’єднати цей обліковий запис до Facebook',
+	'facebook-title' => 'Під’єднання облікового запису до Facebook',
+	'facebook-cancel' => 'Дію скасовано',
+	'facebook-invalid' => 'Неправильний параметр',
+	'facebook-success' => 'Успішна авторизація за допомогою Facebook',
+	'facebook-nickname' => 'Назвисько',
+	'facebook-fullname' => 'Повне ім’я',
+	'facebook-email' => 'Електронна пошта',
 	'facebook-language' => 'Мова',
+	'facebook-timecorrection' => 'Часовий пояс (у годинах)',
+	'facebook-chooselegend' => 'Вибір імені користувача',
+	'facebook-chooseinstructions' => 'Кожний учасник має мати назвисько. Ви можете вибрати одне із запропонованих нижче.',
+	'facebook-choosenick' => 'Ім’я вашого профілю у Facebook ($1)',
+	'facebook-choosefirst' => 'Ваше ім’я ($1)',
+	'facebook-choosefull' => 'Ваше повне ім’я ($1)',
+	'facebook-chooseauto' => 'Автоматично створене ім’я ($1)',
+	'facebook-choosemanual' => 'Ім’я на ваш вибір:',
+	'facebook-chooseexisting' => 'Обліковий запис у вікі',
+	'facebook-chooseusername' => 'Ім’я учасника:',
 	'facebook-choosepassword' => 'Пароль:',
+	'facebook-updateuserinfo' => 'Поновіть ці персональні дані:',
+	'facebook-error-creating-user' => 'Помилка під час створення користувача у локальній базі даних.',
+	'facebook-prefstext' => 'Facebook Connect',
 );
