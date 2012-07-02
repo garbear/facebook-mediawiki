@@ -87,7 +87,7 @@ class SpecialConnect extends SpecialPage {
 		
 		$title = Title::newFromText($this->mReturnTo);
 		if ($title instanceof Title) {
-			$resolvedReturnTo = strtolower(SpecialPage::resolveAlias($title->getDBKey()));
+			$resolvedReturnTo = strtolower(array_shift(SpecialPageFactory::resolveAlias($title->getDBKey())));
 			if (in_array( $resolvedReturnTo, array('userlogout', 'signup', 'connect') )) {
 				$titleObj = Title::newMainPage();
 				$this->mReturnTo = $titleObj->getText();
