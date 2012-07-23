@@ -1211,8 +1211,6 @@ $messages['lb'] = array(
 	'facebook-click-to-login' => 'Klickt fir Iech iwwer Facebook op dësem Site anzeloggen',
 	'facebook-click-to-connect-existing' => 'Klickt fir Äre Facebook-Kont mat $1 ze verbannen',
 	'facebook-conv' => 'Bequemlechkeet',
-	'facebook-convdesc' => "Verbonne Benotzer ginn automatesch ageloggt.
-Wann d'Autorisatioun virläit kann dës Wiki esouguer Facebook als E-Mail-Proxy benotzen esou datt Dir weiderhi wichteg Matdeelunge kréie kënnt ouni Är E-Mailadress präiszeginn.",
 	'facebook-fbml' => 'Facebook-Markup Sprooch',
 	'facebook-comm' => 'Kommunikatioun',
 	'facebook-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
