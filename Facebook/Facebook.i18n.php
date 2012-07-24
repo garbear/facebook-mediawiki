@@ -193,7 +193,6 @@ After a user enters their username/password, this will slide them over to the ne
  * @author Naudefj
  */
 $messages['af'] = array(
-	'facebook-comm' => 'Kommunikasie',
 	'facebook-error' => 'Verifikasiefout',
 	'facebook-invalid' => 'Ongeldige opsie',
 	'facebook-nickname' => 'Bynaam',
@@ -359,9 +358,6 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'group-fb-admin-member' => 'Administrator grupe',
 	'facebook-connect' => 'Prijavite se sa Facebook Connect',
 	'facebook-title' => 'Spajanje računa sa Facebook',
-	'facebook-click-to-login' => 'Kliknite da se prijavite na ovu stranicu preko Facebooka',
-	'facebook-click-to-connect-existing' => 'Kliknite da spojite vaš Facebook račun na $1',
-	'facebook-comm' => 'Komunikacija',
 	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Spoji svoj wiki račun sa svojim Facebook ID',
 	'facebook-cancel' => 'Akcija obustavljena',
@@ -376,7 +372,6 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
  * @author Jkjk
  */
 $messages['cs'] = array(
-	'facebook-fbml' => 'Soubor značek Facebook',
 	'facebook-error' => 'Chyba ověření',
 	'facebook-errortext' => 'Vyskytla se chyba během ověření s Facebook Connect.',
 	'facebook-cancel' => 'Akce zrušena',
@@ -491,9 +486,6 @@ $messages['dsb'] = array(
 	'group-fb-admin' => 'Kupkowe administratory',
 	'group-fb-admin-member' => 'Kupkowy administrator',
 	'grouppage-fb-admin' => '{{ns:project}}:Kupkowe administratory',
-	'facebook-conv' => 'Komfortabelnosć',
-	'facebook-fbml' => 'Wobznamjeńska rěc Facebook',
-	'facebook-comm' => 'Komunikacija',
 	'facebook-cancel' => 'akcija pśetergnjona',
 	'facebook-invalid' => 'Njepłaśiwa akcija',
 	'facebook-nickname' => 'Pśimě',
@@ -533,7 +525,6 @@ $messages['eo'] = array(
 	'facebook-connect' => 'Ensaluti kun Facebook-Konekto',
 	'facebook-convert' => 'Konekti ĉi tiun konton kun Facebook',
 	'facebook-title' => 'Konekti konton kun Facebook',
-	'facebook-comm' => 'Komunikado',
 	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Kunigi vian vikikonton kun via Facebook-identigo',
 	'facebook-invalid' => 'Malvalida elekto',
@@ -624,7 +615,6 @@ $messages['eu'] = array(
 	'facebook-connect' => 'Facebook Konexioarekin saioa hasi',
 	'facebook-convert' => 'Kontu hau Facebookekin lotu',
 	'facebook-title' => 'Kontua Facebookekin  lotu',
-	'facebook-comm' => 'Komunikazioa',
 	'facebook-nickname' => 'Ezizena',
 	'facebook-fullname' => 'Izen osoa',
 	'facebook-email' => 'E-posta helbidea',
@@ -658,7 +648,6 @@ Tarjoaa tunnistautumisen Facebook-ryhmiin pohjautuen ja antaa käyttää FBML-ko
 	'facebook-connect' => 'Kirjaudu sisään Facebook Connectin avulla',
 	'facebook-convert' => 'Yhdistä tämä tili Facebookiin',
 	'facebook-title' => 'Yhdistä tili Facebookin kanssa',
-	'facebook-click-to-login' => 'Kirjaudu tälle sivustolle Facebookin avulla napsauttamalla',
 	'facebook-choosenick' => 'Facebook-profiilisi nimi ($1)',
 	'facebook-choosefirst' => 'Etunimesi ($1)',
 	'facebook-choosefull' => 'Koko nimesi ($1)',
@@ -856,10 +845,6 @@ $messages['he'] = array(
 	'group-fb-user-member' => 'משתמש Facebook Connect',
 	'facebook-connect' => 'כניסה עם Facebook Connect',
 	'facebook-title' => 'קישור חשבון ל־Facebook',
-	'facebook-click-to-login' => 'נא ללחוץ כדי להיכנס לאתר זה דרך Facebook',
-	'facebook-conv' => 'נוחות',
-	'facebook-fbml' => 'שפת הסימון של Facebook',
-	'facebook-comm' => 'תקשורת',
 	'facebook-error' => 'שגיאת אימות',
 	'facebook-errortext' => 'אירעה שגיאה במהלך האימות מול Facebook Connect.',
 	'facebook-cancel' => 'הפעולה בוטלה',
@@ -966,10 +951,6 @@ $messages['hu'] = array(
 	'facebook-connect' => 'Bejelentkezés a Facebook Connecttel',
 	'facebook-convert' => 'Fiók összekötése a Facebookkal',
 	'facebook-title' => 'Fiók összekötése a Facebookkal',
-	'facebook-click-to-login' => 'Bejelentkezés az oldalra Facebookon keresztül',
-	'facebook-conv' => 'Kényelem',
-	'facebook-fbml' => 'Facebook-jelölőnyelv',
-	'facebook-comm' => 'Kommunikáció',
 	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Wikis fiók összekötése facebookos azonosítóval',
 	'facebook-error' => 'Hiba az ellenőrzés során',
@@ -1125,9 +1106,6 @@ Silakan memilih yang berbeda.',
 $messages['it'] = array(
 	'group-fb-groupie' => 'Membri del gruppo',
 	'group-fb-groupie-member' => 'Membri del gruppo',
-	'facebook-click-to-login' => 'Fare clic per accedere a questo sito tramite Facebook',
-	'facebook-click-to-connect-existing' => 'Clicca per collegare il tuo account Facebook a $1',
-	'facebook-comm' => 'Comunicazione',
 	'facebook-error' => 'Errore di verifica',
 	'facebook-nickname' => 'Nickname',
 	'facebook-fullname' => 'Nome completo',
@@ -1222,13 +1200,6 @@ $messages['lb'] = array(
 	'facebook-connect' => 'Mat Facebook-Connect aloggen',
 	'facebook-convert' => 'Dëse Kont mat Facebook verbannen',
 	'facebook-title' => 'Kont mat Facebook verbannen',
-	'facebook-click-to-login' => 'Klickt fir Iech iwwer Facebook op dësem Site anzeloggen',
-	'facebook-click-to-connect-existing' => 'Klickt fir Äre Facebook-Kont mat $1 ze verbannen',
-	'facebook-conv' => 'Bequemlechkeet',
-	'facebook-fbml' => 'Facebook-Markup Sprooch',
-	'facebook-comm' => 'Kommunikatioun',
-	'facebook-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
-Kuckt wie vun Äre Frënn d'Wiki benotzt, a virun allem deelt Är Aktioune mat Äre Frënn iwwer d'Facebook-Newsfeed.",
 	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Verbannt Äre Wiki-Kont mat Ärer Facebook-ID',
 	'facebook-usernameprefix' => 'Facebook-Benotzer',
@@ -1713,9 +1684,6 @@ $messages['ro'] = array(
 	'group-fb-admin' => 'Administratori de grup',
 	'group-fb-admin-member' => 'Administrator grup',
 	'facebook-connect' => 'Conectare cu Facebook Connect',
-	'facebook-click-to-login' => 'Apasă pentru a vă autentifica pe acest site prin Facebook',
-	'facebook-click-to-connect-existing' => 'Apăsaţi pentru a vă conecta contul dvs. Facebook la $1',
-	'facebook-comm' => 'Comunicaţie',
 	'facebook-error' => 'Eroare la verificare',
 	'facebook-cancel' => 'Acţiune anulată',
 	'facebook-invalid' => 'Opţiune invalidă',
