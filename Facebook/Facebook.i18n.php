@@ -250,6 +250,7 @@ $messages['be-tarask'] = array(
 	'facebook-connect' => 'Увайсьці ў сыстэму праз злучэньне Facebook',
 	'facebook-convert' => 'Злучыць гэты рахунак і Facebook',
 	'facebook-title' => 'Злучыць рахунак з Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Аб’яднаць Ваш вікі-рахунак з Вашым ідэнтыфікатарам Facebook',
 	'facebook-error' => 'Памылка праверкі',
 	'facebook-errortext' => 'Узьнікла памылка падчас праверкі са злучэньнем Facebook.',
@@ -310,6 +311,7 @@ Kinnig a ra ur gwiriekadur diazezet war strolladoù Facebook hag implij FBML en 
 	'facebook-connect' => 'Kevreañ gant Facebook Connect',
 	'facebook-convert' => "Kevreañ ar c'hont-mañ gant Facebook",
 	'facebook-title' => 'Kont kevreañ gant Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Kendeuziñ ho kont wiki gant ho ker-anaout Facebook.',
 	'facebook-error' => 'Fazi gwiriañ',
 	'facebook-errortext' => "C'hoarvezet ez eus ur fazi e-ser gwiriañ gant Facebook connect",
@@ -360,6 +362,7 @@ Nudi autentifikaciju zasnovanu na Facebook grupama i korištenju FBML u wiki tek
 	'facebook-click-to-login' => 'Kliknite da se prijavite na ovu stranicu preko Facebooka',
 	'facebook-click-to-connect-existing' => 'Kliknite da spojite vaš Facebook račun na $1',
 	'facebook-comm' => 'Komunikacija',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Spoji svoj wiki račun sa svojim Facebook ID',
 	'facebook-cancel' => 'Akcija obustavljena',
 	'facebook-invalid' => 'Nevaljana opcija',
@@ -428,6 +431,7 @@ Zudem wird die Authentifizierung basierend auf Facebook-Gruppen und der Einsatz 
 	'facebook-connect' => 'Anmelden mit Facebook Connect',
 	'facebook-convert' => 'Dieses Konto mit Facebook verknüpfen',
 	'facebook-title' => 'Konto mit Facebook verknüpfen',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Das Wikikonto mit der Facebook-ID verknüpfen',
 	'facebook-usernameprefix' => 'Facebook-Benutzer',
 	'facebook-error' => 'Überprüfungsfehler',
@@ -530,6 +534,7 @@ $messages['eo'] = array(
 	'facebook-convert' => 'Konekti ĉi tiun konton kun Facebook',
 	'facebook-title' => 'Konekti konton kun Facebook',
 	'facebook-comm' => 'Komunikado',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Kunigi vian vikikonton kun via Facebook-identigo',
 	'facebook-invalid' => 'Malvalida elekto',
 	'facebook-nickname' => 'Kromnomo',
@@ -574,6 +579,7 @@ Ofrece autenticación basada en grupos de Facebook y usa FBML en texto wiki',
 	'facebook-connect' => 'Inicia sesión con Facebook Connect',
 	'facebook-convert' => 'Conectar esta cuenta con Facebook',
 	'facebook-title' => 'Conectar esta cuenta con Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fusiona tu wiki cuenta con tu identificador de Facebook',
 	'facebook-error' => 'Error de verificación',
 	'facebook-errortext' => 'Se produjo un error durante la verificación con Facebook Connect.',
@@ -690,6 +696,7 @@ $messages['fr'] = array(
 	'facebook-connect' => 'Se connecter avec Facebook Connect',
 	'facebook-convert' => 'Connecter ce compte avec Facebook',
 	'facebook-title' => 'Connecter un compte avec Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fusionner votre compte wiki avec votre identifiant Facebook',
 	'facebook-error' => 'Erreur de vérification',
 	'facebook-errortext' => 'Une erreur s’est produite lors de la vérification avec Facebook Connect.',
@@ -747,6 +754,7 @@ Ofrece unha autenticación baseada en grupos do Facebook e o uso de FBML no text
 	'facebook-connect' => 'Identificarse co Facebook Connect',
 	'facebook-convert' => 'Conectar esta conta co Facebook',
 	'facebook-title' => 'Conectar a conta co Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fusionar a súa conta wiki co ID do Facebook',
 	'facebook-error' => 'Erro de verificación',
 	'facebook-errortext' => 'Houbo un erro durante a comprobación co Facebook Connect.',
@@ -804,6 +812,7 @@ Macht e Authentifizierig megli, wu uf Facebook-Gruppe basiert, un dr Yysatz vu F
 	'facebook-connect' => 'Aamälde iber Facebook Connect',
 	'facebook-convert' => 'Des Konto mit Facebook verbinde',
 	'facebook-title' => 'Konto mit Facebook verbinde',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'S Wikikonto mit dr Facebook-ID zämmefiere',
 	'facebook-error' => 'Iberpriefigsfähler',
 	'facebook-errortext' => 'E Fähler isch bi dr Iberpriefig mit Facebook Connect ufträtte.',
@@ -900,6 +909,7 @@ $messages['hsb'] = array(
 	'facebook-connect' => 'Přez Facebook Connect přizjewić',
 	'facebook-convert' => 'Tute konto z Facebookom zwjazać',
 	'facebook-title' => 'Konto z Facebookom zwjazać',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Twoje wikikonto z twojim Facebook-ID zwjazać',
 	'facebook-error' => 'Pruwowanski zmylk',
 	'facebook-errortext' => 'Při přepruwowanju přez Facebook Connect je zmylk wustupił.',
@@ -960,6 +970,7 @@ $messages['hu'] = array(
 	'facebook-conv' => 'Kényelem',
 	'facebook-fbml' => 'Facebook-jelölőnyelv',
 	'facebook-comm' => 'Kommunikáció',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Wikis fiók összekötése facebookos azonosítóval',
 	'facebook-error' => 'Hiba az ellenőrzés során',
 	'facebook-errortext' => 'Hiba történt a Facebook Connect ellenőrzése közben.',
@@ -1012,6 +1023,7 @@ Offere authentication a base de gruppos de Facebook e le uso de FBML in texto wi
 	'facebook-connect' => 'Aperir session con Facebook Connect',
 	'facebook-convert' => 'Connecter iste conto con Facebook',
 	'facebook-title' => 'Connecter le conto con Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fusionar tu conto wiki con tu ID de Facebook',
 	'facebook-error' => 'Error de verification',
 	'facebook-errortext' => 'Un error occurreva durante le verification con Facebook Connect.',
@@ -1070,6 +1082,7 @@ Memberikan autentikasi berdasarkan grup Facebook dan penggunaan FBML dalam teks 
 	'facebook-connect' => 'Masuk dengan Facebook Connect',
 	'facebook-convert' => 'Hubungkan akun ini dengan Facebook',
 	'facebook-title' => 'Hubungkan akun dengan Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Gabungkan akun wiki dengan ID Facebook Anda',
 	'facebook-error' => 'Kesalahan verifikasi',
 	'facebook-errortext' => 'Kesalahan terjadi sewaktu verifikasi dengan Facebook Connect.',
@@ -1152,6 +1165,7 @@ $messages['ja'] = array(
 	'facebook-connect' => 'Facebook接続でログイン',
 	'facebook-convert' => 'このアカウントにFacebookで接続',
 	'facebook-title' => 'Facebookでアカウントに接続',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'FacebookのIDを使用して、ウィキ上の自分のアカウントを統合',
 	'facebook-error' => '検証エラー',
 	'facebook-errortext' => 'Facebook接続で認証中にエラーが発生しました。',
@@ -1215,6 +1229,7 @@ $messages['lb'] = array(
 	'facebook-comm' => 'Kommunikatioun',
 	'facebook-commdesc' => "Facebook-Connect erlaabt e ganz neien Niveau vu Networking.
 Kuckt wie vun Äre Frënn d'Wiki benotzt, a virun allem deelt Är Aktioune mat Äre Frënn iwwer d'Facebook-Newsfeed.",
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Verbannt Äre Wiki-Kont mat Ärer Facebook-ID',
 	'facebook-usernameprefix' => 'Facebook-Benotzer',
 	'facebook-error' => 'Feeler bei der Iwwerpréifung',
@@ -1272,6 +1287,7 @@ $messages['mk'] = array(
 	'facebook-connect' => 'Најава со Facebook Connect',
 	'facebook-convert' => 'Поврзи ја оваа сметка со Facebook',
 	'facebook-title' => 'Поврзи ја сметката преку Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Спојте ја Вашата вики-сметка со Вашата назнака (ID) на Facebook',
 	'facebook-usernameprefix' => 'FacebookUser',
 	'facebook-error' => 'Грешка при потврдувањето',
@@ -1345,6 +1361,7 @@ Maakt het mogelijk om aan te melden met de Facebookgebruiker en FBML te gebruike
 	'facebook-connect' => 'Aanmelden via Facebook Connect',
 	'facebook-convert' => 'Deze gebruiker met Facebook verbinden',
 	'facebook-title' => 'Gebruiker verbinden met Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Voeg uw wikigebruiker samen met uw Facebookgebruiker',
 	'facebook-error' => 'Controlefout',
 	'facebook-errortext' => 'Er is een fout opgetreden tijdens de verificatie via Facebook Connect.',
@@ -1413,6 +1430,7 @@ Tilbyr autentisering basert på Facebookgrupper og bruken av FBML i wikitekst',
 	'facebook-connect' => 'Logg inn med Facebook Connect',
 	'facebook-convert' => 'Koble til denne kontoen med Facebook',
 	'facebook-title' => 'Koble til konto med Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Slå sammen wikikontoen din med din Facebook-ID',
 	'facebook-usernameprefix' => 'FacebookBruker',
 	'facebook-error' => 'Bekreftelsesfeil',
@@ -1471,6 +1489,7 @@ Umożliwia uwierzytelnianie w oparciu o grupy Facebooka i wykorzystanie FBML w t
 	'facebook-connect' => 'Zaloguj przy pomocy Facebook Connect',
 	'facebook-convert' => 'Połącz to konto z Facebookiem',
 	'facebook-title' => 'Połącz konto z Facebookiem',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Połącz swoje konto wiki ze swoim identyfikatorem w Facebooku.',
 	'facebook-error' => 'Błąd weryfikacji',
 	'facebook-errortext' => 'Wystąpił błąd podczas weryfikacji przez Facebook Connect.',
@@ -1529,6 +1548,7 @@ A eufr n'autenticassion basà an sle partìe Facebook e l'utilisassion ëd FBML 
 	'facebook-connect' => 'Intré an Facebook Connect',
 	'facebook-convert' => 'Colega sto cont con Facebook',
 	'facebook-title' => 'Coleghé un cont con Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Mës-cé sò cont wiki con sò identificativ Facebook',
 	'facebook-error' => 'Eror ëd verìfica',
 	'facebook-errortext' => "A l'é capitaje n'eror durant la verìfica con Facebook Connect.",
@@ -1587,6 +1607,7 @@ $messages['pt'] = array(
 	'facebook-connect' => 'Autenticação com o Facebook Connect',
 	'facebook-convert' => 'Ligar esta conta ao Facebook',
 	'facebook-title' => 'Ligar conta ao Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
 	'facebook-error' => 'Erro de verificação',
 	'facebook-errortext' => 'Ocorreu um erro durante a verificação com o Facebook Connect.',
@@ -1644,6 +1665,7 @@ $messages['pt-br'] = array(
 	'facebook-connect' => 'Autenticação com o Facebook Connect',
 	'facebook-convert' => 'Ligar esta conta ao Facebook',
 	'facebook-title' => 'Ligar conta ao Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Fundir a conta wiki com o seu ID no Facebook',
 	'facebook-error' => 'Erro de verificação',
 	'facebook-errortext' => 'Ocorreu um erro durante a verificação com o Facebook Connect.',
@@ -1794,6 +1816,7 @@ $messages['sv'] = array(
 	'facebook-connect' => 'Logga in med Facebook Connect',
 	'facebook-convert' => 'Anslut detta konto med Facebook',
 	'facebook-title' => 'Anslut kontot med Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Koppla din wiki konto med ditt Facebook-ID',
 	'facebook-error' => 'Verifieringsfel',
 	'facebook-errortext' => 'Ett fel uppstod under kontroll med Facebook Connect.',
@@ -1867,6 +1890,7 @@ Nagbibigay ng pagpapatunay batay sa mga pangkat sa Facebook at ang paggamit ng F
 	'facebook-connect' => 'Lumagdang may Ugnay sa Facebook',
 	'facebook-convert' => 'Iugnay ang akawnt na ito sa Facebook',
 	'facebook-title' => 'Iugnay ang akawnt sa Facebook',
+	/* facebook-merge is deprecated */
 	'facebook-merge' => 'Isanib ang iyong akawnt na pangwiki sa iyong ID na pang-Facebook',
 	'facebook-usernameprefix' => 'Tagagamit ng Facebook',
 	'facebook-error' => 'Kamalian sa pagpapatunay',
