@@ -5,3 +5,7 @@
 
 # Copy of config.default.php
 config.php
+.svn
+*~
+*.kate-swp
+.*.swp
