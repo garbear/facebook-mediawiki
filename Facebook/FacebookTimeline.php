@@ -62,7 +62,7 @@ class FacebookTimeline {
 								$object->getType() => $object->getUrl(),
 						));
 					} catch ( FacebookApiException $e ) {
-						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 					}
 				}
 			}
@@ -88,7 +88,7 @@ class FacebookTimeline {
 									$object->getType() => $object->getUrl(),
 							));
 						} catch ( FacebookApiException $e ) {
-							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
@@ -120,7 +120,7 @@ class FacebookTimeline {
 								$object->getType() => $object->getUrl(),
 						));
 					} catch ( FacebookApiException $e ) {
-						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 					}
 				}
 			}
@@ -154,7 +154,7 @@ class FacebookTimeline {
 										$object->getType() => $object->getUrl(),
 								));
 							} catch ( FacebookApiException $e ) {
-								// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+								echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 							}
 						}
 					}
@@ -168,7 +168,7 @@ class FacebookTimeline {
 									$object->getType() => $object->getUrl(),
 							));
 						} catch ( FacebookApiException $e ) {
-							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
@@ -198,7 +198,7 @@ class FacebookTimeline {
 												$object->getType() => $object->getUrl(),
 										));
 									} catch ( FacebookApiException $e ) {
-										// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 									}
 								}
 							} else if ( self::getAction('edit') ) {
@@ -210,7 +210,7 @@ class FacebookTimeline {
 												$object->getType() => $object->getUrl(),
 										));
 									} catch ( FacebookApiException $e ) {
-										// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+										echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 									}
 								}
 							}
@@ -227,7 +227,7 @@ class FacebookTimeline {
 									$object->getType() => $object->getUrl(),
 							));
 						} catch ( FacebookApiException $e ) {
-							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
@@ -275,7 +275,7 @@ class FacebookTimeline {
 									$object->getType() => $object->getUrl(),
 							));
 						} catch ( FacebookApiException $e ) {
-							// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+							echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 						}
 					}
 				}
@@ -301,7 +301,7 @@ class FacebookTimeline {
 								$object->getType() => $object->getUrl(),
 						));
 					} catch ( FacebookApiException $e ) {
-						// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+						echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 					}
 				}
 			}
@@ -322,7 +322,7 @@ class FacebookTimeline {
 				try {
 					self::removeAction( 'watch', $object );
 				} catch ( FacebookApiException $e ) {
-					// echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
+					echo $e->getType() . ": " . $e->getMessage() . "<br/>\n";
 				}
 			}
 		}
