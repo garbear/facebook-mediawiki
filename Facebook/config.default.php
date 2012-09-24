@@ -26,7 +26,7 @@
  */
 $wgFbAppId          = 'YOUR_APP_ID';    # Change this!
 $wgFbSecret         = 'YOUR_SECRET';    # Change this!
-$wfFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
+$wgFbNamespace      = 'YOUR_NAMESPACE'; # Change this too
 //$wgFbPageId       = 'YOUR_PAGE_ID';   # Optional
 
 /**
