@@ -27,7 +27,7 @@
  * @file
  * @ingroup Extensions
  * @author Garrett Brown, Sean Colombo
- * @copyright Copyright � 2008-2012 Garrett Brown, Sean Colombo
+ * @copyright Copyright © 2008-2012 Garrett Brown, Sean Colombo
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
@@ -40,7 +40,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 }
 
 // Facebook version
-define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0.5-stable, September 24, 2012' );
+define( 'MEDIAWIKI_FACEBOOK_VERSION', '4.0.6-stable, September 28, 2012' );
 
 // Magic string to use in substitution (must be defined prior to including config.php).
 define( 'FACEBOOK_LOCALE', '%LOCALE%');
