@@ -49,7 +49,7 @@
 					var doit = confirm("Press OK to to update the " + title + " of your Facebook application to " + correct);
 					// Make sure the FB object has been loaded from Facebook
 					if (doit && FB) {
-						FB.api('/' + id + '?' + field + '=' + correct, 'POST', {
+						FB.api('/' + id + '?' + field + '=' + encodeURIComponent(correct), 'POST', {
 							access_token: app_access_token
 						}, function(response) {
 							if (response && !response.error) {
