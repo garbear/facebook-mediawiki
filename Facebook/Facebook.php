@@ -105,7 +105,7 @@ $wgAutopromote['fb-user'] = APCOND_FB_USER;
 $wgGroupPermissions['fb-user'] = array('facebook-user' => true);
 
 // These hooks need to be hooked up prior to init() because runhooks may be called for them before init is run.
-$wgFbHooksToAddImmediately = array( 'SpecialPage_initList', 'LanguageGetMagic' );
+$wgFbHooksToAddImmediately = array( 'SpecialPage_initList', 'LanguageGetMagic', 'GetPreferences' );
 foreach( $wgFbHooksToAddImmediately as $hookName ) {
 	$wgHooks[$hookName][] = "FacebookHooks::$hookName";
 }

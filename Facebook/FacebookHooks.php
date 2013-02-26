@@ -908,4 +908,46 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		return true;
 	} // initPreferencesExtensionForm hook
 	/**/
+
+        public static function GetPreferences( $user, &$preferences ) {
+		if ( !self::showLogin() ) {
+			$preferences['facebook-update-on-login-fullname'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-fullname',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-gender'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-gender',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-nickname'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-nickname',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-email'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-email',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-language'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-language',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-timecorrection'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-timecorrection',
+		        	'section' => 'facebook/general',
+			);
+		}
+
+      		return true;
+	}
 }
