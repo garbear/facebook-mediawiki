@@ -833,7 +833,7 @@ class SpecialConnect extends SpecialPage {
 		
 		// Add an option to debug Open Graph objects
 		$html .= '
-<form action="' . $this->getTitle('Debug')->getLocalUrl() . '" method="POST" style="padding-left:14px;">
+<form action="' . $this->getPageTitle('Debug')->getLocalUrl() . '" method="POST" style="padding-left:14px;">
 	<h3>' . wfMsg('facebook-object-debug-title') . '</h3>
 	<label for="wpPageName"><p>' . wfMsg('facebook-object-debug') . '</p></label>
 	<input name="wpPageName" id="wpPageName" size="42" value="" style="font-size:1.75em;" /> &nbsp;
@@ -1025,7 +1025,7 @@ class SpecialConnect extends SpecialPage {
 		$html = wfMsgWikiHtml( $messageKey );
 		
 		$html .= '
-<form action="' . $this->getTitle('ChooseName')->getLocalUrl() . '" method="POST">
+<form action="' . $this->getPageTitle('ChooseName')->getLocalUrl() . '" method="POST">
 	<fieldset id="mw-facebook-choosename">
 		<legend>' . wfMsg('facebook-chooselegend') . '</legend>
 		<table>';
@@ -1225,7 +1225,7 @@ class SpecialConnect extends SpecialPage {
 		global $wgSitename;
 		
 		$html = '
-<form action="' . $this->getTitle('MergeAccount')->getLocalUrl() . '" method="POST">
+<form action="' . $this->getPageTitle('MergeAccount')->getLocalUrl() . '" method="POST">
 	<fieldset id="mw-facebook-chooseoptions">
 		<legend>' . wfMsg('facebook-updatelegend') . '</legend>
 		' . wfMsgExt('facebook-merge-text', 'parse', array('$1' => $wgSitename )) .
@@ -1301,7 +1301,7 @@ class SpecialConnect extends SpecialPage {
 ' . wfMsgExt('facebook-continue-text', 'parse', array(
 	'$1' => '[[' . $wgContLang->getNsText( NS_USER ) . ":$username|$username]]")
 ) . '
-<form action="' . $this->getTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">
+<form action="' . $this->getPageTitle('LogoutAndContinue')->getLocalUrl() . '" method="post">
 	<input type="submit" value="' . wfMsg( 'facebook-continue-button' ) . '" />';
 		if ( !empty( $this->mReturnTo ) ) {
 			$html .= '
