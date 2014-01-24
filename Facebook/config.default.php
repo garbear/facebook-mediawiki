@@ -207,7 +207,7 @@ $wgFbAlwaysShowLogin = false;
  * The Facebook icon. You can copy this image to your server if you want, or
  * set to false to disable.
  */
-$wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
+$wgFbLogo = '//static.ak.fbcdn.net/images/icons/favicon.gif';
 
 /**
  * URL of the Facebook JavaScript SDK. If the URL includes the token %LOCALE%
@@ -221,7 +221,7 @@ $wgFbLogo = 'http://static.ak.fbcdn.net/images/icons/favicon.gif';
  * multiple languages, you will also need to host localized versions. For a list
  * of locales supported by Facebook, see FacebookLanguage.php.
  */
-$wgFbScript = 'https://connect.facebook.net/%LOCALE%/all.js';
+$wgFbScript = '//connect.facebook.net/%LOCALE%/all.js';
 
 /**
  * Location of the extension script (MediaWiki <= 1.16). If you override, it
