@@ -170,6 +170,14 @@ It looks like you\'ve just disconnected your account from Facebook.
 We\'ve kept all of your history, edit points and achievements intact, so don\'t worry!
 
 You can use the same username and password as you did before you connected.',
+        'pref-facebook-update-on-login-fullname' => 'Update full name on login',
+        'pref-facebook-update-on-login-gender' => 'Update gender on login',
+        'pref-facebook-update-on-login-nickname' => 'Update nickname on login',
+        'pref-facebook-update-on-login-email' => 'Update E-Mail Adress on login',
+        'pref-facebook-update-on-login-language' => 'Update language on login',
+        'pref-facebook-update-on-login-timecorrection' => 'Update timezone on login',
+	'prefs-facebook' => 'Facebook Connect',
+	'prefs-general' => 'General',
 );
 
 /**
@@ -461,6 +469,14 @@ Bitte einen anderen auswählen.',
 	'facebook-link-to-profile' => 'Facebook-Profil',
 	'facebook-prefsheader' => "Einstellungen zu den Aktionen, die über den eigenen Facebook-Newsfeed ausgegeben werden sollen: <a id='facebookPushEventBar_show' href='#'>Einstellungen anzeigen</a> <a id='facebookPushEventBar_hide' href='#' style='display:none'>Einstellungen ausblenden</a>",
 	'facebook-prefs-can-be-updated' => 'Sie können jederzeit aktualisiert werden, indem man sie unter der Registerkarte „$1“ auf der Seite Einstellungen ändert.',
+        'pref-facebook-update-on-login-fullname' => 'Abgleich des Bürgerlichen Namens beim Login',
+        'pref-facebook-update-on-login-gender' => 'Abgleich Geschlechtes des beim Login',
+        'pref-facebook-update-on-login-nickname' => 'Abgleich des Nickname beim Login',
+        'pref-facebook-update-on-login-email' => 'Abgleich der E-Mail Adresse beim Login',
+        'pref-facebook-update-on-login-language' => 'Abgleich der Spracheinstellungen beim Login',
+        'pref-facebook-update-on-login-timecorrection' => 'Abgleich der Zeitzone beim Login',
+	'prefs-facebook' => 'Facebook Connect',
+	'prefs-general' => 'Allgemein',
 );
 
 /** German (formal address) (Deutsch (Sie-Form))

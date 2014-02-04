@@ -474,7 +474,7 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 	}
 	
 	/**
-	 * Modify the user's persinal toolbar (in the upper right).
+	 * Modify the user's personal toolbar (in the upper right).
 	 */
 	public static function PersonalUrls( &$personal_urls, &$title ) {
 		global $wgUser, $wgFbUseRealName, $wgFbDisableLogin;
@@ -908,4 +908,58 @@ $wgJsMimeType . '";js.src="' . self::getFbScript() .
 		return true;
 	} // initPreferencesExtensionForm hook
 	/**/
+
+        public static function GetPreferences( $user, &$preferences ) {
+		$id = FacebookDB::getFacebookIDs($user, DB_MASTER);
+		if (  count($id) > 0 ) {
+			$preferences['facebook-update-on-login-fullname'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-fullname',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-gender'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-gender',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-nickname'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-nickname',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-email'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-email',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-language'] = array(
+		        	'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-language',
+			        'section' => 'facebook/general',
+			);
+
+			$preferences['facebook-update-on-login-timecorrection'] = array(
+			        'type' => 'toggle',
+			        'label-message' => 'pref-facebook-update-on-login-timecorrection',
+		        	'section' => 'facebook/general',
+			);
+                } else {
+                        $connectlink = $user->getSkin()->link( SpecialPage::getTitleFor( 'Connect' ),
+                                 wfMsgHtml( 'facebook-connect' ), array(),
+                                array( 'returnto' => SpecialPage::getTitleFor( 'Preferences' ) ) );
+                  
+                        $preferences['facebook-connect'] = array(
+                                          'type' => 'info',
+                                          'raw' => true,
+                                          'default' => $connectlink,
+                                          'section' => 'facebook/general',
+                        );
+                }
+
+      		return true;
+	}
 }
